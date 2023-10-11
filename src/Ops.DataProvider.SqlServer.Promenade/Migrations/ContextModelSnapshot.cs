@@ -17,7 +17,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "7.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -866,6 +866,21 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.HasIndex("LocationId");
 
                     b.ToTable("LocationFeatures");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.LocationForm", b =>
+                {
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FormId")
+                        .HasColumnType("int");
+
+                    b.HasKey("LocationId", "FormId");
+
+                    b.HasIndex("FormId");
+
+                    b.ToTable("LocationForms");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.LocationGroup", b =>
@@ -1888,6 +1903,102 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.ToTable("UrlRedirectAccesses");
                 });
 
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.VolunteerForm", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("HeaderSegmentId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("NotifyStaffEmailSetupId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ThanksPageHeaderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VolunteerFormType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ThanksPageHeaderId");
+
+                    b.ToTable("VolunteerForms");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.VolunteerFormSubmission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Availability")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Experience")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("GuardianEmail")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("GuardianName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("GuardianPhone")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Regularity")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("StaffNotifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("VolunteerFormId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VolunteerFormId");
+
+                    b.ToTable("VolunteerFormSubmissions");
+                });
+
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Card", b =>
                 {
                     b.HasOne("Ocuda.Promenade.Models.Entities.Deck", "Deck")
@@ -2145,6 +2256,25 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .IsRequired();
 
                     b.Navigation("Feature");
+
+                    b.Navigation("Location");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.LocationForm", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.VolunteerForm", "Form")
+                        .WithMany()
+                        .HasForeignKey("FormId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Form");
 
                     b.Navigation("Location");
                 });
@@ -2490,6 +2620,27 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Navigation("UrlRedirect");
                 });
 
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.VolunteerForm", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.PageHeader", "ThanksPageHeader")
+                        .WithMany()
+                        .HasForeignKey("ThanksPageHeaderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ThanksPageHeader");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.VolunteerFormSubmission", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.VolunteerForm", "VolunteerForm")
+                        .WithMany("VolunteerFormSubmissions")
+                        .HasForeignKey("VolunteerFormId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("VolunteerForm");
+                });
+
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Carousel", b =>
                 {
                     b.Navigation("Items");
@@ -2528,6 +2679,11 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Podcast", b =>
                 {
                     b.Navigation("PodcastItems");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.VolunteerForm", b =>
+                {
+                    b.Navigation("VolunteerFormSubmissions");
                 });
 #pragma warning restore 612, 618
         }

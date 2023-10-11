@@ -92,6 +92,32 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<User> GetNonSupervisorAsync(int locationId)
+        {
+            var supervisorIds = DbSet
+                .AsNoTracking()
+                .Where(_ => !_.IsDeleted && !_.IsSysadmin && _.SupervisorId != null)
+                .Select(_ => _.SupervisorId)
+                .Distinct();
+
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => !_.IsDeleted
+                   && !_.IsSysadmin
+                   && _.AssociatedLocation == locationId
+                   && !supervisorIds.Contains(_.Id))
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<string> GetProfilePictureFilenameAsync(string username)
+        {
+            return await DbSet
+                 .AsNoTracking()
+                 .Where(_ => _.Username == username)
+                 .Select(_ => _.PictureFilename)
+                 .SingleOrDefaultAsync();
+        }
+
         public async Task<User> GetSupervisorAsync(int userId)
         {
             return await DbSet
@@ -101,26 +127,57 @@ namespace Ocuda.Ops.Data.Ops
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<bool> IsDuplicateEmail(User user)
+        public async Task<User> GetSystemAdministratorAsync()
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Email == user.Email
-                         && _.Id != user.Id
-                         && !_.IsDeleted
-                         && !_.IsSysadmin)
-                .AnyAsync();
+                .Where(_ => _.IsSysadmin)
+                .FirstOrDefaultAsync();
         }
 
-        public async Task<bool> IsDuplicateUsername(User user)
+        public async Task<ICollection<string>> GetTitlesAsync()
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Username == user.Username
-                         && _.Id != user.Id
-                         && !_.IsDeleted
-                         && !_.IsSysadmin)
-                .AnyAsync();
+                .Where(_ => !string.IsNullOrEmpty(_.Title))
+                .OrderBy(_ => _.Title)
+                .Select(_ => _.Title)
+                .Distinct()
+                .ToListAsync();
+        }
+
+        public async Task<bool> IsSupervisor(int userId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .AnyAsync(_ => _.SupervisorId == userId);
+        }
+
+        /// <summary>
+        /// Marks a user as deleted. Do not call this directly, call the similar call in UserService
+        /// so that it can perform necessary housekeeping before disabling a user.
+        /// </summary>
+        /// <param name="username">Username of the user to disable/delete</param>
+        /// <param name="currentUserId">The user id of the current user</param>
+        /// <param name="asOf">The date/time to mark the user deleted as of</param>
+        /// <exception cref="OcudaException">Throws an OcudaException if it can't find the user
+        /// </exception>
+        public async Task MarkUserDeletedAsync(string username, int currentUserId, DateTime asOf)
+        {
+            var users = DbSet.Where(_ => _.Username == username && !_.IsDeleted);
+            if (!users.Any())
+            {
+                throw new OcudaException($"Unable to find user with username {username}");
+            }
+            foreach (var user in users)
+            {
+                user.DeletedAt = asOf;
+                user.IsDeleted = true;
+                user.UpdatedAt = asOf;
+                user.UpdatedBy = currentUserId;
+            }
+            DbSet.UpdateRange(users);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<CollectionWithCount<User>> SearchAsync(SearchFilter searchFilter)
@@ -164,79 +221,5 @@ namespace Ocuda.Ops.Data.Ops
             DbSet.Update(user);
             await _context.SaveChangesAsync();
         }
-
-        #region Initial setup methods
-
-        public async Task<User> GetNonSupervisorAsync(int locationId)
-        {
-            var supervisorIds = DbSet
-                .AsNoTracking()
-                .Where(_ => !_.IsDeleted && !_.IsSysadmin && _.SupervisorId != null)
-                .Select(_ => _.SupervisorId)
-                .Distinct();
-
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => !_.IsDeleted
-                   && !_.IsSysadmin
-                   && _.AssociatedLocation == locationId
-                   && !supervisorIds.Contains(_.Id))
-                .FirstOrDefaultAsync();
-        }
-
-        public async Task<string> GetProfilePictureFilenameAsync(string username)
-        {
-            return await DbSet
-                 .AsNoTracking()
-                 .Where(_ => _.Username == username)
-                 .Select(_ => _.PictureFilename)
-                 .SingleOrDefaultAsync();
-        }
-
-        public async Task<User> GetSystemAdministratorAsync()
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.IsSysadmin)
-                .FirstOrDefaultAsync();
-        }
-
-        public async Task<ICollection<string>> GetTitlesAsync()
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => !string.IsNullOrEmpty(_.Title))
-                .OrderBy(_ => _.Title)
-                .Select(_ => _.Title)
-                .Distinct()
-                .ToListAsync();
-        }
-
-        public async Task<bool> IsSupervisor(int userId)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .AnyAsync(_ => _.SupervisorId == userId);
-        }
-
-        public async Task MarkUserDeletedAsync(string username, int currentUserId, DateTime asOf)
-        {
-            var users = DbSet.Where(_ => _.Username == username && !_.IsDeleted);
-            if (!users.Any())
-            {
-                throw new OcudaException($"Unable to find user with username {username}");
-            }
-            foreach (var user in users)
-            {
-                user.DeletedAt = asOf;
-                user.IsDeleted = true;
-                user.UpdatedAt = asOf;
-                user.UpdatedBy = currentUserId;
-            }
-            DbSet.UpdateRange(users);
-            await _context.SaveChangesAsync();
-        }
-
-        #endregion Initial setup methods
     }
 }

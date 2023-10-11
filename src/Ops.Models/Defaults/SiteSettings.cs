@@ -57,6 +57,15 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
+                Id = Keys.SiteSetting.Email.BccAddress,
+                Name = "BCC address",
+                Description = "BCC all outgoing emails to this address",
+                Category = "Email",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
                 Id = Keys.SiteSetting.Email.FromAddress,
                 Name = "Email from address",
                 Description = "Email address that outgoing system mails are from",
@@ -120,15 +129,6 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
-                Id = Keys.SiteSetting.Email.BccAddress,
-                Name = "BCC address",
-                Description = "BCC all outgoing emails to this address",
-                Category = "Email",
-                Value = "",
-                Type = SiteSettingType.StringNullable
-            },
-            new SiteSetting
-            {
                 Id = Keys.SiteSetting.Email.RestrictToDomain,
                 Name = "Restrict to domain",
                 Description = "Restrict all outgoing emails to only addresses @ this domain",
@@ -143,12 +143,30 @@ namespace Ocuda.Ops.Models.Defaults
 
             new SiteSetting
             {
+                Id = Keys.SiteSetting.FileManagement.MaxThumbnailCount,
+                Name = "Maximum Thumbnail Count",
+                Description = "Maximum number of thumbnails that can be attached to a file",
+                Category = "File Management",
+                Value = "4",
+                Type = SiteSettingType.Int
+            },
+            new SiteSetting
+            {
                 Id = Keys.SiteSetting.FileManagement.MaxUploadBytes,
                 Name = "Maximum file size",
                 Description = "Maximum file upload size (in bytes)",
                 Category = "File Management",
                 Value = "2097152",
                 Type = SiteSettingType.Int
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.FileManagement.ThumbnailTypes,
+                Name = "Thumbnail Types",
+                Description = "Comma separated list of acceptable file type extensions for thumbnails",
+                Category = "File Management",
+                Value = ".jpg,.png",
+                Type = SiteSettingType.String
             },
 
             #endregion FileManagement
@@ -235,30 +253,12 @@ namespace Ocuda.Ops.Models.Defaults
 
             new SiteSetting
             {
-                Id = Keys.SiteSetting.FileManagement.MaxThumbnailCount,
-                Name = "Maximum Thumbnail Count",
-                Description = "Maximum number of thumbnails that can be attached to a file",
-                Category = "File Management",
-                Value = "4",
-                Type = SiteSettingType.Int
-            },
-            new SiteSetting
-            {
-                Id = Keys.SiteSetting.FileManagement.ThumbnailTypes,
-                Name = "Thumbnail Types",
-                Description = "Comma separated list of acceptable file type extensions for thumbnails",
-                Category = "File Management",
-                Value = ".jpg,.png",
-                Type = SiteSettingType.String
-            },
-            new SiteSetting
-            {
-                Id = Keys.SiteSetting.UserInterface.ModelStateTimeoutMinutes,
-                Name = "Web request validation timeout",
-                Description = "Timeout for submitted pages to perform validation",
+                Id = Keys.SiteSetting.UserInterface.BaseIntranetLink,
+                Name = "Base link for the Intranet",
+                Description = "The base of the URL for the administration/Intranet site",
                 Category = "User Interface",
-                Value = "2",
-                Type =  SiteSettingType.Int
+                Value = "",
+                Type = SiteSettingType.StringNullable
             },
             new SiteSetting
             {
@@ -268,6 +268,15 @@ namespace Ocuda.Ops.Models.Defaults
                 Category = "User Interface",
                 Value = "10",
                 Type = SiteSettingType.Int
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.UserInterface.ModelStateTimeoutMinutes,
+                Name = "Web request validation timeout",
+                Description = "Timeout for submitted pages to perform validation",
+                Category = "User Interface",
+                Value = "2",
+                Type =  SiteSettingType.Int
             },
             new SiteSetting
             {

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
@@ -15,12 +14,18 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
+        public async Task<PageHeader> GetByIdAndTypeAsync(int id, PageType type)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .SingleOrDefaultAsync(_ => _.Id == id && _.Type == type);
+        }
+
         public async Task<PageHeader> GetByStubAndTypeAsync(string stub, PageType type)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub && _.Type == type)
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(_ => _.Stub == stub && _.Type == type);
         }
     }
 }

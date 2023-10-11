@@ -19,6 +19,7 @@ namespace Ocuda.Ops.Service
 {
     public class PageService : BaseService<PageService>, IPageService
     {
+        private const string IndexStub = "index";
         private readonly ICarouselService _carouselService;
         private readonly IDeckService _deckService;
         private readonly IImageFeatureService _imageFeatureService;
@@ -35,9 +36,9 @@ namespace Ocuda.Ops.Service
         private readonly ISegmentService _segmentService;
 
         public PageService(ILogger<PageService> logger,
-            IHttpContextAccessor httpContextAccessor,
             ICarouselService carouselService,
             IDeckService deckService,
+            IHttpContextAccessor httpContextAccessor,
             IImageFeatureService imageFeatureService,
             ILanguageService languageService,
             IPageHeaderRepository pageHeaderRepository,
@@ -49,27 +50,29 @@ namespace Ocuda.Ops.Service
             ISegmentService segmentService)
             : base(logger, httpContextAccessor)
         {
-            _carouselService = carouselService
-                ?? throw new ArgumentNullException(nameof(carouselService));
-            _deckService = deckService ?? throw new ArgumentNullException(nameof(deckService));
-            _imageFeatureService = imageFeatureService
-                ?? throw new ArgumentNullException(nameof(imageFeatureService));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
-            _pageHeaderRepository = pageHeaderRepository
-                ?? throw new ArgumentNullException(nameof(pageRepository));
-            _pageItemRepository = pageItemRepository
-                ?? throw new ArgumentNullException(nameof(pageItemRepository));
-            _pageLayoutRepository = pageLayoutRepository
-                ?? throw new ArgumentNullException(nameof(pageLayoutRepository));
-            _pageLayoutTextRepository = pageLayoutTextRepository
-                ?? throw new ArgumentNullException(nameof(pageLayoutTextRepository));
-            _pageRepository = pageRepository
-                ?? throw new ArgumentNullException(nameof(pageRepository));
-            _permissionGroupPageContentRepository = permissionGroupPageContentRepository
-                ?? throw new ArgumentNullException(nameof(permissionGroupPageContentRepository));
-            _segmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
+            ArgumentNullException.ThrowIfNull(carouselService);
+            ArgumentNullException.ThrowIfNull(deckService);
+            ArgumentNullException.ThrowIfNull(imageFeatureService);
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(pageHeaderRepository);
+            ArgumentNullException.ThrowIfNull(pageItemRepository);
+            ArgumentNullException.ThrowIfNull(pageLayoutRepository);
+            ArgumentNullException.ThrowIfNull(pageLayoutTextRepository);
+            ArgumentNullException.ThrowIfNull(pageRepository);
+            ArgumentNullException.ThrowIfNull(permissionGroupPageContentRepository);
+            ArgumentNullException.ThrowIfNull(segmentService);
+
+            _carouselService = carouselService;
+            _deckService = deckService;
+            _imageFeatureService = imageFeatureService;
+            _languageService = languageService;
+            _pageHeaderRepository = pageHeaderRepository;
+            _pageItemRepository = pageItemRepository;
+            _pageLayoutRepository = pageLayoutRepository;
+            _pageLayoutTextRepository = pageLayoutTextRepository;
+            _pageRepository = pageRepository;
+            _permissionGroupPageContentRepository = permissionGroupPageContentRepository;
+            _segmentService = segmentService;
         }
 
         public async Task<PageLayout> CloneLayoutAsync(int pageHeaderId,
@@ -221,6 +224,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<Page> CreateAsync(Page page)
         {
+            ArgumentNullException.ThrowIfNull(page);
+
             page.Title = page.Title?.Trim();
             page.Content = page.Content?.Trim();
 
@@ -234,6 +239,8 @@ namespace Ocuda.Ops.Service
             Justification = "Stubs are part of a URI and are normalized to lowercase")]
         public async Task<PageHeader> CreateHeaderAsync(PageHeader header)
         {
+            ArgumentNullException.ThrowIfNull(header);
+
             header.Stub = header.Stub?.Trim().ToLowerInvariant();
 
             if (await _pageHeaderRepository.StubInUseAsync(header))
@@ -331,6 +338,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<PageLayout> CreateLayoutAsync(PageLayout layout)
         {
+            ArgumentNullException.ThrowIfNull(layout);
+
             layout.Name = layout.Name.Trim();
             layout.PreviewId = Guid.NewGuid();
 
@@ -349,6 +358,12 @@ namespace Ocuda.Ops.Service
         public async Task DeleteHeaderAsync(int id)
         {
             var header = await _pageHeaderRepository.FindAsync(id);
+
+            if (header.Type == PageType.Home
+                && header.Stub.Equals(IndexStub, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new OcudaException($"Unable to delete {header.Type} section {header.Stub} page.");
+            }
 
             if (header.IsLayoutPage)
             {
@@ -387,12 +402,8 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteItemNoSaveAsync(int pageItemId, bool ignoreSort = false)
         {
-            var pageItem = await _pageItemRepository.FindAsync(pageItemId);
-
-            if (pageItem == null)
-            {
-                throw new OcudaException("Page item does not exist.");
-            }
+            var pageItem = await _pageItemRepository.FindAsync(pageItemId)
+                ?? throw new OcudaException("Page item does not exist.");
 
             if (pageItem.CarouselId.HasValue)
             {
@@ -452,6 +463,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<Page> EditAsync(Page page)
         {
+            ArgumentNullException.ThrowIfNull(page);
+
             var currentPage = await _pageRepository.GetByHeaderAndLanguageAsync(
                 page.PageHeaderId, page.LanguageId);
             currentPage.Title = page.Title?.Trim();
@@ -466,6 +479,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<PageHeader> EditHeaderAsync(PageHeader header)
         {
+            ArgumentNullException.ThrowIfNull(header);
+
             var currentHeader = await _pageHeaderRepository.FindAsync(header.Id);
 
             currentHeader.PageName = header.PageName?.Trim();
@@ -478,6 +493,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<PageItem> EditItemAsync(PageItem pageItem)
         {
+            ArgumentNullException.ThrowIfNull(pageItem);
+
             if (!pageItem.CarouselId.HasValue && !pageItem.SegmentId.HasValue)
             {
                 throw new OcudaException("No content selected");
@@ -501,6 +518,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<PageLayout> EditLayoutAsync(PageLayout layout)
         {
+            ArgumentNullException.ThrowIfNull(layout);
+
             var currentlayout = await _pageLayoutRepository.FindAsync(layout.Id);
             currentlayout.Name = layout.Name?.Trim();
             currentlayout.SocialCardId = layout.SocialCardId;
@@ -573,6 +592,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<PageLayoutText> SetLayoutTextAsync(PageLayoutText layoutText)
         {
+            ArgumentNullException.ThrowIfNull(layoutText);
+
             var currentText = await _pageLayoutTextRepository.GetByPageLayoutAndLanguageAsync(
                 layoutText.PageLayoutId, layoutText.LanguageId);
 
@@ -600,6 +621,8 @@ namespace Ocuda.Ops.Service
             Justification = "Stubs are part of a URI and are normalized to lowercase")]
         public async Task<bool> StubInUseAsync(PageHeader header)
         {
+            ArgumentNullException.ThrowIfNull(header);
+
             header.Stub = header.Stub?.Trim().ToLowerInvariant();
             return await _pageHeaderRepository.StubInUseAsync(header);
         }
@@ -623,12 +646,8 @@ namespace Ocuda.Ops.Service
             }
 
             var itemInPosition = await _pageItemRepository.GetByLayoutAndOrderAsync(
-                item.PageLayoutId, newSortOrder);
-
-            if (itemInPosition == null)
-            {
-                throw new OcudaException("Item is already in the last position.");
-            }
+                item.PageLayoutId, newSortOrder)
+                ?? throw new OcudaException("Item is already in the last position.");
 
             itemInPosition.Order = item.Order;
             item.Order = newSortOrder;

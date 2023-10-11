@@ -37,6 +37,7 @@ namespace Ocuda.Promenade.Data
         public DbSet<ImageFeatureTemplate> ImageFeatureTemplates { get; }
         public DbSet<Language> Languages { get; set; }
         public DbSet<LocationFeature> LocationFeatures { get; }
+        public DbSet<LocationForm> LocationForms { get; }
         public DbSet<LocationGroup> LocationGroups { get; }
         public DbSet<LocationHours> LocationHours { get; }
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
@@ -65,6 +66,8 @@ namespace Ocuda.Promenade.Data
         public DbSet<SocialCard> SocialCards { get; }
         public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
         public DbSet<UrlRedirect> UrlRedirects { get; }
+        public DbSet<VolunteerForm> VolunteerForms { get; }
+        public DbSet<VolunteerFormSubmission> VolunteerFormSubmissions { get; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -93,6 +96,8 @@ namespace Ocuda.Promenade.Data
                 .HasKey(_ => new { _.LanguageId, _.ImageFeatureItemId });
             modelBuilder.Entity<LocationFeature>()
                 .HasKey(_ => new { _.FeatureId, _.LocationId });
+            modelBuilder.Entity<LocationForm>()
+                .HasKey(_ => new { _.LocationId, _.FormId });
             modelBuilder.Entity<LocationGroup>()
                 .HasKey(_ => new { _.GroupId, _.LocationId });
             modelBuilder.Entity<LocationHours>()

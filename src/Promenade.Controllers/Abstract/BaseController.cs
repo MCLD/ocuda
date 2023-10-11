@@ -27,14 +27,36 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
         protected BaseController(ServiceFacades.Controller<T> context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            ArgumentNullException.ThrowIfNull(context);
+
             _logger = context.Logger;
             _config = context.Config;
             _localizer = context.Localizer;
             _siteSettingService = context.SiteSettingService;
+        }
+
+        /// <summary>
+        /// Property to return the pending info alert, if there is none then return null.
+        /// </summary>
+        protected string AlertInfo
+        {
+            get
+            {
+                return HasAlertInfo
+                    ? TempData[TempDataKey.AlertInfo] as string
+                    : null;
+            }
+        }
+
+        /// <summary>
+        /// Returns a boolean indicating whether or not there is a pending info alert to show
+        /// </summary>
+        protected bool HasAlertInfo
+        {
+            get
+            {
+                return TempData.ContainsKey(TempDataKey.AlertInfo);
+            }
         }
 
         protected string PageTitle { get; set; }
@@ -102,6 +124,17 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 actionLink.Path = CultureInfo.CurrentCulture.Name + actionLink.Path;
                 return actionLink.Uri.AbsoluteUri;
             }
+        }
+
+        /// <summary>
+        /// Set an alert to be shown on the next page load if the page supports showing alerts.
+        /// Verify that the redirected page shows alerts before setting this value so that it does
+        /// not hang around in TempData indefinitely.
+        /// </summary>
+        /// <param name="alertMessage">The text of the alert message, raw HTML.</param>
+        protected void SetAlertInfo(string alertMessage)
+        {
+            TempData[TempDataKey.AlertInfo] = alertMessage;
         }
 
         /// <summary>

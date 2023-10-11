@@ -29,6 +29,15 @@
                     Structured Data
                 </a>
             </li>
+            <li class="nav-item">
+                <a asp-action="@nameof(LocationsController.VolunteerForms)"
+                    asp-route-locationStub="@Model.LocationStub"
+                    class="nav-link"
+                    ActiveBy routeKey="Action"
+                    value="@nameof(LocationsController.VolunteerForms)">
+                    Forms
+                </a>
+            </li>
         </ul>
     </div>
 </div>

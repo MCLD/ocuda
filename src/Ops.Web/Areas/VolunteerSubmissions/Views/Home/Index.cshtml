@@ -1,0 +1,78 @@
+﻿@model Ocuda.Ops.Controllers.Areas.VolunteerSubmissions.ViewModels.IndexViewModel
+
+<partial name="_VolunteerPartial" />
+
+<form method="get" role="form">
+    <div class="row my-3">
+        <div class="col-12">
+            <div class="input-group">
+                <span class="input-group-text">Filter by location:</span>
+                <select class="form-select"
+                        asp-for="SelectedLocation"
+                        asp-items="Model.LocationNamesDropdown">
+                    <option value="0">All locations</option>
+                </select>
+                <button class="btn btn-outline-success">Filter</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.Submissions?.Count() > 0)
+{
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-sm table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Submitted At</th>
+                        <th>Location</th>
+                        <th>Type</th>
+                        <th>Submitted by</th>
+                        <th>Staff Notified</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var submission in Model.Submissions)
+                    {
+                        <tr>
+                            <td class="align-middle">
+                                @submission.CreatedAt.ToString("g")
+                            </td>
+                            <td class="align-middle">
+                                @(Model.AllLocationNames?.ContainsKey(submission.LocationId) == true ? Model.AllLocationNames[submission.LocationId] : "Unknown")
+                            </td>
+                            <td class="align-middle">
+                                @(submission.VolunteerFormType?.ToString() ?? "Unknown")
+                            </td>
+                            <td>
+                                <a asp-action="@nameof(HomeController.Details)"
+                                   asp-controller="@HomeController.Name"
+                                   asp-route-id="@submission.Id"
+                                   asp-route-page="@(Model.CurrentPage > 1 ? Model.CurrentPage : null)"
+                                   asp-route-selectedLocation="@(Model.SelectedLocation > 0 ? Model.SelectedLocation:null)">
+                                    @submission.Name
+                                </a>
+                            </td>
+                            <td>
+                                @if (submission.StaffNotifiedAt.HasValue)
+                                {
+                                    @submission.StaffNotifiedAt.Value.ToString("g")
+                                }
+                                else
+                                {
+                                    <em>No notification info found</em>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <nav paginate="@Model"></nav>
+}
+else
+{
+    <div class="alert alert-warning">No form submissions found.</div>
+}

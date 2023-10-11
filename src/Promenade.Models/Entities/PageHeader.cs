@@ -10,7 +10,9 @@ namespace Ocuda.Promenade.Models.Entities
         About,
         Home,
         News,
-        Subject
+        Subject,
+        Thanks,
+        Sorry
     }
 
     public class PageHeader

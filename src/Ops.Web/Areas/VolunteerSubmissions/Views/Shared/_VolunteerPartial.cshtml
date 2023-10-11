@@ -1,0 +1,24 @@
+﻿@model Ocuda.Ops.Controllers.Areas.VolunteerSubmissions.ViewModels.ViewModelBase
+
+<div class="d-flex justify-content-between mb-2">
+    <h1>
+        @Model.Heading
+        @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
+        {
+            <small class="text-muted d-print-block">@Model.SecondaryHeading</small>
+        }
+    </h1>
+    <div class="pt-2 d-print-none">
+        @if (string.IsNullOrEmpty(Model.BackLink))
+        {
+            <a class="btn btn-outline-dark"
+               asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+               asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
+        }
+        else
+        {
+            <a class="btn btn-outline-dark"
+               href="@Model.BackLink">Back</a>
+        }
+    </div>
+</div>

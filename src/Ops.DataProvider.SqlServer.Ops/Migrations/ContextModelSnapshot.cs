@@ -17,7 +17,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "7.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -2079,6 +2079,44 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.ToTable("UserSyncLocations");
                 });
 
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.VolunteerFormSubmissionEmailRecord", b =>
+                {
+                    b.Property<int>("VolunterFormSubmissionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EmailRecordId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("VolunterFormSubmissionId", "EmailRecordId");
+
+                    b.HasIndex("EmailRecordId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("VolunteerFormSubmissionEmailRecords");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.VolunteerFormUserMapping", b =>
+                {
+                    b.Property<int>("VolunteerFormId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("VolunteerFormId", "LocationId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("VolunteerFormUserMappings");
+                });
+
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Category", b =>
                 {
                     b.HasOne("Ocuda.Ops.Models.Entities.User", "CreatedByUser")
@@ -2981,6 +3019,36 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.Navigation("CreatedByUser");
 
                     b.Navigation("UpdatedByUser");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.VolunteerFormSubmissionEmailRecord", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.EmailRecord", "EmailRecord")
+                        .WithMany()
+                        .HasForeignKey("EmailRecordId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Ops.Models.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("EmailRecord");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.VolunteerFormUserMapping", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.FileLibrary", b =>

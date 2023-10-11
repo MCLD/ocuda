@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Models;
@@ -23,13 +24,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
             get
             {
                 return IsSiteManager
-                    && PageType != PageType.Home
-                    && PageHeaders?.Count > 0;
+                    && PageType != PageType.Home;
             }
         }
 
+        public string TypeNotes { get; set; }
+
         public string MakeLink(PageHeader pageHeader)
         {
+            ArgumentNullException.ThrowIfNull(pageHeader);
+
             string type = pageHeader.Type.ToString().Trim('/').ToLowerInvariant();
             string stub = pageHeader.Stub.Trim('/');
 

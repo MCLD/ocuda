@@ -42,27 +42,18 @@ namespace Ocuda.Promenade.Web
         public Startup(IConfiguration configuration,
             IWebHostEnvironment env)
         {
-            if (env == null)
-            {
-                throw new ArgumentNullException(nameof(env));
-            }
+            ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(env);
 
-            _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _config = configuration;
             _isDevelopment = env.IsDevelopment();
         }
 
         public void Configure(IApplicationBuilder app,
             Utility.Services.Interfaces.IPathResolverService pathResolver)
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            if (pathResolver == null)
-            {
-                throw new ArgumentNullException(nameof(pathResolver));
-            }
+            ArgumentNullException.ThrowIfNull(app);
+            ArgumentNullException.ThrowIfNull(pathResolver);
 
             if (!_isDevelopment)
             {
@@ -166,10 +157,7 @@ namespace Ocuda.Promenade.Web
             Justification = "Dependency injection")]
         public void ConfigureServices(IServiceCollection services)
         {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
+            ArgumentNullException.ThrowIfNull(services);
 
             if (_isDevelopment)
             {
@@ -430,6 +418,10 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.ExternalResourceRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IFeatureRepository,
                 Data.Promenade.FeatureRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IVolunteerFormRepository,
+                Data.Promenade.VolunteerFormRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IVolunteerFormSubmissionRepository,
+                Data.Promenade.VolunteerFormSubmissionRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IGroupRepository,
                 Data.Promenade.GroupRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILanguageRepository,
@@ -438,6 +430,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.LocationRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILocationFeatureRepository,
                 Data.Promenade.LocationFeatureRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ILocationFormRepository,
+                Data.Promenade.LocationFormRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILocationGroupRepository,
                 Data.Promenade.LocationGroupRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILocationHoursRepository,
@@ -515,6 +509,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<DeckService>();
             services.AddScoped<EmediaService>();
             services.AddScoped<ExternalResourceService>();
+            services.AddScoped<ImageFeatureService>();
             services.AddScoped<LanguageService>();
             services.AddScoped<LocationService>();
             services.AddScoped<NavigationService>();
@@ -528,7 +523,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<SiteAlertService>();
             services.AddScoped<SiteSettingService>();
             services.AddScoped<SocialCardService>();
-            services.AddScoped<ImageFeatureService>();
+            services.AddScoped<VolunteerFormService>();
         }
     }
 }

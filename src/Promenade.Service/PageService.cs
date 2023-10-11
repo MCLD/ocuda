@@ -37,20 +37,23 @@ namespace Ocuda.Promenade.Service
             LanguageService languageService)
             : base(logger, dateTimeProvider)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-            _httpContextAccessor = httpContextAccessor
-                ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            _pageHeaderRepository = pageHeaderRepository
-                ?? throw new ArgumentNullException(nameof(pageHeaderRepository));
-            _pageLayoutRepository = pageLayoutRepository
-                ?? throw new ArgumentNullException(nameof(pageLayoutRepository));
-            _pageLayoutTextRepository = pageLayoutTextRepository
-                ?? throw new ArgumentNullException(nameof(pageLayoutTextRepository));
-            _pageRepository = pageRepository
-                ?? throw new ArgumentNullException(nameof(pageRepository));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(config);
+            ArgumentNullException.ThrowIfNull(httpContextAccessor);
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(pageHeaderRepository);
+            ArgumentNullException.ThrowIfNull(pageLayoutRepository);
+            ArgumentNullException.ThrowIfNull(pageLayoutTextRepository);
+            ArgumentNullException.ThrowIfNull(pageRepository);
+
+            _cache = cache;
+            _config = config;
+            _httpContextAccessor = httpContextAccessor;
+            _languageService = languageService;
+            _pageHeaderRepository = pageHeaderRepository;
+            _pageLayoutRepository = pageLayoutRepository;
+            _pageLayoutTextRepository = pageLayoutTextRepository;
+            _pageRepository = pageRepository;
         }
 
         public async Task<Page> GetContentPageByStubAndType(string stub,
@@ -339,6 +342,37 @@ namespace Ocuda.Promenade.Service
             }
 
             return pageLayout;
+        }
+
+        public async Task<string> GetStubByHeaderIdTypeAsync(int headerId,
+            PageType type,
+            bool forceReload)
+        {
+            var cacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.PromPageHeaderSlug,
+                headerId,
+                type);
+
+            PageHeader header = null;
+
+            if (!forceReload)
+            {
+                header = await _cache.GetObjectFromCacheAsync<PageHeader>(cacheKey);
+            }
+
+            if (header == null)
+            {
+                header = await _pageHeaderRepository.GetByIdAndTypeAsync(headerId, type);
+
+                var cachePagesInHours = GetPageCacheDuration(_config);
+
+                if (header != null && cachePagesInHours > 0)
+                {
+                    await _cache.SaveToCacheAsync(cacheKey, header, cachePagesInHours);
+                }
+            }
+
+            return header.Stub?.Trim();
         }
 
         private async Task<Page> GetPageFromCacheAsync(int languageId, PageType type, string stub)

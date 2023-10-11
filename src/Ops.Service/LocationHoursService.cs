@@ -23,19 +23,17 @@ namespace Ocuda.Ops.Service
             ILocationHoursRepository locationHoursRepository)
             : base(logger, httpContextAccessor)
         {
-            _locationHoursOverrideRepository = locationHoursOverrideRepository
-                ?? throw new ArgumentNullException(nameof(locationHoursOverrideRepository));
-            _locationHoursRepository = locationHoursRepository
-                ?? throw new ArgumentNullException(nameof(locationHoursRepository));
-        }
+            ArgumentNullException.ThrowIfNull(locationHoursOverrideRepository);
+            ArgumentNullException.ThrowIfNull(locationHoursRepository);
 
-        public async Task<List<LocationHours>> GetLocationHoursByIdAsync(int locationId)
-        {
-            return await _locationHoursRepository.GetLocationHoursByLocationId(locationId);
+            _locationHoursOverrideRepository = locationHoursOverrideRepository;
+            _locationHoursRepository = locationHoursRepository;
         }
 
         public async Task<LocationHours> AddLocationHoursAsync(LocationHours locationHours)
         {
+            ArgumentNullException.ThrowIfNull(locationHours);
+
             await ValidateAsync(locationHours);
 
             await _locationHoursRepository.AddAsync(locationHours);
@@ -43,8 +41,37 @@ namespace Ocuda.Ops.Service
             return locationHours;
         }
 
+        public async Task<LocationHoursOverride> AddLocationHoursOverrideAsync(
+            LocationHoursOverride hoursOverride)
+        {
+            ArgumentNullException.ThrowIfNull(hoursOverride);
+
+            hoursOverride.Reason = hoursOverride.Reason?.Trim();
+            if (!hoursOverride.Open)
+            {
+                hoursOverride.OpenTime = null;
+                hoursOverride.CloseTime = null;
+            }
+
+            await ValidateOverrideAsync(hoursOverride);
+
+            await _locationHoursOverrideRepository.AddAsync(hoursOverride);
+            await _locationHoursOverrideRepository.SaveAsync();
+            return hoursOverride;
+        }
+
+        public async Task DeleteLocationsHoursOverrideAsync(int id)
+        {
+            var hoursOverride = await _locationHoursOverrideRepository.FindAsync(id)
+                ?? throw new OcudaException($"Unable to find hours override for location id {id}");
+            _locationHoursOverrideRepository.Remove(hoursOverride);
+            await _locationHoursOverrideRepository.SaveAsync();
+        }
+
         public async Task<List<LocationHours>> EditAsync(List<LocationHours> locationHours)
         {
+            ArgumentNullException.ThrowIfNull(locationHours);
+
             foreach (var hour in locationHours)
             {
                 var currentLocationHour = await _locationHoursRepository
@@ -70,32 +97,11 @@ namespace Ocuda.Ops.Service
             return locationHours;
         }
 
-        public async Task<ICollection<LocationHoursOverride>> GetLocationHoursOverrideByIdAsync(
-            int locationId)
-        {
-            return await _locationHoursOverrideRepository.GetByLocationIdAsync(locationId);
-        }
-
-        public async Task<LocationHoursOverride> AddLocationHoursOverrideAsync(
-            LocationHoursOverride hoursOverride)
-        {
-            hoursOverride.Reason = hoursOverride.Reason?.Trim();
-            if (!hoursOverride.Open)
-            {
-                hoursOverride.OpenTime = null;
-                hoursOverride.CloseTime = null;
-            }
-
-            await ValidateOverrideAsync(hoursOverride);
-
-            await _locationHoursOverrideRepository.AddAsync(hoursOverride);
-            await _locationHoursOverrideRepository.SaveAsync();
-            return hoursOverride;
-        }
-
         public async Task<LocationHoursOverride> EditLocationHoursOverrideAsync(
             LocationHoursOverride hoursOverride)
         {
+            ArgumentNullException.ThrowIfNull(hoursOverride);
+
             var currentOverride = await _locationHoursOverrideRepository
                 .FindAsync(hoursOverride.Id);
 
@@ -121,11 +127,15 @@ namespace Ocuda.Ops.Service
             return currentOverride;
         }
 
-        public async Task DeleteLocationsHoursOverrideAsync(int id)
+        public async Task<List<LocationHours>> GetLocationHoursByIdAsync(int locationId)
         {
-            var hoursOverride = await _locationHoursOverrideRepository.FindAsync(id);
-            _locationHoursOverrideRepository.Remove(hoursOverride);
-            await _locationHoursOverrideRepository.SaveAsync();
+            return await _locationHoursRepository.GetLocationHoursByLocationId(locationId);
+        }
+
+        public async Task<ICollection<LocationHoursOverride>> GetLocationHoursOverrideByIdAsync(
+            int locationId)
+        {
+            return await _locationHoursOverrideRepository.GetByLocationIdAsync(locationId);
         }
 
         private async Task ValidateAsync(LocationHours locationHour)

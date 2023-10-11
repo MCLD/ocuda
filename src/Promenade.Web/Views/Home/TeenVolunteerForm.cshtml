@@ -1,0 +1,99 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Home.TeenVolunteerFormViewModel
+
+@if (!string.IsNullOrEmpty(Model?.SegmentHeader))
+{
+    <div class="row">
+        <div class="col-12">
+            <h2>@Model.SegmentHeader</h2>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Model?.WarningText))
+{
+    <div class="row">
+        <div class="col-12 col-sm-10 offset-sm-1">
+            <div class="alert alert-warning prom-alert">
+                <p>@Html.Raw(Model.WarningText)</p>
+            </div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Model?.SegmentText))
+{
+    <div class="row">
+        <div class="col-12">
+            @Html.Raw(Model.SegmentText)
+        </div>
+    </div>
+}
+
+@if (Model.AdultFormAvailable)
+{
+    <div class="row">
+        <div class="col-12">
+            <strong>
+                <em>
+                    @Html.Raw(Localizer[Ocuda.i18n.Keys.Promenade.PromptAreYouAdultVolunteer])
+                    @Html.ActionLink(Localizer[Ocuda.i18n.Keys.Promenade.LinkAdultVolunteerForm], nameof(HomeController.VolunteerAdult), HomeController.Name, new { Model.LocationSlug })
+                </em>
+            </strong>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-12">
+        <form method="post" role="form" asp-action="TeenVolunteerForm" asp-controller="Locations">
+            <h2>@Localizer[Ocuda.i18n.Keys.Promenade.ContactInformation]</h2>
+            <input asp-for="Name"
+                   type="text"
+                   formgroup />
+            <input asp-for="Phone"
+                   type="tel"
+                   formgroup
+                   placeholder="###-###-####" />
+            <input asp-for="Email"
+                   type="email"
+                   formgroup />
+            
+            <input asp-for="GuardianName"
+                   type="text"
+                   formgroup />
+            <input asp-for="GuardianPhone"
+                   type="tel"
+                   formgroup
+                   placeholder="###-###-####" />
+            <input asp-for="GuardianEmail"
+                   type="email"
+                   formgroup />
+
+            <h2>@Localizer[Ocuda.i18n.Keys.Promenade.AvailabilityExperience]</h2>
+            <textarea asp-for="Availability"
+                      rows="5"
+                      type="text"
+                      formgroup />
+            <textarea asp-for="Experience"
+                      rows="5"
+                      type="text"
+                      formgroup />
+            <textarea asp-for="Regularity"
+                      rows="5"
+                      type="text"
+                      formgroup />
+            <div>
+                <button type="submit"
+                        class="btn btn-lg m-2 float-right"
+                        button-spinner>
+                    <span class="fa-regular fa-circle-check"></span>
+                    @Localizer[Promenade.ButtonSubmit]
+                </button>
+            </div>
+
+            <input asp-for="FormId" type="hidden" />
+            <input asp-for="LocationId" type="hidden" />
+            <input asp-for="LocationSlug" type="hidden" />
+        </form>
+    </div>
+</div>

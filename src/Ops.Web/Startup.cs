@@ -38,17 +38,16 @@ namespace Ocuda.Ops.Web
         public Startup(IConfiguration configuration,
             IWebHostEnvironment env)
         {
-            _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            ArgumentNullException.ThrowIfNull(configuration);
+
+            _config = configuration;
             _isDevelopment = env.IsDevelopment();
         }
 
         public void Configure(IApplicationBuilder app,
             Utility.Services.Interfaces.IPathResolverService pathResolver)
         {
-            if (pathResolver == null)
-            {
-                throw new ArgumentNullException(nameof(pathResolver));
-            }
+            ArgumentNullException.ThrowIfNull(pathResolver);
 
             // configure error page handling and development IDE linking
             if (_isDevelopment)
@@ -111,11 +110,10 @@ namespace Ocuda.Ops.Web
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability",
                     "CA1506:Avoid excessive class coupling",
             Justification = "Dependency injection")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Vulnerability",
-            "S4830:Server certificates should be verified during SSL/TLS connections",
-            Justification = "Screenly OSE uses self-signed certificates")]
         public void ConfigureServices(IServiceCollection services)
         {
+            ArgumentNullException.ThrowIfNull(services);
+
             // set a default culture of en-US if none is specified
             string culture = _config[Configuration.OpsCulture] ?? DefaultCulture;
             services.Configure<RequestLocalizationOptions>(_ =>
@@ -357,6 +355,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.FileRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileTypeRepository,
                 Data.Ops.FileTypeRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IVolunteerUserMappingRepository,
+                Data.Ops.VolunteerUserMappingRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IHistoricalIncidentRepository,
                 Data.Ops.HistoricalIncidentRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IIncidentFollowupRepository,
@@ -419,6 +419,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.UserSyncHistoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserSyncLocationRepository,
                 Data.Ops.UserSyncLocationRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IVolunteerFormSubmissionEmailRecordRepository,
+                Data.Ops.VolunteerFormSubmissionEmailRecordRepository>();
 
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardDetailRepository,
                 Data.Promenade.CardDetailRepository>();
@@ -486,6 +488,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.LocationProductMapRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationRepository,
                 Data.Promenade.LocationRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationFormRepository,
+                Data.Promenade.LocationFormRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
                 Data.Promenade.PageHeaderRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageItemRepository,
@@ -520,6 +524,10 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.SiteSettingPromRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISocialCardRepository,
                 Data.Promenade.SocialCardRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IVolunteerFormRepository,
+                Data.Promenade.VolunteerFormRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IVolunteerFormSubmissionRepository,
+                Data.Promenade.VolunteerFormSubmissionRepository>();
 
             // services
             services.AddScoped<IAuthorizationService, AuthorizationService>();
@@ -578,8 +586,11 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ITitleClassService, TitleClassService>();
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
+            services.AddScoped<IUserManagementService, UserManagementService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserSyncService, UserSyncService>();
+            services.AddScoped<IVolunteerFormService, VolunteerFormService>();
+            services.AddScoped<IVolunteerNotificationService, VolunteerNotificationService>();
 
             // background process
             services.AddScoped<JobScopedProcessingService>();

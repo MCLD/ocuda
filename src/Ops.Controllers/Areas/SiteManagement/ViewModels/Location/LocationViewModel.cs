@@ -6,6 +6,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location
     public class LocationViewModel : LocationPartialViewModel
     {
         public string Action { get; set; }
+
         public ICollection<Promenade.Models.Entities.Location> AllLocations { get; set; }
 
         public string DescriptionSegmentName { get; set; }
@@ -25,6 +26,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location
         public PaginateModel PaginateModel { get; set; }
         public string PostFeatureSegmentName { get; set; }
         public string PreFeatureSegmentName { get; set; }
+
         public string SocialCardName { get; set; }
+
+        public List<LocationVolunteerFormViewModel> VolunteerForms { get; set; }
     }
 }

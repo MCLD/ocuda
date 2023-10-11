@@ -6,7 +6,7 @@ namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
     [Route("{culture:cultureConstraint?}/[Controller]")]
-    public class SubjectController : BasePageController<SubjectController>
+    public class SubjectController : GeneralBasePageController<SubjectController>
     {
         public SubjectController(ServiceFacades.Controller<SubjectController> context,
             ServiceFacades.PageController pageContext)

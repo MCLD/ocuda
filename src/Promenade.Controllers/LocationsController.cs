@@ -17,8 +17,9 @@ namespace Ocuda.Promenade.Controllers
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
             LocationService locationService) : base(context)
         {
-            _locationService = locationService
-                ?? throw new ArgumentNullException(nameof(locationService));
+            ArgumentNullException.ThrowIfNull(locationService);
+
+            _locationService = locationService;
 
             _apiKey = _config[Utility.Keys.Configuration.OcudaGoogleAPI];
         }
@@ -72,7 +73,7 @@ namespace Ocuda.Promenade.Controllers
             }
 
             var viewModel = await CreateLocationViewModelAsync(default, default);
-            viewModel.Warning = issue;
+            viewModel.WarningText = issue;
             return await ShowNearestAsync(viewModel);
         }
 
@@ -112,6 +113,7 @@ namespace Ocuda.Promenade.Controllers
                 else
                 {
                     viewModel = await CreateLocationViewModelAsync();
+                    viewModel.InfoText = _localizer[i18n.Keys.Promenade.ErrorCouldNotGeocode];
                 }
             }
 
@@ -141,7 +143,7 @@ namespace Ocuda.Promenade.Controllers
 
             if (!string.IsNullOrWhiteSpace(viewModel.Zip))
             {
-                viewModel.Info = _localizer[i18n.Keys.Promenade.ZipCodeClosest,
+                viewModel.InfoText = _localizer[i18n.Keys.Promenade.ZipCodeClosest,
                     viewModel.Zip.Trim()];
             }
 

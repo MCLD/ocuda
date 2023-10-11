@@ -237,6 +237,11 @@
         public static readonly string PromPageHeader = "pageheader.{0}.{1}";
 
         /// <summary>
+        /// Cached page header info, {0} is the id, {1} is the page type
+        /// </summary>
+        public static readonly string PromPageHeaderSlug = "pageheaderslug.{0}.{1}";
+
+        /// <summary>
         /// Cached page layout, {0} is the layout id
         /// </summary>
         public static readonly string PromPageLayout = "pagelayout.{0}";
@@ -310,5 +315,15 @@
         /// Cached social card, {0} is the card id
         /// </summary>
         public static readonly string PromSocialCard = "socialcard.{0}";
+
+        /// <summary>
+        /// Cached volunteer forms, {0} is VolunteerFormType, {1} is location id
+        /// </summary>
+        public static readonly string PromVolunteerForm = "volform.{0}.{1}";
+
+        /// <summary>
+        /// Cached volunteer form location relationships, {0} is form id, {1} is location idm
+        /// </summary>
+        public static readonly string PromVolunteerFormLocation = "volformloc.{0}.{1}";
     }
 }
