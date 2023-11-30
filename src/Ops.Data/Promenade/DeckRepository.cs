@@ -23,6 +23,23 @@ namespace Ocuda.Ops.Data.Promenade
             await _context.SaveChangesAsync();
         }
 
+        public async Task FixOrderAsync(int deckId)
+        {
+            var cards = _context.Cards
+                .Where(_ => _.DeckId == deckId)
+                .OrderBy(_ => _.Order);
+
+            int order = 1;
+            foreach (var card in cards)
+            {
+                card.Order = order;
+                order++;
+            }
+
+            _context.UpdateRange(cards);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<Deck> GetByIdAsync(int deckId)
         {
             return await DbSet

@@ -78,12 +78,8 @@ namespace Ocuda.Ops.Service
         {
             var cards = await _cardRepository.GetOrderInformationById(cardId);
 
-            var requestedCard = cards.SingleOrDefault(_ => _.Id == cardId);
-
-            if (requestedCard == null)
-            {
-                throw new OcudaException($"Unable to find card id {cardId}");
-            }
+            var requestedCard = cards.SingleOrDefault(_ => _.Id == cardId)
+                ?? throw new OcudaException($"Unable to find card id {cardId}");
 
             if (increment)
             {
@@ -98,11 +94,8 @@ namespace Ocuda.Ops.Service
             }
             else
             {
-                var nextCard = cards.SingleOrDefault(_ => _.Order == requestedCard.Order + 1);
-                if (nextCard == null)
-                {
-                    throw new OcudaException($"Card id {cardId} is already the last card.");
-                }
+                var nextCard = cards.SingleOrDefault(_ => _.Order == requestedCard.Order + 1)
+                    ?? throw new OcudaException($"Card id {cardId} is already the last card.");
                 nextCard.Order--;
                 requestedCard.Order++;
                 _cardRepository.Update(nextCard);
@@ -172,6 +165,10 @@ namespace Ocuda.Ops.Service
                 int layoutId = await _pageItemRepository.RemoveByDeckIdAsync(deckId);
                 await _deckRepository.DeleteDeckAsync(deckId);
                 return (0, layoutId);
+            }
+            else
+            {
+                await _deckRepository.FixOrderAsync(deckId);
             }
 
             return (deckId, 0);
