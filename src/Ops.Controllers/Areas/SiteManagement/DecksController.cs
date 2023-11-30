@@ -485,6 +485,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                                 string.Join(", ", permissionGroupsStrings));
                         }
                     }
+                    else
+                    {
+                        _logger.LogInformation("No page header found for deck id {DeckId}",
+                            deckId);
+                    }
                 }
                 else
                 {
