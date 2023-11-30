@@ -456,7 +456,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
                 || await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.WebPageContentManagement))
+                    ApplicationPermission.WebPageContentManagement))
             {
                 return true;
             }
@@ -487,8 +487,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     }
                     else
                     {
-                        _logger.LogInformation("No page header found for deck id {DeckId}",
-                            deckId);
+                        _logger.LogInformation("No page header found for deck id {DeckId}", deckId);
                     }
                 }
                 else
