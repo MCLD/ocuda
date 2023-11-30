@@ -473,8 +473,24 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         var permissionGroupsStrings = permissionGroups
                             .Select(_ => _.PermissionGroupId.ToString(CultureInfo.InvariantCulture));
 
-                        return permissionClaims.Any(_ => permissionGroupsStrings.Contains(_));
+                        if (permissionClaims.Any(_ => permissionGroupsStrings.Contains(_)))
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            _logger.LogInformation("No permission for {Username} ({UserId}) to edit decks, permissions: {PermissionList}",
+                                CurrentUsername,
+                                CurrentUserId,
+                                string.Join(", ", permissionGroupsStrings));
+                        }
                     }
+                }
+                else
+                {
+                    _logger.LogInformation("No claims for {UserName} ({UserId}) to edit decks.",
+                        CurrentUsername,
+                        CurrentUserId);
                 }
                 return false;
             }

@@ -7,6 +7,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     {
         Task DeleteDeckAsync(int deckId);
 
+        Task FixOrderAsync(int deckId);
+
         Task<Deck> GetByIdAsync(int deckId);
 
         Task<int?> GetPageHeaderIdAsync(int deckId);
