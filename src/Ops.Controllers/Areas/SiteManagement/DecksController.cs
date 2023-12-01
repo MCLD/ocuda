@@ -201,7 +201,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             int? deckId = null;
             try
             {
-                deckId = await _deckService.CardOrderAsync(cardId, true);
+                deckId = await _deckService.CardOrderAsync(cardId, false);
             }
             catch (OcudaException oex)
             {
@@ -218,7 +218,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             int? deckId = null;
             try
             {
-                deckId = await _deckService.CardOrderAsync(cardId, false);
+                deckId = await _deckService.CardOrderAsync(cardId, true);
             }
             catch (OcudaException oex)
             {
@@ -479,7 +479,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         }
                         else
                         {
-                            _logger.LogInformation("No permission for {Username} ({UserId}) to edit decks, permissions: {PermissionList}",
+                            _logger.LogWarning("No permission for {Username} ({UserId}) to edit decks, permissions: {PermissionList}",
                                 CurrentUsername,
                                 CurrentUserId,
                                 string.Join(", ", permissionGroupsStrings));
@@ -487,12 +487,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     }
                     else
                     {
-                        _logger.LogInformation("No page header found for deck id {DeckId}", deckId);
+                        _logger.LogWarning("No page header found for deck id {DeckId}", deckId);
                     }
                 }
                 else
                 {
-                    _logger.LogInformation("No claims for {UserName} ({UserId}) to edit decks.",
+                    _logger.LogWarning("No claims for {UserName} ({UserId}) to edit decks.",
                         CurrentUsername,
                         CurrentUserId);
                 }

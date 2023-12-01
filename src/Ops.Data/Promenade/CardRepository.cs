@@ -30,7 +30,7 @@ namespace Ocuda.Ops.Data.Promenade
                   .Where(_ => _.DeckId == card.DeckId)
                   .MaxAsync(_ => (int?)_.Order);
 
-            card.Order = largestOrder ?? 0 + 1;
+            card.Order = (largestOrder ?? 0) + 1;
 
             await DbSet.AddAsync(card);
             return card;
