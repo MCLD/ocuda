@@ -83,6 +83,14 @@ namespace Ocuda.Ops.Service
 
             if (increment)
             {
+                var nextCard = cards.SingleOrDefault(_ => _.Order == requestedCard.Order + 1)
+                    ?? throw new OcudaException($"Card id {cardId} is already the last card.");
+                nextCard.Order--;
+                requestedCard.Order++;
+                _cardRepository.Update(nextCard);
+            }
+            else
+            {
                 var prevCard = cards.SingleOrDefault(_ => _.Order == requestedCard.Order - 1);
                 if (prevCard == null || requestedCard.Order <= 1)
                 {
@@ -92,14 +100,7 @@ namespace Ocuda.Ops.Service
                 requestedCard.Order--;
                 _cardRepository.Update(prevCard);
             }
-            else
-            {
-                var nextCard = cards.SingleOrDefault(_ => _.Order == requestedCard.Order + 1)
-                    ?? throw new OcudaException($"Card id {cardId} is already the last card.");
-                nextCard.Order--;
-                requestedCard.Order++;
-                _cardRepository.Update(nextCard);
-            }
+
             _cardRepository.Update(requestedCard);
             await _cardRepository.SaveAsync();
 
