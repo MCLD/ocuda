@@ -114,27 +114,58 @@ footer {
     display: none;
 }
 
-.prom-nav-middle .prom-nav-link {
-    display: block;
-}
-
 .prom-nav-top > .prom-right-nav .prom-nav-link {
     display: block;
 }
 
 /* bottom nav bar */
+.prom-width-100 {
+    width: 100%;
+}
+
 .prom-nav-middle-parent {
     background-color: #333;
 }
 
 .prom-nav-middle .prom-nav-dropdown {
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    transform: none;
     cursor: pointer;
+    background-color: inherit;
+    max-width: inherit;
+    min-width: unset;
+    border: none;
+    border-radius: 0;
+}
+
+.prom-nav-middle .prom-nav-dropdown .dropdown-item {
+    text-align: center;
+    white-space: normal;
+    padding: 0.5rem 0;
+}
+
+.prom-nav-middle .prom-nav-link {
+    flex: 1;
+    max-width: 140px;
+    display: block;
+}
+
+.prom-nav-middle .nav-link {
+    line-height: 45px;
+}
+
+.prom-nav-middle li.prom-nav-link:first-child {
+    display: none;
 }
 
 .prom-nav-middle li.prom-nav-link {
-    border: 2px solid #ccc;
+    text-align: center;
+    font-weight: bold;
+    background-color: lightgray;
+}
+
+.prom-nav-middle li.prom-nav-link:nth-child(even) {
     background-color: white;
 }
 
@@ -142,19 +173,18 @@ footer {
     border-radius: 0;
 }
 
+.prom-nav-middle .prom-nav-dropdown li {
+    border: 1px solid white;
+}
+
 @media (min-width: 385px) {
     .prom-nav-middle .prom-dropdown-swap-link {
         display: block;
-        border: 2px solid #ccc;
         background-color: white;
     }
 
     .prom-nav-top > .prom-right-nav .prom-dropdown-swap-link {
         display: block;
-    }
-
-    .prom-nav-middle .prom-nav-link {
-        display: none;
     }
 
     .prom-nav-top > .prom-right-nav .prom-nav-link {
@@ -164,6 +194,21 @@ footer {
     .prom-nav-middle .prom-dropdown-swap-link > a {
         border-radius: 0;
     }
+}
+
+@media (min-width: 576px) {
+    .prom-nav-middle li.prom-nav-link:first-child {
+        display: block;
+    }
+
+    .prom-nav-middle li.prom-nav-link {
+        background-color: white;
+    }
+
+    .prom-nav-middle li.prom-nav-link:nth-child(even) {
+        background-color: lightgray;
+    }
+    
 }
 
 /* content */
