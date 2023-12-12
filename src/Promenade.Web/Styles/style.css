@@ -142,7 +142,8 @@ footer {
 .prom-nav-middle .prom-nav-dropdown .dropdown-item {
     text-align: center;
     white-space: normal;
-    padding: 0.5rem 0;
+    word-break: break-word;
+    padding: 0.7rem 0;
 }
 
 .prom-nav-middle .prom-nav-link {
@@ -151,8 +152,12 @@ footer {
     display: block;
 }
 
-.prom-nav-middle .nav-link {
-    line-height: 45px;
+.prom-nav-middle .prom-nav-link .nav-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 5px;
 }
 
 .prom-nav-middle li.prom-nav-link:first-child {
@@ -162,11 +167,27 @@ footer {
 .prom-nav-middle li.prom-nav-link {
     text-align: center;
     font-weight: bold;
-    background-color: lightgray;
+    background-color: #979797;
 }
 
 .prom-nav-middle li.prom-nav-link:nth-child(even) {
-    background-color: white;
+    background-color: #e2e2e2;
+}
+
+.prom-nav-link *, .prom-nav-link:hover .dropdown-toggle::after, .nav-link:focus {
+    color: black;
+}
+
+.prom-nav-link .dropdown-toggle {
+    white-space: normal;
+}
+
+.dropdown-toggle::after {
+    transition: transform 0.2s ease;
+}
+
+.dropdown-toggle.show::after {
+    transform: rotate(-180deg);
 }
 
 .prom-nav-middle a.prom-nav-link {
@@ -174,7 +195,7 @@ footer {
 }
 
 .prom-nav-middle .prom-nav-dropdown li {
-    border: 1px solid white;
+    border-bottom: 2px solid white;
 }
 
 @media (min-width: 385px) {
@@ -202,12 +223,12 @@ footer {
     }
 
     .prom-nav-middle li.prom-nav-link {
-        background-color: white;
+        background-color: #e2e2e2;
     }
 
-    .prom-nav-middle li.prom-nav-link:nth-child(even) {
-        background-color: lightgray;
-    }
+        .prom-nav-middle li.prom-nav-link:nth-child(even) {
+            background-color: #979797;
+        }
     
 }
 
