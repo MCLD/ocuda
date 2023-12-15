@@ -13,6 +13,7 @@
         public const string HrefLang = "HrefLang";
         public const string L10n = "L10n";
         public const string LeftNavigation = "LeftNavigation";
+        public const string MainPhoneNumber = "MainPhoneNumber";
         public const string MiddleNavigation = "MiddleNavigation";
         public const string PageTitleSuffix = "PageTitle";
         public const string PublicContentPath = "PublicContentPath";

@@ -133,6 +133,9 @@ namespace Ocuda.Promenade.Controllers.Filters
             context.HttpContext.Items[ItemKey.SocialYoutubeUrl] = await _siteSettingService
                 .GetSettingStringAsync(SiteSetting.Social.YoutubeUrl, forceReload);
 
+            context.HttpContext.Items[ItemKey.MainPhoneNumber] = await _siteSettingService
+                .GetSettingStringAsync(SiteSetting.Social.MainPhoneNumber, forceReload);
+
             await next();
         }
     }

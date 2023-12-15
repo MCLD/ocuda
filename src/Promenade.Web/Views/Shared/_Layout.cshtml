@@ -57,7 +57,7 @@
                     {
                         if (l10nLinks?.Count() > 1)
                         {
-                            <div class="@(topNavigation?.Navigations.Count() == 0 ? "col-12" : "col-3")">
+                            <div class="@(topNavigation?.Navigations.Count() == 0 ? "col-12" : "col-4")">
                                 @if (!string.IsNullOrEmpty(bannerImage))
                                 {
                                     <span role="banner" aria-label="@Localizer[Promenade.VisitHomePage]">
@@ -76,32 +76,26 @@
                         }
                         if (topNavigation?.Navigations.Count() > 0)
                         {
-                            <ul class="@(l10nLinks?.Count() > 1 ? "col-9" : "col-12") prom-right-nav">
+                            <ul class="@(l10nLinks?.Count() > 1 ? "col-8" : "col-12") prom-right-nav">
                                 <li>
-                                    <span class="dropdown">
-                                        <button class="btn btn-outline-dark btn-sm dropdown-toggle prom-language-dropdown"
-                                                type="button"
-                                                id="languageDropdown"
-                                                data-bs-toggle="dropdown"
-                                                aria-haspopup="true" aria-expanded="true">
-                                            @(currentUiCulture.Parent.NativeName ?? currentUiCulture.NativeName) <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu" role="list">
-                                            @foreach (var l10nItem in l10nLinks)
-                                            {
-                                                <li>
-                                                    <a href="@l10nItem.Value"
-                                                       class="dropdown-item">@l10nItem.Key</a>
-                                                </li>
-                                            }
-                                        </ul>
-                                    </span>
+                                    <div class="btn-group btn-toggle" style="border: 2px solid #0A58CA; border-radius:10px; overflow: hidden">
+                                        @{
+                                            var currentLang = currentUiCulture.Parent.Name ?? currentUiCulture.Name;
+                                            var languages = l10nLinks.ToArray();
+                                            string currentL10 = languages.LastOrDefault().Value.Contains(currentLang)
+                                            ? languages.LastOrDefault().Value
+                                            : languages.FirstOrDefault().Value;
+                                            <a href="@languages[0].Value"><button style="border-radius: 0 6px 6px 0;" class="btn btn-sm @(languages[0].Value == currentL10 ? "btn-primary active" : "btn-default")">@languages[0].Key</button></a>
+                                            <a href="@languages[1].Value"><button style="border-radius: 6px 0 0 6px" class="btn btn-sm @(languages[1].Value == currentL10 ? "btn-primary active" : "btn-default")">@languages[1].Key</button></a>
+                                        }
+
+                                    </div>
                                 </li>
                                 @foreach (var item in topNavigation.Navigations)
                                 {
                                     if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)
                                     {
-                                        <li class="nav-item @(item.Navigations.Count() == 0 ? null : "prom-nav-link")">
+                                        <li class="nav-item prom-nav-top-button @(item.Navigations.Count() == 0 ? null : "prom-nav-link")">
                                             @if (string.IsNullOrEmpty(item.NavigationText.Label)
                                        && !string.IsNullOrEmpty(item.Icon)
                                        && !string.IsNullOrEmpty(item.NavigationText.Title))
@@ -132,7 +126,7 @@
                                     if (item.Navigations.Count() > 0)
                                     {
                                         <li role="presentation"
-                                            class="dropdown @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : null)">
+                                            class="dropdown prom-nav-top-button @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : null)">
                                             <a class="nav-link dropdown-toggle @(item.NavigationText.Label == null ? null : "d-flex align-items-center")"
                                                data-bs-toggle="dropdown"
                                                href="#"
@@ -192,7 +186,7 @@
                     <div class="row">
                         <div class="d-flex prom-nav-middle-parent p-0">
                             <div class="prom-nav-middle d-print-none prom-width-100" aria-label="bottom" role="navigation">
-                                <ul class="nav nav-pills d-flex justify-content-center align-items-center prom-width-100">
+                                <ul class="nav nav-pills d-flex justify-content-center align-items-stretch prom-width-100">
                                     @foreach (var item in middleNavigation.Navigations)
                                     {
                                         <li role="presentation"
@@ -250,6 +244,7 @@
         <div class="row prom-content-container">
             @{
                 var leftNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.LeftNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
+                leftNavigation = null;
                 int leftNavigationSectionNumber = 0;
                 int leftNavigationFeaturetteNumber = 0;
             }
@@ -406,51 +401,24 @@
         </div>
         @{
             var footerNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.FooterNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
+            var footerImage = Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImageAlt] as string;
             if (footerNavigation?.Navigations.Count() > 0)
             {
-                <footer class="row d-print-none" role="contentinfo">
-                    <div class="col-12 d-flex justify-content-center align-items-center">
-                        @if (!string.IsNullOrEmpty(bannerImage))
-                        {
-                            <span role="banner" aria-label="@Localizer[Promenade.VisitHomePage]">
-                                <a asp-action="Index"
-                                   asp-controller="Home"
-                                   asp-area=""
-                                   asp-route-culture="">
-                                    <img src="@bannerImage"
-                                         alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImageAlt]"
-                                         class="img-fluid mx-auto prom-logo" />
-                                </a>
-                            </span>
-                        }
-                        @foreach (var item in footerNavigation.Navigations)
-                        {
-                            <div>
-                                @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                           && !string.IsNullOrEmpty(item.Icon)
-                           && !string.IsNullOrEmpty(item.NavigationText.Title))
-                                {
-                                    <a href="@item.NavigationText.Link"
-                                       title="@item.NavigationText.Title"
-                                       aria-label="@item.NavigationText.Title">
-                                        <span class="@item.Icon"></span>
-                                    </a>
-                                }
-                                else
-                                {
-                                    <a href="@item.NavigationText.Link">
-                                        @if (!string.IsNullOrEmpty(item.Icon))
-                                        {
-                                            <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space")"></span>
-                                        }
-                                        <span class="prom-footer-link-text">@item.NavigationText.Label</span>
-                                    </a>
-                                }
-                            </div>
-                        }
-                        <div class="d-none d-sm-block me-2" style="font-size: 1.25rem;">
+                <footer class="row row-nowrap d-print-none" role="contentinfo">
+                    <div class="col-3 col-sm-12 prom-footer-contact">
+                        <div class="col-12 col-sm-3 text-center footer-contact">
+                            Contact Us
+                        </div>
+                        <div class="col-12 col-sm-3 text-center footer-contact">
+                            @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.MainPhoneNumber]?.ToString()))
+                            {
+                                <span>@Context.Items[Ocuda.Promenade.Controllers.ItemKey.MainPhoneNumber]</span>
+                            }
+                        </div>
+                        <div class="col-12 col-sm-3 text-center footer-contact">
                             <ul aria-label="@Localizer[Promenade.ConnectSocialMedia]"
                                 class="nav d-inline-flex justify-content-center prom-nav-middle-social">
+
                                 @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]?.ToString()))
                                 {
                                     <li>
@@ -507,6 +475,48 @@
                                 }
                             </ul>
                         </div>
+                    </div>
+                    <div class="col-12 d-flex justify-content-center align-items-center">
+                        @if (!string.IsNullOrEmpty(footerImage))
+                        {
+                            <div class="col-2">
+                                <span role="banner" aria-label="@Localizer[Promenade.VisitHomePage]">
+                                    <a asp-action="Index"
+                                       asp-controller="Home"
+                                       asp-area=""
+                                       asp-route-culture="">
+                                        <img src="@footerImage"
+                                             alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImageAlt]"
+                                             class="img-fluid mx-auto prom-logo" />
+                                    </a>
+                                </span>
+                            </div>
+                        }
+                        @foreach (var item in footerNavigation.Navigations)
+                        {
+                            <div>
+                                @if (string.IsNullOrEmpty(item.NavigationText.Label)
+                           && !string.IsNullOrEmpty(item.Icon)
+                           && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                {
+                                    <a href="@item.NavigationText.Link"
+                                       title="@item.NavigationText.Title"
+                                       aria-label="@item.NavigationText.Title">
+                                        <span class="@item.Icon"></span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="@item.NavigationText.Link">
+                                        @if (!string.IsNullOrEmpty(item.Icon))
+                                        {
+                                            <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space")"></span>
+                                        }
+                                        <span class="prom-footer-link-text">@item.NavigationText.Label</span>
+                                    </a>
+                                }
+                            </div>
+                        }
                     </div>
                 </footer>
             }

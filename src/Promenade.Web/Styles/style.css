@@ -23,8 +23,13 @@ span.prom-fa-space {
 /* footer */
 footer {
     background-color: #333;
-    height: 51px;
+    display: flex;
+    flex-direction: row-reverse;
 }
+
+    footer.row-nowrap {
+        flex-wrap: nowrap;
+    }
 
     footer a,
     footer a:hover {
@@ -36,6 +41,12 @@ footer {
         footer a:hover .prom-footer-link-text {
             text-decoration: underline;
         }
+
+@media (min-width:576px) {
+    footer {
+        flex-direction: column;
+    }
+}
 
 /* carousels */
 
@@ -71,32 +82,43 @@ footer {
 }
 
 /* top nav bar */
+.prom-logo {
+    max-height: 80px;
+}
+
 .prom-nav-top {
     background-color: white;
     color: #666;
     line-height: normal;
 }
 
-    .prom-nav-top .prom-language-dropdown {
-        margin: 10px 0;
+.prom-nav-top-button {
+    border-radius: 50px 10px 10px 50px;
+    background-color: #F26729;
+    margin-left: 15px;
+}
+
+.prom-nav-top .prom-language-dropdown {
+    margin: 10px 0;
+}
+
+.prom-nav-top > .prom-right-nav {
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    list-style-type: none;
+}
+
+    .prom-nav-top > .prom-right-nav > li {
+        padding: 0.4rem 0.5rem;
+        height: fit-content;
     }
 
-    .prom-nav-top > .prom-right-nav {
-        margin: 0;
-        display: flex;
-        justify-content: flex-end;
-        list-style-type: none;
-    }
-
-        .prom-nav-top > .prom-right-nav > li {
-            padding: 1rem 0.5rem;
-            float: right;
+        .prom-nav-top > .prom-right-nav > li > a {
+            color: white;
+            padding: 0
         }
-
-            .prom-nav-top > .prom-right-nav > li > a {
-                color: #666;
-                padding: 0;
-            }
 
 .prom-location .prom-features a:hover {
     text-decoration: none;
@@ -123,6 +145,29 @@ footer {
     width: 100%;
 }
 
+.prom-footer-contact {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: rgb(61, 61, 194);
+    padding-left: 0;
+    padding-right: 0;
+}
+
+    .prom-footer-contact a {
+        color: white;
+    }
+
+    .prom-footer-contact .footer-contact {
+        padding: 5px 0;
+        color: white;
+        font-weight: bold;
+    }
+
+        .prom-footer-contact .footer-contact:nth-child(odd) {
+            background: rgb(83, 134, 211);
+        }
+
 .prom-nav-middle-parent {
     background-color: #333;
 }
@@ -139,26 +184,27 @@ footer {
     border-radius: 0;
 }
 
-.prom-nav-middle .prom-nav-dropdown .dropdown-item {
-    text-align: center;
-    white-space: normal;
-    word-break: break-word;
-    padding: 0.7rem 0;
-}
+    .prom-nav-middle .prom-nav-dropdown .dropdown-item {
+        text-align: center;
+        white-space: normal;
+        word-break: break-word;
+        padding: 0.7rem 0;
+    }
 
 .prom-nav-middle .prom-nav-link {
     flex: 1;
     max-width: 140px;
+    line-height: 18px;
     display: block;
 }
 
-.prom-nav-middle .prom-nav-link .nav-link {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    padding: 5px;
-}
+    .prom-nav-middle .prom-nav-link .nav-link {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        padding: 5px;
+    }
 
 .prom-nav-middle li.prom-nav-link:first-child {
     display: none;
@@ -170,9 +216,9 @@ footer {
     background-color: #979797;
 }
 
-.prom-nav-middle li.prom-nav-link:nth-child(even) {
-    background-color: #e2e2e2;
-}
+    .prom-nav-middle li.prom-nav-link:nth-child(even) {
+        background-color: #e2e2e2;
+    }
 
 .prom-nav-link *, .prom-nav-link:hover .dropdown-toggle::after, .nav-link:focus {
     color: black;
@@ -218,6 +264,10 @@ footer {
 }
 
 @media (min-width: 576px) {
+    .prom-footer-contact {
+        flex-direction: row;
+    }
+
     .prom-nav-middle li.prom-nav-link:first-child {
         display: block;
     }
@@ -229,7 +279,6 @@ footer {
         .prom-nav-middle li.prom-nav-link:nth-child(even) {
             background-color: #979797;
         }
-    
 }
 
 /* content */
@@ -353,10 +402,10 @@ a.prom-leftnav-header:hover {
     }
 
 .prom-tile {
-    padding-top: 45px;
+    padding-top: 15px;
     background: white;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.125);
-    height: 162px;
+    height: 132px;
     margin-bottom: 0.5rem;
 }
 

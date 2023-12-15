@@ -11,6 +11,7 @@
             public const string TwitterUrl = "Social.TwitterUrl";
             public const string TwitterUsername = "Social.TwitterUsername";
             public const string YoutubeUrl = "Social.YoutubeUrl";
+            public const string MainPhoneNumber = "Social.MainPhoneNumber";
         }
 
         public struct Site
