@@ -201,7 +201,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             int? deckId = null;
             try
             {
-                deckId = await _deckService.CardOrderAsync(cardId, true);
+                deckId = await _deckService.CardOrderAsync(cardId, false);
             }
             catch (OcudaException oex)
             {
@@ -218,7 +218,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             int? deckId = null;
             try
             {
-                deckId = await _deckService.CardOrderAsync(cardId, false);
+                deckId = await _deckService.CardOrderAsync(cardId, true);
             }
             catch (OcudaException oex)
             {
@@ -456,7 +456,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
                 || await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.WebPageContentManagement))
+                    ApplicationPermission.WebPageContentManagement))
             {
                 return true;
             }
@@ -473,8 +473,28 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         var permissionGroupsStrings = permissionGroups
                             .Select(_ => _.PermissionGroupId.ToString(CultureInfo.InvariantCulture));
 
-                        return permissionClaims.Any(_ => permissionGroupsStrings.Contains(_));
+                        if (permissionClaims.Any(_ => permissionGroupsStrings.Contains(_)))
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            _logger.LogWarning("No permission for {Username} ({UserId}) to edit decks, permissions: {PermissionList}",
+                                CurrentUsername,
+                                CurrentUserId,
+                                string.Join(", ", permissionGroupsStrings));
+                        }
                     }
+                    else
+                    {
+                        _logger.LogWarning("No page header found for deck id {DeckId}", deckId);
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("No claims for {UserName} ({UserId}) to edit decks.",
+                        CurrentUsername,
+                        CurrentUserId);
                 }
                 return false;
             }

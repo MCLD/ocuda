@@ -44,6 +44,7 @@
 </div>
 
 <form id="addImageForm" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="DeckId" />
     <input type="hidden" asp-for="CardDetail.CardId" />
     <input type="hidden" asp-for="CardDetail.LanguageId" />
     <div class="modal fade" data-bs-backdrop="static" data-keyboard="false" id="addModal">
@@ -278,8 +279,8 @@ filename = Model.CardDetail.Filename
                 ResetSpinners();
             }
         }
-        
-        $('#addModal').on('hidden.bs.modal', function(e) {
+
+        $('#addModal').on('hidden.bs.modal', function (e) {
             $('#CardImage').val('');
             $('#addImageAlertRow').addClass('d-none');
             $('#AltText').val('');
