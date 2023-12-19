@@ -5,57 +5,68 @@
     <socialcard card="@Model.PageLayout.SocialCard"></socialcard>
 }
 
-<div class="row d-flex justify-content-center mb-4">
-    <div class="d-flex flex-column flex-sm-row col-12 col-md-10 col-xl-8">
-        <div class="col-12 col-sm-8 d-flex align-items-center">
-            <img class="img-fluid" src="https://mcldaz.org/assets/images/en-US/features/Winter%20Reading%20FC%20(1).jpg" />
-        </div>
-        <div class="d-flex flex-column justify-content-between col-12 col-sm-4 p-1 gap-1" style="background:lightgray">
-            <div class="d-flex align-items-center flex-grow-1" style="background:white">
-                <span class="fa-solid fa-landmark p-3 py-sm-0"></span>
-                <span>Locations</span>
-            </div>
-            <div class="d-flex align-items-center flex-grow-1" style="background:white">
-                <span class="fa-regular fa-calendar-days p-3 py-sm-0"></span>
-                <span>Events</span>
-            </div>
-            <div class="d-flex align-items-center flex-grow-1" style="background:white">
-                <span class="fa-solid fa-circle-info p-3 py-sm-0"></span>
-                <span>Help & Info</span>
-            </div>
-            <div class="d-flex align-items-center flex-grow-1" style="background:white">
-                <span class="fa-regular fa-face-smile-beam p-3 py-sm-0"></span>
-                <span>Ask Us!</span>
+<!--
+<div class="row">
+    <div class="col-12">
+        <div class="mx-auto d-block mb-3" style="max-width: 740px;">
+            <div class="row no-gutters">
+                <div class="col-12 col-sm-9">
+                    <img class="img-fluid" src="https://mcldaz.org/assets/images/en-US/features/Winter%20Reading%20FC%20(1).jpg" />
+                </div>
+                <div class="d-flex flex-column justify-content-between col-12 col-sm-3 p-2 gap-2" style="background:lightgray; box-sizing: border-box">
+                    <div class="d-flex align-items-center flex-grow-1" style="background:white">
+                        <span class="fa-solid fa-landmark px-2 px-sm-3"></span>
+                        <span>Locations</span>
+                    </div>
+                    <div class="d-flex align-items-center flex-grow-1" style="background:white">
+                        <span class="fa-regular fa-calendar-days px-2 px-sm-3"></span>
+                        <span>Events</span>
+                    </div>
+                    <div class="d-flex align-items-center flex-grow-1" style="background:white">
+                        <span class="fa-solid fa-circle-info px-2 px-sm-3"></span>
+                        <span>Help & Info</span>
+                    </div>
+                    <div class="d-flex align-items-center flex-grow-1" style="background:white">
+                        <span class="fa-regular fa-face-smile-beam px-2 px-sm-3"></span>
+                        <span>Ask Us!</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row d-flex justify-content-center mb-4">
-    <div class="d-flex col-12 col-md-10 col-xl-8">
-        <div class="col-8 d-flex align-items-center">
-            <img class="img-fluid" src="https://mcldaz.org/assets/images/en-US/features/Winter%20Reading%20FC%20(1).jpg" />
-        </div>
-        <div class="d-flex flex-column justify-content-between col-4 p-1 gap-1" style="background:lightgray">
-            <div class="d-flex align-items-center flex-grow-1" style="background:white">
-                <span class="fa-solid fa-landmark px-2 px-sm-3"></span>
-                <span>Locations</span>
-            </div>
-            <div class="d-flex align-items-center flex-grow-1" style="background:white">
-                <span class="fa-regular fa-calendar-days px-2 px-sm-3"></span>
-                <span>Events</span>
-            </div>
-            <div class="d-flex align-items-center flex-grow-1" style="background:white">
-                <span class="fa-solid fa-circle-info px-2 px-sm-3"></span>
-                <span>Help & Info</span>
-            </div>
-            <div class="d-flex align-items-center flex-grow-1" style="background:white">
-                <span class="fa-regular fa-face-smile-beam px-2 px-sm-3"></span>
-                <span>Ask Us!</span>
+<div class="row">
+    <div class="col-12">
+        <div class="mx-auto d-block mb-3" style="max-width: 740px;">
+            <div class="row no-gutters">
+                <div class="col-9">
+                    <img class="img-fluid" src="https://mcldaz.org/assets/images/en-US/features/Winter%20Reading%20FC%20(1).jpg" />
+                </div>
+                <div class="d-flex flex-column justify-content-between col-3 p-2 gap-2" style="background:lightgray">
+                    <div class="d-flex align-items-center flex-grow-1" style="background:white">
+                        <span class="fa-solid fa-landmark px-2 px-sm-3"></span>
+                        <span>Locations</span>
+                    </div>
+                    <div class="d-flex align-items-center flex-grow-1" style="background:white">
+                        <span class="fa-regular fa-calendar-days px-2 px-sm-3"></span>
+                        <span>Events</span>
+                    </div>
+                    <div class="d-flex align-items-center flex-grow-1" style="background:white">
+                        <span class="fa-solid fa-circle-info px-2 px-sm-3"></span>
+                        <span>Help & Info</span>
+                    </div>
+                    <div class="d-flex align-items-center flex-grow-1" style="background:white">
+                        <span class="fa-regular fa-face-smile-beam px-2 px-sm-3"></span>
+                        <span>Ask Us!</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+-->
 
 @if (Model.HasCarousels)
 {
@@ -201,8 +212,8 @@
                                     {
                                         <text>data-button-@button.Order='{"Sort":"@button.Order","Button":"@button.LabelText.Text","Link":"@button.Url"}' </text>
                                     }>
-                                                                            <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p>
-                                                                        </a>
+                                                                                                                                                    <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p>
+                                                                                                                                                </a>
                                 </div>
                             }
                         </div>
@@ -331,3 +342,36 @@
         </ul>
     }
 }
+
+<!--
+
+<div class="row">
+    <div class="col-12">
+        <div class="mx-auto d-block mb-3" style="max-width: 740px;">
+            <div class="row no-gutters">
+                <div class="col-12 col-sm-9">
+                    <img class="img-fluid" src="https://images.unsplash.com/photo-1577985051167-0d49eec21977" />
+                </div>
+                <div class="d-flex flex-column justify-content-between col-12 col-sm-3 p-2 gap-2" style="background:lightgray">
+                    <a href="" class="prom-segment-nav d-flex align-items-center flex-grow-1" style="background:white">
+                        <span class="fa-solid fa-landmark p-3 py-sm-0"></span>
+                        <span>Locations</span>
+                    </a>
+                    <a href="" class="prom-segment-nav d-flex align-items-center flex-grow-1" style="background:white">
+                        <span class="fa-regular fa-calendar-days p-3 py-sm-0"></span>
+                        <span>Events</span>
+                    </a>
+                    <a href="" class="prom-segment-nav d-flex align-items-center flex-grow-1" style="background:white">
+                        <span class="fa-solid fa-circle-info p-3 py-sm-0"></span>
+                        <span>Help & Info</span>
+                    </a>
+                    <a href="" class="prom-segment-nav d-flex align-items-center flex-grow-1" style="background:white">
+                        <span class="fa-regular fa-face-smile-beam p-3 py-sm-0"></span>
+                        <span>Ask Us!</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+-->
