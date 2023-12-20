@@ -33,7 +33,7 @@ footer {
 }
 
 footer .prom-logo {
-    max-height: 100px;
+    max-height: 90px;
 }
 
     footer.row-nowrap {
@@ -233,7 +233,7 @@ footer .prom-logo {
         justify-content: center;
         align-items: center;
         height: 100%;
-        padding: 5px;
+        padding: 0.25rem;
     }
 
 .prom-nav-middle li.prom-nav-link:first-child {
