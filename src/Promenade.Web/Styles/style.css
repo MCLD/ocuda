@@ -156,10 +156,6 @@ footer .prom-logo {
     text-decoration: underline;
 }
 
-.prom-nav-middle .prom-dropdown-swap-link {
-    display: none;
-}
-
 .prom-nav-top > .prom-right-nav .prom-dropdown-swap-link {
     display: none;
 }
@@ -169,15 +165,11 @@ footer .prom-logo {
 }
 
 /* bottom nav bar */
-.prom-width-100 {
-    width: 100%;
-}
-
 .prom-footer-contact {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background: rgb(61, 61, 194);
+    background: #3d3dc2;
     padding-left: 0;
     padding-right: 0;
 }
@@ -204,38 +196,36 @@ footer .prom-logo {
     }
 
         .prom-footer-contact .footer-contact:nth-child(odd) {
-            background: rgb(83, 134, 211);
+            background: #5386d3;
         }
 
 .prom-nav-middle-parent {
     background-color: #333;
 }
 
+.prom-nav-middle .prom-dropdown-swap-link {
+    display: none;
+}
+
 .prom-nav-middle .prom-nav-dropdown {
-    padding-top: 0px;
-    padding-bottom: 0px;
-    transform: none;
+    padding: 0;
     cursor: pointer;
     background-color: inherit;
-    max-width: inherit;
     min-width: unset;
     border: none;
     border-radius: 0;
+    text-align: center;
 }
 
     .prom-nav-middle .prom-nav-dropdown .dropdown-item {
-        text-align: center;
         white-space: normal;
         word-break: break-word;
         padding: 0.7rem 0.4rem;
-        width: 100%;
     }
 
 .prom-nav-middle .prom-nav-link {
     flex: 1;
     max-width: 140px;
-    line-height: 18px;
-    display: block;
 }
 
     .prom-nav-middle .prom-nav-link .nav-link {
@@ -251,8 +241,6 @@ footer .prom-logo {
 }
 
 .prom-nav-middle li.prom-nav-link {
-    text-align: center;
-    font-weight: bold;
     background-color: #979797;
 }
 
@@ -274,14 +262,6 @@ footer .prom-logo {
 
 .dropdown-toggle.show::after {
     transform: rotate(-180deg);
-}
-
-.prom-nav-middle a.prom-nav-link {
-    border-radius: 0;
-}
-
-.prom-nav-middle .prom-nav-dropdown li {
-    border-bottom: 2px solid white;
 }
 
 .prom-top-searchbar {
@@ -570,15 +550,4 @@ blockquote {
     .prom-content-container {
         background-color: white;
     }
-}
-
-.no-gutters {
-    margin-right: 0;
-    margin-left: 0;
-    > .col, > [class*="col-"]
-
-{
-    padding-right: 0;
-    padding-left: 0;
-}
 }

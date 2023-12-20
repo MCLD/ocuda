@@ -85,9 +85,9 @@
 
                             <ul class="@(l10nLinks?.Count() > 1 ? "col-8" : "col-12") prom-right-nav">
                                 <li class="d-none d-sm-block p-0">
-                                    <div class="btn-group btn-toggle" style="border: 2px solid #0A58CA; border-radius:10px; overflow: hidden">
-                                        <a href="@languages[0].Value"><button style="border-radius: 0 6px 6px 0;" class="btn btn-sm @(languages[0].Value == currentL10 ? "btn-primary active" : "btn-default")">@languages[0].Key</button></a>
-                                        <a href="@languages[1].Value"><button style="border-radius: 6px 0 0 6px" class="btn btn-sm @(languages[1].Value == currentL10 ? "btn-primary active" : "btn-default")">@languages[1].Key</button></a>
+                                    <div class="btn-group btn-toggle border border-2 border-primary rounded" style="overflow: hidden">
+                                        <a href="@languages[0].Value"><button style="border-radius: 0 6px 6px 0;" class="btn btn-md border-0 @(languages[0].Value == currentL10 ? "btn-primary bg-primary active" : "btn-default")">@languages[0].Key</button></a>
+                                        <a href="@languages[1].Value"><button style="border-radius: 6px 0 0 6px" class="btn btn-md border-0 @(languages[1].Value == currentL10 ? "btn-primary bg-primary active" : "btn-default")">@languages[1].Key</button></a>
 
                                     </div>
                                 </li>
@@ -193,8 +193,8 @@
                 {
                     <div class="row">
                         <div class="d-flex prom-nav-middle-parent p-0">
-                            <div class="prom-nav-middle d-print-none prom-width-100" aria-label="bottom" role="navigation">
-                                <ul class="nav nav-pills d-flex justify-content-center align-items-stretch prom-width-100">
+                            <div class="prom-nav-middle d-print-none w-100" aria-label="bottom" role="navigation">
+                                <ul class="nav nav-pills d-flex justify-content-center align-items-stretch w-100">
                                     @foreach (var item in middleNavigation.Navigations)
                                     {
                                         <li role="presentation"
@@ -210,7 +210,7 @@
                                                 <ul class="dropdown-menu prom-nav-dropdown">
                                                     @foreach (var subItem in item.Navigations)
                                                     {
-                                                        <li>
+                                                        <li class="border border-1 border-white border-top-0">
                                                             @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
                                                        && !string.IsNullOrEmpty(subItem.Icon)
                                                        && !string.IsNullOrEmpty(subItem.NavigationText.Title))
