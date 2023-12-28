@@ -58,7 +58,6 @@ footer .prom-logo {
     footer a:hover {
         color: white;
         text-decoration: none;
-        font-size: 0.8rem;
     }
 
         footer a:hover .prom-footer-link-text {
@@ -132,9 +131,10 @@ footer .prom-logo {
 }
 
 .prom-nav-top-button {
-    border-radius: 50px 10px 10px 50px;
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
     background-color: lightgray;
-    margin-left: 15px;
 }
 
 .prom-nav-top .prom-language-dropdown {
@@ -171,6 +171,13 @@ footer .prom-logo {
     display: block;
 }
 
+@media (min-width: 576px) {
+    .prom-nav-top-button {
+        border-radius: 50px 10px 10px 50px;
+        max-width: 120px;
+    }
+}
+
 /* bottom nav bar */
 .prom-footer-contact {
     display: flex;
@@ -191,10 +198,6 @@ footer .prom-logo {
         font-size: 1rem;
         color: white;
     }
-
-        .prom-footer-contact a:hover {
-            font-size: 1rem;
-        }
 
     .prom-footer-contact .footer-contact {
         padding: 10px 0;
@@ -272,7 +275,19 @@ footer .prom-logo {
 .prom-top-searchbar {
     min-height: 40px;
     background-color: #d8dfe1;
+    gap: 10px;
 }
+
+.prom-top-searchbar .dropdown-item {
+    font-weight: bold;
+}
+
+    .prom-top-searchbar .dual-search-button {
+        padding: 0.5rem;
+        border-radius: 10px;
+        border: 1px solid #132048;
+        min-width: 110px;
+    }
 
 @media (min-width: 385px) {
     .prom-nav-middle .prom-dropdown-swap-link {

@@ -45,7 +45,7 @@
     <a aria-label="Skip to main content" href="#mainContent" class="visually-hidden"></a>
     <div class="container-fluid prom-content">
         <header>
-            <div class="row prom-nav-top py-2 p-sm-0 d-print-none" aria-label="Top" role="navigation">
+            <div class="row prom-nav-top py-sm-2 d-print-none" aria-label="Top" role="navigation">
                 @{
                     var topNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.TopNavigation]
                     as Ocuda.Promenade.Models.Entities.Navigation;
@@ -57,7 +57,7 @@
                     {
                         if (l10nLinks?.Count() > 1)
                         {
-                            <div class="col-12 @(topNavigation?.Navigations.Count() == 0 ? "" : "col-sm-4") d-flex justify-content-center justify-content-sm-start">
+                            <div class="col-12 @(topNavigation?.Navigations.Count() == 0 ? "" : "col-sm-4") mb-2 mb-sm-0 ps-sm-0 ps-md-3 d-flex justify-content-center justify-content-sm-start">
                                 @if (!string.IsNullOrEmpty(bannerImage))
                                 {
                                     <span role="banner" aria-label="@Localizer[Promenade.VisitHomePage]">
@@ -83,7 +83,7 @@
                             ? languages.LastOrDefault().Value
                             : languages.FirstOrDefault().Value;
 
-                            <ul class="col-12 @(l10nLinks?.Count() > 1 ? "col-sm-8" : "") d-flex justify-content-around justify-content-sm-end align-items-center m-0 prom-right-nav">
+                            <ul class="@(l10nLinks?.Count() > 1 ? "col-sm-8" : "") mb-0 pe-sm-0 pe-md-3 d-flex justify-content-around justify-content-sm-end align-items-center prom-right-nav px-0">
                                 <li class="d-none d-sm-block p-0">
                                     <div class="btn-group btn-toggle border border-2 border-primary rounded">
                                         <a href="@languages[0].Value">
@@ -102,7 +102,7 @@
                                 <li class="d-sm-none nav-item prom-nav-top-button bg-primary">
                                     <a href="@(languages[0].Value == currentL10 ? languages[1].Value : languages[0].Value)"
                                        class="nav-link d-flex align-items-center">
-                                        <span class="fa-solid fa-comment prom-fa-space"></span>
+                                        <span class="fa-solid fa-comment prom-fa-space hidden-xxs"></span>
                                         <span class="">@currentUiCulture.Parent.DisplayName</span>
                                     </a>
                                 </li>
@@ -111,7 +111,7 @@
                                 {
                                     if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)
                                     {
-                                        <li class="nav-item prom-nav-top-button @(item.Navigations.Count() == 0 ? null : "prom-nav-link")">
+                                        <li class="nav-item prom-nav-top-button ms-sm-2 ms-md-3 @(item.Navigations.Count() == 0 ? null : "prom-nav-link")">
                                             @if (string.IsNullOrEmpty(item.NavigationText.Label)
                                        && !string.IsNullOrEmpty(item.Icon)
                                        && !string.IsNullOrEmpty(item.NavigationText.Title))
@@ -129,11 +129,11 @@
                                                    class="nav-link @(item.NavigationText.Label == null ? null : "d-flex align-items-center")">
                                                     @if (!string.IsNullOrEmpty(item.Icon))
                                                     {
-                                                        <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space")"></span>
+                                                        <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space") hidden-xxs"></span>
                                                     }
                                                     @if (!string.IsNullOrEmpty(item.NavigationText.Label))
                                                     {
-                                                        <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : null)">@item.NavigationText.Label</span>
+                                                        <span>@item.NavigationText.Label</span>
                                                     }
                                                 </a>
                                             }
@@ -142,7 +142,7 @@
                                     if (item.Navigations.Count() > 0)
                                     {
                                         <li role="presentation"
-                                            class="dropdown prom-nav-top-button @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : null)">
+                                            class="dropdown prom-nav-top-button ms-sm-2 ms-md-3 @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : null)">
                                             <a class="nav-link dropdown-toggle @(item.NavigationText.Label == null ? null : "d-flex align-items-center")"
                                                data-bs-toggle="dropdown"
                                                href="#"
@@ -151,11 +151,11 @@
                                                aria-expanded="false">
                                                 @if (!string.IsNullOrEmpty(item.Icon))
                                                 {
-                                                    <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space")"></span>
+                                                    <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space") hidden-xxs"></span>
                                                 }
                                                 @if (!string.IsNullOrEmpty(item.NavigationText.Label))
                                                 {
-                                                    <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : null)">@item.NavigationText.Label</span>
+                                                    <span class="">@item.NavigationText.Label</span>
                                                 }
                                             </a>
                                             <ul class="dropdown-menu dropdown-menu-end prom-nav-dropdown">
@@ -202,70 +202,70 @@
                     <div class="row">
                         <div class="d-flex prom-nav-middle-parent p-0">
                             <div class="prom-nav-middle navbar navbar-dark navbar-expand-sm p-0 d-print-none w-100" aria-label="bottom" role="navigation">
-                                <button class="navbar-toggler nav-link dropdown-toggle border-0 border-bottom border-white w-100 py-3 text-center collapsed" style="box-shadow: none;" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                                <button class="navbar-toggler nav-link dropdown-toggle border-0 border-bottom border-top border-white w-100 py-3 text-center collapsed" style="box-shadow: none;" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                                     <span class="text-white">Menu</span>
                                     <span class="caret"></span>
                                 </button>
-                                <div class="row collapse navbar-collapse" id="navbarSupportedContent">
-                                <ul class="row g-0 flex-column flex-sm-row align-items-stretch nav nav-pills mx-auto" style="max-width: 740px;">
-                                    @foreach (var item in middleNavigation.Navigations)
-                                    {
-                                        <li role="presentation"
-                                            class="nav-item prom-nav-link col-12 col-sm-2 @(item.Navigations.Count() > 0 ? "dropdown" : "")">
-                                            <a class="nav-link col-12 @(item.Navigations.Count() > 0 ? "dropdown-toggle" : "")"
-                                               data-bs-toggle="dropdown"
-                                               href="#"
-                                               role="button"
-                                               aria-haspopup="true"
-                                               aria-expanded="false"><span class="nav-link-icon @(item.Icon != null ? item.Icon : null)"></span><span class="nav-link-text">@item.NavigationText.Label</span><span class="caret"></span></a>
-                                            @if (item.Navigations.Count() > 0)
-                                            {
-                                                <ul class="dropdown-menu prom-nav-dropdown w-100">
-                                                    @foreach (var subItem in item.Navigations)
-                                                    {
-                                                        <li class="border border-1 border-white border-top-0">
-                                                            @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
-                                                       && !string.IsNullOrEmpty(subItem.Icon)
-                                                       && !string.IsNullOrEmpty(subItem.NavigationText.Title))
-                                                            {
-                                                                <a href="@subItem.NavigationText.Link"
-                                                                   target="@(item.TargetNewWindow ? "_blank" : null)"
-                                                                   class="dropdown-item"
-                                                                   title="@subItem.NavigationText.Title"
-                                                                   aria-label="@subItem.NavigationText.Title">
-                                                                    <span class="@subItem.Icon"></span>
-                                                                </a>
-                                                            }
-                                                            else
-                                                            {
-                                                                <a href="@subItem.NavigationText.Link"
-                                                                   target="@(item.TargetNewWindow ? "_blank" : null)"
-                                                                   class="dropdown-item">
-                                                                    @if (!string.IsNullOrEmpty(subItem.Icon))
-                                                                    {
+                                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                                    <ul class="flex-column flex-sm-row align-items-stretch nav nav-pills w-100 mx-auto" style="max-width: 740px;">
+                                        @foreach (var item in middleNavigation.Navigations)
+                                        {
+                                            <li role="presentation"
+                                                class="nav-item prom-nav-link col-12 col-sm-2 @(item.Navigations.Count() > 0 ? "dropdown" : "")">
+                                                <a class="nav-link col-12 p-1 @(item.Navigations.Count() > 0 ? "dropdown-toggle" : "")"
+                                                   data-bs-toggle="dropdown"
+                                                   href="#"
+                                                   role="button"
+                                                   aria-haspopup="true"
+                                                   aria-expanded="false"><span class="nav-link-icon @(item.Icon != null ? item.Icon : null)"></span><span class="nav-link-text">@item.NavigationText.Label</span><span class="caret"></span></a>
+                                                @if (item.Navigations.Count() > 0)
+                                                {
+                                                    <ul class="dropdown-menu prom-nav-dropdown w-100">
+                                                        @foreach (var subItem in item.Navigations)
+                                                        {
+                                                            <li class="border border-1 border-white border-top-0">
+                                                                @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
+                                                           && !string.IsNullOrEmpty(subItem.Icon)
+                                                           && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                                                                {
+                                                                    <a href="@subItem.NavigationText.Link"
+                                                                       target="@(item.TargetNewWindow ? "_blank" : null)"
+                                                                       class="dropdown-item"
+                                                                       title="@subItem.NavigationText.Title"
+                                                                       aria-label="@subItem.NavigationText.Title">
                                                                         <span class="@subItem.Icon"></span>
-                                                                    }
-                                                                    @subItem.NavigationText.Label
-                                                                </a>
-                                                            }
-                                                        </li>
-                                                    }
-                                                </ul>
+                                                                    </a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <a href="@subItem.NavigationText.Link"
+                                                                       target="@(item.TargetNewWindow ? "_blank" : null)"
+                                                                       class="dropdown-item">
+                                                                        @if (!string.IsNullOrEmpty(subItem.Icon))
+                                                                        {
+                                                                            <span class="@subItem.Icon"></span>
+                                                                        }
+                                                                        @subItem.NavigationText.Label
+                                                                    </a>
+                                                                }
+                                                            </li>
+                                                        }
+                                                    </ul>
 
-                                            }
-                                        </li>
-                                    }
-                                </ul>
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
                 }
             }
-            <div class="row prom-top-searchbar d-none d-sm-block">
-                <div style="max-width: 740px" class="mx-auto d-block my-2">
-                    <div class="input-group home-catalog-search">
-                        <div class="d-flex align-items-center dropdown">
+            <div class="row prom-top-searchbar py-2">
+                <div class="mx-auto d-block" style="max-width: 600px">
+                    <div class="input-group flex-column flex-sm-row gap-3 home-catalog-search">
+                        <div class="d-none d-sm-flex align-items-center dropdown">
                             <a class="nav-link dropdown-toggle btn border border-secondary p-2 rounded-4"
                                data-bs-toggle="dropdown"
                                href="#"
@@ -275,31 +275,45 @@
                                 <span class="nav-link-text">Search the Website</span>
                                 <span class="caret"></span>
                             </a>
-                            <ul class="dropdown-menu prom-nav-dropdown">
+                            <ul class="dropdown-menu prom-nav-dropdown p-0">
                                 <li>
-                                    <a href="#" class="dropdown-item">
+                                    <a href="#" class="dropdown-item p-2 rounded">
                                         Search the Website <!-- TODO: These are not functional and should not have hard coded strings -->
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="dropdown-item">
+                                    <a href="#" class="dropdown-item p-2 rounded">
                                         Search the Catalog <!-- TODO: These are not functional and should not have hard coded strings -->
                                     </a>
                                 </li>
                             </ul>
                         </div>
-                        <input type="text"
-                               id="textboxTerm"
-                               onkeypress="return ProcessInput(event)"
-                               class="form-control rounded mx-3"
-                               placeholder="Search the catalog"
-                               title="Search the catalog" />
+                        <div class="d-flex flex-grow-1">
+                            <input type="text"
+                                   id="textboxTerm"
+                                   onkeypress="return ProcessInput(event)"
+                                   class="form-control rounded py-3 py-sm-2 mx-sm-3"
+                                   placeholder="Search Here!"
+                                   title="Search" />
+                        </div>
                         <div class="input-group-append d-flex align-items-center justify-content-center">
-                            <button class="btn search-button rounded-circle"
+                            <button class="btn search-button rounded-circle d-none d-sm-flex"
                                     type="button"
                                     onclick="DoKeywordSearch();">
                                 <span class="fas fa-search"></span>
                             </button>
+                            <div class="d-flex flex-row gap-3 d-sm-none dual-search-button-container">
+                                <button class="btn dual-search-button d-sm-none"
+                                        type="button"
+                                        onclick="alert('Site Search Not Yet Implemented');">
+                                    Site Search
+                                </button>
+                                <button class="btn dual-search-button d-sm-none"
+                                        type="button"
+                                        onclick="DoKeywordSearch();">
+                                    Catalog Search
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -5,9 +5,11 @@
     <socialcard card="@Model.PageLayout.SocialCard"></socialcard>
 }
 
+<!--
+
 <div class="row">
     <div class="col-12">
-        <div class="mx-auto d-block mb-3" style="max-width: 740px;">
+        <div class="mx-auto d-block mb-4" style="max-width: 740px;">
             <div class="row g-0">
                 <div class="col-12 col-sm-9">
                     <img class="img-fluid" src="https://mcldaz.org/assets/images/en-US/features/Winter%20Reading%20FC%20(1).jpg" />
@@ -35,9 +37,11 @@
     </div>
 </div>
 
+
+
 <div class="row">
     <div class="col-12">
-        <div class="mx-auto d-block mb-3" style="max-width: 740px;">
+        <div class="mx-auto d-block mb-4" style="max-width: 740px;">
             <div class="row g-0">
                 <div class="col-9">
                     <img class="img-fluid" src="https://mcldaz.org/assets/images/en-US/features/Winter%20Reading%20FC%20(1).jpg" />
@@ -64,6 +68,8 @@
         </div>
     </div>
 </div>
+
+-->
 
 
 @if (Model.HasCarousels)
@@ -247,14 +253,14 @@
                         }
                         @foreach (var featureItem in item.PageFeature.Items)
                         {
-                            <div class="col-xs-12 col-sm-6 col-lg-3 mb-2">
+                            <div class="col-xs-12 col-sm-6 col-md-3 mb-2">
                                 @if (!string.IsNullOrEmpty(featureItem.ImageFeatureItemText.FileContent))
                                 {
                                     <a href="@featureItem.ImageFeatureItemText.Link" class="d-block prom-tile">
                                         <svg viewBox="0 0 200 200" class="d-block mx-auto">
                                             @Html.Raw(featureItem.ImageFeatureItemText.FileContent)
                                         </svg>
-                                        <p class="px-2">@featureItem.ImageFeatureItemText.AltText</p>
+                                        <p class="px-2 mb-0">@featureItem.ImageFeatureItemText.AltText</p>
                                     </a>
                                 }
                                 else
@@ -340,36 +346,3 @@
         </ul>
     }
 }
-
-<!--
-
-<div class="row">
-    <div class="col-12">
-        <div class="mx-auto d-block mb-3" style="max-width: 740px;">
-            <div class="row g-0">
-                <div class="col-12 col-sm-9">
-                    <img class="img-fluid" src="https://images.unsplash.com/photo-1577985051167-0d49eec21977" />
-                </div>
-                <div class="d-flex flex-column justify-content-between col-12 col-sm-3 p-2 gap-2" style="background:lightgray">
-                    <a href="" class="prom-segment-nav d-flex align-items-center flex-grow-1" style="background:white">
-                        <span class="fa-solid fa-landmark p-3 py-sm-0"></span>
-                        <span>Locations</span>
-                    </a>
-                    <a href="" class="prom-segment-nav d-flex align-items-center flex-grow-1" style="background:white">
-                        <span class="fa-regular fa-calendar-days p-3 py-sm-0"></span>
-                        <span>Events</span>
-                    </a>
-                    <a href="" class="prom-segment-nav d-flex align-items-center flex-grow-1" style="background:white">
-                        <span class="fa-solid fa-circle-info p-3 py-sm-0"></span>
-                        <span>Help & Info</span>
-                    </a>
-                    <a href="" class="prom-segment-nav d-flex align-items-center flex-grow-1" style="background:white">
-                        <span class="fa-regular fa-face-smile-beam p-3 py-sm-0"></span>
-                        <span>Ask Us!</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
--->
