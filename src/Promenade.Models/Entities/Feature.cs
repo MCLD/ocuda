@@ -56,23 +56,23 @@ namespace Ocuda.Promenade.Models.Entities
             { "smart table", "SMART Table" },
             { "laptops & hotspots", "💻 Laptops & HotSpots" },
             { "ukuleles", "🎵 Ukuleles" },
+            { "volunteer", "🙋 Volunteer" }
         };
         [NotMapped]
         private static readonly Dictionary<string, string> LocationServiceNames = new(StringComparer.InvariantCultureIgnoreCase)
         {
             { "7-day express", "📚 7-Day Express" },
             { "low lision resource center", "👓 Low Vision Resource Center" },
-            { "seed library", "Seed Library" },
-            { "solar status", "Solar Status" },
+            { "seed library", "🌿 Seed Library" },
+            { "solar status", "☀️ Solar Status" },
             { "leed gold", "LEED Gold" },
             { "leed platinum", "LEED Platinum" },
             { "printing", "🖨️ Printing" },
-            { "browse events", "Browse Events" },
-            { "send me events", "Send Me Events" },
+            { "browse events", "📖 Browse Events" },
+            { "send me events", "📧 Send Me Events" },
             { "wi-fi", "🛜🌐 Wi-Fi" },
             { "curbside pickup", "🚙 Curbside Pickup" },
             { "facebook", "Facebook" },
-            { "friends", "Friends" }
         };
 
         public static string GetDisplayName(string name)

@@ -9,9 +9,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         public LocationsFeaturesViewModel(LocationFeature locationsFeatures)
         {
             BodyText = CommonMarkConverter.Convert(locationsFeatures?.Feature?.BodyText);
-            Icon = string.IsNullOrEmpty(locationsFeatures?.Feature?.IconText)
-                ? locationsFeatures?.Feature?.Icon
-                : $"{locationsFeatures?.Feature?.Icon} prom-location-icon-text";
+            Icon = locationsFeatures?.Feature?.Icon;
             ImagePath = locationsFeatures?.Feature?.ImagePath;
             Name = locationsFeatures?.Feature?.Name;
             RedirectLink = locationsFeatures?.RedirectUrl;
