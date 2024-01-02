@@ -316,47 +316,47 @@
         </div>
     @foreach (var feature in Model.LocationFeatures)
     {
-                                                            <div class="col-4 col-md-3 col-lg-2 my-2">
+                                                                <div class="col-4 col-md-3 col-lg-2 my-2">
             @if (string.IsNullOrEmpty(feature.RedirectLink))
             {
-                                                                                                                    <a asp-action="@nameof(HomeController.Feature)"
-                                                                                                                       asp-controller="@HomeController.Name"
-                                                                                                                       asp-route-locationSlug="@Model.Location.Stub"
-                                                                                                                       asp-route-featureSlug="@feature.Stub"
-                                                                                                                       data-bs-toggle="modal"
-                                                                                                                       data-bs-target="#featureModal"
-                                                                                                                       target="@(feature.NewTab == true ? "_blank" : null)"
-                                                                                                                       data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
-                                                                                                                       data-name="@feature.Name">
-                                                                                                                        <span class="fa-stack fa-2x d-block mx-auto">
-                                                                                                                            <span class="fa-solid fa-square fa-stack-2x"></span>
-                                                                                                                            <span class="@feature.Icon"
+                                                                                                                            <a asp-action="@nameof(HomeController.Feature)"
+                                                                                                                               asp-controller="@HomeController.Name"
+                                                                                                                               asp-route-locationSlug="@Model.Location.Stub"
+                                                                                                                               asp-route-featureSlug="@feature.Stub"
+                                                                                                                               data-bs-toggle="modal"
+                                                                                                                               data-bs-target="#featureModal"
+                                                                                                                               target="@(feature.NewTab == true ? "_blank" : null)"
+                                                                                                                               data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
+                                                                                                                               data-name="@feature.Name">
+                                                                                                                                <span class="fa-stack fa-2x d-block mx-auto">
+                                                                                                                                    <span class="fa-solid fa-square fa-stack-2x"></span>
+                                                                                                                                    <span class="@feature.Icon"
                         @(string.IsNullOrEmpty(feature.IconText) ? "" : "aria-hidden='true'")>
                             @Html.Raw(feature.IconText)
-                                                                                                                            </span>
-                                                                                                                        </span>
+                                                                                                                                    </span>
+                                                                                                                                </span>
                     @feature.Name
                     @if (feature.NewTab == true)
                     {
-                                                                                                                                                                            <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
+                                                                                                                                                                                        <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
                     }
-                                                                                                                    </a>
+                                                                                                                            </a>
             }
             else
             {
-                                                                                                                    <a href="@feature.RedirectLink" target="@(feature.NewTab == true ? "_blank" : null)">
-                                                                                                                        <span class="fa-stack fa-2x d-block mx-auto">
-                                                                                                                            <span class="fa-solid fa-square fa-stack-2x"></span>
-                                                                                                                            <span class="@feature.Icon"></span>
-                                                                                                                        </span>
+                                                                                                                            <a href="@feature.RedirectLink" target="@(feature.NewTab == true ? "_blank" : null)">
+                                                                                                                                <span class="fa-stack fa-2x d-block mx-auto">
+                                                                                                                                    <span class="fa-solid fa-square fa-stack-2x"></span>
+                                                                                                                                    <span class="@feature.Icon"></span>
+                                                                                                                                </span>
                     @feature.Name
                     @if (feature.NewTab.HasValue && feature.NewTab.Value == true)
                     {
-                                                                                                                                                                            <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
+                                                                                                                                                                                        <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
                     }
-                                                                                                                    </a>
+                                                                                                                            </a>
             }
-                                                            </div>
+                                                                </div>
     }
     </div>
 
