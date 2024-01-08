@@ -85,33 +85,32 @@
 
                             <ul class="@(l10nLinks?.Count() > 1 ? "col-sm-8" : "") mb-0 pe-sm-0 pe-md-3 d-flex justify-content-around justify-content-sm-end align-items-center prom-right-nav px-0">
                                 <li class="d-none d-sm-block p-0">
-                                    <div class="btn-group btn-toggle border border-2 border-primary rounded">
+                                    <div class="btn-group btn-toggle border border-2 border-prom-primary rounded">
                                         <a href="@languages[0].Value">
-                                            <div style="border-radius: 0 6px 6px 0" class="btn btn-md border-0 @(languages[0].Value == currentL10 ? "btn-primary bg-primary active" : "bg-transparent")">
+                                            <div style="border-radius: 0 6px 6px 0" class="btn btn-md border-0 @(languages[0].Value == currentL10 ? "btn-primary bg-prom-primary active" : "bg-transparent")">
                                                 @languages[0].Key
                                             </div>
                                         </a>
                                         <a href="@languages[1].Value">
-                                            <div style="border-radius: 6px 0 0 6px" class="btn btn-md border-0 @(languages[1].Value == currentL10 ? "btn-primary bg-primary active" : "bg-transparent")">
+                                            <div style="border-radius: 6px 0 0 6px" class="btn btn-md border-0 @(languages[1].Value == currentL10 ? "btn-primary bg-prom-primary active" : "bg-transparent")">
                                                 @languages[1].Key
                                             </div>
                                         </a>
 
                                     </div>
                                 </li>
-                                <li class="d-sm-none nav-item prom-nav-top-button bg-primary">
+                                <li class="d-sm-none nav-item prom-nav-top-button bg-prom-primary">
                                     <a href="@(languages[0].Value == currentL10 ? languages[1].Value : languages[0].Value)"
                                        class="nav-link d-flex align-items-center">
-                                        <span class="fa-solid fa-comment prom-fa-space hidden-xxs"></span>
+                                        <span class="fa-solid fa-comment prom-fa-space"></span>
                                         <span class="">@currentUiCulture.Parent.DisplayName</span>
                                     </a>
                                 </li>
 
                                 @foreach (var item in topNavigation.Navigations)
                                 {
-                                    if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)
-                                    {
-                                        <li class="nav-item prom-nav-top-button ms-sm-2 ms-md-3 @(item.Navigations.Count() == 0 ? null : "prom-nav-link")">
+
+                                        <li class="nav-item prom-nav-top-button ms-sm-2 ms-md-3">
                                             @if (string.IsNullOrEmpty(item.NavigationText.Label)
                                        && !string.IsNullOrEmpty(item.Icon)
                                        && !string.IsNullOrEmpty(item.NavigationText.Title))
@@ -129,7 +128,7 @@
                                                    class="nav-link @(item.NavigationText.Label == null ? null : "d-flex align-items-center")">
                                                     @if (!string.IsNullOrEmpty(item.Icon))
                                                     {
-                                                        <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space") hidden-xxs"></span>
+                                                        <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space")"></span>
                                                     }
                                                     @if (!string.IsNullOrEmpty(item.NavigationText.Label))
                                                     {
@@ -138,7 +137,8 @@
                                                 </a>
                                             }
                                         </li>
-                                    }
+
+                                    <!-- TODO: confirm that this can be removed
                                     if (item.Navigations.Count() > 0)
                                     {
                                         <li role="presentation"
@@ -151,7 +151,7 @@
                                                aria-expanded="false">
                                                 @if (!string.IsNullOrEmpty(item.Icon))
                                                 {
-                                                    <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space") hidden-xxs"></span>
+                                                    <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space")"></span>
                                                 }
                                                 @if (!string.IsNullOrEmpty(item.NavigationText.Label))
                                                 {
@@ -189,6 +189,7 @@
                                             </ul>
                                         </li>
                                     }
+                                    -->
                                 }
                             </ul>
                         }
@@ -203,14 +204,14 @@
                 if (middleNavigation?.Navigations.Count() > 0)
                 {
                     <div class="row">
-                        <div class="d-flex prom-nav-middle-parent p-0">
-                            <div class="prom-nav-middle navbar navbar-dark navbar-expand-sm p-0 d-print-none w-100" aria-label="bottom" role="navigation">
+                        <div class="d-flex prom-nav-middle-parent p-0 px-lg-2">
+                            <div class="prom-nav-middle navbar navbar-dark navbar-expand-sm p-0 px-lg-2 d-print-none w-100" aria-label="bottom" role="navigation">
                                 <button class="navbar-toggler nav-link dropdown-toggle border-0 p-3 border-bottom border-top border-white w-100 py-3 text-center collapsed" style="box-shadow: none;" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                                     <span class="text-white nav-link-text">Menu</span>
                                     <span class="caret"></span>
                                 </button>
-                                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                                    <ul class="flex-column flex-sm-row align-items-stretch nav nav-pills w-100 mx-auto" style="max-width: 740px;">
+                                <div class="collapse navbar-collapse px-lg-2" id="navbarSupportedContent">
+                                    <ul class="flex-column flex-sm-row align-items-stretch nav nav-pills px-lg-1 col-12 col-lg-10 offset-lg-1">
                                         @foreach (var item in middleNavigation.Navigations)
                                         {
                                             <li role="presentation"
@@ -398,7 +399,7 @@
                 <div class="mx-auto d-block" style="max-width: 600px">
                     <div class="input-group flex-column flex-sm-row gap-3 home-catalog-search">
                         <div class="d-none d-sm-flex align-items-center dropdown">
-                            <a class="nav-link dropdown-toggle btn border border-secondary p-2 rounded-4"
+                            <a class="nav-link dropdown-toggle btn border border-secondary p-2 rounded"
                                data-bs-toggle="dropdown"
                                href="#"
                                role="button"
@@ -435,12 +436,12 @@
                                 <span class="fas fa-search"></span>
                             </button>
                             <div class="d-flex flex-row gap-3 d-sm-none dual-search-button-container">
-                                <button class="btn dual-search-button d-sm-none"
+                                <button class="btn dual-search-button d-sm-none rounded"
                                         type="button"
                                         onclick="alert('Site Search Not Yet Implemented');">
                                     Site Search
                                 </button>
-                                <button class="btn dual-search-button d-sm-none"
+                                <button class="btn dual-search-button d-sm-none rounded"
                                         type="button"
                                         onclick="DoKeywordSearch();">
                                     Catalog Search
@@ -539,7 +540,7 @@
         </div>
         <footer class="row d-print-none" role="contentinfo">
             <div class="col-12 col-md-3 prom-footer-contact text-center">
-                <div class="row flex-md-column mx-auto w-100" style="max-width: 740px">
+                <div class="row flex-md-column mx-auto w-100">
                     <div class="col-12 col-sm-4 col-md-12 py-2 footer-contact">
                         <!-- TODO: Fix this hardcoded string -->
                         Contact Us

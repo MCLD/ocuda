@@ -146,7 +146,7 @@ footer .prom-logo {
 }
 
     .prom-nav-top > .prom-right-nav > li {
-        padding: 0.4rem 0.5rem;
+        padding: 0.6rem 0.5rem;
         height: fit-content;
     }
 
@@ -183,7 +183,7 @@ footer .prom-logo {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background: #3d3dc2;
+    background: light-gray;
     padding-left: 0;
     padding-right: 0;
 }
@@ -205,8 +205,8 @@ footer .prom-logo {
         font-weight: bold;
     }
 
-        .prom-footer-contact .footer-contact:nth-child(odd) {
-            background: #5386d3;
+        .prom-footer-contact .footer-contact:nth-child(even) {
+            background: gray;
         }
 
 .prom-nav-middle-parent {
@@ -238,6 +238,7 @@ footer .prom-logo {
         justify-content: center;
         align-items: center;
         height: 100%;
+        min-height: 45px;
     }
 
 .prom-nav-middle li.prom-nav-link:first-child {
@@ -456,6 +457,7 @@ a.prom-leftnav-header:hover {
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.125);
     height: 132px;
     margin-bottom: 0.5rem;
+    text-decoration: none;
 }
 
     .prom-tile > svg {
