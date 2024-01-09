@@ -373,8 +373,6 @@
         @if (Model.RoleProperties.CanHaveChildren)
         {
             <text>
-                $(".icon-picker").iconpicker({ placement: "bottomLeft" });
-
                 $("#addForm").submit(function (e) {
                     e.preventDefault();
                     var form = $(this);
