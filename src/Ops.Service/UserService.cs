@@ -53,6 +53,11 @@ namespace Ocuda.Ops.Service
             return await _userRepository.SearchIdsAsync(filter);
         }
 
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await _userRepository.GetAllAsync();
+        }
+
         public async Task<int?> GetAssociatedLocation(int userId)
         {
             var user = await _userRepository.FindAsync(userId);
@@ -158,7 +163,7 @@ namespace Ocuda.Ops.Service
             Justification = "Normalize username to lowercase.")]
         public async Task<User> LookupUserAsync(string username)
         {
-            return await _userRepository
+ return await _userRepository
                 .FindByUsernameAsync(username?.Trim().ToLowerInvariant());
         }
 
