@@ -32,13 +32,14 @@ namespace Ocuda.Ops.Controllers
 
         [HttpGet("")]
         [HttpGet("[action]")]
-        public async Task<IActionResult> Index(string searchText, int page)
+        public async Task<IActionResult> Index(string searchText, int page, int associatedLocation = 0)
         {
             int currentPage = page < 2 ? 1 : page;
 
-            var filter = new SearchFilter(currentPage, PerPage)
+            var filter = new StaffSearchFilter(currentPage, PerPage)
             {
                 SearchText = searchText,
+                AssociatedLocation = associatedLocation
             };
 
             var users = await _userService.FindAsync(filter);
@@ -50,7 +51,8 @@ namespace Ocuda.Ops.Controllers
                 ItemsPerPage = filter.Take.Value,
                 Locations = await GetLocationsAsync(_locationService),
                 Users = users.Data,
-                SearchText = searchText
+                SearchText = searchText,
+                AssociatedLocation = associatedLocation
             };
 
             if (viewModel.PastMaxPage)
@@ -66,7 +68,7 @@ namespace Ocuda.Ops.Controllers
         {
             int currentPage = page < 2 ? 1 : page;
 
-            var filter = new SearchFilter(currentPage, 5)
+            var filter = new StaffSearchFilter(currentPage, 5)
             {
                 SearchText = searchText
             };

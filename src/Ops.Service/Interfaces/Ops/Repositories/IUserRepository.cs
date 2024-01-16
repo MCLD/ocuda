@@ -35,7 +35,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 
         Task MarkUserDeletedAsync(string username, int currentUserId, DateTime asOf);
 
-        Task<CollectionWithCount<User>> SearchAsync(SearchFilter searchFilter);
+        Task<CollectionWithCount<User>> SearchAsync(StaffSearchFilter searchFilter);
 
         Task<IEnumerable<int>> SearchIdsAsync(SearchFilter searchFilter);
 
