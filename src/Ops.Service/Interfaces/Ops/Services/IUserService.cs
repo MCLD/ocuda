@@ -9,7 +9,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IUserService
     {
-        Task<CollectionWithCount<User>> FindAsync(SearchFilter filter);
+        Task<CollectionWithCount<User>> FindAsync(StaffSearchFilter filter);
 
         Task<IEnumerable<int>> FindIdsAsync(SearchFilter filter);
 

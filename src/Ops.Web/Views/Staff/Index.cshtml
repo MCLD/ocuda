@@ -27,6 +27,12 @@
                        type="text"
                        class="form-control"
                        aria-label="Search text" />
+                <select asp-items="@(new SelectList(Model.Locations.OrderBy(x => x.Value), "Key", "Value"))" 
+                        name="AssociatedLocation" 
+                        class="form-select"
+                        asp-for="@Model.AssociatedLocation">
+                    <option value="0">All Locations</option>
+                </select>
                 <a class="btn btn-outline-secondary"
                    asp-action=@nameof(Ocuda.Ops.Controllers.StaffController.Index)>
                     Clear
@@ -34,7 +40,7 @@
                 <button class="btn btn-outline-success"
                         id="goSearch">
                     Go
-                </button>
+                </button>           
             </div>
         </div>
     </div>

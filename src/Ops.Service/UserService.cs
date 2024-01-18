@@ -43,7 +43,7 @@ namespace Ocuda.Ops.Service
             _userRepository = userRepository;
         }
 
-        public async Task<CollectionWithCount<User>> FindAsync(SearchFilter filter)
+        public async Task<CollectionWithCount<User>> FindAsync(StaffSearchFilter filter)
         {
             return await _userRepository.SearchAsync(filter);
         }
