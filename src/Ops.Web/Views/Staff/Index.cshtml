@@ -29,6 +29,7 @@
                        aria-label="Search text" />
                 <select asp-items="@(new SelectList(Model.Locations.OrderBy(x => x.Value), "Key", "Value"))" 
                         name="AssociatedLocation" 
+                        class="form-select"
                         asp-for="@Model.AssociatedLocation">
                     <option>All Locations</option>
                 </select>
