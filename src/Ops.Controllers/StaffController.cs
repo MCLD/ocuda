@@ -10,29 +10,23 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 namespace Ocuda.Ops.Controllers
 {
     [Route("[controller]")]
-    public class StaffController : BaseController<StaffController>
+    public class StaffController(ServiceFacades.Controller<StaffController> context,
+        ILocationService locationService,
+        IUserService userService) : BaseController<StaffController>(context)
     {
         private const int PerPage = 10;
 
-        private readonly ILocationService _locationService;
-        private readonly IUserService _userService;
-
-        public StaffController(ServiceFacades.Controller<StaffController> context,
-            ILocationService locationService,
-            IUserService userService)
-            : base(context)
-        {
-            _locationService = locationService
+        private readonly ILocationService _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-        }
+
+        private readonly IUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
 
         public static string Name
         { get { return "Staff"; } }
 
         [HttpGet("")]
         [HttpGet("[action]")]
-        public async Task<IActionResult> Index(string searchText, int page, int associatedLocation = 0)
+        public async Task<IActionResult> Index(string searchText, int page, int associatedLocation)
         {
             int currentPage = page < 2 ? 1 : page;
 

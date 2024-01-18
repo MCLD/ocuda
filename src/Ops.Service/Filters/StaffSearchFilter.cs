@@ -14,6 +14,6 @@
         {
         }
 
-        public int AssociatedLocation { get; set; } = 0;
+        public int AssociatedLocation { get; set; }
     }
 }

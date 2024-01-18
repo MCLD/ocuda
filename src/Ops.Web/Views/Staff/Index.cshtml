@@ -31,7 +31,7 @@
                         name="AssociatedLocation" 
                         class="form-select"
                         asp-for="@Model.AssociatedLocation">
-                    <option>All Locations</option>
+                    <option value="0">All Locations</option>
                 </select>
                 <a class="btn btn-outline-secondary"
                    asp-action=@nameof(Ocuda.Ops.Controllers.StaffController.Index)>
