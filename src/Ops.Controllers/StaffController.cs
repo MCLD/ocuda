@@ -10,16 +10,22 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 namespace Ocuda.Ops.Controllers
 {
     [Route("[controller]")]
-    public class StaffController(ServiceFacades.Controller<StaffController> context,
-        ILocationService locationService,
-        IUserService userService) : BaseController<StaffController>(context)
+    public class StaffController : BaseController<StaffController>
     {
         private const int PerPage = 10;
 
-        private readonly ILocationService _locationService = locationService
-                ?? throw new ArgumentNullException(nameof(locationService));
+        private readonly ILocationService _locationService;
+        private readonly IUserService _userService;
 
-        private readonly IUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        public StaffController(ServiceFacades.Controller<StaffController> context,
+            ILocationService locationService,
+            IUserService userService)
+            : base(context)
+        {
+            _locationService = locationService
+                ?? throw new ArgumentNullException(nameof(locationService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        }
 
         public static string Name
         { get { return "Staff"; } }
