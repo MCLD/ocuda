@@ -46,3 +46,33 @@ else
         </form>
     </div>
 </div>
+
+<script>
+    var today = new Date("@Model.FirstAvailable").toISOString().split('T')[0];
+    document.querySelector("#RequestedDate").setAttribute('min', today);
+
+    document.querySelector("#RequestedDate").addEventListener("change", () => {
+        const selectedDate = document.querySelector("#RequestedDate").value;
+        getTimeBlocks(selectedDate);
+    })
+
+    async function getTimeBlocks(selectedDate) {
+        try {
+            const response = await fetch(`@nameof(HelpController.GetDateTimeBlocks)/${selectedDate}`);
+            const timeBlocks = await response.json();
+            updateTimeOptions(timeBlocks);
+        } catch (e) {
+            console.error(e);
+        }
+       
+    }
+
+    function updateTimeOptions(timeBlocks) {
+        const optionEl = document.querySelector("#RequestedTime");
+        optionEl.innerHTML = "";
+        timeBlocks.forEach(block => {
+            optionEl.appendChild(new Option(block.text, block.value));
+        })
+    }
+
+</script>

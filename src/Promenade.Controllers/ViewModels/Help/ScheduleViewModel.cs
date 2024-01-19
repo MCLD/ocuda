@@ -8,6 +8,9 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
     public class ScheduleViewModel
     {
         [Required]
+        public System.DateTime FirstAvailable { get; set; }
+
+        [Required]
         [Display(Name = i18n.Keys.Promenade.PromptRequestedDate)]
         public System.DateTime RequestedDate { get; set; }
 
