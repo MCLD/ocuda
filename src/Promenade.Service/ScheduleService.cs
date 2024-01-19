@@ -21,6 +21,7 @@ namespace Ocuda.Promenade.Service
     {
         private const int HoursInADay = 24;
         private const int SuggestedTimesTake = 3;
+        /* Duplicate Interval in HelpController.cs, potentially should be site setting */
         private const double TimeBlockInterval = 0.5;
 
         private readonly IOcudaCache _cache;
@@ -258,6 +259,11 @@ namespace Ocuda.Promenade.Service
                 .GetLimitsForDayAsync(requestedDate.DayOfWeek))
                 .ToDictionary(_ => _.Hour, _ => _.Limit);
 
+            if (dayLimits.Count == 0) 
+            {
+                return new List<SelectListItem>();
+            }
+
             for (double hour = startHour; hour <= endHour; hour += TimeBlockInterval)
             {
                 var dayHour = hour % HoursInADay;
@@ -266,7 +272,7 @@ namespace Ocuda.Promenade.Service
 
                 var isHourAtLimit = dayLimits[timeBlock.Hour] == 0 || dayRequests.ContainsKey(timeBlock) && dayRequests[timeBlock] >= dayLimits[timeBlock.Hour];
 
-                if (timeBlock > requestedDate && !isHourAtLimit)
+                if (timeBlock >= requestedDate && !isHourAtLimit)
                 {
                     timeBlocks.Add(DateTime.Now.Date.AddHours(dayHour));
                 }
@@ -298,9 +304,11 @@ namespace Ocuda.Promenade.Service
                 {
                     return true;
                 }
+
+                return false;
             }
 
-            return false;
+            return true;
         }
 
         private async Task<ScheduleRequest> AddAsyncInternal(ScheduleRequest scheduleRequest,

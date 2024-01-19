@@ -23,6 +23,8 @@ namespace Ocuda.Promenade.Controllers
     {
         private const string TempDataDateTime = "ScheduleDateTime";
         private const string TempDataSubjectId = "ScheduleSubjectId";
+        /* Duplicate Interval in HelpController.cs, potentially should be site setting */
+        private const double TimeBlockInterval = 0.5;
 
         private const string ViewModelEmail = nameof(ScheduleRequest)
             + "."
@@ -62,7 +64,8 @@ namespace Ocuda.Promenade.Controllers
         [HttpGet("[action]/{selectedDate}")]
         public async Task<JsonResult> GetDateTimeBlocks(string selectedDate)
         {
-            var date = DateTime.Parse(selectedDate);
+            var date = DateTime.MinValue;
+            _ = DateTime.TryParse(selectedDate, out date);
             var availableBlocks = await GetTimeBlocks(date);
             return Json(availableBlocks.Select(_ => new { value = _.Value, text = _.Text }));
         }
@@ -752,7 +755,17 @@ namespace Ocuda.Promenade.Controllers
             var bufferHours = await _siteSettingService.GetSettingDoubleAsync(
                 Models.Keys.SiteSetting.Scheduling.BufferHours);
 
+            bufferHours = 3;
+
             var firstAvailable = date.RoundUp(QuantizeSpan).AddHours(bufferHours);
+
+            var isOverLimit = await _scheduleService.IsRequestOverLimitAsync(firstAvailable);
+
+            while (isOverLimit && firstAvailable.Hour <= startHour + availableHours)
+            {
+                firstAvailable = firstAvailable.AddHours(TimeBlockInterval);
+                isOverLimit = await _scheduleService.IsRequestOverLimitAsync(firstAvailable);
+            }
 
             if (firstAvailable.TimeOfDay < firstAvailable.Date.AddHours(startHour).TimeOfDay)
             {
