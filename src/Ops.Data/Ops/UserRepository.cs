@@ -113,7 +113,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                  .AsNoTracking()
-                 .Where(_ => _.Username == username)
+                 .Where(_ => !_.IsDeleted && _.Username == username)
                  .Select(_ => _.PictureFilename)
                  .SingleOrDefaultAsync();
         }
@@ -196,7 +196,7 @@ namespace Ocuda.Ops.Data.Ops
             }
             if (searchFilter.AssociatedLocation > 0)
             {
-                query = query.Where(_ => _.AssociatedLocation ==  searchFilter.AssociatedLocation);
+                query = query.Where(_ => _.AssociatedLocation == searchFilter.AssociatedLocation);
             }
             return new CollectionWithCount<User>
             {

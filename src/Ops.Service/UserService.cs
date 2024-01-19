@@ -105,12 +105,22 @@ namespace Ocuda.Ops.Service
             new FileExtensionContentTypeProvider()
                 .TryGetContentType(filePath, out string fileType);
 
-            return new FileDownload
+            if (System.IO.File.Exists(filePath))
             {
-                Filename = filename,
-                FileType = fileType,
-                FileData = await System.IO.File.ReadAllBytesAsync(filePath)
-            };
+                return new FileDownload
+                {
+                    Filename = filename,
+                    FileType = fileType,
+                    FileData = await System.IO.File.ReadAllBytesAsync(filePath)
+                };
+            }
+            else
+            {
+                _logger.LogError("Missing profile picture for user {Username}: {FilePath}",
+                    username,
+                    filePath);
+                return null;
+            }
         }
 
         public async Task<IDictionary<TitleClass, ICollection<User>>>
@@ -163,8 +173,8 @@ namespace Ocuda.Ops.Service
             Justification = "Normalize username to lowercase.")]
         public async Task<User> LookupUserAsync(string username)
         {
- return await _userRepository
-                .FindByUsernameAsync(username?.Trim().ToLowerInvariant());
+            return await _userRepository
+                           .FindByUsernameAsync(username?.Trim().ToLowerInvariant());
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
