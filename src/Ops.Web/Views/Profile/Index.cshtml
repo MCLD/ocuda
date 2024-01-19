@@ -22,20 +22,6 @@
         </div>
     </form>
 
-    <form asp-action="@nameof(ProfileController.RemovePicture)"
-          method="post"
-          role="form">
-        <input name="userId" value="@Model.User.Id" type="hidden" />
-        <input name="username" value="@Model.User.Username" type="hidden" />
-        <div modal
-             id="removePictureModal"
-             name="Remove picture"
-             modal-header="Remove picture"
-             type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
-            Remove the picture associated with this profile?
-        </div>
-    </form>
-
     <form asp-action="@(nameof(ProfileController.UpdateLocation))"
           method="post"
           role="form">
@@ -54,6 +40,23 @@
                     id="locationList"
                     asp-items="Model.Locations"
                     class="form-control"></select>
+        </div>
+    </form>
+}
+
+@if (Model.CanUpdatePicture)
+{
+    <form asp-action="@nameof(ProfileController.RemovePicture)"
+          method="post"
+          role="form">
+        <input name="userId" value="@Model.User.Id" type="hidden" />
+        <input name="username" value="@Model.User.Username" type="hidden" />
+        <div modal
+             id="removePictureModal"
+             name="Remove picture"
+             modal-header="Remove picture"
+             type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
+            Remove the picture associated with this profile?
         </div>
     </form>
 }
