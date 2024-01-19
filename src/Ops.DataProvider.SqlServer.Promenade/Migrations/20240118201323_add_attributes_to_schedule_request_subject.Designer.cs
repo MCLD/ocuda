@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ocuda.Ops.DataProvider.SqlServer.Promenade;
 
@@ -11,9 +12,11 @@ using Ocuda.Ops.DataProvider.SqlServer.Promenade;
 namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20240118201323_add_attributes_to_schedule_request_subject")]
+    partial class add_attributes_to_schedule_request_subject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
