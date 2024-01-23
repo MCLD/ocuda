@@ -9,5 +9,6 @@ namespace Ocuda.Ops.Controllers.ViewModels.Staff
         public IDictionary<int, string> Locations { get; set; }
         public string SearchText { get; set; }
         public ICollection<User> Users { get; set; }
+        public int AssociatedLocation { get; set; }
     }
 }

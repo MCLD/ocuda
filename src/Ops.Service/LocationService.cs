@@ -300,6 +300,19 @@ namespace Ocuda.Ops.Service
             return await _locationRepository.FindAsync(locationId);
         }
 
+        public async Task<Location> GetLocationByCodeAsync(string locationCode)
+        {
+            var location = await _locationRepository.GetLocationByCode(locationCode);
+            if (location == null)
+            {
+                throw new OcudaException("Location not found.");
+            }
+            else
+            {
+                return location;
+            }
+        }
+
         public async Task<Location> GetLocationByStubAsync(string locationStub)
         {
             var location = await _locationRepository.GetLocationByStub(locationStub);

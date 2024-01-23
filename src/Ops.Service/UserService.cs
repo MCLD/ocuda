@@ -43,7 +43,7 @@ namespace Ocuda.Ops.Service
             _userRepository = userRepository;
         }
 
-        public async Task<CollectionWithCount<User>> FindAsync(SearchFilter filter)
+        public async Task<CollectionWithCount<User>> FindAsync(StaffSearchFilter filter)
         {
             return await _userRepository.SearchAsync(filter);
         }
@@ -51,6 +51,11 @@ namespace Ocuda.Ops.Service
         public async Task<IEnumerable<int>> FindIdsAsync(SearchFilter filter)
         {
             return await _userRepository.SearchIdsAsync(filter);
+        }
+
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await _userRepository.GetAllAsync();
         }
 
         public async Task<int?> GetAssociatedLocation(int userId)
@@ -100,12 +105,22 @@ namespace Ocuda.Ops.Service
             new FileExtensionContentTypeProvider()
                 .TryGetContentType(filePath, out string fileType);
 
-            return new FileDownload
+            if (System.IO.File.Exists(filePath))
             {
-                Filename = filename,
-                FileType = fileType,
-                FileData = await System.IO.File.ReadAllBytesAsync(filePath)
-            };
+                return new FileDownload
+                {
+                    Filename = filename,
+                    FileType = fileType,
+                    FileData = await System.IO.File.ReadAllBytesAsync(filePath)
+                };
+            }
+            else
+            {
+                _logger.LogError("Missing profile picture for user {Username}: {FilePath}",
+                    username,
+                    filePath);
+                return null;
+            }
         }
 
         public async Task<IDictionary<TitleClass, ICollection<User>>>
@@ -159,7 +174,7 @@ namespace Ocuda.Ops.Service
         public async Task<User> LookupUserAsync(string username)
         {
             return await _userRepository
-                .FindByUsernameAsync(username?.Trim().ToLowerInvariant());
+                           .FindByUsernameAsync(username?.Trim().ToLowerInvariant());
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
