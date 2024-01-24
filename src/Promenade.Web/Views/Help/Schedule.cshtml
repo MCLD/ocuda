@@ -51,8 +51,10 @@ else
 
 <script>
     var today = new Date("@Model.FirstAvailable").toISOString().split('T')[0];
+    var lastDate = new Date("@Model.LastAvailableDate").toISOString().split('T')[0];
     var baseUrl = '@Url.Action(nameof(HelpController.Availability))';
     document.querySelector("#RequestedDate").setAttribute('min', today);
+    document.querySelector("#RequestedDate").setAttribute('max', lastDate);
 
     document.querySelector("#RequestedDate").addEventListener("change", () => {
         const selectedDate = document.querySelector("#RequestedDate").value;
@@ -60,18 +62,13 @@ else
     })
 
     async function getTimeBlocks(selectedDate) {
-        try {
-            const fullUrl = baseUrl.endsWith('/') 
-                ? baseUrl + selectedDate 
-                : baseUrl + '/' + selectedDate;
-            console.info(fullUrl)
-            const response = await fetch(fullUrl);
-            const timeBlocks = await response.json();
-            updateTimeOptions(timeBlocks);
-        } catch (e) {
-            console.error(e);
-        }
-       
+        const fullUrl = baseUrl.endsWith('/') 
+            ? baseUrl + selectedDate 
+            : baseUrl + '/' + selectedDate;
+        console.info(fullUrl)
+        const response = await fetch(fullUrl);
+        const timeBlocks = await response.json();
+        updateTimeOptions(timeBlocks);
     }
 
     function updateTimeOptions(timeBlocks) {
@@ -86,5 +83,4 @@ else
         })
         document.querySelector("#submitButton").disabled = false;
     }
-
 </script>

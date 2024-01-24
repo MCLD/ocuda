@@ -10,6 +10,8 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
         [Required]
         public System.DateTime FirstAvailable { get; set; }
 
+        public System.DateTime? LastAvailableDate { get; set; }
+
         [Required]
         [Display(Name = i18n.Keys.Promenade.PromptRequestedDate)]
         public System.DateTime RequestedDate { get; set; }
@@ -19,6 +21,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
         public System.DateTime RequestedTime { get; set; }
 
         public SegmentText SegmentText { get; set; }
+
         [Required]
         [Display(Name = i18n.Keys.Promenade.PromptSubject)]
         public int SubjectId { get; set; }
