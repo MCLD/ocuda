@@ -50,11 +50,13 @@ else
 </div>
 
 <script>
-    var today = new Date("@Model.FirstAvailable").toISOString().split('T')[0];
-    var lastDate = new Date("@Model.LastAvailableDate").toISOString().split('T')[0];
-    var baseUrl = '@Url.Action(nameof(HelpController.Availability))';
+    const today = '@Model.FirstAvailable.ToString("O").Substring(0, 10)';
+    const lastDate = '@(Model.LastAvailableDate.HasValue ? Model.LastAvailableDate.Value.ToString("O").Substring(0, 10) : "")';
+    const baseUrl = '@Url.Action(nameof(HelpController.Availability))';
     document.querySelector("#RequestedDate").setAttribute('min', today);
-    document.querySelector("#RequestedDate").setAttribute('max', lastDate);
+    if (lastDate.length > 0) {
+        document.querySelector("#RequestedDate").setAttribute('max', lastDate);
+    }
 
     document.querySelector("#RequestedDate").addEventListener("change", () => {
         const selectedDate = document.querySelector("#RequestedDate").value;

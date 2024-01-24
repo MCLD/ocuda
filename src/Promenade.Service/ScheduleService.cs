@@ -271,7 +271,7 @@ namespace Ocuda.Promenade.Service
                 var timeBlock = requestedDate.Date.AddHours(dayHour);
 
                 var isHourAtLimit
-                    = !dayLimits.ContainsKey(timeBlock.Hour) 
+                    = !dayLimits.ContainsKey(timeBlock.Hour)
                     || (dayLimits.ContainsKey(timeBlock.Hour) && dayLimits[timeBlock.Hour] == 0)
                     || (dayRequests.ContainsKey(timeBlock) && dayRequests[timeBlock] >= dayLimits[timeBlock.Hour]);
 
@@ -302,12 +302,7 @@ namespace Ocuda.Promenade.Service
             {
                 var requestCount = await _scheduleRequestRepository
                     .GetTimeSlotCountAsync(requestTime);
-                if (requestCount >= limit.Value)
-                {
-                    return true;
-                }
-
-                return false;
+                return requestCount >= limit.Value;
             }
 
             return true;
