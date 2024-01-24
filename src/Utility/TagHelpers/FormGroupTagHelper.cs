@@ -35,6 +35,8 @@ namespace Ocuda.Utility.TagHelpers
         private const string labelNameAttribute = "label-name";
         private const string onBlurJs = "on-blur-js";
         private const string requiredFieldClass = "fa-solid fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker";
+        private const string selectTagClass = "form-select";
+        private const string selectTagName = "select";
         private const string showLengthAttributeName = "show-length";
         private const string validationIgnoreClass = "validation-ignore";
 
@@ -146,7 +148,14 @@ namespace Ocuda.Utility.TagHelpers
         private async Task<TagHelperOutput> CreateInputElement(TagHelperOutput output)
         {
             var attributes = new TagHelperAttributeList(output.Attributes);
-            attributes.AddCssClass(defaultInputClass);
+            if (output.TagName == selectTagName)
+            {
+                attributes.AddCssClass(selectTagClass);
+            }
+            else
+            {
+                attributes.AddCssClass(defaultInputClass);
+            }
             attributes.RemoveAll(attributeName);
             var inputOutput = CreateTagHelperOutput(output.TagName, attributes);
 

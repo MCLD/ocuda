@@ -11,6 +11,7 @@ using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Help;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
+using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Helpers;
@@ -40,33 +41,44 @@ namespace Ocuda.Promenade.Controllers
 
         private static readonly TimeSpan QuantizeSpan = TimeSpan.FromMinutes(30);
 
+        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly LocationService _locationService;
         private readonly ScheduleService _scheduleService;
         private readonly SegmentService _segmentService;
 
         public HelpController(ServiceFacades.Controller<HelpController> context,
+            IDateTimeProvider dateTimeProvider,
             LocationService locationService,
             ScheduleService scheduleService,
             SegmentService segmentService)
             : base(context)
         {
-            _locationService = locationService
-                ?? throw new ArgumentNullException(nameof(locationService));
-            _scheduleService = scheduleService
-                ?? throw new ArgumentNullException(nameof(scheduleService));
-            _segmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
+            ArgumentNullException.ThrowIfNull(dateTimeProvider);
+            ArgumentNullException.ThrowIfNull(locationService);
+            ArgumentNullException.ThrowIfNull(scheduleService);
+            ArgumentNullException.ThrowIfNull(segmentService);
+
+            _dateTimeProvider = dateTimeProvider;
+            _locationService = locationService;
+            _scheduleService = scheduleService;
+            _segmentService = segmentService;
         }
 
         public static string Name
         { get { return "Help"; } }
 
-        [HttpGet("[action]/{selectedDate}")]
-        public async Task<JsonResult> GetDateTimeBlocks(string selectedDate)
+        [HttpGet("[action]")]
+        public async Task<JsonResult> Availability()
         {
-            var date = DateTime.MinValue;
-            _ = DateTime.TryParse(selectedDate, out date);
-            var availableBlocks = await GetTimeBlocks(date);
+            return await Availability(string.Empty);
+        }
+
+        [HttpGet("[action]/{selectedDate}")]
+        public async Task<JsonResult> Availability(string selectedDate)
+        {
+            var availableBlocks = DateTime.TryParse(selectedDate, out var date)
+                ? await GetTimeBlocks(date)
+                : await GetTimeBlocks();
             return Json(availableBlocks.Select(_ => new { value = _.Value, text = _.Text }));
         }
 
@@ -809,23 +821,31 @@ namespace Ocuda.Promenade.Controllers
             }
 
             return blockedDays;
+        
         }
 
-        private async Task<IEnumerable<SelectListItem>> GetTimeBlocks(DateTime requestedDate)
+        private async Task<IEnumerable<SelectListItem>> GetTimeBlocks()
+        {
+            return await GetTimeBlocks(null);
+        }
+
+        private async Task<IEnumerable<SelectListItem>> GetTimeBlocks(DateTime? requestedDate)
         {
             var startHour = await _siteSettingService.GetSettingDoubleAsync(
                 Models.Keys.SiteSetting.Scheduling.StartHour);
             var availableHours = await _siteSettingService.GetSettingDoubleAsync(
                 Models.Keys.SiteSetting.Scheduling.AvailableHours);
 
-            if (requestedDate == DateTime.MinValue || requestedDate.Date == DateTime.Today)
+            if (!requestedDate.HasValue 
+                || requestedDate.Value.Date <= _dateTimeProvider.Now)
             {
-                requestedDate = await FirstAvailable(DateTime.Now);
-                availableHours -= (requestedDate.Hour - startHour);
-                startHour = requestedDate.Hour;
+                requestedDate = await FirstAvailable(_dateTimeProvider.Now);
+                availableHours -= (requestedDate.Value.Hour - startHour);
+                startHour = requestedDate.Value.Hour;
             }
 
-            return await _scheduleService.GetAvailableTimeBlocks(startHour, availableHours, requestedDate);
+            return await _scheduleService
+                .GetAvailableTimeBlocks(startHour, availableHours, requestedDate.Value);
         }
 
         private async Task<IActionResult> NoScheduleAsync(bool forceReload)

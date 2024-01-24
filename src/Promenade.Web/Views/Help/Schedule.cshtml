@@ -35,7 +35,8 @@ else
                     formgroup>
             </select>
             <select asp-for="SubjectId"
-                    asp-items="Model.Subjects" formgroup></select>
+                    asp-items="Model.Subjects"
+                    formgroup></select>
             <div>
                 <button type="submit"
                         id="submitButton"
@@ -50,6 +51,7 @@ else
 
 <script>
     var today = new Date("@Model.FirstAvailable").toISOString().split('T')[0];
+    var baseUrl = '@Url.Action(nameof(HelpController.Availability))';
     document.querySelector("#RequestedDate").setAttribute('min', today);
 
     document.querySelector("#RequestedDate").addEventListener("change", () => {
@@ -59,7 +61,11 @@ else
 
     async function getTimeBlocks(selectedDate) {
         try {
-            const response = await fetch(`@nameof(HelpController.GetDateTimeBlocks)/${selectedDate}`);
+            const fullUrl = baseUrl.endsWith('/') 
+                ? baseUrl + selectedDate 
+                : baseUrl + '/' + selectedDate;
+            console.info(fullUrl)
+            const response = await fetch(fullUrl);
             const timeBlocks = await response.json();
             updateTimeOptions(timeBlocks);
         } catch (e) {

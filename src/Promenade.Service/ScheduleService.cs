@@ -259,7 +259,7 @@ namespace Ocuda.Promenade.Service
                 .GetLimitsForDayAsync(requestedDate.DayOfWeek))
                 .ToDictionary(_ => _.Hour, _ => _.Limit);
 
-            if (dayLimits.Count == 0) 
+            if (dayLimits.Count == 0)
             {
                 return new List<SelectListItem>();
             }
@@ -270,13 +270,15 @@ namespace Ocuda.Promenade.Service
 
                 var timeBlock = requestedDate.Date.AddHours(dayHour);
 
-                var isHourAtLimit = dayLimits[timeBlock.Hour] == 0 || dayRequests.ContainsKey(timeBlock) && dayRequests[timeBlock] >= dayLimits[timeBlock.Hour];
+                var isHourAtLimit
+                    = !dayLimits.ContainsKey(timeBlock.Hour) 
+                    || (dayLimits.ContainsKey(timeBlock.Hour) && dayLimits[timeBlock.Hour] == 0)
+                    || (dayRequests.ContainsKey(timeBlock) && dayRequests[timeBlock] >= dayLimits[timeBlock.Hour]);
 
                 if (timeBlock >= requestedDate && !isHourAtLimit)
                 {
                     timeBlocks.Add(DateTime.Now.Date.AddHours(dayHour));
                 }
-
 
                 if (timeBlocks.Count >= HoursInADay / TimeBlockInterval)
                 {

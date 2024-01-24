@@ -12,8 +12,8 @@ using Ocuda.Ops.DataProvider.SqlServer.Promenade;
 namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20240118201323_add_attributes_to_schedule_request_subject")]
-    partial class add_attributes_to_schedule_request_subject
+    [Migration("20240123204539_prom_v1.0.0.254")]
+    partial class prom_v100254
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

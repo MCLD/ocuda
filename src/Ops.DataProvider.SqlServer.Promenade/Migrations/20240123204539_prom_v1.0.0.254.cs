@@ -5,7 +5,7 @@
 namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 {
     /// <inheritdoc />
-    public partial class add_attributes_to_schedule_request_subject : Migration
+    public partial class prom_v100254 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,7 +24,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                 nullable: false,
                 defaultValue: 0);
 
-            migrationBuilder.Sql("UPDATE ScheduleRequestSubject SET IsActive=1");
+            // set all items to active by default
+            migrationBuilder.Sql("UPDATE [ScheduleRequestSubject] SET [IsActive] = 1");
         }
 
         /// <inheritdoc />
