@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -123,6 +124,17 @@ namespace Ocuda.Ops.Web
             });
 
             services.AddHealthChecks();
+
+            services.AddHttpClient<ImageOptimApi.Client>()
+                .ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler
+                {
+                    AllowAutoRedirect = true
+                })
+                .ConfigureHttpClient(_ =>
+                {
+                    _.Timeout = TimeSpan.FromSeconds(30);
+                    _.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("TestApp", "1.0.0"));
+                });
 
             switch (_config[Configuration.OpsDistributedCache])
             {
