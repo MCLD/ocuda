@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Home.IndexViewModel
+@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Home.IndexViewModel
 @using Ocuda.Ops.Controllers.Areas.SiteManagement
 
 <h1>Web Site management</h1>
@@ -61,6 +61,23 @@
             </div>
         </div>
     }
+
+    @if (Model.IsSiteManager)
+    {
+        <div class="col-12 col-md-4 my-2">
+            <div class="card">
+                <div class="card-header lead fw-bold">
+                    Image Optimizer
+                </div>
+                <div class="card-body">
+                    <a asp-controller="@ImageOptimizerController.Name"
+                       asp-action="@nameof(ImageOptimizerController.Index)"
+                       class="btn btn-outline-primary mt-1">Image Optimizer</a>
+                </div>
+            </div>
+        </div>
+    }
+
     @if (Model.IsSiteManager)
     {
         <div class="col-12 col-md-4 my-2">

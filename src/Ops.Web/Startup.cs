@@ -125,17 +125,6 @@ namespace Ocuda.Ops.Web
 
             services.AddHealthChecks();
 
-            services.AddHttpClient<ImageOptimApi.Client>()
-                .ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler
-                {
-                    AllowAutoRedirect = true
-                })
-                .ConfigureHttpClient(_ =>
-                {
-                    _.Timeout = TimeSpan.FromSeconds(30);
-                    _.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("TestApp", "1.0.0"));
-                });
-
             switch (_config[Configuration.OpsDistributedCache])
             {
                 case "Redis":
@@ -189,7 +178,7 @@ namespace Ocuda.Ops.Web
                     throw new OcudaException("No Configuration.OpsDatabaseProvider configured.");
             }
 
-            // stoer the data protection key in the context
+            // store the data protection key in the context
             services.AddDataProtection().PersistKeysToDbContext<OpsContext>();
 
             var sessionTimeout = TimeSpan.FromHours(2 * 60);
@@ -308,6 +297,16 @@ namespace Ocuda.Ops.Web
                         ServerCertificateCustomValidationCallback
                             = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
                     };
+                });
+            services.AddHttpClient<ImageOptimApi.Client>()
+                .ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler
+                {
+                    AllowAutoRedirect = true
+                })
+                .ConfigureHttpClient(_ =>
+                {
+                    _.Timeout = TimeSpan.FromSeconds(30);
+                    _.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("TestApp", "1.0.0"));
                 });
 
             services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
@@ -556,6 +555,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IHistoricalIncidentService, HistoricalIncidentService>();
             services.AddScoped<IImageFeatureService, ImageFeatureService>();
+            services.AddScoped<IImageOptimizerService, ImageOptimizerService>();
             services.AddScoped<IIncidentService, IncidentService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
