@@ -1,22 +1,35 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using ImageOptimApi;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using MimeKit;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
-using Ocuda.Utility.Keys;
+using Ocuda.Utility.Exceptions;
+using SixLabors.ImageSharp;
 
 namespace Ocuda.Ops.Service
 {
-    public class ImageService : IImageService
+    public class ImageService : BaseService<ImageService>, IImageService
     {
         private readonly Client _client;
         private readonly IConfiguration _config;
 
-        public ImageService(Client client, IConfiguration config)
+        private static readonly string[] ValidImageTypes = { ".jpg", ".png" };
+
+        public ImageService(
+            Client client, 
+            IConfiguration config, 
+            ILogger<ImageService> logger,
+            IHttpContextAccessor httpContextAccessor) : base(logger, httpContextAccessor)
         {
-            _client = client;
-            _config = config;
-            _client.Username = _config[Configuration.OpsImageOptimizerUsername];
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _client.Username = _config[Ocuda.Utility.Keys.Configuration.OpsImageOptimizerUsername];
         }
 
         public string BgColor { get => _client.BgColor; set => _client.BgColor = value; }
@@ -42,6 +55,118 @@ namespace Ocuda.Ops.Service
         public async Task<OptimizedImageResult> OptimizeAsync(string imagePath)
         {
             return await _client.OptimizeAsync(imagePath);
+        }
+
+        public async Task<OptimizedImageResult> OptimizeAsync(IFormFile formFile)
+        {
+            OptimizedImageResult optimized;
+
+            string filePath = Path.Combine(Path.GetTempPath(),
+                Path.GetFileNameWithoutExtension(Path.GetTempFileName())
+                + Path.GetExtension(formFile.FileName));
+
+            try
+            {
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await formFile.CopyToAsync(stream);
+                stream.Close();
+
+                optimized = await OptimizeAsync(filePath);
+                _logger.LogInformation("Image optimization took {ElapsedSeconds}s",
+                    optimized.ElapsedSeconds);
+            }
+            catch (ParameterException pex)
+            {
+                _logger.LogError("Error with image submission: ", pex.Message);
+                return null;
+
+            }
+            finally
+            {
+                File.Delete(filePath);
+            }
+
+            if (optimized == null || optimized.Status != Status.Success)
+            {
+                _logger.LogError("Problem optimizing image: {ErrorStatus} {ErrorMessage}",
+                        optimized.Status,
+                        optimized.StatusMessage);
+                throw new ParameterException($"The image {formFile.FileName} could not be optimized.");
+            }
+
+            return optimized;
+        }
+
+        public (string extension, byte[] imageBytes) ConvertFromBase64(string imageBase64, bool profileImage = false)
+        {
+            byte[] imageBytes;
+
+            string extension;
+
+            try
+            {
+                imageBytes = Convert.FromBase64String(imageBase64);
+                var imageInfo = Image.Identify(imageBytes);
+                if (imageInfo.Height != imageInfo.Width)
+                {
+                    throw new OcudaException("Profile picture must be square.");
+                }
+
+                var imageFormat = imageInfo.Metadata.DecodedImageFormat;
+
+                var validFileType = false;
+                foreach (var validExtension in ValidImageTypes)
+                {
+                    if (imageFormat.MimeTypes.Contains(MimeTypes.GetMimeType(validExtension)))
+                    {
+                        validFileType = true;
+                        break;
+                    }
+                }
+
+                if (!validFileType)
+                {
+                    throw new OcudaException("Invalid image format, please upload a JPEG or PNG picture");
+                }
+                extension = imageFormat.FileExtensions.First();
+            }
+            catch (UnknownImageFormatException uifex)
+            {
+                throw new OcudaException("Unknown image type, please upload a JPEG or PNG picture",
+                    uifex);
+            }
+
+            return (extension, imageBytes);
+        }
+
+        public string ConvertToBase64(byte[] imageBytes)
+        {
+            try
+            {
+                var imageInfo = Image.Identify(imageBytes);
+                var metaData = "data:" + imageInfo.Metadata.DecodedImageFormat.DefaultMimeType + ";base64,";
+                var base64 = Convert.ToBase64String(imageBytes);
+                return metaData + base64;
+            }
+            catch (UnknownImageFormatException uifex)
+            {
+                throw new OcudaException("Unknown image type, please upload a JPEG or PNG picture",
+                    uifex);
+            }
+        }
+
+        public string GetExtension(byte[] imageBytes)
+        {
+            try
+            {
+                var imageInfo = Image.Identify(imageBytes);
+                return '.' + imageInfo.Metadata.DecodedImageFormat.FileExtensions.First();
+            }
+            catch (UnknownImageFormatException uifex)
+            {
+                throw new OcudaException("Unknown image type, please upload a JPEG or PNG picture",
+                    uifex);
+            }
         }
     }
 }

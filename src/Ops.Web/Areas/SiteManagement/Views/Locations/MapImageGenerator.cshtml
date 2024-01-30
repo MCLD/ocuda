@@ -65,7 +65,7 @@
     const fileName = "@Model.LocationStub";
 
     const optimizePath = "@Url.Action(nameof(ImageOptimizerController.OptimizeBase64), ImageOptimizerController.Name)";
-    const savePath = "@Url.Action(nameof(LocationsController.Map))"
+    const savePath = "@Url.Action(nameof(LocationsController.UpdateMapImage), LocationsController.Name)"
 
     const zoomEl = document.querySelector('#zoom-level');
     const scaleEl = document.querySelector('#scale');
@@ -136,6 +136,12 @@
             });
 
             const optimizedImage = await optimizedResponse.json();
+
+            statusEl.className = "text-success";
+            statusEl.innerText = "Optimized Successfully! Saving image..."
+
+            //Pick up from here...
+
         } catch (e) {
             console.log(e);
             statusEl.className = "text-danger";
@@ -143,16 +149,7 @@
             return;
         }
         
-        statusEl.className = "text-success";
-        statusEl.innerText = "Optimized Successfully! Saving image..."
-
-        const img = document.createElement('img');
-        img.src = optimizedImage;
-        img.classList.add('mb-3');
-
-        const imageContainer = document.querySelector('#image-preview-container');
-        imageContainer.innerHTML = '';
-        imageContainer.appendChild(img);
+        
     }
 
 </script>

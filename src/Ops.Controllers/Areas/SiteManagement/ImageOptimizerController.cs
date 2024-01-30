@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using ImageOptimApi;
 using Microsoft.AspNetCore.Authorization;
@@ -19,14 +20,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class ImageOptimizerController : BaseController<ImageOptimizerController>
     {
-        private readonly IImageService _imageOptimizerService;
+        private readonly IImageService _imageService;
         public static readonly string Name = "ImageOptimizer";
 
         public ImageOptimizerController(
-            IImageService imageOptimizerService,
+            IImageService imageService,
             ServiceFacades.Controller<ImageOptimizerController> context) : base(context)
         {
-            _imageOptimizerService = imageOptimizerService ?? throw new ArgumentNullException(nameof(imageOptimizerService));
+            _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
         }
 
         [HttpGet("")]
@@ -50,75 +51,50 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             OptimizedImageResult optimized;
 
-            string filename = Path.Combine(Path.GetTempPath(),
-                Path.GetFileNameWithoutExtension(Path.GetTempFileName())
-                + Path.GetExtension(viewModel.FormFile.FileName));
-
             try
             {
-                using var stream = new FileStream(filename, FileMode.Create);
-                await viewModel.FormFile.CopyToAsync(stream);
-                stream.Close();
+                optimized = await _imageService.OptimizeAsync(viewModel.FormFile);
 
-                optimized = await _imageOptimizerService.OptimizeAsync(filename);
-                _logger.LogInformation("Image optimization took {ElapsedSeconds}s",
-                    optimized.ElapsedSeconds);
-            }
+                string newFilename = Path.GetFileNameWithoutExtension(viewModel.FormFile.FileName)
+                    + _imageService.GetExtension(optimized.File);
+
+                var provider = new FileExtensionContentTypeProvider();
+                provider.TryGetContentType(newFilename, out var contentType);
+                return File(optimized.File,
+                    contentType ?? "application/octet-stream",
+                    newFilename);
+            } 
             catch (ParameterException pex)
             {
-                _logger.LogError("Error with image submission: ", pex.Message);
-                return null;
-
-            }
-            finally
-            {
-                System.IO.File.Delete(filename);
-            }
-
-            if (optimized != null)
-            {
-                if (optimized.Status == Status.Success)
-                {
-                    string newFilename = _imageOptimizerService.Format == Format.Auto
-                        ? viewModel.FormFile.FileName
-                        : Path.GetFileNameWithoutExtension(viewModel.FormFile.FileName)
-                            + GetExtension(_imageOptimizerService.Format);
-                    var provider = new FileExtensionContentTypeProvider();
-                    provider.TryGetContentType(newFilename, out var contentType);
-                    return File(optimized.File,
-                        contentType ?? "application/octet-stream",
-                        newFilename);
-                }
-                else
-                {
-                    _logger.LogError("Problem optimizing image: {ErrorStatus} {ErrorMessage}",
-                        optimized.Status,
-                        optimized.StatusMessage);
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                        $"{optimized.Status}: {optimized.StatusMessage}");
-                }
-            }
-            else
-            {
-                _logger.LogError("No optimized image returned.");
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "No optimized image returned.");
+                        pex.Message);
             }
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> OptimizeBase64(string imageBase64)
+        public async Task<IActionResult> OptimizeBase64([FromBody] string imageBase64)
         {
+            try
+            {
+                var (extension, imageBytes) = _imageService.ConvertFromBase64(imageBase64);
 
+                string filePath = Path.Combine(Path.GetTempPath(),
+                Path.GetFileNameWithoutExtension(Path.GetTempFileName())
+                + '.' + extension);
+
+                System.IO.File.WriteAllBytes(filePath, imageBytes);
+
+                var optimized = await _imageService.OptimizeAsync(filePath);
+
+                var optimizedBase64 = _imageService.ConvertToBase64(optimized.File);
+
+                return new JsonResult(optimizedBase64);
+            }
+            catch (ParameterException pex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                        pex.Message);
+            }
         }
-
-        private static string GetExtension(Format format) => format switch
-        {
-            Format.Png => ".png",
-            Format.Jpeg => ".jpg",
-            Format.WebM => ".webm",
-            Format.H264 => ".h264",
-            _ => string.Empty,
-        };
     }
 }

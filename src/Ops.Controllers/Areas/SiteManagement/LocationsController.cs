@@ -1077,10 +1077,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
         }
 
-        [HttpPost("{locationStub}/[action]")]
-        public async Task<IActionResult> UpdateMapImage(LocationMapViewModel viewModel)
+        public async Task<IActionResult> UpdateMapImage(string imageBase64)
         {
-
+            return new JsonResult("Cool!");
         }
 
         [HttpPost]

@@ -26,5 +26,12 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         public Task<OptimizedImageResult> OptimizeAsync(string imagePath);
 
+        public Task<OptimizedImageResult> OptimizeAsync(IFormFile formFile);
+
+        public (string extension, byte[] imageBytes) ConvertFromBase64(string imageBase64, bool profileImage = false);
+
+        public string ConvertToBase64(byte[] imageBytes);
+
+        public string GetExtension(byte[] imageBytes);
     }
 }
