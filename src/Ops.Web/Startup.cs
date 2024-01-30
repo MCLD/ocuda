@@ -555,7 +555,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IHistoricalIncidentService, HistoricalIncidentService>();
             services.AddScoped<IImageFeatureService, ImageFeatureService>();
-            services.AddScoped<IImageOptimizerService, ImageOptimizerService>();
+            services.AddScoped<IImageService, ImageService>();
             services.AddScoped<IIncidentService, IncidentService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();

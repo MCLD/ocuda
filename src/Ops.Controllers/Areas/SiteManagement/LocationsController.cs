@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using ImageOptimApi;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
@@ -37,6 +40,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ISegmentService _segmentService;
         private readonly ISocialCardService _socialCardService;
         private readonly IVolunteerFormService _volunteerFormService;
+        private readonly IImageService _imageOptimizerService;
 
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
             IConfiguration config,
@@ -49,7 +53,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ILocationService locationService,
             ISegmentService segmentService,
             ISocialCardService socialCardService,
-            IVolunteerFormService volunteerFormService) : base(context)
+            IVolunteerFormService volunteerFormService,
+            IImageService imageOptimizerService) : base(context)
         {
             ArgumentNullException.ThrowIfNull(config);
             ArgumentNullException.ThrowIfNull(featureService);
@@ -62,6 +67,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ArgumentNullException.ThrowIfNull(segmentService);
             ArgumentNullException.ThrowIfNull(socialCardService);
             ArgumentNullException.ThrowIfNull(volunteerFormService);
+            ArgumentNullException.ThrowIfNull(imageOptimizerService);
 
             _featureService = featureService;
             _groupService = groupService;
@@ -73,6 +79,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             _segmentService = segmentService;
             _socialCardService = socialCardService;
             _volunteerFormService = volunteerFormService;
+            _imageOptimizerService = imageOptimizerService;
 
             _apiKey = config[Configuration.OcudaGoogleAPI];
         }
@@ -1039,8 +1046,41 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             catch (OcudaException ex)
             {
                 ShowAlertDanger($"Unable to find Location {locationStub}: {ex.Message}");
-                return RedirectToAction(nameof(LocationsController.Index));
+                return RedirectToAction(nameof(Index));
             }
+        }
+
+        [HttpGet("{locationStub}/[action]")]
+        public async Task<IActionResult> MapImageGenerator(string locationStub)
+        {
+            try
+            {
+                var location = await _locationService
+                        .GetLocationByStubAsync(locationStub);
+                location.IsNewLocation = false;
+
+                var viewModel = new LocationMapViewModel
+                {
+                    Location = location,
+                    LocationName = location.Name,
+                    LocationStub = location.Stub,
+                    LocationGroups = await _locationGroupService
+                        .GetLocationGroupsByLocationAsync(location),
+                    MapApiKey = _apiKey
+                };
+                return View(viewModel);
+            }
+            catch (OcudaException ex)
+            {
+                ShowAlertDanger($"Unable to find Location {locationStub}: {ex.Message}");
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        [HttpPost("{locationStub}/[action]")]
+        public async Task<IActionResult> UpdateMapImage(LocationMapViewModel viewModel)
+        {
+
         }
 
         [HttpPost]

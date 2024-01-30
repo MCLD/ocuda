@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
-using MimeKit;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ImageOptimizer;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -20,11 +19,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class ImageOptimizerController : BaseController<ImageOptimizerController>
     {
-        private readonly IImageOptimizerService _imageOptimizerService;
+        private readonly IImageService _imageOptimizerService;
         public static readonly string Name = "ImageOptimizer";
 
         public ImageOptimizerController(
-            IImageOptimizerService imageOptimizerService,
+            IImageService imageOptimizerService,
             ServiceFacades.Controller<ImageOptimizerController> context) : base(context)
         {
             _imageOptimizerService = imageOptimizerService ?? throw new ArgumentNullException(nameof(imageOptimizerService));
@@ -49,18 +48,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     "No uploaded image supplied.");
             }
 
+            OptimizedImageResult optimized;
+
             string filename = Path.Combine(Path.GetTempPath(),
                 Path.GetFileNameWithoutExtension(Path.GetTempFileName())
                 + Path.GetExtension(viewModel.FormFile.FileName));
 
-            OptimizedImageResult optimized;
             try
             {
                 using var stream = new FileStream(filename, FileMode.Create);
                 await viewModel.FormFile.CopyToAsync(stream);
                 stream.Close();
-
-                _imageOptimizerService.Format = viewModel.TargetFormat;
 
                 optimized = await _imageOptimizerService.OptimizeAsync(filename);
                 _logger.LogInformation("Image optimization took {ElapsedSeconds}s",
@@ -69,13 +67,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             catch (ParameterException pex)
             {
                 _logger.LogError("Error with image submission: ", pex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    $"Error with image submission: {pex.Message}");
+                return null;
+
             }
             finally
             {
                 System.IO.File.Delete(filename);
             }
+
             if (optimized != null)
             {
                 if (optimized.Status == Status.Success)
@@ -105,6 +104,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "No optimized image returned.");
             }
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> OptimizeBase64(string imageBase64)
+        {
+
         }
 
         private static string GetExtension(Format format) => format switch

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,15 +14,19 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Service
 {
     public class LocationService : BaseService<LocationService>, ILocationService
     {
         private const string ndash = "\u2013";
+        private readonly string LocationFilePath = "locations";
+        private readonly string MapFilePath = "maps";
 
         private readonly IGoogleClient _googleClient;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
@@ -32,6 +37,8 @@ namespace Ocuda.Ops.Service
         private readonly ILocationRepository _locationRepository;
         private readonly IRosterDivisionRepository _rosterDivisionRepository;
         private readonly IRosterLocationRepository _rosterLocationRepository;
+        private readonly IPathResolverService _pathResolver;
+        private readonly ISiteSettingService _siteSettingService;
 
         public LocationService(IGoogleClient googleClient,
             ILocationFeatureRepository locationFeatureRepository,
@@ -43,7 +50,9 @@ namespace Ocuda.Ops.Service
             ILocationRepository locationRepository,
             ILogger<LocationService> logger,
             IRosterDivisionRepository rosterDivisionRepository,
-            IRosterLocationRepository rosterLocationRepository)
+            IRosterLocationRepository rosterLocationRepository,
+            IPathResolverService pathResolver,
+            ISiteSettingService siteSettingService)
             : base(logger, httpContextAccessor)
         {
             _googleClient = googleClient ?? throw new ArgumentNullException(nameof(googleClient));
@@ -62,6 +71,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(rosterDivisionRepository));
             _rosterLocationRepository = rosterLocationRepository
                 ?? throw new ArgumentNullException(nameof(rosterLocationRepository));
+            _pathResolver = pathResolver ?? throw new ArgumentNullException(nameof(pathResolver));
+            _siteSettingService = siteSettingService;
         }
 
         public async Task<Location> AddLocationAsync(Location location)
@@ -411,6 +422,25 @@ namespace Ocuda.Ops.Service
             {
                 throw new OcudaException($"Location Stub '{location.Stub}' already exists.");
             }
+        }
+
+        public async Task UploadLocationMapAsync()
+        {
+            string basePath = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var filePath = Path.Combine(basePath,
+                LocationFilePath,
+                MapFilePath);
+
+            if (!Directory.Exists(filePath))
+            {
+                _logger.LogInformation("Creating image card directory: {Path}",
+                    filePath);
+                Directory.CreateDirectory(filePath);
+            }
+
+            //await System.IO.File.WriteAllBytesAsync(filename, imageBytes);
         }
     }
 }

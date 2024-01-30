@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ImageOptimApi;
+using Microsoft.AspNetCore.Http;
 
 namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 {
-    public interface IImageOptimizerService
+    public interface IImageService
     {
         public string BgColor { get; set; }
         public bool Crop { get; set; }

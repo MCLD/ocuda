@@ -7,12 +7,12 @@ using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Service
 {
-    public class ImageOptimizerService : IImageOptimizerService
+    public class ImageService : IImageService
     {
         private readonly Client _client;
         private readonly IConfiguration _config;
 
-        public ImageOptimizerService(Client client, IConfiguration config)
+        public ImageService(Client client, IConfiguration config)
         {
             _client = client;
             _config = config;

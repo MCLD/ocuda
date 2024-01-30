@@ -162,7 +162,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         replaceImage);
 
                     // copy file
-                    await System.IO.File.WriteAllBytesAsync(filename, ms.ToArray());
+                    await System.IO.File.WriteAllBytesAsync(filename, imageBytes);
 
                     // update detail
                     currentCard.Filename = Path.GetFileName(filename);
