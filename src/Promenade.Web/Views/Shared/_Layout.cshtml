@@ -139,57 +139,57 @@
                                     </li>
 
                                     <!-- TODO: confirm that this can be removed
-                                    if (item.Navigations.Count() > 0)
-                                    {
-                                        <li role="presentation"
-                                            class="dropdown prom-nav-top-button ms-sm-2 ms-md-3 @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : null)">
-                                            <a class="nav-link dropdown-toggle @(item.NavigationText.Label == null ? null : "d-flex align-items-center")"
-                                               data-bs-toggle="dropdown"
-                                               href="#"
-                                               role="button"
-                                               aria-haspopup="true"
-                                               aria-expanded="false">
+                                             if (item.Navigations.Count() > 0)
+                                             {
+                                                 <li role="presentation"
+                                                     class="dropdown prom-nav-top-button ms-sm-2 ms-md-3 @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : null)">
+                                                     <a class="nav-link dropdown-toggle @(item.NavigationText.Label == null ? null : "d-flex align-items-center")"
+                                                        data-bs-toggle="dropdown"
+                                                        href="#"
+                                                        role="button"
+                                                        aria-haspopup="true"
+                                                        aria-expanded="false">
                                     @if (!string.IsNullOrEmpty(item.Icon))
                                     {
-                                                        <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space")"></span>
+                                                                         <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space")"></span>
                                     }
                                     @if (!string.IsNullOrEmpty(item.NavigationText.Label))
                                     {
-                                                        <span class="">@item.NavigationText.Label</span>
+                                                                         <span class="">@item.NavigationText.Label</span>
                                     }
-                                            </a>
-                                            <ul class="dropdown-menu dropdown-menu-end prom-nav-dropdown">
+                                                     </a>
+                                                     <ul class="dropdown-menu dropdown-menu-end prom-nav-dropdown">
                                     @foreach (var subItem in item.Navigations)
                                     {
-                                                        <li>
+                                                                         <li>
                                             @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
-                                  && !string.IsNullOrEmpty(subItem.Icon)
-                                  && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                    && !string.IsNullOrEmpty(subItem.Icon)
+                    && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                             {
-                                                                    <a href="@subItem.NavigationText.Link"
-                                                                       class="dropdown-item"
-                                                                       title="@subItem.NavigationText.Title"
-                                                                       aria-label="@subItem.NavigationText.Title">
-                                                                        <span class="@subItem.Icon"></span>
-                                                                    </a>
+                                                                                             <a href="@subItem.NavigationText.Link"
+                                                                                                class="dropdown-item"
+                                                                                                title="@subItem.NavigationText.Title"
+                                                                                                aria-label="@subItem.NavigationText.Title">
+                                                                                                 <span class="@subItem.Icon"></span>
+                                                                                             </a>
                                             }
                                             else
                                             {
-                                                                    <a href="@subItem.NavigationText.Link"
-                                                                       class="dropdown-item">
+                                                                                             <a href="@subItem.NavigationText.Link"
+                                                                                                class="dropdown-item">
                                                     @if (!string.IsNullOrEmpty(subItem.Icon))
                                                     {
-                                                                                <span class="@subItem.Icon"></span>
+                                                                                                                 <span class="@subItem.Icon"></span>
                                                     }
                                                     @subItem.NavigationText.Label
-                                                                    </a>
+                                                                                             </a>
                                             }
-                                                        </li>
+                                                                         </li>
                                     }
-                                            </ul>
-                                        </li>
-                                    }
-                                    -->
+                                                     </ul>
+                                                 </li>
+                                             }
+                                             -->
                                 }
                             </ul>
                         }
@@ -215,14 +215,16 @@
                                         {
                                             <li role="presentation"
                                                 class="nav-item prom-nav-link col-12 col-sm-2 @(item.Navigations.Count() > 0 ? "dropdown" : "")">
-                                                <a class="nav-link col-12 p-3 p-sm-1 @(item.Navigations.Count() > 0 ? "dropdown-toggle" : "")"
-                                                   data-bs-toggle="dropdown"
-                                                   href="#"
-                                                   role="button"
-                                                   aria-haspopup="true"
-                                                   aria-expanded="false"><span class="nav-link-icon @(item.Icon != null ? item.Icon : null)"></span><span class="nav-link-text">@item.NavigationText.Label</span><span class="caret"></span></a>
                                                 @if (item.Navigations.Count() > 0)
                                                 {
+                                                    <a class="nav-link col-12 p-3 p-sm-1 @(item.Navigations.Count() > 0 ? "dropdown-toggle" : "")"
+                                                       data-bs-toggle="dropdown"
+                                                       href="@(item.Navigations.Count() == 0 ? item.NavigationText.Link : "#")"
+                                                       role="button"
+                                                       aria-haspopup="true"
+                                                       aria-expanded="false">
+                                                        <span class="nav-link-icon @(item.Icon != null ? item.Icon : null)"></span><span class="nav-link-text">@item.NavigationText.Label</span><span class="caret"></span>
+                                                    </a>
                                                     <ul class="dropdown-menu prom-nav-dropdown w-100">
                                                         @foreach (var subItem in item.Navigations)
                                                         {
@@ -254,7 +256,14 @@
                                                             </li>
                                                         }
                                                     </ul>
-
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link col-12 p-3 p-sm-1"
+                                                       href="@item.NavigationText.Link"
+                                                       role="button">
+                                                        <span class="nav-link-icon @(item.Icon != null ? item.Icon : null)"></span><span class="nav-link-text">@item.NavigationText.Label</span>
+                                                    </a>
                                                 }
                                             </li>
                                         }
@@ -272,30 +281,30 @@
 
                         <!-- TODO: Implement site search and complete this dropdown menu
 
-                        <div class="d-none d-sm-flex align-items-center dropdown">
-                            <a class="nav-link dropdown-toggle btn border border-secondary p-2 rounded"
-                               data-bs-toggle="dropdown"
-                               href="#"
-                               role="button"
-                               aria-haspopup="true"
-                               aria-expanded="false">
-                                <span class="nav-link-text">Search the Website</span>
-                                <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu prom-nav-dropdown p-0">
-                                <li>
-                                    <a href="#" class="dropdown-item p-2 rounded">
-                                        Search the Website 
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="dropdown-item p-2 rounded">
-                                        Search the Catalog 
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    -->
+                            <div class="d-none d-sm-flex align-items-center dropdown">
+                                <a class="nav-link dropdown-toggle btn border border-secondary p-2 rounded"
+                                   data-bs-toggle="dropdown"
+                                   href="#"
+                                   role="button"
+                                   aria-haspopup="true"
+                                   aria-expanded="false">
+                                    <span class="nav-link-text">Search the Website</span>
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu prom-nav-dropdown p-0">
+                                    <li>
+                                        <a href="#" class="dropdown-item p-2 rounded">
+                                            Search the Website
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="dropdown-item p-2 rounded">
+                                            Search the Catalog
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        -->
                         <div class="d-flex flex-grow-1">
                             <input type="text"
                                    id="textboxTerm"
