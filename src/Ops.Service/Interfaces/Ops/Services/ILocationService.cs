@@ -51,6 +51,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId);
 
-        Task UploadLocationMapAsync();
+        Task UploadLocationMapAsync(byte[] imageBytes, string fileName);
     }
 }

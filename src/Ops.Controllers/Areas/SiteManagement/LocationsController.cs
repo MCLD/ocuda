@@ -1062,8 +1062,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var viewModel = new LocationMapViewModel
                 {
                     Location = location,
-                    LocationName = location.Name,
-                    LocationStub = location.Stub,
                     LocationGroups = await _locationGroupService
                         .GetLocationGroupsByLocationAsync(location),
                     MapApiKey = _apiKey
@@ -1077,9 +1075,22 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
         }
 
-        public async Task<IActionResult> UpdateMapImage(string imageBase64)
+        [HttpPost("[action]/{locationCode}")]
+        public async Task<IActionResult> UpdateMapImage([FromBody] string imageBase64, string locationCode)
         {
-            return new JsonResult("Cool!");
+            try
+            {
+                var (extension, imageBytes) = _imageOptimizerService.ConvertFromBase64(imageBase64);
+                var fileName = locationCode + '.' + extension;
+
+                await _locationService.UploadLocationMapAsync(imageBytes, fileName);
+                return StatusCode(StatusCodes.Status200OK, "Image updated successfully!");
+            }
+            catch (ParameterException pex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                        pex.Message);
+            }
         }
 
         [HttpPost]

@@ -77,7 +77,7 @@ namespace Ocuda.Ops.Service
             }
             catch (ParameterException pex)
             {
-                _logger.LogError("Error with image submission: ", pex.Message);
+                _logger.LogError("Error with image submission: {ErrorMessage}", pex.Message);
                 return null;
 
             }
@@ -161,6 +161,21 @@ namespace Ocuda.Ops.Service
             {
                 var imageInfo = Image.Identify(imageBytes);
                 return '.' + imageInfo.Metadata.DecodedImageFormat.FileExtensions.First();
+            }
+            catch (UnknownImageFormatException uifex)
+            {
+                throw new OcudaException("Unknown image type, please upload a JPEG or PNG picture",
+                    uifex);
+            }
+        }
+
+        public string GetMimeType(byte[] imageBytes)
+        {
+            try
+            {
+                var imageInfo = Image.Identify(imageBytes);
+                var mimeType = imageInfo.Metadata.DecodedImageFormat.DefaultMimeType;
+                return mimeType;
             }
             catch (UnknownImageFormatException uifex)
             {

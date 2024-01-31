@@ -72,7 +72,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> OptimizeBase64([FromBody] string imageBase64)
+        public async Task<IActionResult> OptimizeFromBase64([FromBody] string imageBase64)
         {
             try
             {

@@ -14,7 +14,6 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
-using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
@@ -26,6 +25,7 @@ namespace Ocuda.Ops.Service
     {
         private const string ndash = "\u2013";
         private readonly string LocationFilePath = "locations";
+        private readonly string ImageFilePath = "images";
         private readonly string MapFilePath = "maps";
 
         private readonly IGoogleClient _googleClient;
@@ -424,23 +424,51 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public async Task UploadLocationMapAsync()
+        public async Task UploadLocationMapAsync(byte[] imageBytes, string fileName)
         {
+            if (imageBytes == null || fileName == null)
+            {
+                throw new OcudaException("Invalid map image or filename.");
+            }
+
             string basePath = await _siteSettingService.GetSettingStringAsync(
                 Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
 
             var filePath = Path.Combine(basePath,
+                ImageFilePath,
                 LocationFilePath,
                 MapFilePath);
 
-            if (!Directory.Exists(filePath))
+            try
             {
-                _logger.LogInformation("Creating image card directory: {Path}",
-                    filePath);
-                Directory.CreateDirectory(filePath);
+                if (!Directory.Exists(filePath))
+                {
+                    _logger.LogInformation("Creating image card directory: {Path}",
+                        filePath);
+                    Directory.CreateDirectory(filePath);
+                }
+
+                filePath = Path.Combine(filePath, fileName);
+
+                await File.WriteAllBytesAsync(filePath, imageBytes);
+
+                var locationCode = fileName.Split('.')[0];
+
+                var location = await _locationRepository.GetLocationByCode(locationCode);
+                location.MapImagePath = filePath;
+
+                _locationRepository.Update(location);
+                await _locationRepository.SaveAsync();
+            } catch (OcudaException oex) 
+            {
+                _logger.LogError("Error uploading map image: {ErrorMessage}",
+                    oex.Message);
+                throw new OcudaException($"Error uploading map image: {oex.Message}");
             }
 
-            //await System.IO.File.WriteAllBytesAsync(filename, imageBytes);
+            
+
+            
         }
     }
 }

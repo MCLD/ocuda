@@ -33,5 +33,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         public string ConvertToBase64(byte[] imageBytes);
 
         public string GetExtension(byte[] imageBytes);
+
+        public string GetMimeType(byte[] imageBytes);
     }
 }

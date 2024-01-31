@@ -2,7 +2,7 @@
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location
 {
-    public class LocationMapViewModel : LocationPartialViewModel
+    public class LocationMapViewModel
     {
         public Promenade.Models.Entities.Location Location { get; set; }
         public ICollection<Promenade.Models.Entities.LocationGroup> LocationGroups { get; set; }
