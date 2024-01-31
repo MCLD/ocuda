@@ -33,6 +33,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId);
 
+        Task<Location> GetLocationByCodeAsync(string code);
+
         Task<Location> GetLocationByIdAsync(int locationId);
 
         Task<Location> GetLocationByStubAsync(string locationStub);

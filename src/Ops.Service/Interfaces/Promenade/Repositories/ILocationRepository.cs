@@ -18,6 +18,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<IDictionary<int, string>> GetAllNamesIncludingDeletedAsync();
 
+        Task<Location> GetLocationByCode(string locationCode);
+
         Task<Location> GetLocationByStub(string locationStub);
 
         Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(LocationFilter filter);

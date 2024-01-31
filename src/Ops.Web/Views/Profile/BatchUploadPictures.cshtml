@@ -1,0 +1,100 @@
+﻿@model Ocuda.Ops.Controllers.ViewModels.Profile.BatchUploadPicturesViewModel
+
+<div class="container">
+    <h1>Upload Profile Photos</h1>
+    <div class="mb-4">
+        <div>Filenames must be formatted as: <strong>"LocationCode_LastName, Firstname"</strong></div>
+        <div class="mb-2">(ie <strong>"RO_Smith, John.jpg"</strong>)</div>
+        <div>Photos must be cropped to <strong>700px X 700px.</strong></div>
+    </div>
+    <div class="mb-4">
+        <input id="pictureSelect" name="pictureSelect" type="file" multiple />
+    </div>
+    <div class="mb-4">
+        <button type="submit" id="submitButton" class="btn btn-success col-3">Submit</button>
+    </div>
+    <div class="text-danger">
+        <ul id="alert-list"></ul>
+    </div>
+
+</div>
+
+<script>
+    const dataDivider = ";base64,";
+    const filenameRegex = new RegExp(/[_\,\.]/);
+    let files = [];
+
+    document.querySelector("#pictureSelect").addEventListener("change", function () {
+        files = this.files;
+    });
+
+    document.querySelector("#submitButton").addEventListener("click", async function () {
+        let errorCount = 0;
+        let successCount = 0;
+
+        this.disabled = true;
+        this.innerText = "Uploading...";
+
+        for (let i = 0; i < files.length; ++i) {
+            const reader = new FileReader();
+
+            reader.onload = async () => {
+                const result = await submitPhoto(reader.result, files[i].name);
+                errorCount += result;
+                successCount += 1 - result;
+            };
+
+            reader.readAsDataURL(files[i]);
+            await new Promise(res => setTimeout(res, 300));
+        }
+
+        console.log("Upload complete, error count: ", errorCount, ". Success count: ", successCount);
+
+        this.disabled = false;
+        this.innerText = "Submit";
+        alert("Upload complete!");
+    })
+
+    async function submitPhoto(imageData, filename) {
+        const dataDividerIndex = imageData.indexOf(dataDivider);
+        const nonAlphaRegex = /[^a-zA-Z]/;
+        const metaData = imageData.substring(0, dataDividerIndex);
+        const photoData = imageData.substring(dataDividerIndex + dataDivider.length);
+        if (filename.split(filenameRegex).length !== 4) {
+            return appendAlert(`Filename [${filename}] is formatted incorrectly. Please format file names as LocationStub_LastName, Firstname [ie XX_Lastname, Firstname.jpg]`);
+        }
+        const [location, lastName, firstName, _] = filename.split(/[_\,\.]/);
+
+        // Hard coded override for photo location codes that don't match database codes
+        const locationStub = location === "AD" ? "RO" : location === "GL" ? "GO" : location.substring(0, 2);
+
+        const formData = new FormData();
+        formData.append("@nameof(Model.ProfilePicture)", photoData);
+        formData.append("@nameof(Model.ProfilePictureMetadata)", metaData);
+        formData.append("@nameof(Model.LocationCode)", locationStub.trim());
+        formData.append("@nameof(Model.FirstName)", firstName.replace(nonAlphaRegex, "").trim());
+        formData.append("@nameof(Model.LastName)", lastName.replace(nonAlphaRegex, "").trim());
+
+        const response = await fetch('@Url.Action(nameof(ProfileController.BatchUploadPictures))', {
+            method: "POST",
+            body: formData,
+        });
+
+        const json = await response.json();
+
+        if (json.success) return 0;
+
+        appendAlert(json.message);
+
+        return 1;
+    }
+
+    function appendAlert(alertText) {
+        const alertContainer = document.querySelector("#alert-list");
+
+        const alert = document.createElement('li');
+        alert.innerText = alertText;
+
+        alertContainer.appendChild(alert);
+    }
+</script>
