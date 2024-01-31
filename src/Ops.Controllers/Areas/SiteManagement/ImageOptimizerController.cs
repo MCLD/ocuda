@@ -34,9 +34,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpGet("[action]")]
         public async Task<IActionResult> Index()
         {
-            var viewModel = new ImageOptimizerViewModel();
-
-            return View(viewModel);
+            return View(new ImageOptimizerViewModel());
         }
 
         [HttpPost("[action]")]
@@ -80,7 +78,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                 string filePath = Path.Combine(Path.GetTempPath(),
                 Path.GetFileNameWithoutExtension(Path.GetTempFileName())
-                + '.' + extension);
+                + extension);
 
                 System.IO.File.WriteAllBytes(filePath, imageBytes);
 

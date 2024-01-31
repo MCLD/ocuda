@@ -285,8 +285,20 @@ namespace Ocuda.Ops.Service
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            
-            var (extension, profilePicture) = _imageService.ConvertFromBase64(profilePictureBase64, true);
+
+            string extension;
+            byte[] profilePicture;
+
+            try
+            {
+                (extension, profilePicture) = _imageService.ConvertFromBase64(profilePictureBase64, true);
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogError("Error converting profile picture from base64: {ErrorMessage}",
+                    oex.Message);
+                throw oex;
+            }
 
             var checkPath = GetProfilePictureFilePath(null);
             if (!System.IO.Directory.Exists(checkPath))

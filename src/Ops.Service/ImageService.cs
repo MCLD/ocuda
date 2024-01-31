@@ -107,7 +107,8 @@ namespace Ocuda.Ops.Service
             {
                 imageBytes = Convert.FromBase64String(imageBase64);
                 var imageInfo = Image.Identify(imageBytes);
-                if (imageInfo.Height != imageInfo.Width)
+
+                if (profileImage && imageInfo.Height != imageInfo.Width)
                 {
                     throw new OcudaException("Profile picture must be square.");
                 }
@@ -128,7 +129,7 @@ namespace Ocuda.Ops.Service
                 {
                     throw new OcudaException("Invalid image format, please upload a JPEG or PNG picture");
                 }
-                extension = imageFormat.FileExtensions.First();
+                extension = '.' + imageFormat.FileExtensions.First();
             }
             catch (UnknownImageFormatException uifex)
             {

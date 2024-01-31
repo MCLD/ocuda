@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
@@ -40,7 +39,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ISegmentService _segmentService;
         private readonly ISocialCardService _socialCardService;
         private readonly IVolunteerFormService _volunteerFormService;
-        private readonly IImageService _imageOptimizerService;
+        private readonly IImageService _imageService;
 
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
             IConfiguration config,
@@ -54,7 +53,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ISegmentService segmentService,
             ISocialCardService socialCardService,
             IVolunteerFormService volunteerFormService,
-            IImageService imageOptimizerService) : base(context)
+            IImageService imageService) : base(context)
         {
             ArgumentNullException.ThrowIfNull(config);
             ArgumentNullException.ThrowIfNull(featureService);
@@ -67,7 +66,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ArgumentNullException.ThrowIfNull(segmentService);
             ArgumentNullException.ThrowIfNull(socialCardService);
             ArgumentNullException.ThrowIfNull(volunteerFormService);
-            ArgumentNullException.ThrowIfNull(imageOptimizerService);
+            ArgumentNullException.ThrowIfNull(imageService);
 
             _featureService = featureService;
             _groupService = groupService;
@@ -79,7 +78,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             _segmentService = segmentService;
             _socialCardService = socialCardService;
             _volunteerFormService = volunteerFormService;
-            _imageOptimizerService = imageOptimizerService;
+            _imageService = imageService;
 
             _apiKey = config[Configuration.OcudaGoogleAPI];
         }
@@ -1080,8 +1079,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             try
             {
-                var (extension, imageBytes) = _imageOptimizerService.ConvertFromBase64(imageBase64);
-                var fileName = locationCode + '.' + extension;
+                var (extension, imageBytes) = _imageService.ConvertFromBase64(imageBase64);
+                var fileName = locationCode + extension;
 
                 await _locationService.UploadLocationMapAsync(imageBytes, fileName);
                 return StatusCode(StatusCodes.Status200OK, "Image updated successfully!");

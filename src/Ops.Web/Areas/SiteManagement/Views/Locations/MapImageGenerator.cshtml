@@ -75,8 +75,6 @@
 
     let imageBase64;
 
-    const apiPath = "https://maps.googleapis.com/maps/api/staticmap?zoom={branch.Zoom}&size={imageWidth}x{imageHeight}&maptype=roadmap&markers=color:red|{branch.Address}&key={mapApiKey}&style=feature:poi|visibility:off&scale={scale}"
-
     function inputsComplete() {
         let complete = true;
         document.querySelectorAll('input').forEach(input => {
