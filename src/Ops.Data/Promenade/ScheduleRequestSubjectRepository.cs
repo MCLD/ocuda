@@ -22,7 +22,8 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.SegmentId == segmentId)
+                .Where(_ => _.SegmentId == segmentId && _.IsActive)
+                .OrderBy(_ => _.OrderBy)
                 .ToListAsync();
         }
     }

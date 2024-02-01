@@ -14,5 +14,6 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
         Task<ICollection<DataWithCount<DateTime>>> GetHourRequestCountsAsync(DateTime requestedTime,
             DateTime firstAvailable);
         Task<int> GetTimeSlotCountAsync(DateTime requestTime);
+        Task<Dictionary<DateTime, int>> GetRequestsForDay(DateTime requestDate);
     }
 }
