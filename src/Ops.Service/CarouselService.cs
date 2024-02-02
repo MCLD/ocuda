@@ -60,6 +60,84 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(siteSettingService));
         }
 
+        public async Task<Carousel> CloneAsync(int currentCarouselId)
+        {
+            var currentCarousel = await _carouselRepository.FindAsync(currentCarouselId);
+
+            var newCarousel = new Carousel
+            {
+                Name = currentCarousel.Name
+            };
+
+            await _carouselRepository.AddAsync(newCarousel);
+            await _carouselRepository.SaveAsync();
+
+            var carouselTexts = await _carouselTextRepository.GetForCarouselAsync(currentCarouselId);
+
+            foreach (var text in carouselTexts)
+            {
+                var newText = new CarouselText
+                {
+                    CarouselId = newCarousel.Id,
+                    LanguageId = text.LanguageId,
+                    Title = text.Title
+                };
+
+                await _carouselTextRepository.AddAsync(newText);
+                
+            }
+
+            await _carouselTextRepository.SaveAsync();
+
+            var carouselItems = await GetItemListByIdAsync(currentCarouselId);
+
+            foreach (var item in carouselItems)
+            {
+                var newItem = new CarouselItem
+                {
+                    CarouselId = newCarousel.Id,
+                    Order = item.Order,
+                    Name = item.Name,
+                };
+
+                await _carouselItemRepository.AddAsync(newItem);
+                await _carouselItemRepository.SaveAsync();
+
+                var itemTexts = await _carouselItemTextRepository.GetAllForCarouselItemAsync(item.Id);
+
+                foreach (var itemText in itemTexts)
+                {
+                    await _carouselItemTextRepository.AddAsync(new CarouselItemText
+                    {
+                        CarouselItemId = newItem.Id,
+                        LanguageId = itemText.LanguageId,
+                        Label = itemText.Label,
+                        ImageUrl = itemText.ImageUrl,
+                        Title = itemText.Title,
+                        Description = itemText.Description,
+                    });
+                }
+
+                await _carouselItemTextRepository.SaveAsync();
+
+                foreach (var button in item.Buttons)
+                {
+                    await _carouselButtonRepository.AddAsync(new CarouselButton
+                    {
+                        CarouselItemId = newItem.Id,
+                        Order = button.Order,
+                        Url = button.Url,
+                        LabelId = button.LabelId,
+                    });
+                }
+
+                await _carouselButtonRepository.SaveAsync();
+
+            }
+
+            return newCarousel;
+        }
+
         public async Task<Carousel> CreateAsync(Carousel carousel)
         {
             carousel = await CreateNoSaveAsync(carousel);
@@ -325,6 +403,11 @@ namespace Ocuda.Ops.Service
         public async Task<CarouselItem> GetItemByIdAsync(int id)
         {
             return await _carouselItemRepository.FindAsync(id);
+        }
+
+        public async Task<List<CarouselItem>> GetItemListByIdAsync(int carouselId)
+        {
+            return await _carouselItemRepository.GetAllByCarouselIdAsync(carouselId);
         }
 
         public async Task<int?> GetPageHeaderIdForCarouselAsync(int id)
