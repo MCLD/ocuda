@@ -27,8 +27,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
 
         public static bool IsClonable(PageLayout layout)
         {
-            return layout?.Items?.Count > 0
-                && !layout.Items.Any(_ => _.CarouselId.HasValue);
+            return layout?.Items?.Count > 0;
         }
 
         public static string TableRow(PageLayout layout)
