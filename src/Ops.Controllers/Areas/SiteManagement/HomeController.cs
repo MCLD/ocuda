@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Home;
 using Ocuda.Ops.Models.Entities;
@@ -17,13 +18,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class HomeController : BaseController<HomeController>
     {
         private readonly IPermissionGroupService _permissionGroupService;
+        private readonly IConfiguration _config;
+        private readonly bool _canOptimizeImages;
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
-            IPermissionGroupService permissionGroupService)
+            IPermissionGroupService permissionGroupService,
+            IConfiguration config)
             : base(context)
         {
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
+            _config = config
+                ?? throw new ArgumentNullException(nameof(config));
+            _canOptimizeImages = _config[Configuration.OpsImageOptimizerUsername] != null;
         }
 
         public static string Name
@@ -34,7 +41,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             var viewModel = new IndexViewModel
             {
-                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
+                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
+                CanOptimizeImages = _canOptimizeImages
             };
 
             var permissionIds = UserClaims(ClaimType.PermissionId);
