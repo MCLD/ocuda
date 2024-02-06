@@ -29,11 +29,18 @@
                       data-placement="top">
                 </span>
             </label>
-            <input class="form-control" id="zoom-level" name="zoom-level" type="number" value="12" />
+            <input class="form-control" id="zoom-level" name="zoom-level" type="number" value="12" min="0" max="18" />
         </div>
         <div class="d-flex mb-3">
-            <label class="col-4" for="scale">Scale</label>
-            <input class="form-control" id="scale" name="scale" type="number" value="1" />
+            <label class="col-4" for="scale">
+                Scale
+                <span class="fa-regular fa-circle-question"
+                      title="Scale value can be 1 or 2. For high dpi displays, use scale 2 to prevent image from being distorted."
+                      data-bs-toggle="tooltip"
+                      data-placement="top">
+                </span>
+            </label>
+            <input class="form-control" id="scale" name="scale" type="number" value="2" min="1" max="2" />
         </div>
         <div class="d-flex mb-3">
             <label class="col-4" for="image-width">Image Width</label>
@@ -47,7 +54,7 @@
 </div>
 
 <div class="row">
-    <div id="image-preview-container"></div>
+    <div class="col-sm-6" id="image-preview-container"></div>
 </div>
 
 <div class="row">
@@ -56,7 +63,7 @@
             <button class="btn btn-primary w-100" id="preview-image">Preview</button>
         </div>
         <div class="flex-grow-1">
-            <button class="btn btn-success w-100" id="save-image">Optimize and Save</button>
+            <button class="btn btn-success w-100" id="save-image" disabled>Optimize and Save</button>
         </div>
     </div>
 
@@ -107,6 +114,8 @@
             }
 
             try {
+                document.querySelector('#save-image').disabled = true;
+
                 const mapImageResult = await fetch(`https://maps.googleapis.com/maps/api/staticmap?zoom=${zoomEl.value}&size=${widthEl.value}x${heightEl.value}&maptype=roadmap&markers=color:red|${locationAddress}&key=${apiKey}&style=feature:poi|visibility:off&scale=${scaleEl.value}`);
 
                 const imageBlob = await mapImageResult.blob();
@@ -121,11 +130,13 @@
 
                 const img = document.createElement('img');
                 img.src = mapImageResult.url;
-                img.classList.add('mb-3');
+                img.className = 'mb-3 img-fluid';
 
                 const imageContainer = document.querySelector('#image-preview-container');
                 imageContainer.innerHTML = '';
                 imageContainer.appendChild(img);
+
+                document.querySelector('#save-image').disabled = false;
 
             } catch (e) {
                 console.error(e);
