@@ -21,7 +21,14 @@
 <div class="row">
     <div class="col-sm-6">
         <div class="d-flex mb-3">
-            <label class="col-4" for="zoom-level">Zoom Level</label>
+            <label class="col-4" for="zoom-level">
+                Zoom Level
+                <span class="fa-regular fa-circle-question"
+                      title="Google Maps zoom levels range from 0 to 18. For most locations, a zoom level between 10 - 14 is most practical."
+                      data-bs-toggle="tooltip"
+                      data-placement="top">
+                </span>
+            </label>
             <input class="form-control" id="zoom-level" name="zoom-level" type="number" value="12" />
         </div>
         <div class="d-flex mb-3">
@@ -56,99 +63,105 @@
 </div>
 <div id="status-message" class="text-info"></div>
 
-<script>
-    document.querySelector('#preview-image').addEventListener('click', showPreview);
-    document.querySelector('#save-image').addEventListener('click', saveImage);
+@section Scripts
+    {
+    <script>
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip()
+        })
 
-    const locationAddress = "@Model.Location.Address";
-    const apiKey = "@Model.MapApiKey";
-    const fileName = "@Model.Location.Stub";
+        document.querySelector('#preview-image').addEventListener('click', showPreview);
+        document.querySelector('#save-image').addEventListener('click', saveImage);
 
-    const optimizePath = "@Url.Action(nameof(ImageOptimizerController.OptimizeFromBase64), ImageOptimizerController.Name)";
-    const savePath = "@Url.Action(nameof(LocationsController.UpdateMapImage), LocationsController.Name, new { locationCode = Model.Location.Code})";
-    console.log("Save path: ", savePath);
+        const locationAddress = "@Model.Location.Address";
+        const apiKey = "@Model.MapApiKey";
+        const fileName = "@Model.Location.Stub";
 
-    const zoomEl = document.querySelector('#zoom-level');
-    const scaleEl = document.querySelector('#scale');
-    const widthEl = document.querySelector('#image-width');
-    const heightEl = document.querySelector('#image-height');
+        const optimizePath = "@Url.Action(nameof(ImageOptimizerController.OptimizeFromBase64), ImageOptimizerController.Name)";
+        const savePath = "@Url.Action(nameof(LocationsController.UpdateMapImage), LocationsController.Name, new { locationCode = Model.Location.Code})";
 
-    let imageBase64;
+        const zoomEl = document.querySelector('#zoom-level');
+        const scaleEl = document.querySelector('#scale');
+        const widthEl = document.querySelector('#image-width');
+        const heightEl = document.querySelector('#image-height');
 
-    function inputsComplete() {
-        let complete = true;
-        document.querySelectorAll('input').forEach(input => {
-            if (!input.value) {
-                input.parentElement.firstElementChild.classList.add("text-danger");
-                complete = false;
-            } else {
-                input.parentElement.firstElementChild.classList.remove("text-danger");
+        let imageBase64;
+
+        function inputsComplete() {
+            let complete = true;
+            document.querySelectorAll('input').forEach(input => {
+                if (!input.value) {
+                    input.parentElement.firstElementChild.classList.add("text-danger");
+                    complete = false;
+                } else {
+                    input.parentElement.firstElementChild.classList.remove("text-danger");
+                }
+            });
+
+            return complete;
+        }
+
+        async function showPreview() {
+            if (!inputsComplete()) {
+                return alert("All input fields must be complete");
             }
-        });
 
-        return complete;
-    }
+            try {
+                const mapImageResult = await fetch(`https://maps.googleapis.com/maps/api/staticmap?zoom=${zoomEl.value}&size=${widthEl.value}x${heightEl.value}&maptype=roadmap&markers=color:red|${locationAddress}&key=${apiKey}&style=feature:poi|visibility:off&scale=${scaleEl.value}`);
 
-    async function showPreview() {
-        if (!inputsComplete()) {
-            return alert("All input fields must be complete");
+                const imageBlob = await mapImageResult.blob();
+                const dataBase64 = await new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(imageBlob);
+                });
+                imageBase64 = dataBase64.split(',')[1];
+
+                imagePath = mapImageResult.url;
+
+                const img = document.createElement('img');
+                img.src = mapImageResult.url;
+                img.classList.add('mb-3');
+
+                const imageContainer = document.querySelector('#image-preview-container');
+                imageContainer.innerHTML = '';
+                imageContainer.appendChild(img);
+
+            } catch (e) {
+                console.error(e);
+                alert(e);
+            }
         }
 
-        try {
-            const mapImageResult = await fetch(`https://maps.googleapis.com/maps/api/staticmap?zoom=${zoomEl.value}&size=${widthEl.value}x${heightEl.value}&maptype=roadmap&markers=color:red|${locationAddress}&key=${apiKey}&style=feature:poi|visibility:off&scale=${scaleEl.value}`);
+        async function saveImage() {
+            const statusEl = document.querySelector('#status-message');
+            statusEl.innerText = "Optimizing image...";
 
-            const imageBlob = await mapImageResult.blob();
-            const dataBase64 = await new Promise(resolve => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.readAsDataURL(imageBlob);
-            });
-            imageBase64 = dataBase64.split(',')[1];
+            try {
+                const optimizedResponse = await fetch(savePath, {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: 'post',
+                    body: JSON.stringify(imageBase64)
+                });
 
-            imagePath = mapImageResult.url;
+                const optimizedImage = await optimizedResponse.json();
 
-            const img = document.createElement('img');
-            img.src = mapImageResult.url;
-            img.classList.add('mb-3');
+                statusEl.className = "text-success";
+                statusEl.innerText = "Optimized Successfully! Saving image..."
 
-            const imageContainer = document.querySelector('#image-preview-container');
-            imageContainer.innerHTML = '';
-            imageContainer.appendChild(img);
+                //Pick up from here...
 
-        } catch (e) {
-            console.error(e);
-            alert(e);
+            } catch (e) {
+                console.log(e);
+                statusEl.className = "text-danger";
+                statusEl.innerText = `Error optimizing image. ${e.value}`;
+                return;
+            }
+
+
         }
-    }
 
-    async function saveImage() {
-        const statusEl = document.querySelector('#status-message');
-        statusEl.innerText = "Optimizing image...";
-
-        try {
-            const optimizedResponse = await fetch(savePath, {
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                method: 'post',
-                body: JSON.stringify(imageBase64)
-            });
-
-            const optimizedImage = await optimizedResponse.json();
-
-            statusEl.className = "text-success";
-            statusEl.innerText = "Optimized Successfully! Saving image..."
-
-            //Pick up from here...
-
-        } catch (e) {
-            console.log(e);
-            statusEl.className = "text-danger";
-            statusEl.innerText = `Error optimizing image. ${e.value}`;
-            return;
-        }
-        
-        
-    }
-
-</script>
+    </script>
+}
