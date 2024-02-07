@@ -1122,7 +1122,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var fileName = locationCode + extension;
 
                 await _locationService.UploadLocationMapAsync(imageBytes, fileName);
-                return StatusCode(StatusCodes.Status200OK, "Image updated successfully!");
+                return new JsonResult("Image updated successfully!");
             }
             catch (ParameterException pex)
             {

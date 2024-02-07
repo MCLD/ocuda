@@ -24,12 +24,12 @@
             <label class="col-4" for="zoom-level">
                 Zoom Level
                 <span class="fa-regular fa-circle-question"
-                      title="Google Maps zoom levels range from 0 to 18. For most locations, a zoom level between 10 - 14 is most practical."
+                      title="Google Maps zoom levels range from 0 to 18. For most locations, a zoom level between 12 - 14 is most practical."
                       data-bs-toggle="tooltip"
                       data-placement="top">
                 </span>
             </label>
-            <input class="form-control" id="zoom-level" name="zoom-level" type="number" value="12" min="0" max="18" />
+            <input class="form-control" id="zoom-level" name="zoom-level" type="number" value="13" min="0" max="18" />
         </div>
         <div class="d-flex mb-3">
             <label class="col-4" for="scale">
@@ -79,6 +79,12 @@
 
         document.querySelector('#preview-image').addEventListener('click', showPreview);
         document.querySelector('#save-image').addEventListener('click', saveImage);
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Enter')
+            {
+                showPreview();
+            }
+        })
 
         const locationAddress = "@Model.Location.Address";
         const apiKey = "@Model.MapApiKey";
@@ -92,6 +98,7 @@
         const widthEl = document.querySelector('#image-width');
         const heightEl = document.querySelector('#image-height');
 
+        let requestingPreview = false;
         let imageBase64;
 
         function inputsComplete() {
@@ -109,11 +116,14 @@
         }
 
         async function showPreview() {
+            if (requestingPreview) return;
+
             if (!inputsComplete()) {
                 return alert("All input fields must be complete");
             }
 
             try {
+                requestingPreview = true;
                 document.querySelector('#save-image').disabled = true;
 
                 const mapImageResult = await fetch(`https://maps.googleapis.com/maps/api/staticmap?zoom=${zoomEl.value}&size=${widthEl.value}x${heightEl.value}&maptype=roadmap&markers=color:red|${locationAddress}&key=${apiKey}&style=feature:poi|visibility:off&scale=${scaleEl.value}`);
@@ -141,6 +151,8 @@
             } catch (e) {
                 console.error(e);
                 alert(e);
+            } finally {
+                requestingPreview = false;
             }
         }
 
@@ -149,7 +161,7 @@
             statusEl.innerText = "Optimizing image...";
 
             try {
-                const optimizedResponse = await fetch(savePath, {
+                const saveResponse = await fetch(savePath, {
                     headers: {
                         "Content-Type": "application/json"
                     },
@@ -157,12 +169,11 @@
                     body: JSON.stringify(imageBase64)
                 });
 
-                const optimizedImage = await optimizedResponse.json();
+                const saveMessage = await saveResponse.json();
+
 
                 statusEl.className = "text-success";
-                statusEl.innerText = "Optimized Successfully! Saving image..."
-
-                //Pick up from here...
+                statusEl.innerText = saveMessage;
 
             } catch (e) {
                 console.log(e);

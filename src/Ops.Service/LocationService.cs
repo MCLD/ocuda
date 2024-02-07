@@ -24,6 +24,7 @@ namespace Ocuda.Ops.Service
     public class LocationService : BaseService<LocationService>, ILocationService
     {
         private const string ndash = "\u2013";
+        private readonly string AssetBasePath = "assets";
         private readonly string LocationFilePath = "locations";
         private readonly string ImageFilePath = "images";
         private readonly string MapFilePath = "maps";
@@ -461,17 +462,35 @@ namespace Ocuda.Ops.Service
                     Directory.CreateDirectory(filePath);
                 }
 
-                filePath = Path.Combine(filePath, fileName);
+                var fileWritePath = Path.Combine(filePath, fileName);
 
-                await File.WriteAllBytesAsync(filePath, imageBytes);
+                await File.WriteAllBytesAsync(fileWritePath, imageBytes);
+
+                var assetBase = Path.DirectorySeparatorChar + AssetBasePath;
+
+                var assetPath = Path.Combine(assetBase,
+                ImageFilePath,
+                LocationFilePath,
+                MapFilePath,
+                fileName);
 
                 var locationCode = fileName.Split('.')[0];
 
                 var location = await _locationRepository.GetLocationByCode(locationCode);
-                location.MapImagePath = filePath;
+
+                var oldFileName = Path.GetFileName(location.MapImagePath);
+
+                location.MapImagePath = assetPath;
 
                 _locationRepository.Update(location);
                 await _locationRepository.SaveAsync();
+
+                if (fileName != oldFileName)
+                {
+                    var oldFilePath = Path.Combine(filePath, oldFileName);
+                    File.Delete(oldFilePath);
+                }
+
             } catch (OcudaException oex) 
             {
                 _logger.LogError("Error uploading map image: {ErrorMessage}",
