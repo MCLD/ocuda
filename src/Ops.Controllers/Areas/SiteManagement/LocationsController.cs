@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using ImageOptimApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
@@ -29,6 +32,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class LocationsController : BaseController<LocationsController>
     {
         private readonly string _apiKey;
+        private readonly string ImageFilePath = "images";
+        private readonly string LocationFilePath = "locations";
+        private readonly string MapFilePath = "maps";
         private readonly IFeatureService _featureService;
         private readonly IGroupService _groupService;
         private readonly ILanguageService _languageService;
@@ -37,6 +43,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ILocationHoursService _locationHoursService;
         private readonly ILocationService _locationService;
         private readonly ISegmentService _segmentService;
+        private readonly ISiteSettingService _siteSettingService;
         private readonly ISocialCardService _socialCardService;
         private readonly IVolunteerFormService _volunteerFormService;
         private readonly IImageService _imageService;
@@ -51,6 +58,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ILocationHoursService locationHoursService,
             ILocationService locationService,
             ISegmentService segmentService,
+            ISiteSettingService siteSettingService,
             ISocialCardService socialCardService,
             IVolunteerFormService volunteerFormService,
             IImageService imageService) : base(context)
@@ -64,6 +72,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ArgumentNullException.ThrowIfNull(locationHoursService);
             ArgumentNullException.ThrowIfNull(locationService);
             ArgumentNullException.ThrowIfNull(segmentService);
+            ArgumentNullException.ThrowIfNull(siteSettingService);
             ArgumentNullException.ThrowIfNull(socialCardService);
             ArgumentNullException.ThrowIfNull(volunteerFormService);
             ArgumentNullException.ThrowIfNull(imageService);
@@ -76,6 +85,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             _locationHoursService = locationHoursService;
             _locationService = locationService;
             _segmentService = segmentService;
+            _siteSettingService = siteSettingService;
             _socialCardService = socialCardService;
             _volunteerFormService = volunteerFormService;
             _imageService = imageService;
@@ -922,6 +932,35 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             return RedirectToAction(nameof(Hours), new { locationStub = model.LocationStub });
+        }
+
+        [HttpGet("[action]/{promMapPath}")]
+        public async Task<IActionResult> Image(string promMapPath)
+        {
+
+            var promBasePath = await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var filePath = HttpUtility.UrlDecode(promMapPath);
+
+            var mapImagePath = Path.Combine(promBasePath,
+                    ImageFilePath,
+                    LocationFilePath,
+                    MapFilePath,
+                    Path.GetFileName(filePath));
+
+            if (!System.IO.File.Exists(mapImagePath))
+            {
+                return StatusCode(404);
+            }
+            else
+            {
+                new FileExtensionContentTypeProvider()
+                    .TryGetContentType(mapImagePath, out string fileType);
+
+                return PhysicalFile(mapImagePath, fileType
+                    ?? System.Net.Mime.MediaTypeNames.Application.Octet);
+            }
         }
 
         [HttpGet("")]
