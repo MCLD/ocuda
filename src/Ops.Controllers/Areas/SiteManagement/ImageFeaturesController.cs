@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ImageOptimApi;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,7 @@ using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Models.Keys;
+using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
@@ -34,6 +36,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IImageFeatureService _imageFeatureService;
+        private readonly IImageService _imageService;
         private readonly ILanguageService _languageService;
         private readonly IPermissionGroupService _permissionGroupService;
 
@@ -41,6 +44,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             IDateTimeProvider dateTimeProvider,
             ILanguageService languageService,
             IImageFeatureService imageFeatureService,
+            IImageService imageService,
             IPermissionGroupService permissionGroupService)
             : base(context)
         {
@@ -50,6 +54,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(languageService));
             _imageFeatureService = imageFeatureService
                 ?? throw new ArgumentNullException(nameof(imageFeatureService));
+            _imageService = imageService
+                ?? throw new ArgumentNullException(nameof(imageService));
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
         }
@@ -388,6 +394,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             byte[] imageBytes = null;
 
+            OptimizedImageResult optimized;
+
             if (model.ItemImage != null)
             {
                 var extension = Path.GetExtension(model.ItemImage.FileName);
@@ -398,21 +406,29 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
                 else
                 {
-                    using var ms = new MemoryStream();
-                    await model.ItemImage.CopyToAsync(ms);
-                    imageBytes = ms.ToArray();
-
+                    try
+                    {
+                        optimized = await _imageService.OptimizeAsync(model.ItemImage);
+                        imageBytes = optimized.File;
+                    }
+                    catch (ParameterException pex)
+                    {
+                        TempData[ItemErrorMessageKey] = $"Error optimizing uploaded image: {pex.Message}";
+                        ModelState.AddModelError("ItemImage",
+                            $"Error optimizing uploaded image: {pex.Message}");
+                    }
+                    
                     var template = await _imageFeatureService
                         .GetTemplateForImageFeatureAsync(featureItem.ImageFeatureId);
 
                     var maxFileSize = template?.MaximumFileSizeBytes ?? MaximumFileSizeBytes;
 
-                    if (imageBytes.Length > maxFileSize)
+                    if (imageBytes?.Length > maxFileSize)
                     {
                         ModelState.AddModelError("ItemImage", $"Image must be smaller than {maxFileSize / 1024} KB");
                     }
 
-                    if (template?.Height.HasValue == true || template?.Width.HasValue == true)
+                    if (imageBytes != null && (template?.Height.HasValue == true || template?.Width.HasValue == true))
                     {
                         using var image = Image.Load(imageBytes);
                         if (template.Height.HasValue && image.Height != template.Height)
