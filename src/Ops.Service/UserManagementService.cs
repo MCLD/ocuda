@@ -20,10 +20,10 @@ namespace Ocuda.Ops.Service
         public static readonly string ProfilePicturePath = "profilepicture";
 
         private readonly IOcudaCache _cache;
+        private readonly IImageService _imageService;
         private readonly IPathResolverService _pathResolver;
         private readonly IUserRepository _userRepository;
         private readonly IVolunteerFormService _volunteerFormService;
-        private readonly IImageService _imageService;
 
         public UserManagementService(ILogger<UserManagementService> logger,
             IHttpContextAccessor httpContextAccessor,
@@ -281,10 +281,7 @@ namespace Ocuda.Ops.Service
 
         public async Task UploadProfilePictureAsync(User user, string profilePictureBase64)
         {
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
+            ArgumentNullException.ThrowIfNull(user);
 
             string extension;
             byte[] profilePicture;
@@ -297,7 +294,7 @@ namespace Ocuda.Ops.Service
             {
                 _logger.LogError("Error converting profile picture from base64: {ErrorMessage}",
                     oex.Message);
-                throw oex;
+                throw;
             }
 
             var checkPath = GetProfilePictureFilePath(null);

@@ -22,18 +22,20 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         public string Username { get; set; }
         public int? Width { get; set; }
 
-        public Task<OptimizedImageResult> OptimizeAsync(Uri imageUri);
+        public (string extension, byte[] imageBytes) ConvertFromBase64(string imageBase64);
 
-        public Task<OptimizedImageResult> OptimizeAsync(string imagePath);
-
-        public Task<OptimizedImageResult> OptimizeAsync(IFormFile formFile);
-
-        public (string extension, byte[] imageBytes) ConvertFromBase64(string imageBase64, bool profileImage = false);
+        public (string extension, byte[] imageBytes) ConvertFromBase64(string imageBase64, bool profileImage);
 
         public string ConvertToBase64(byte[] imageBytes);
 
         public string GetExtension(byte[] imageBytes);
 
         public string GetMimeType(byte[] imageBytes);
+
+        public Task<OptimizedImageResult> OptimizeAsync(Uri imageUri);
+
+        public Task<OptimizedImageResult> OptimizeAsync(string imagePath);
+
+        public Task<OptimizedImageResult> OptimizeAsync(IFormFile formFile);
     }
 }
