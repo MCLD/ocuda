@@ -97,6 +97,7 @@
         const scaleEl = document.querySelector('#scale');
         const widthEl = document.querySelector('#image-width');
         const heightEl = document.querySelector('#image-height');
+        const statusEl = document.querySelector('#status-message');
 
         let requestingPreview = false;
         let imageBase64;
@@ -118,6 +119,9 @@
         async function showPreview() {
             if (requestingPreview) return;
 
+            statusEl.className = "text-info";
+            statusEl.innerText = "";
+
             if (!inputsComplete()) {
                 return alert("All input fields must be complete");
             }
@@ -127,6 +131,12 @@
                 document.querySelector('#save-image').disabled = true;
 
                 const mapImageResult = await fetch(`https://maps.googleapis.com/maps/api/staticmap?zoom=${zoomEl.value}&size=${widthEl.value}x${heightEl.value}&maptype=roadmap&markers=color:red|${locationAddress}&key=${apiKey}&style=feature:poi|visibility:off&scale=${scaleEl.value}`);
+
+                if (!mapImageResult.ok) {
+                    statusEl.className = "text-danger";
+                    statusEl.innerText = `Error fetching map image: ${mapImageResult.status} ${mapImageResult.statusText}.`;
+                    return;
+                }
 
                 const imageBlob = await mapImageResult.blob();
                 const dataBase64 = await new Promise(resolve => {
@@ -151,13 +161,15 @@
             } catch (e) {
                 console.error(e);
                 alert(e);
+                statusEl.className = "text-danger";
+                statusEl.innerText = `Error optimizing image. ${e.value}`;
             } finally {
                 requestingPreview = false;
             }
         }
 
         async function saveImage() {
-            const statusEl = document.querySelector('#status-message');
+            
             statusEl.innerText = "Optimizing image...";
 
             try {
