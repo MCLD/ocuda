@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
@@ -20,6 +21,8 @@ namespace Ocuda.Promenade.Service
     {
         private const int HoursInADay = 24;
         private const int SuggestedTimesTake = 3;
+        /* Duplicate Interval in HelpController.cs, potentially should be site setting */
+        private const double TimeBlockInterval = 0.5;
 
         private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
@@ -193,7 +196,9 @@ namespace Ocuda.Promenade.Service
 
             if (subjects?.Any() != true)
             {
-                subjects = await _scheduleRequestSubjectRepository.GetAllAsync();
+                subjects = (await _scheduleRequestSubjectRepository.GetAllAsync())
+                    .Where(_ => _.IsActive)
+                    .OrderBy(_ => _.OrderBy);
                 await _cache.SaveToCacheAsync(Utility.Keys.Cache.PromScheduleSubjects,
                     subjects,
                     pageCacheDuration);
@@ -236,6 +241,60 @@ namespace Ocuda.Promenade.Service
             return subjects;
         }
 
+        public async Task<IEnumerable<SelectListItem>> GetAvailableTimeBlocks(double startHour, double availableHours, DateTime requestedDate)
+        {
+            // Round up start hour to nearest time interval
+            startHour = Math.Ceiling(startHour / TimeBlockInterval)
+                * TimeBlockInterval;
+
+            // Round down end hour to nearest time interval
+            var endHour = Math.Floor((startHour + availableHours) / TimeBlockInterval)
+                * TimeBlockInterval;
+
+            var timeBlocks = new List<DateTime>();
+
+            var dayRequests = await _scheduleRequestRepository.GetRequestsForDay(requestedDate);
+
+            var dayLimits = (await _scheduleRequestLimitRepository
+                .GetLimitsForDayAsync(requestedDate.DayOfWeek))
+                .ToDictionary(_ => _.Hour, _ => _.Limit);
+
+            if (dayLimits.Count == 0)
+            {
+                return new List<SelectListItem>();
+            }
+
+            for (double hour = startHour; hour <= endHour; hour += TimeBlockInterval)
+            {
+                var dayHour = hour % HoursInADay;
+
+                var timeBlock = requestedDate.Date.AddHours(dayHour);
+
+                var isHourAtLimit
+                    = !dayLimits.ContainsKey(timeBlock.Hour)
+                    || (dayLimits.ContainsKey(timeBlock.Hour) && dayLimits[timeBlock.Hour] == 0)
+                    || (dayRequests.ContainsKey(timeBlock) && dayRequests[timeBlock] >= dayLimits[timeBlock.Hour]);
+
+                if (timeBlock >= requestedDate && !isHourAtLimit)
+                {
+                    timeBlocks.Add(DateTime.Now.Date.AddHours(dayHour));
+                }
+
+                if (timeBlocks.Count >= HoursInADay / TimeBlockInterval)
+                {
+                    break;
+                }
+            }
+
+            return timeBlocks
+                .OrderBy(_ => _.TimeOfDay)
+                .Select(_ => new SelectListItem
+                {
+                    Text = _.ToShortTimeString(),
+                    Value = _.ToString(CultureInfo.CurrentCulture)
+                });
+        }
+
         public async Task<bool> IsRequestOverLimitAsync(DateTime requestTime)
         {
             var limit = await _scheduleRequestLimitRepository.GetTimeSlotLimitAsync(requestTime);
@@ -243,13 +302,10 @@ namespace Ocuda.Promenade.Service
             {
                 var requestCount = await _scheduleRequestRepository
                     .GetTimeSlotCountAsync(requestTime);
-                if (requestCount >= limit.Value)
-                {
-                    return true;
-                }
+                return requestCount >= limit.Value;
             }
 
-            return false;
+            return true;
         }
 
         private async Task<ScheduleRequest> AddAsyncInternal(ScheduleRequest scheduleRequest,

@@ -24,11 +24,6 @@ namespace Ocuda.Ops.Service
     public class LocationService : BaseService<LocationService>, ILocationService
     {
         private const string ndash = "\u2013";
-        private readonly string AssetBasePath = "assets";
-        private readonly string LocationFilePath = "locations";
-        private readonly string ImageFilePath = "images";
-        private readonly string MapFilePath = "maps";
-
         private readonly IGoogleClient _googleClient;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
         private readonly ILocationGroupRepository _locationGroupRepository;
@@ -38,8 +33,11 @@ namespace Ocuda.Ops.Service
         private readonly ILocationRepository _locationRepository;
         private readonly IRosterDivisionRepository _rosterDivisionRepository;
         private readonly IRosterLocationRepository _rosterLocationRepository;
-        private readonly IPathResolverService _pathResolver;
         private readonly ISiteSettingService _siteSettingService;
+        private readonly string AssetBasePath = "assets";
+        private readonly string ImageFilePath = "images";
+        private readonly string LocationFilePath = "locations";
+        private readonly string MapFilePath = "maps";
 
         public LocationService(IGoogleClient googleClient,
             ILocationFeatureRepository locationFeatureRepository,
@@ -52,7 +50,6 @@ namespace Ocuda.Ops.Service
             ILogger<LocationService> logger,
             IRosterDivisionRepository rosterDivisionRepository,
             IRosterLocationRepository rosterLocationRepository,
-            IPathResolverService pathResolver,
             ISiteSettingService siteSettingService)
             : base(logger, httpContextAccessor)
         {
@@ -72,7 +69,6 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(rosterDivisionRepository));
             _rosterLocationRepository = rosterLocationRepository
                 ?? throw new ArgumentNullException(nameof(rosterLocationRepository));
-            _pathResolver = pathResolver ?? throw new ArgumentNullException(nameof(pathResolver));
             _siteSettingService = siteSettingService;
         }
 
@@ -307,11 +303,6 @@ namespace Ocuda.Ops.Service
             return formattedDayGroupings;
         }
 
-        public async Task<Location> GetLocationByIdAsync(int locationId)
-        {
-            return await _locationRepository.FindAsync(locationId);
-        }
-
         public async Task<Location> GetLocationByCodeAsync(string locationCode)
         {
             var location = await _locationRepository.GetLocationByCode(locationCode);
@@ -323,6 +314,11 @@ namespace Ocuda.Ops.Service
             {
                 return location;
             }
+        }
+
+        public async Task<Location> GetLocationByIdAsync(int locationId)
+        {
+            return await _locationRepository.FindAsync(locationId);
         }
 
         public async Task<Location> GetLocationByStubAsync(string locationStub)
@@ -378,12 +374,8 @@ namespace Ocuda.Ops.Service
 
         public async Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId)
         {
-            var existing = await _locationProductMapRepository.FindAsync(locationMapId);
-
-            if (existing == null)
-            {
-                throw new OcudaException("Unable to find that location map.");
-            }
+            var existing = await _locationProductMapRepository.FindAsync(locationMapId)
+                ?? throw new OcudaException("Unable to find that location map.");
 
             existing.ImportLocation = importLocation;
             existing.LocationId = locationId;
@@ -396,45 +388,6 @@ namespace Ocuda.Ops.Service
             catch (Exception ex)
             {
                 throw new OcudaException(ex.Message, ex);
-            }
-        }
-
-        private string GetFormattedDayGroupings(List<DayOfWeek> days)
-        {
-            var dayFormatter = new DateTimeFormatInfo();
-            if (days.Count == 1)
-            {
-                return dayFormatter.GetAbbreviatedDayName(days[0]);
-            }
-            else
-            {
-                var firstDay = days[0];
-                var lastDay = days.Last();
-
-                if (days.Count == lastDay - firstDay + 1)
-                {
-                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)}{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay)}";
-                }
-                else if (days.Count == 2)
-                {
-                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)} & {dayFormatter.GetAbbreviatedDayName(lastDay)}";
-                }
-                else
-                {
-                    return string.Join(", ", days.Select(_ => dayFormatter.GetAbbreviatedDayName(_)));
-                }
-            }
-        }
-
-        private async Task ValidateAsync(Location location)
-        {
-            if (await _locationRepository.IsDuplicateNameAsync(location))
-            {
-                throw new OcudaException($"Location Name '{location.Name}' already exists.");
-            }
-            if (await _locationRepository.IsDuplicateStubAsync(location))
-            {
-                throw new OcudaException($"Location Stub '{location.Stub}' already exists.");
             }
         }
 
@@ -490,17 +443,52 @@ namespace Ocuda.Ops.Service
                     var oldFilePath = Path.Combine(filePath, oldFileName);
                     File.Delete(oldFilePath);
                 }
-
-            } catch (OcudaException oex) 
+            }
+            catch (OcudaException oex)
             {
                 _logger.LogError("Error uploading map image: {ErrorMessage}",
                     oex.Message);
                 throw new OcudaException($"Error uploading map image: {oex.Message}");
             }
+        }
 
-            
+        private static string GetFormattedDayGroupings(List<DayOfWeek> days)
+        {
+            var dayFormatter = new DateTimeFormatInfo();
+            if (days.Count == 1)
+            {
+                return dayFormatter.GetAbbreviatedDayName(days[0]);
+            }
+            else
+            {
+                var firstDay = days[0];
+                var lastDay = days.Last();
 
-            
+                if (days.Count == lastDay - firstDay + 1)
+                {
+                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)}{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay)}";
+                }
+                else if (days.Count == 2)
+                {
+                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)} & {dayFormatter.GetAbbreviatedDayName(lastDay)}";
+                }
+                else
+                {
+                    return string.Join(", ", days.Select(_ => dayFormatter.GetAbbreviatedDayName(_)));
+                }
+            }
+        }
+
+        private async Task ValidateAsync(Location location)
+        {
+            if (await _locationRepository.IsDuplicateNameAsync(location))
+            {
+                throw new OcudaException($"Location Name '{location.Name}' already exists.");
+            }
+            if (await _locationRepository.IsDuplicateStubAsync(location))
+            {
+                throw new OcudaException($"Location Stub '{location.Stub}' already exists.");
+            }
         }
     }
 }

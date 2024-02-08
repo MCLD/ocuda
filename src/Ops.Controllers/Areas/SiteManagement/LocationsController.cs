@@ -43,7 +43,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ILocationHoursService _locationHoursService;
         private readonly ILocationService _locationService;
         private readonly ISegmentService _segmentService;
-        private readonly ISiteSettingService _siteSettingService;
         private readonly ISocialCardService _socialCardService;
         private readonly IVolunteerFormService _volunteerFormService;
         private readonly IImageService _imageService;
@@ -58,7 +57,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ILocationHoursService locationHoursService,
             ILocationService locationService,
             ISegmentService segmentService,
-            ISiteSettingService siteSettingService,
             ISocialCardService socialCardService,
             IVolunteerFormService volunteerFormService,
             IImageService imageService) : base(context)
@@ -72,7 +70,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ArgumentNullException.ThrowIfNull(locationHoursService);
             ArgumentNullException.ThrowIfNull(locationService);
             ArgumentNullException.ThrowIfNull(segmentService);
-            ArgumentNullException.ThrowIfNull(siteSettingService);
             ArgumentNullException.ThrowIfNull(socialCardService);
             ArgumentNullException.ThrowIfNull(volunteerFormService);
             ArgumentNullException.ThrowIfNull(imageService);
@@ -85,7 +82,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             _locationHoursService = locationHoursService;
             _locationService = locationService;
             _segmentService = segmentService;
-            _siteSettingService = siteSettingService;
             _socialCardService = socialCardService;
             _volunteerFormService = volunteerFormService;
             _imageService = imageService;
@@ -187,7 +183,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 { "PostFeature", "Post-feature"},
             };
 
-            if (!validSegments.ContainsKey(whichSegment))
+            if (!validSegments.TryGetValue(whichSegment, out string value))
             {
                 ShowAlertDanger($"Invalid add segment request: unknown segment: {whichSegment}");
                 return RedirectToAction(nameof(Location), new { locationStub });
@@ -215,7 +211,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var segment = await _segmentService.CreateAsync(new Segment
             {
                 IsActive = true,
-                Name = $"{location.Name} - {validSegments[whichSegment]}",
+                Name = $"{location.Name} - {value}",
             });
 
             await _segmentService.CreateSegmentTextAsync(new SegmentText
@@ -937,7 +933,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpGet("[action]/{promMapPath}")]
         public async Task<IActionResult> Image(string promMapPath)
         {
-
             var promBasePath = await _siteSettingService.GetSettingStringAsync(
                     Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
 
@@ -1046,9 +1041,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var segments
                     = await _segmentService.GetNamesByIdsAsync(GetAssociatedSegmentIds(location));
 
-                if (segments.ContainsKey(location.DescriptionSegmentId))
+                if (segments.TryGetValue(location.DescriptionSegmentId, out string value))
                 {
-                    viewModel.DescriptionSegmentName = segments[location.DescriptionSegmentId];
+                    viewModel.DescriptionSegmentName = value;
                 }
                 if (location.HoursSegmentId.HasValue)
                 {
@@ -1376,7 +1371,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             try
             {
                 var location = await _locationService.GetLocationByIdAsync(viewModel.LocationId);
-                viewModel.FormSubmissions = new List<VolunteerFormSubmission>();
+                viewModel.FormSubmissions = [];
                 var formSubmissions = await _volunteerFormService
                     .GetVolunteerFormSubmissionsAsync(location.Id, viewModel.TypeId.Value);
                 viewModel.FormSubmissions.AddRange(formSubmissions);

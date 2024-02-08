@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using ImageOptimApi;
 using Microsoft.AspNetCore.Http;
@@ -16,20 +17,23 @@ namespace Ocuda.Ops.Service
 {
     public class ImageService : BaseService<ImageService>, IImageService
     {
+        private static readonly string[] ValidImageTypes = { ".jpg", ".png" };
         private readonly Client _client;
         private readonly IConfiguration _config;
 
-        private static readonly string[] ValidImageTypes = { ".jpg", ".png" };
-
         public ImageService(
-            Client client, 
-            IConfiguration config, 
+            Client client,
+            IConfiguration config,
             ILogger<ImageService> logger,
             IHttpContextAccessor httpContextAccessor) : base(logger, httpContextAccessor)
         {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-            _client.Username = _config[Ocuda.Utility.Keys.Configuration.OpsImageOptimizerUsername];
+            ArgumentNullException.ThrowIfNull(client);
+            ArgumentNullException.ThrowIfNull(config);
+
+            _client = client;
+            _config = config;
+
+            _client.Username = _config[Utility.Keys.Configuration.OpsImageOptimizerUsername];
         }
 
         public string BgColor { get => _client.BgColor; set => _client.BgColor = value; }
@@ -47,57 +51,12 @@ namespace Ocuda.Ops.Service
         public string Username { get => _client.Username; set => _client.Username = value; }
         public int? Width { get => _client.Width; set => _client.Width = value; }
 
-        public async Task<OptimizedImageResult> OptimizeAsync(Uri imageUri)
+        public (string extension, byte[] imageBytes) ConvertFromBase64(string imageBase64)
         {
-            return await _client.OptimizeAsync(imageUri);
+            return ConvertFromBase64(imageBase64, false);
         }
 
-        public async Task<OptimizedImageResult> OptimizeAsync(string imagePath)
-        {
-            return await _client.OptimizeAsync(imagePath);
-        }
-
-        public async Task<OptimizedImageResult> OptimizeAsync(IFormFile formFile)
-        {
-            OptimizedImageResult optimized;
-
-            string filePath = Path.Combine(Path.GetTempPath(),
-                Path.GetFileNameWithoutExtension(Path.GetTempFileName())
-                + Path.GetExtension(formFile.FileName));
-
-            try
-            {
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await formFile.CopyToAsync(stream);
-                stream.Close();
-
-                optimized = await OptimizeAsync(filePath);
-                _logger.LogInformation("Image optimization took {ElapsedSeconds}s",
-                    optimized.ElapsedSeconds);
-            }
-            catch (ParameterException pex)
-            {
-                _logger.LogError("Error with image submission: {ErrorMessage}", pex.Message);
-                return null;
-
-            }
-            finally
-            {
-                File.Delete(filePath);
-            }
-
-            if (optimized == null || optimized.Status != Status.Success)
-            {
-                _logger.LogError("Problem optimizing image: {ErrorStatus} {ErrorMessage}",
-                        optimized.Status,
-                        optimized.StatusMessage);
-                throw new ParameterException($"The image {formFile.FileName} could not be optimized.");
-            }
-
-            return optimized;
-        }
-
-        public (string extension, byte[] imageBytes) ConvertFromBase64(string imageBase64, bool profileImage = false)
+        public (string extension, byte[] imageBytes) ConvertFromBase64(string imageBase64, bool profileImage)
         {
             byte[] imageBytes;
 
@@ -175,14 +134,64 @@ namespace Ocuda.Ops.Service
             try
             {
                 var imageInfo = Image.Identify(imageBytes);
-                var mimeType = imageInfo.Metadata.DecodedImageFormat.DefaultMimeType;
-                return mimeType;
+                return imageInfo.Metadata.DecodedImageFormat.DefaultMimeType;
             }
             catch (UnknownImageFormatException uifex)
             {
                 throw new OcudaException("Unknown image type, please upload a JPEG or PNG picture",
                     uifex);
             }
+        }
+
+        public async Task<OptimizedImageResult> OptimizeAsync(Uri imageUri)
+        {
+            return await _client.OptimizeAsync(imageUri);
+        }
+
+        public async Task<OptimizedImageResult> OptimizeAsync(string imagePath)
+        {
+            return await _client.OptimizeAsync(imagePath);
+        }
+
+        public async Task<OptimizedImageResult> OptimizeAsync(IFormFile formFile)
+        {
+            ArgumentNullException.ThrowIfNull(formFile);
+
+            OptimizedImageResult optimized;
+
+            string filePath = Path.Combine(Path.GetTempPath(),
+                Path.GetFileNameWithoutExtension(Path.GetTempFileName())
+                + Path.GetExtension(formFile.FileName));
+
+            try
+            {
+                await using var stream = new FileStream(filePath, FileMode.Create);
+                await formFile.CopyToAsync(stream);
+                stream.Close();
+
+                optimized = await OptimizeAsync(filePath);
+                _logger.LogInformation("Image optimization took {ElapsedSeconds}s",
+                    optimized.ElapsedSeconds);
+            }
+            catch (ParameterException pex)
+            {
+                _logger.LogError("Error with image submission: {ErrorMessage}", pex.Message);
+                return null;
+            }
+            finally
+            {
+                File.Delete(filePath);
+            }
+
+            if (optimized?.Status != Status.Success)
+            {
+                _logger.LogError("Problem optimizing image, status {ErrorStatus}: {ErrorMessage}",
+                        optimized.Status,
+                        optimized.StatusMessage);
+                throw new OcudaException($"The image {formFile.FileName} could not be optimized.");
+            }
+
+            return optimized;
         }
     }
 }

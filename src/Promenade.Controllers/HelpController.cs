@@ -11,6 +11,7 @@ using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Help;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
+using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Helpers;
@@ -19,11 +20,11 @@ namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
     [Route("{culture:cultureConstraint?}/[Controller]")]
-    public class HelpController : BaseController<HelpController>
+    public partial class HelpController : BaseController<HelpController>
     {
-        private const int HoursInADay = 24;
         private const string TempDataDateTime = "ScheduleDateTime";
         private const string TempDataSubjectId = "ScheduleSubjectId";
+        /* Duplicate Interval in HelpController.cs, potentially should be site setting */
         private const double TimeBlockInterval = 0.5;
 
         private const string ViewModelEmail = nameof(ScheduleRequest)
@@ -40,26 +41,46 @@ namespace Ocuda.Promenade.Controllers
 
         private static readonly TimeSpan QuantizeSpan = TimeSpan.FromMinutes(30);
 
+        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly LocationService _locationService;
         private readonly ScheduleService _scheduleService;
         private readonly SegmentService _segmentService;
 
         public HelpController(ServiceFacades.Controller<HelpController> context,
+            IDateTimeProvider dateTimeProvider,
             LocationService locationService,
             ScheduleService scheduleService,
             SegmentService segmentService)
             : base(context)
         {
-            _locationService = locationService
-                ?? throw new ArgumentNullException(nameof(locationService));
-            _scheduleService = scheduleService
-                ?? throw new ArgumentNullException(nameof(scheduleService));
-            _segmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
+            ArgumentNullException.ThrowIfNull(dateTimeProvider);
+            ArgumentNullException.ThrowIfNull(locationService);
+            ArgumentNullException.ThrowIfNull(scheduleService);
+            ArgumentNullException.ThrowIfNull(segmentService);
+
+            _dateTimeProvider = dateTimeProvider;
+            _locationService = locationService;
+            _scheduleService = scheduleService;
+            _segmentService = segmentService;
         }
 
         public static string Name
         { get { return "Help"; } }
+
+        [HttpGet("[action]")]
+        public async Task<JsonResult> Availability()
+        {
+            return await Availability(string.Empty);
+        }
+
+        [HttpGet("[action]/{selectedDate}")]
+        public async Task<JsonResult> Availability(string selectedDate)
+        {
+            var availableBlocks = DateTime.TryParse(selectedDate, out var date)
+                ? await GetTimeBlocks(date)
+                : await GetTimeBlocks();
+            return Json(availableBlocks.Select(_ => new { value = _.Value, text = _.Text }));
+        }
 
         [HttpGet("[action]")]
         [ResponseCache(NoStore = true)]
@@ -115,7 +136,7 @@ namespace Ocuda.Promenade.Controllers
             DateTime firstAvailable;
             try
             {
-                firstAvailable = await FirstAvailable(DateTime.Now);
+                firstAvailable = await FirstAvailable(_dateTimeProvider.Now);
             }
             catch (OcudaException)
             {
@@ -167,7 +188,7 @@ namespace Ocuda.Promenade.Controllers
             }
 
             // if the selected date is today then ensure it's not before the first available time
-            if (viewModel.RequestedDate.Date == DateTime.Now.Date
+            if (viewModel.RequestedDate.Date == _dateTimeProvider.Now.Date
                 && viewModel.RequestedTime.TimeOfDay < firstAvailable.TimeOfDay)
             {
                 ModelState.AddModelError(nameof(viewModel.RequestedTime),
@@ -271,7 +292,7 @@ namespace Ocuda.Promenade.Controllers
             string phoneNumbers;
             if (!string.IsNullOrEmpty(viewModel.ScheduleRequestPhone))
             {
-                phoneNumbers = Regex.Replace(viewModel.ScheduleRequestPhone, "[^0-9.]", "");
+                phoneNumbers = DigitsOnlyRegex().Replace(viewModel.ScheduleRequestPhone, "");
                 if (phoneNumbers.Length != 10)
                 {
                     ModelState.AddModelError(nameof(viewModel.ScheduleRequestPhone),
@@ -378,7 +399,7 @@ namespace Ocuda.Promenade.Controllers
             DateTime firstAvailable;
             try
             {
-                firstAvailable = await FirstAvailable(DateTime.Now);
+                firstAvailable = await FirstAvailable(_dateTimeProvider.Now);
             }
             catch (OcudaException)
             {
@@ -430,7 +451,7 @@ namespace Ocuda.Promenade.Controllers
             }
 
             // if the selected date is today then ensure it's not before the first available time
-            if (viewModel.RequestedDate.Value.Date == DateTime.Now.Date
+            if (viewModel.RequestedDate.Value.Date == _dateTimeProvider.Now.Date
                 && viewModel.RequestedTime.Value.TimeOfDay < firstAvailable.TimeOfDay)
             {
                 ModelState.AddModelError(nameof(viewModel.RequestedTime),
@@ -502,8 +523,11 @@ namespace Ocuda.Promenade.Controllers
             }
         }
 
+        [GeneratedRegex("[^0-9.]")]
+        private static partial Regex DigitsOnlyRegex();
+
         private async Task<IActionResult>
-            DisplayScheduleDetailsFormAsync(ScheduleDetailsViewModel viewModel,
+                    DisplayScheduleDetailsFormAsync(ScheduleDetailsViewModel viewModel,
             int selectedSubjectId,
             DateTime requestedTime)
         {
@@ -590,9 +614,9 @@ namespace Ocuda.Promenade.Controllers
             if (scheduleViewModel == null)
             {
                 scheduleViewModel = new ScheduleViewModel();
-                if (TempData.ContainsKey(TempDataDateTime))
+                if (TempData.TryGetValue(TempDataDateTime, out object tempDateTime))
                 {
-                    var dateTime = TempData[TempDataDateTime] as DateTime?;
+                    var dateTime = tempDateTime as DateTime?;
                     if (dateTime != null)
                     {
                         scheduleViewModel.RequestedDate = dateTime.Value.Date;
@@ -600,9 +624,9 @@ namespace Ocuda.Promenade.Controllers
                     }
                 }
 
-                if (TempData.ContainsKey(TempDataSubjectId))
+                if (TempData.TryGetValue(TempDataSubjectId, out object subjectId))
                 {
-                    scheduleViewModel.SubjectId = (int)TempData[TempDataSubjectId];
+                    scheduleViewModel.SubjectId = (int)subjectId;
                 }
             }
 
@@ -632,7 +656,10 @@ namespace Ocuda.Promenade.Controllers
 
             try
             {
-                var firstAvailable = await FirstAvailable(DateTime.Now);
+                var firstAvailable = await FirstAvailable(_dateTimeProvider.Now);
+
+                scheduleViewModel.FirstAvailable = firstAvailable;
+                scheduleViewModel.LastAvailableDate = firstAvailable.AddDays(7);
 
                 if (scheduleViewModel.RequestedDate == DateTime.MinValue)
                 {
@@ -649,7 +676,7 @@ namespace Ocuda.Promenade.Controllers
                 scheduleViewModel.WarningText = ex.Message;
             }
 
-            scheduleViewModel.TimeBlocks = await GetTimeBlocks();
+            scheduleViewModel.TimeBlocks = await GetTimeBlocks(scheduleViewModel.RequestedTime);
 
             return View("Schedule", scheduleViewModel);
         }
@@ -676,7 +703,7 @@ namespace Ocuda.Promenade.Controllers
             var scheduleViewModel = viewModel ?? new ScheduleTimesViewModel()
             {
                 RequestedDate = requestedTime,
-                RequestedTime = DateTime.Now.Date.Add(requestedTime.TimeOfDay)
+                RequestedTime = _dateTimeProvider.Now.Date.Add(requestedTime.TimeOfDay)
             };
 
             scheduleViewModel.ScheduleRequestTime = requestedTime;
@@ -686,7 +713,7 @@ namespace Ocuda.Promenade.Controllers
             var availableHours = await _siteSettingService.GetSettingDoubleAsync(
                 Models.Keys.SiteSetting.Scheduling.AvailableHours);
 
-            var firstAvailable = await FirstAvailable(DateTime.Now);
+            var firstAvailable = await FirstAvailable(_dateTimeProvider.Now);
             var blockedDays = await GetBlockedDays();
 
             var daySuggestedTimes = await _scheduleService.GetDaySuggestedTimesAsync(
@@ -722,7 +749,7 @@ namespace Ocuda.Promenade.Controllers
                 }
             }
 
-            scheduleViewModel.TimeBlocks = await GetTimeBlocks();
+            scheduleViewModel.TimeBlocks = await GetTimeBlocks(requestedTime);
 
             return View(nameof(ScheduleTimes), scheduleViewModel);
         }
@@ -745,6 +772,14 @@ namespace Ocuda.Promenade.Controllers
                 Models.Keys.SiteSetting.Scheduling.BufferHours);
 
             var firstAvailable = date.RoundUp(QuantizeSpan).AddHours(bufferHours);
+
+            var isOverLimit = await _scheduleService.IsRequestOverLimitAsync(firstAvailable);
+
+            while (isOverLimit && firstAvailable.Hour <= startHour + availableHours)
+            {
+                firstAvailable = firstAvailable.AddHours(TimeBlockInterval);
+                isOverLimit = await _scheduleService.IsRequestOverLimitAsync(firstAvailable);
+            }
 
             if (firstAvailable.TimeOfDay < firstAvailable.Date.AddHours(startHour).TimeOfDay)
             {
@@ -777,7 +812,7 @@ namespace Ocuda.Promenade.Controllers
 
             foreach (var day in unavailableDays)
             {
-                if (Enum.TryParse<DayOfWeek>(day, true, out DayOfWeek result))
+                if (Enum.TryParse(day, true, out DayOfWeek result))
                 {
                     blockedDays.Add(result);
                 }
@@ -792,40 +827,26 @@ namespace Ocuda.Promenade.Controllers
 
         private async Task<IEnumerable<SelectListItem>> GetTimeBlocks()
         {
+            return await GetTimeBlocks(null);
+        }
+
+        private async Task<IEnumerable<SelectListItem>> GetTimeBlocks(DateTime? requestedDate)
+        {
             var startHour = await _siteSettingService.GetSettingDoubleAsync(
                 Models.Keys.SiteSetting.Scheduling.StartHour);
             var availableHours = await _siteSettingService.GetSettingDoubleAsync(
                 Models.Keys.SiteSetting.Scheduling.AvailableHours);
 
-            // Round up start hour to nearest time interval
-            startHour = Math.Ceiling(startHour / TimeBlockInterval)
-                * TimeBlockInterval;
-
-            // Round down end hour to nearest time interval
-            var endHour = Math.Floor((startHour + availableHours) / TimeBlockInterval)
-                * TimeBlockInterval;
-
-            var timeBlocks = new List<DateTime>();
-
-            for (double hour = startHour; hour <= endHour; hour += TimeBlockInterval)
+            if (!requestedDate.HasValue
+                || requestedDate.Value.Date <= _dateTimeProvider.Now)
             {
-                var dayHour = hour % HoursInADay;
-
-                timeBlocks.Add(DateTime.Now.Date.AddHours(dayHour));
-
-                if (timeBlocks.Count >= HoursInADay / TimeBlockInterval)
-                {
-                    break;
-                }
+                requestedDate = await FirstAvailable(_dateTimeProvider.Now);
+                availableHours -= requestedDate.Value.Hour - startHour;
+                startHour = requestedDate.Value.Hour;
             }
 
-            return timeBlocks
-                .OrderBy(_ => _.TimeOfDay)
-                .Select(_ => new SelectListItem
-                {
-                    Text = _.ToShortTimeString(),
-                    Value = _.ToString(CultureInfo.CurrentCulture)
-                });
+            return await _scheduleService
+                .GetAvailableTimeBlocks(startHour, availableHours, requestedDate.Value);
         }
 
         private async Task<IActionResult> NoScheduleAsync(bool forceReload)

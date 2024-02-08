@@ -35,9 +35,11 @@ else
                     formgroup>
             </select>
             <select asp-for="SubjectId"
-                    asp-items="Model.Subjects" formgroup></select>
+                    asp-items="Model.Subjects"
+                    formgroup></select>
             <div>
                 <button type="submit"
+                        id="submitButton"
                         class="btn btn-outline-dark m-2 btn-lg float-end">
                     @Localizer[Promenade.ButtonNext]
                     <span class="fa-solid fa-chevron-right"></span>
@@ -46,3 +48,41 @@ else
         </form>
     </div>
 </div>
+
+<script>
+    const today = '@Model.FirstAvailable.ToString("O").Substring(0, 10)';
+    const lastDate = '@(Model.LastAvailableDate.HasValue ? Model.LastAvailableDate.Value.ToString("O").Substring(0, 10) : "")';
+    const baseUrl = '@Url.Action(nameof(HelpController.Availability))';
+    document.querySelector("#RequestedDate").setAttribute('min', today);
+    if (lastDate.length > 0) {
+        document.querySelector("#RequestedDate").setAttribute('max', lastDate);
+    }
+
+    document.querySelector("#RequestedDate").addEventListener("change", () => {
+        const selectedDate = document.querySelector("#RequestedDate").value;
+        getTimeBlocks(selectedDate);
+    })
+
+    async function getTimeBlocks(selectedDate) {
+        const fullUrl = baseUrl.endsWith('/') 
+            ? baseUrl + selectedDate 
+            : baseUrl + '/' + selectedDate;
+        console.info(fullUrl)
+        const response = await fetch(fullUrl);
+        const timeBlocks = await response.json();
+        updateTimeOptions(timeBlocks);
+    }
+
+    function updateTimeOptions(timeBlocks) {
+        const optionEl = document.querySelector("#RequestedTime");
+        optionEl.innerHTML = "";
+        if (timeBlocks.length === 0) {
+            document.querySelector("#submitButton").disabled = true;
+            return optionEl.appendChild(new Option("No appointments available", "No appointments available"))
+        }
+        timeBlocks.forEach(block => {
+            optionEl.appendChild(new Option(block.text, block.value));
+        })
+        document.querySelector("#submitButton").disabled = false;
+    }
+</script>

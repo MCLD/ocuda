@@ -17,19 +17,21 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]")]
     public class HomeController : BaseController<HomeController>
     {
-        private readonly IPermissionGroupService _permissionGroupService;
-        private readonly IConfiguration _config;
         private readonly bool _canOptimizeImages;
+        private readonly IConfiguration _config;
+        private readonly IPermissionGroupService _permissionGroupService;
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
             IPermissionGroupService permissionGroupService,
             IConfiguration config)
             : base(context)
         {
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
-            _config = config
-                ?? throw new ArgumentNullException(nameof(config));
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+            ArgumentNullException.ThrowIfNull(config);
+
+            _permissionGroupService = permissionGroupService;
+            _config = config;
+
             _canOptimizeImages = _config[Configuration.OpsImageOptimizerUsername] != null;
         }
 
