@@ -17,7 +17,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
     [Route("[area]")]
     public class HomeController : BaseController<HomeController>
     {
-        private static readonly string BookmarkletFilePath = Path.Combine("scripts",
+        private static readonly string BookmarkletFilePath = Path.Combine("Scripts",
             "CoverIssue-Bookmarklet.js");
 
         private readonly ICoverIssueService _coverIssueService;
