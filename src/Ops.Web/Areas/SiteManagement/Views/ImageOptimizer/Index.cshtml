@@ -1,22 +1,43 @@
 ﻿@using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ImageOptimizer
 @model ImageOptimizerViewModel;
 
-<div class="container-fluid">
-    <div style="max-width: 528px">
+<div class="row mb-2">
+    <div class="col-sm-7">
         <h1>Image Optimizer</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
+    </div>
+</div>
+
+
+<div class="row mb-2">
+    <div class="col-12">
         <form id="optimizer-form" method="post"
               asp-action="@nameof(ImageOptimizerController.Index)"
               asp-controller="@ImageOptimizerController.Name"
               enctype="multipart/form-data">
             <div class="mb-3">
                 <label asp-for="@Model.TargetFormat">Output image format: </label>
-                <select class="form-control optimizer-input" asp-for="@Model.TargetFormat" asp-items="@ImageOptimizerViewModel.Formats"></select>
+                <select class="form-select optimizer-input"
+                        asp-for="@Model.TargetFormat"
+                        asp-items="@ImageOptimizerViewModel.Formats"></select>
             </div>
             <div class="mb-3">
                 <label asp-for="@Model.FormFile">Select an image: </label>
-                <input class="form-control optimizer-input" type="file" asp-for="@Model.FormFile" accept="image/png, image/jpeg" />
+                <input class="form-control optimizer-input"
+                       type="file"
+                       asp-for="@Model.FormFile" 
+                       accept="image/png, image/jpeg" />
             </div>
-            <button class="btn btn-success" id="submit-button" type="submit" disabled>Submit</button>
+            <button class="btn btn-success"
+                    button-spinner
+                    id="submit-button"
+                    type="submit" disabled>
+                Submit
+            </button>
         </form>
     </div>
 </div>
@@ -32,6 +53,6 @@
     })
 
     document.querySelector('#optimizer-form').addEventListener('submit', () => {
-        submitButton.disabled = true;
+        setTimeout(ResetSpinners, 2000);
     });
 </script>

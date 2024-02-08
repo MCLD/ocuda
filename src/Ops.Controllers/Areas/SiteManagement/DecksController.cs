@@ -28,7 +28,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         public static readonly int CardImageWidth = 666;
         public static readonly int MaximumFileSizeBytes = 200 * 1024;
-        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png" };
+        private static readonly string[] ValidImageExtensions = [".jpg", ".png"];
 
         private readonly IDeckService _deckService;
         private readonly ILanguageService _languageService;
@@ -116,7 +116,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
-                using var ms = new MemoryStream();
+                await using var ms = new MemoryStream();
                 await viewModel.CardImage.CopyToAsync(ms);
                 var imageBytes = ms.ToArray();
 

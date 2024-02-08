@@ -20,8 +20,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class ImageOptimizerController : BaseController<ImageOptimizerController>
     {
-        private readonly IImageService _imageService;
         public static readonly string Name = "ImageOptimizer";
+        private readonly IImageService _imageService;
 
         public ImageOptimizerController(
             IImageService imageService,
@@ -32,7 +32,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpGet("")]
         [HttpGet("[action]")]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return View(new ImageOptimizerViewModel());
         }
@@ -51,6 +51,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             try
             {
+                _imageService.Format = viewModel.TargetFormat;
+
                 optimized = await _imageService.OptimizeAsync(viewModel.FormFile);
 
                 string newFilename = Path.GetFileNameWithoutExtension(viewModel.FormFile.FileName)
@@ -61,7 +63,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return File(optimized.File,
                     contentType ?? "application/octet-stream",
                     newFilename);
-            } 
+            }
             catch (ParameterException pex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
