@@ -1371,7 +1371,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             try
             {
                 var location = await _locationService.GetLocationByIdAsync(viewModel.LocationId);
-                viewModel.FormSubmissions = [];
+                viewModel.FormSubmissions = new List<VolunteerFormSubmission>();
                 var formSubmissions = await _volunteerFormService
                     .GetVolunteerFormSubmissionsAsync(location.Id, viewModel.TypeId.Value);
                 viewModel.FormSubmissions.AddRange(formSubmissions);
