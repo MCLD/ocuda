@@ -15,7 +15,6 @@ using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Decks;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Models.Keys;
-using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
@@ -30,7 +29,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         public static readonly int CardImageWidth = 666;
         public static readonly int MaximumFileSizeBytes = 200 * 1024;
-        private static readonly string[] ValidImageExtensions = [".jpg", ".png"];
+        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png" };
 
         private readonly IDeckService _deckService;
         private readonly IImageService _imageService;

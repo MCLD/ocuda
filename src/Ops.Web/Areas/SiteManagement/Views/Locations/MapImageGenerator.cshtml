@@ -20,6 +20,12 @@
 </div>
 <div class="row">
     <div class="col-sm-6">
+        <div class="alert alert-success" id="status-message" style="display: none;"></div>
+        <div class="alert alert-warning" id="status-error" style="display: none;"></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6">
         <div class="d-flex mb-3">
             <label class="col-4" for="zoom-level">
                 Zoom Level
@@ -68,7 +74,6 @@
     </div>
 
 </div>
-<div id="status-message" class="text-info"></div>
 
 @section Scripts
     {
@@ -97,7 +102,6 @@
         const scaleEl = document.querySelector('#scale');
         const widthEl = document.querySelector('#image-width');
         const heightEl = document.querySelector('#image-height');
-        const statusEl = document.querySelector('#status-message');
 
         let requestingPreview = false;
         let imageBase64;
@@ -116,11 +120,33 @@
             return complete;
         }
 
+        function showStatus(statusMessage) {
+            if (statusMessage) {
+                showError();
+                document.querySelector('#status-message').innerText = statusMessage;
+                document.querySelector('#status-message').style.display = "block";
+            } else {
+                document.querySelector('#status-message').innerText = "";
+                document.querySelector('#status-message').style.display = "none";
+            }
+        }
+
+        function showError(errorMessage) {
+            if (errorMessage) {
+                showStatus();
+                document.querySelector('#status-error').innerText = errorMessage;
+                document.querySelector('#status-error').style.display = "block";
+            } else {
+                document.querySelector('#status-error').innerText = "";
+                document.querySelector('#status-error').style.display = "none";
+            }
+        }
+
         async function showPreview() {
             if (requestingPreview) return;
 
-            statusEl.className = "text-info";
-            statusEl.innerText = "";
+            showStatus("Fetching preview image...");
+            showError();
 
             if (!inputsComplete()) {
                 return alert("All input fields must be complete");
@@ -130,11 +156,12 @@
                 requestingPreview = true;
                 document.querySelector('#save-image').disabled = true;
 
+                showStatus('Fetching map...');
+
                 const mapImageResult = await fetch(`https://maps.googleapis.com/maps/api/staticmap?zoom=${zoomEl.value}&size=${widthEl.value}x${heightEl.value}&maptype=roadmap&markers=color:red|${locationAddress}&key=${apiKey}&style=feature:poi|visibility:off&scale=${scaleEl.value}`);
 
                 if (!mapImageResult.ok) {
-                    statusEl.className = "text-danger";
-                    statusEl.innerText = `Error fetching map image: ${mapImageResult.status} ${mapImageResult.statusText}.`;
+                    showError(`Error fetching map image: ${mapImageResult.status} ${await mapImageResult.text()}.`);
                     return;
                 }
 
@@ -157,21 +184,18 @@
                 imageContainer.appendChild(img);
 
                 document.querySelector('#save-image').disabled = false;
-
             } catch (e) {
                 console.error(e);
                 alert(e);
-                statusEl.className = "text-danger";
-                statusEl.innerText = `Error optimizing image. ${e.value}`;
+                showStatus();
+                showError(`Error optimizing image: ${e.value}`);
             } finally {
                 requestingPreview = false;
             }
         }
 
         async function saveImage() {
-            
-            statusEl.innerText = "Optimizing image...";
-
+            showStatus("Optimizing image...");
             try {
                 const saveResponse = await fetch(savePath, {
                     headers: {
@@ -183,19 +207,12 @@
 
                 const saveMessage = await saveResponse.json();
 
-
-                statusEl.className = "text-success";
-                statusEl.innerText = saveMessage;
-
+                showStatus(saveMessage);
             } catch (e) {
                 console.log(e);
-                statusEl.className = "text-danger";
-                statusEl.innerText = `Error optimizing image. ${e.value}`;
+                showError(`Error optimizing image. ${e.value}`);
                 return;
             }
-
-
         }
-
     </script>
 }
