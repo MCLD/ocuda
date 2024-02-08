@@ -288,7 +288,7 @@ namespace Ocuda.Ops.Web
                     ).UseContentRoot();
             });
 
-            services.AddHttpClient<Utility.Abstract.IGoogleClient, Utility.Clients.GoogleClient>();
+            services.AddHttpClient<IGoogleClient, Utility.Clients.GoogleClient>();
             services.AddHttpClient<Service.Abstract.IScreenlyClient, ScreenlyClient>()
                 .ConfigurePrimaryHttpMessageHandler(() =>
                 {
@@ -306,7 +306,8 @@ namespace Ocuda.Ops.Web
                 .ConfigureHttpClient(_ =>
                 {
                     _.Timeout = TimeSpan.FromSeconds(30);
-                    _.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("TestApp", "1.0.0"));
+                    _.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(nameof(Ocuda),
+                        Utility.Helpers.VersionHelper.GetVersion()));
                 });
 
             services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
