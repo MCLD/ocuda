@@ -19,7 +19,6 @@ namespace Ocuda.Ops.Service
     {
         private static readonly string[] ValidImageTypes = { ".jpg", ".png" };
         private readonly Client _client;
-        private readonly IConfiguration _config;
 
         public ImageService(
             Client client,
@@ -31,9 +30,8 @@ namespace Ocuda.Ops.Service
             ArgumentNullException.ThrowIfNull(config);
 
             _client = client;
-            _config = config;
 
-            _client.Username = _config[Utility.Keys.Configuration.OpsImageOptimizerUsername];
+            _client.Username = config[Utility.Keys.Configuration.OpsImageOptimizerUsername];
         }
 
         public string BgColor { get => _client.BgColor; set => _client.BgColor = value; }

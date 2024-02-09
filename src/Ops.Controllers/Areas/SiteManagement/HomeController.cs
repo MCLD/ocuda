@@ -18,7 +18,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class HomeController : BaseController<HomeController>
     {
         private readonly bool _canOptimizeImages;
-        private readonly IConfiguration _config;
         private readonly IPermissionGroupService _permissionGroupService;
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
@@ -30,9 +29,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ArgumentNullException.ThrowIfNull(config);
 
             _permissionGroupService = permissionGroupService;
-            _config = config;
 
-            _canOptimizeImages = _config[Configuration.OpsImageOptimizerUsername] != null;
+            _canOptimizeImages = config[Configuration.OpsImageOptimizerUsername] != null;
         }
 
         public static string Name
