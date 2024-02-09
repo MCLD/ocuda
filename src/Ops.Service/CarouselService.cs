@@ -84,7 +84,6 @@ namespace Ocuda.Ops.Service
                 };
 
                 await _carouselTextRepository.AddAsync(newText);
-                
             }
 
             await _carouselTextRepository.SaveAsync();
@@ -132,7 +131,6 @@ namespace Ocuda.Ops.Service
                 }
 
                 await _carouselButtonRepository.SaveAsync();
-
             }
 
             return newCarousel;
