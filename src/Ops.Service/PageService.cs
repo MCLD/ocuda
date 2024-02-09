@@ -198,6 +198,21 @@ namespace Ocuda.Ops.Service
                         cardCount,
                         cardDetailCount);
                 }
+                else if (item.CarouselId.HasValue)
+                {
+                    var newCarousel = await _carouselService.CloneAsync((int)item.CarouselId);
+
+                    var newItem = await CreateItemAsync(new PageItem
+                    {
+                        Order = item.Order,
+                        PageLayoutId = newLayout.Id,
+                        Carousel = newCarousel
+                    });
+
+                    _logger.LogDebug("Layout {NewLayoutId}: cloned carousel to new carousel id {ItemId}",
+                        newLayout.Id,
+                        newItem.Id);
+                }
             }
 
             return newLayout;
@@ -284,11 +299,18 @@ namespace Ocuda.Ops.Service
             }
             else if (pageItem.Carousel != null)
             {
-                pageItem.Carousel.CarouselText ??= new CarouselText
+                if (pageItem.Carousel.Id == 0)
                 {
-                    Title = pageItem.Carousel.Name
-                };
-                carousel = await _carouselService.CreateNoSaveAsync(pageItem.Carousel);
+                    pageItem.Carousel.CarouselText ??= new CarouselText
+                    {
+                        Title = pageItem.Carousel.Name
+                    };
+                    carousel = await _carouselService.CreateNoSaveAsync(pageItem.Carousel);
+                }
+                else
+                {
+                    carousel = pageItem.Carousel;
+                }
             }
             else if (pageItem.Deck != null)
             {

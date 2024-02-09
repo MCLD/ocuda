@@ -8,6 +8,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 {
     public interface ICarouselService
     {
+        Task<Carousel> CloneAsync(int currentCarouselId);
         Task<Carousel> CreateAsync(Carousel carousel);
         Task<CarouselButton> CreateButtonAsync(CarouselButton button);
         Task<CarouselItem> CreateItemAsync(CarouselItem carouselItem);
@@ -24,6 +25,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<string> GetDefaultNameForCarouselAsync(int carouselId);
         Task<string> GetDefaultNameForItemAsync(int itemId);
         Task<CarouselItem> GetItemByIdAsync(int id);
+        Task<List<CarouselItem>> GetItemListByIdAsync(int carouselId);
         Task<int?> GetPageHeaderIdForCarouselAsync(int id);
         Task<int?> GetPageLayoutIdForCarouselAsync(int id);
         Task<DataWithCount<ICollection<Carousel>>> GetPaginatedListAsync(BaseFilter filter);
