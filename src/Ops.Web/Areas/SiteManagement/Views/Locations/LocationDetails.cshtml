@@ -948,6 +948,24 @@
             </table>
         </div>
     </div>
+
+    <div class="row mt-2">
+        <div>
+            <h3>Location map</h3>
+            <table class="table table-sm table-bordered table-hover">
+                <tr>
+                    <td>
+                        <img class="img-fluid w-100" style="max-width: 500px" src="@Url.Action(nameof(LocationsController.Image), LocationsController.Name, new { promMapPath = Model.Location.MapImagePath })">
+                    </td>
+                    <td class="align-middle text-end">
+                        <a class="btn btn-primary" href="@Url.Action(nameof(LocationsController.MapImageGenerator), LocationsController.Name, new { locationStub = Model.Location.Stub })">
+                            New Map
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
 }
 
 @section scripts{
@@ -1088,7 +1106,7 @@
                     {
                         itemId: itemId,
                         locationId: @Model.Location.Id
-                                                                                                        }, function () {
+                                                                                                                                }, function () {
                     $("#deleteModal").modal('hide');
                     window.location.reload();
                 });

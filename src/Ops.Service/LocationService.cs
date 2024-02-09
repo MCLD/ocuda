@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,13 +17,13 @@ using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Service
 {
     public class LocationService : BaseService<LocationService>, ILocationService
     {
         private const string ndash = "\u2013";
-
         private readonly IGoogleClient _googleClient;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
         private readonly ILocationGroupRepository _locationGroupRepository;
@@ -32,6 +33,11 @@ namespace Ocuda.Ops.Service
         private readonly ILocationRepository _locationRepository;
         private readonly IRosterDivisionRepository _rosterDivisionRepository;
         private readonly IRosterLocationRepository _rosterLocationRepository;
+        private readonly ISiteSettingService _siteSettingService;
+        private readonly string AssetBasePath = "assets";
+        private readonly string ImageFilePath = "images";
+        private readonly string LocationFilePath = "locations";
+        private readonly string MapFilePath = "maps";
 
         public LocationService(IGoogleClient googleClient,
             ILocationFeatureRepository locationFeatureRepository,
@@ -43,7 +49,8 @@ namespace Ocuda.Ops.Service
             ILocationRepository locationRepository,
             ILogger<LocationService> logger,
             IRosterDivisionRepository rosterDivisionRepository,
-            IRosterLocationRepository rosterLocationRepository)
+            IRosterLocationRepository rosterLocationRepository,
+            ISiteSettingService siteSettingService)
             : base(logger, httpContextAccessor)
         {
             _googleClient = googleClient ?? throw new ArgumentNullException(nameof(googleClient));
@@ -62,6 +69,7 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(rosterDivisionRepository));
             _rosterLocationRepository = rosterLocationRepository
                 ?? throw new ArgumentNullException(nameof(rosterLocationRepository));
+            _siteSettingService = siteSettingService;
         }
 
         public async Task<Location> AddLocationAsync(Location location)
@@ -295,11 +303,6 @@ namespace Ocuda.Ops.Service
             return formattedDayGroupings;
         }
 
-        public async Task<Location> GetLocationByIdAsync(int locationId)
-        {
-            return await _locationRepository.FindAsync(locationId);
-        }
-
         public async Task<Location> GetLocationByCodeAsync(string locationCode)
         {
             var location = await _locationRepository.GetLocationByCode(locationCode);
@@ -311,6 +314,11 @@ namespace Ocuda.Ops.Service
             {
                 return location;
             }
+        }
+
+        public async Task<Location> GetLocationByIdAsync(int locationId)
+        {
+            return await _locationRepository.FindAsync(locationId);
         }
 
         public async Task<Location> GetLocationByStubAsync(string locationStub)
@@ -366,12 +374,8 @@ namespace Ocuda.Ops.Service
 
         public async Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId)
         {
-            var existing = await _locationProductMapRepository.FindAsync(locationMapId);
-
-            if (existing == null)
-            {
-                throw new OcudaException("Unable to find that location map.");
-            }
+            var existing = await _locationProductMapRepository.FindAsync(locationMapId)
+                ?? throw new OcudaException("Unable to find that location map.");
 
             existing.ImportLocation = importLocation;
             existing.LocationId = locationId;
@@ -387,7 +391,68 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        private string GetFormattedDayGroupings(List<DayOfWeek> days)
+        public async Task UploadLocationMapAsync(byte[] imageBytes, string fileName)
+        {
+            if (imageBytes == null || fileName == null)
+            {
+                throw new OcudaException("Invalid map image or filename.");
+            }
+
+            string basePath = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var filePath = Path.Combine(basePath,
+                ImageFilePath,
+                LocationFilePath,
+                MapFilePath);
+
+            try
+            {
+                if (!Directory.Exists(filePath))
+                {
+                    _logger.LogInformation("Creating image card directory: {Path}",
+                        filePath);
+                    Directory.CreateDirectory(filePath);
+                }
+
+                var fileWritePath = Path.Combine(filePath, fileName);
+
+                await File.WriteAllBytesAsync(fileWritePath, imageBytes);
+
+                var assetBase = Path.DirectorySeparatorChar + AssetBasePath;
+
+                var assetPath = Path.Combine(assetBase,
+                ImageFilePath,
+                LocationFilePath,
+                MapFilePath,
+                fileName);
+
+                var locationCode = fileName.Split('.')[0];
+
+                var location = await _locationRepository.GetLocationByCode(locationCode);
+
+                var oldFileName = Path.GetFileName(location.MapImagePath);
+
+                location.MapImagePath = assetPath;
+
+                _locationRepository.Update(location);
+                await _locationRepository.SaveAsync();
+
+                if (fileName != oldFileName)
+                {
+                    var oldFilePath = Path.Combine(filePath, oldFileName);
+                    File.Delete(oldFilePath);
+                }
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogError("Error uploading map image: {ErrorMessage}",
+                    oex.Message);
+                throw new OcudaException($"Error uploading map image: {oex.Message}");
+            }
+        }
+
+        private static string GetFormattedDayGroupings(List<DayOfWeek> days)
         {
             var dayFormatter = new DateTimeFormatInfo();
             if (days.Count == 1)

@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
+using ImageOptimApi;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
@@ -27,6 +32,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class LocationsController : BaseController<LocationsController>
     {
         private readonly string _apiKey;
+        private readonly string ImageFilePath = "images";
+        private readonly string LocationFilePath = "locations";
+        private readonly string MapFilePath = "maps";
         private readonly IFeatureService _featureService;
         private readonly IGroupService _groupService;
         private readonly ILanguageService _languageService;
@@ -37,6 +45,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ISegmentService _segmentService;
         private readonly ISocialCardService _socialCardService;
         private readonly IVolunteerFormService _volunteerFormService;
+        private readonly IImageService _imageService;
 
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
             IConfiguration config,
@@ -49,7 +58,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ILocationService locationService,
             ISegmentService segmentService,
             ISocialCardService socialCardService,
-            IVolunteerFormService volunteerFormService) : base(context)
+            IVolunteerFormService volunteerFormService,
+            IImageService imageService) : base(context)
         {
             ArgumentNullException.ThrowIfNull(config);
             ArgumentNullException.ThrowIfNull(featureService);
@@ -62,6 +72,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ArgumentNullException.ThrowIfNull(segmentService);
             ArgumentNullException.ThrowIfNull(socialCardService);
             ArgumentNullException.ThrowIfNull(volunteerFormService);
+            ArgumentNullException.ThrowIfNull(imageService);
 
             _featureService = featureService;
             _groupService = groupService;
@@ -73,6 +84,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             _segmentService = segmentService;
             _socialCardService = socialCardService;
             _volunteerFormService = volunteerFormService;
+            _imageService = imageService;
 
             _apiKey = config[Configuration.OcudaGoogleAPI];
         }
@@ -171,7 +183,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 { "PostFeature", "Post-feature"},
             };
 
-            if (!validSegments.ContainsKey(whichSegment))
+            if (!validSegments.TryGetValue(whichSegment, out string value))
             {
                 ShowAlertDanger($"Invalid add segment request: unknown segment: {whichSegment}");
                 return RedirectToAction(nameof(Location), new { locationStub });
@@ -199,7 +211,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var segment = await _segmentService.CreateAsync(new Segment
             {
                 IsActive = true,
-                Name = $"{location.Name} - {validSegments[whichSegment]}",
+                Name = $"{location.Name} - {value}",
             });
 
             await _segmentService.CreateSegmentTextAsync(new SegmentText
@@ -918,6 +930,34 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Hours), new { locationStub = model.LocationStub });
         }
 
+        [HttpGet("[action]/{promMapPath}")]
+        public async Task<IActionResult> Image(string promMapPath)
+        {
+            var promBasePath = await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var filePath = HttpUtility.UrlDecode(promMapPath);
+
+            var mapImagePath = Path.Combine(promBasePath,
+                    ImageFilePath,
+                    LocationFilePath,
+                    MapFilePath,
+                    Path.GetFileName(filePath));
+
+            if (!System.IO.File.Exists(mapImagePath))
+            {
+                return StatusCode(404);
+            }
+            else
+            {
+                new FileExtensionContentTypeProvider()
+                    .TryGetContentType(mapImagePath, out string fileType);
+
+                return PhysicalFile(mapImagePath, fileType
+                    ?? System.Net.Mime.MediaTypeNames.Application.Octet);
+            }
+        }
+
         [HttpGet("")]
         [HttpGet("[action]")]
         public async Task<IActionResult> Index(int page = 1)
@@ -1001,9 +1041,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var segments
                     = await _segmentService.GetNamesByIdsAsync(GetAssociatedSegmentIds(location));
 
-                if (segments.ContainsKey(location.DescriptionSegmentId))
+                if (segments.TryGetValue(location.DescriptionSegmentId, out string value))
                 {
-                    viewModel.DescriptionSegmentName = segments[location.DescriptionSegmentId];
+                    viewModel.DescriptionSegmentName = value;
                 }
                 if (location.HoursSegmentId.HasValue)
                 {
@@ -1039,7 +1079,50 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             catch (OcudaException ex)
             {
                 ShowAlertDanger($"Unable to find Location {locationStub}: {ex.Message}");
-                return RedirectToAction(nameof(LocationsController.Index));
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        [HttpGet("{locationStub}/[action]")]
+        public async Task<IActionResult> MapImageGenerator(string locationStub)
+        {
+            try
+            {
+                var location = await _locationService
+                        .GetLocationByStubAsync(locationStub);
+                location.IsNewLocation = false;
+
+                var viewModel = new LocationMapViewModel
+                {
+                    Location = location,
+                    LocationGroups = await _locationGroupService
+                        .GetLocationGroupsByLocationAsync(location),
+                    MapApiKey = _apiKey
+                };
+                return View(viewModel);
+            }
+            catch (OcudaException ex)
+            {
+                ShowAlertDanger($"Unable to find Location {locationStub}: {ex.Message}");
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        [HttpPost("[action]/{locationCode}")]
+        public async Task<IActionResult> UpdateMapImage([FromBody] string imageBase64, string locationCode)
+        {
+            try
+            {
+                var (extension, imageBytes) = _imageService.ConvertFromBase64(imageBase64);
+                var fileName = locationCode + extension;
+
+                await _locationService.UploadLocationMapAsync(imageBytes, fileName);
+                return new JsonResult("Image updated successfully!");
+            }
+            catch (ParameterException pex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                        pex.Message);
             }
         }
 

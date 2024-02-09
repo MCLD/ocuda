@@ -44,7 +44,6 @@
     </div>
     <div class="col-12" style="clear: both;">
         <form method="post" asp-action="@nameof(ProfileController.UploadPicture)">
-            <input type="hidden" asp-for="ProfilePictureMetadata" />
             <input type="hidden" asp-for="ProfilePicture" />
             <input type="hidden" asp-for="UserId" value="@Model.User.Id" />
             <button type="submit"
@@ -84,11 +83,8 @@
             },
             onCropResize: function (imageDataUrl, cropFailure, cropWidth, cropHeight) {
                 if (imageDataUrl) {
-                    let dataDividerLocation = imageDataUrl.indexOf(dataDivider);
-                    document.getElementById("ProfilePictureMetadata").value
-                        = imageDataUrl.substring(0, dataDividerLocation);
-                    document.getElementById("ProfilePicture").value
-                        = imageDataUrl.substring(dataDividerLocation + dataDivider.length);
+                    let profilePicture = imageDataUrl.split(dataDivider)[1];
+                    document.getElementById("ProfilePicture").value = profilePicture;
                 }
                 let width = Math.floor(cropWidth);
                 let height = Math.floor(cropHeight);
