@@ -25,9 +25,9 @@
                 </div>
                 <div class="card-body">
                     <a asp-area="@CarouselsController.Area"
-                   asp-controller="@CarouselsController.Name"
-                   asp-action="@nameof(CarouselsController.Index)"
-                   class="btn btn-outline-primary mt-1">@CarouselsController.Name</a>
+                       asp-controller="@CarouselsController.Name"
+                       asp-action="@nameof(CarouselsController.Index)"
+                       class="btn btn-outline-primary mt-1">@CarouselsController.Name</a>
                 </div>
             </div>
         </div>
@@ -38,9 +38,9 @@
                 </div>
                 <div class="card-body">
                     <a asp-area="@CategoriesController.Area"
-                   asp-controller="@CategoriesController.Name"
-                   asp-action="@nameof(CategoriesController.Index)"
-                   class="btn btn-outline-primary mt-1">@CategoriesController.Name</a>
+                       asp-controller="@CategoriesController.Name"
+                       asp-action="@nameof(CategoriesController.Index)"
+                       class="btn btn-outline-primary mt-1">@CategoriesController.Name</a>
                 </div>
             </div>
         </div>
@@ -54,13 +54,30 @@
                 </div>
                 <div class="card-body">
                     <a asp-area="@EmediaController.Area"
-                   asp-controller="@EmediaController.Name"
-                   asp-action="@nameof(EmediaController.Index)"
-                   class="btn btn-outline-primary mt-1">@EmediaController.Name</a>
+                       asp-controller="@EmediaController.Name"
+                       asp-action="@nameof(EmediaController.Index)"
+                       class="btn btn-outline-primary mt-1">@EmediaController.Name</a>
                 </div>
             </div>
         </div>
     }
+
+    @if (Model.IsSiteManager && Model.CanOptimizeImages)
+    {
+        <div class="col-12 col-md-4 my-2">
+            <div class="card">
+                <div class="card-header lead fw-bold">
+                    Image Optimizer
+                </div>
+                <div class="card-body">
+                    <a asp-controller="@ImageOptimizerController.Name"
+                       asp-action="@nameof(ImageOptimizerController.Index)"
+                       class="btn btn-outline-primary mt-1">Image Optimizer</a>
+                </div>
+            </div>
+        </div>
+    }
+
     @if (Model.IsSiteManager)
     {
         <div class="col-12 col-md-4 my-2">
@@ -70,23 +87,23 @@
                 </div>
                 <div class="card-body">
                     <a asp-area="@LocationsController.Area"
-                   asp-controller="@LocationsController.Name"
-                   asp-action="@nameof(LocationsController.Index)"
-                   class="btn btn-outline-primary mt-1">@LocationsController.Name</a>
+                       asp-controller="@LocationsController.Name"
+                       asp-action="@nameof(LocationsController.Index)"
+                       class="btn btn-outline-primary mt-1">@LocationsController.Name</a>
                     <a asp-area="@GroupsController.Area"
-                   asp-controller="@GroupsController.Name"
-                   asp-action="@nameof(GroupsController.Index)"
-                   class="btn btn-outline-primary mt-1 ">@GroupsController.Name</a>
+                       asp-controller="@GroupsController.Name"
+                       asp-action="@nameof(GroupsController.Index)"
+                       class="btn btn-outline-primary mt-1 ">@GroupsController.Name</a>
 
                     <a asp-area="@FeaturesController.Area"
-                   asp-controller="@FeaturesController.Name"
-                   asp-action="@nameof(FeaturesController.Index)"
-                   class="btn btn-outline-primary mt-1">@FeaturesController.Name</a>
+                       asp-controller="@FeaturesController.Name"
+                       asp-action="@nameof(FeaturesController.Index)"
+                       class="btn btn-outline-primary mt-1">@FeaturesController.Name</a>
 
                     <a asp-area="@VolunteerController.Area"
-                   asp-controller="@VolunteerController.Name"
-                   asp-action="@nameof(VolunteerController.Index)"
-                   class="btn btn-outline-primary mt-1">@VolunteerController.Name</a>
+                       asp-controller="@VolunteerController.Name"
+                       asp-action="@nameof(VolunteerController.Index)"
+                       class="btn btn-outline-primary mt-1">@VolunteerController.Name</a>
                 </div>
             </div>
         </div>
@@ -100,9 +117,9 @@
                 </div>
                 <div class="card-body">
                     <a asp-area="@NavigationsController.Area"
-                   asp-controller="@NavigationsController.Name"
-                   asp-action="@nameof(NavigationsController.Index)"
-                   class="btn btn-outline-primary mt-1">View @NavigationsController.Name</a>
+                       asp-controller="@NavigationsController.Name"
+                       asp-action="@nameof(NavigationsController.Index)"
+                       class="btn btn-outline-primary mt-1">View @NavigationsController.Name</a>
                 </div>
             </div>
         </div>
@@ -116,9 +133,9 @@
                 </div>
                 <div class="card-body">
                     <a asp-area="@PagesController.Area"
-                   asp-controller="@PagesController.Name"
-                   asp-action="@nameof(PagesController.Index)"
-                   class="btn btn-outline-primary mt-1">View @PagesController.Name</a>
+                       asp-controller="@PagesController.Name"
+                       asp-action="@nameof(PagesController.Index)"
+                       class="btn btn-outline-primary mt-1">View @PagesController.Name</a>
                 </div>
             </div>
         </div>
@@ -132,9 +149,9 @@
                 </div>
                 <div class="card-body">
                     <a asp-area="@PodcastsController.Area"
-                   asp-controller="@PodcastsController.Name"
-                   asp-action="@nameof(PodcastsController.Index)"
-                   class="btn btn-outline-primary mt-1">View @PodcastsController.Name</a>
+                       asp-controller="@PodcastsController.Name"
+                       asp-action="@nameof(PodcastsController.Index)"
+                       class="btn btn-outline-primary mt-1">View @PodcastsController.Name</a>
                 </div>
             </div>
         </div>
@@ -148,9 +165,9 @@
                 </div>
                 <div class="card-body">
                     <a asp-area="@ProductsController.Area"
-                   asp-controller="@ProductsController.Name"
-                   asp-action="@nameof(ProductsController.Index)"
-                   class="btn btn-outline-primary mt-1">View @ProductsController.Name</a>
+                       asp-controller="@ProductsController.Name"
+                       asp-action="@nameof(ProductsController.Index)"
+                       class="btn btn-outline-primary mt-1">View @ProductsController.Name</a>
                 </div>
             </div>
         </div>
@@ -164,9 +181,9 @@
                 </div>
                 <div class="card-body">
                     <a asp-area="@ScheduleController.Area"
-                   asp-controller="@ScheduleController.Name"
-                   asp-action="@nameof(ScheduleController.Limits)"
-                   class="btn btn-outline-primary mt-1">View @ScheduleController.Name</a>
+                       asp-controller="@ScheduleController.Name"
+                       asp-action="@nameof(ScheduleController.Limits)"
+                       class="btn btn-outline-primary mt-1">View @ScheduleController.Name</a>
                 </div>
             </div>
         </div>
@@ -177,13 +194,13 @@
                 </div>
                 <div class="card-body">
                     <a asp-area="@SegmentsController.Area"
-                   asp-controller="@SegmentsController.Name"
-                   asp-action="@nameof(SegmentsController.Index)"
-                   class="btn btn-outline-primary mt-1">View @SegmentsController.Name</a>
+                       asp-controller="@SegmentsController.Name"
+                       asp-action="@nameof(SegmentsController.Index)"
+                       class="btn btn-outline-primary mt-1">View @SegmentsController.Name</a>
                     <a asp-area="@SegmentWrapsController.Area"
-                   asp-controller="@SegmentWrapsController.Name"
-                   asp-action="@nameof(SegmentWrapsController.Index)"
-                   class="btn btn-outline-primary mt-1">View Segment Wraps</a>
+                       asp-controller="@SegmentWrapsController.Name"
+                       asp-action="@nameof(SegmentWrapsController.Index)"
+                       class="btn btn-outline-primary mt-1">View Segment Wraps</a>
                 </div>
             </div>
         </div>
@@ -194,13 +211,13 @@
                 </div>
                 <div class="card-body">
                     <a asp-area="@ExternalResourcesController.Area"
-                   asp-controller="@ExternalResourcesController.Name"
-                   asp-action="@nameof(ExternalResourcesController.Index)"
-                   class="btn btn-outline-primary mt-1">External Resources</a>
+                       asp-controller="@ExternalResourcesController.Name"
+                       asp-action="@nameof(ExternalResourcesController.Index)"
+                       class="btn btn-outline-primary mt-1">External Resources</a>
                     <a asp-area="@SiteSettingsController.Area"
-                   asp-controller="@SiteSettingsController.Name"
-                   asp-action="@nameof(SiteSettingsController.Index)"
-                   class="btn btn-outline-primary mt-1">Site Settings</a>
+                       asp-controller="@SiteSettingsController.Name"
+                       asp-action="@nameof(SiteSettingsController.Index)"
+                       class="btn btn-outline-primary mt-1">Site Settings</a>
                 </div>
             </div>
         </div>
@@ -211,9 +228,9 @@
                 </div>
                 <div class="card-body">
                     <a asp-area="@SocialCardsController.Area"
-                   asp-controller="@SocialCardsController.Name"
-                   asp-action="@nameof(SocialCardsController.Index)"
-                   class="btn btn-outline-primary mt-1">View Social Cards</a>
+                       asp-controller="@SocialCardsController.Name"
+                       asp-action="@nameof(SocialCardsController.Index)"
+                       class="btn btn-outline-primary mt-1">View Social Cards</a>
                 </div>
             </div>
         </div>
