@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using ImageOptimApi;
 using Microsoft.AspNetCore.Http;
@@ -143,12 +142,42 @@ namespace Ocuda.Ops.Service
 
         public async Task<OptimizedImageResult> OptimizeAsync(Uri imageUri)
         {
-            return await _client.OptimizeAsync(imageUri);
+            if (Format == Format.Auto)
+            {
+                Format = Format.Jpeg;
+                var optimizedJpeg = await _client.OptimizeAsync(imageUri);
+                Format = Format.Png;
+                var optimizedPng = await _client.OptimizeAsync(imageUri);
+                Format = Format.Auto;
+
+                return optimizedJpeg.File.Length > optimizedPng.File.Length
+                    ? optimizedPng
+                    : optimizedJpeg;
+            }
+            else
+            {
+                return await _client.OptimizeAsync(imageUri);
+            }
         }
 
         public async Task<OptimizedImageResult> OptimizeAsync(string imagePath)
         {
-            return await _client.OptimizeAsync(imagePath);
+            if (Format == Format.Auto)
+            {
+                Format = Format.Jpeg;
+                var optimizedJpeg = await _client.OptimizeAsync(imagePath);
+                Format = Format.Png;
+                var optimizedPng = await _client.OptimizeAsync(imagePath);
+                Format = Format.Auto;
+
+                return optimizedJpeg.File.Length > optimizedPng.File.Length
+                    ? optimizedPng
+                    : optimizedJpeg;
+            }
+            else
+            {
+                return await _client.OptimizeAsync(imagePath);
+            }
         }
 
         public async Task<OptimizedImageResult> OptimizeAsync(IFormFile formFile)
