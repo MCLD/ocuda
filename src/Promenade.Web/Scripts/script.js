@@ -3,8 +3,8 @@
 
 document.addEventListener("DOMContentLoaded", function () {
     $(".prom-carousel").slick({
-        slidesToShow: 4,
-        slidesToScroll: 4,
+        slidesToShow: 5,
+        slidesToScroll: 5,
         autoplay: false,
         dots: false,
         prevArrow:
@@ -15,19 +15,26 @@ document.addEventListener("DOMContentLoaded", function () {
             {
                 breakpoint: 1350,
                 settings: {
+                    slidesToShow: 4,
+                    slidesToScroll: 4,
+                },
+            },
+            {
+                breakpoint: 1000,
+                settings: {
                     slidesToShow: 3,
                     slidesToScroll: 3,
                 },
             },
             {
-                breakpoint: 1000,
+                breakpoint: 770,
                 settings: {
                     slidesToShow: 2,
                     slidesToScroll: 2,
                 },
             },
             {
-                breakpoint: 750,
+                breakpoint: 576,
                 settings: {
                     slidesToShow: 1,
                     slidesToScroll: 1,

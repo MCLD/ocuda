@@ -5,36 +5,34 @@
     <socialcard card="@Model.PageLayout.SocialCard"></socialcard>
 }
 
-
 <!--
-
 <div class="row">
     <div class="col-12">
-        <div class="mx-auto d-block mb-4" style="max-width: 740px;">
-            <div class="row g-0">
-                <div class="col-12 col-sm-7">
-                    <img class="img-fluid" src="https://mcldaz.org/assets/images/en-US/features/Winter%20Reading%20FC%20(1).jpg" />
-                </div>
-                <div class="col-12 col-sm-5 p-2 gap-2" style="background:lightgray; box-sizing: border-box">
-                    <div class="row gx-2 h-100">
-                        <div class="d-flex flex-column col-6 gap-2 flex-grow-1">
-                            <div class="d-flex align-items-center justify-content-center py-4 py-sm-1 gap-2 flex-grow-1" style="background:white">
-                                <span class="fa-solid fa-landmark"></span>
-                                <span>Locations</span>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-center py-4 py-sm-1 gap-2 flex-grow-1" style="background:white">
-                                <span class="fa-regular fa-calendar-days"></span>
-                                <span>Events</span>
-                            </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-4">
+                    <div class="row g-0">
+                        <div class="col-12 col-md-7">
+                            <img class="img-fluid" src="assets/images/HomepageBanner_Mockup_1480x500.png" />
                         </div>
-                        <div class="d-flex flex-column col-6 gap-2 flex-grow-1">
-                            <div class="d-flex align-items-center justify-content-center py-4 py-sm-1 gap-2 flex-grow-1" style="background:white">
-                                <span class="fa-solid fa-circle-info"></span>
-                                <span>Help & Info</span>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-center py-4 py-sm-1 gap-2 flex-grow-1" style="background:white">
-                                <span class="fa-regular fa-face-smile-beam"></span>
-                                <span>Ask Us!</span>
+                        <div class="col-12 col-md-5 p-2 gap-2 fs-5 text-bold" style="background:lightgray; box-sizing: border-box">
+                            <div class="banner-link-grid-container gap-2 h-100">
+                                    <div class="d-flex align-items-center justify-content-center py-4 py-md-1 gap-2 flex-grow-1" style="background:white">
+                                        <span class="fa-solid fa-landmark mb-1"></span>
+                                        <span class="text-bold">Locations</span>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-center py-4 py-md-1 gap-2 flex-grow-1" style="background:white">
+                                        <span class="fa-regular fa-calendar-days mb-1"></span>
+                                        <span>Events</span>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-center py-4 py-md-1 gap-2 flex-grow-1" style="background:white">
+                                        <span class="fa-solid fa-circle-info mb-1"></span>
+                                        <span>Help &amp; Info</span>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-center py-4 py-md-1 gap-2 flex-grow-1" style="background:white">
+                                        <span class="fa-regular fa-face-smile-beam mb-1"></span>
+                                        <span>Ask Us!</span>
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -43,38 +41,8 @@
         </div>
     </div>
 </div>
-
-<div class="row">
-    <div class="col-12">
-        <div class="mx-auto d-block mb-4" style="max-width: 740px;">
-            <div class="row g-0">
-                <div class="col-9">
-                    <img class="img-fluid" src="https://mcldaz.org/assets/images/en-US/features/Winter%20Reading%20FC%20(1).jpg" />
-                </div>
-                <div class="d-flex flex-column justify-content-between col-3 p-2 gap-2" style="background:lightgray">
-                    <div class="d-flex align-items-center flex-grow-1" style="background:white">
-                        <span class="fa-solid fa-landmark px-2 px-sm-3"></span>
-                        <span>Locations</span>
-                    </div>
-                    <div class="d-flex align-items-center flex-grow-1" style="background:white">
-                        <span class="fa-regular fa-calendar-days px-2 px-sm-3"></span>
-                        <span>Events</span>
-                    </div>
-                    <div class="d-flex align-items-center flex-grow-1" style="background:white">
-                        <span class="fa-solid fa-circle-info px-2 px-sm-3"></span>
-                        <span>Help & Info</span>
-                    </div>
-                    <div class="d-flex align-items-center flex-grow-1" style="background:white">
-                        <span class="fa-regular fa-face-smile-beam px-2 px-sm-3"></span>
-                        <span>Ask Us!</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 -->
+
 @if (Model.HasCarousels)
 {
     <div class="modal prom-modal-details"
@@ -203,7 +171,7 @@
                 <div class="card">
                     @if (!string.IsNullOrEmpty(item.Carousel.CarouselText?.Title))
                     {
-                        <div class="card-header">@item.Carousel.CarouselText.Title</div>
+                        <div class="card-header h3">@item.Carousel.CarouselText.Title</div>
                     }
                     <div class="card-body">
                         <div class="prom-carousel">
@@ -247,16 +215,16 @@
     }
     else if (item.PageFeatureId.HasValue)
     {
-        <div class="row">
-            <div class="col-12">
-                <div style="max-width: 740px" class="mx-auto d-block mb-3">
-                    <div class="row">
+        <div class="row mb-3">
+            <div class="col-12 mb-2">
+                <div style="max-width: 740px; background-color: lightgray" class="mx-auto d-block p-2">
+                    <div class="row g-2">
                         @{
                             int count = 0;
                         }
                         @foreach (var featureItem in item.PageFeature.Items)
                         {
-                            <div class="col-xs-12 col-sm-6 col-md-3 mb-2">
+                            <div class="col-xs-12 col-sm-6 col-md-3">
                                 @if (!string.IsNullOrEmpty(featureItem.ImageFeatureItemText.FileContent))
                                 {
                                     <a href="@featureItem.ImageFeatureItemText.Link" class="d-block prom-tile">

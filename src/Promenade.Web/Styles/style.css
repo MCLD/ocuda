@@ -183,7 +183,7 @@ footer .prom-logo {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background: light-gray;
+    background: lightgray;
     padding-left: 0;
     padding-right: 0;
 }
@@ -333,6 +333,12 @@ footer .prom-logo {
 
 /* content */
 
+.banner-link-grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
 .prom-leftnav-container {
     padding: 1rem 0.5rem;
 }
@@ -452,11 +458,9 @@ a.prom-leftnav-header:hover {
     }
 
 .prom-tile {
-    padding-top: 15px;
+    padding-top: 45px;
     background: white;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.125);
-    height: 132px;
-    margin-bottom: 0.5rem;
+    height: 162px;
     text-decoration: none;
 }
 

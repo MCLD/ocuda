@@ -137,59 +137,6 @@
                                             </a>
                                         }
                                     </li>
-
-                                    <!-- TODO: confirm that this can be removed
-                                             if (item.Navigations.Count() > 0)
-                                             {
-                                                 <li role="presentation"
-                                                     class="dropdown prom-nav-top-button ms-sm-2 ms-md-3 @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : null)">
-                                                     <a class="nav-link dropdown-toggle @(item.NavigationText.Label == null ? null : "d-flex align-items-center")"
-                                                        data-bs-toggle="dropdown"
-                                                        href="#"
-                                                        role="button"
-                                                        aria-haspopup="true"
-                                                        aria-expanded="false">
-                                    @if (!string.IsNullOrEmpty(item.Icon))
-                                    {
-                                                                         <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space")"></span>
-                                    }
-                                    @if (!string.IsNullOrEmpty(item.NavigationText.Label))
-                                    {
-                                                                         <span class="">@item.NavigationText.Label</span>
-                                    }
-                                                     </a>
-                                                     <ul class="dropdown-menu dropdown-menu-end prom-nav-dropdown">
-                                    @foreach (var subItem in item.Navigations)
-                                    {
-                                                                         <li>
-                                            @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
-                    && !string.IsNullOrEmpty(subItem.Icon)
-                    && !string.IsNullOrEmpty(subItem.NavigationText.Title))
-                                            {
-                                                                                             <a href="@subItem.NavigationText.Link"
-                                                                                                class="dropdown-item"
-                                                                                                title="@subItem.NavigationText.Title"
-                                                                                                aria-label="@subItem.NavigationText.Title">
-                                                                                                 <span class="@subItem.Icon"></span>
-                                                                                             </a>
-                                            }
-                                            else
-                                            {
-                                                                                             <a href="@subItem.NavigationText.Link"
-                                                                                                class="dropdown-item">
-                                                    @if (!string.IsNullOrEmpty(subItem.Icon))
-                                                    {
-                                                                                                                 <span class="@subItem.Icon"></span>
-                                                    }
-                                                    @subItem.NavigationText.Label
-                                                                                             </a>
-                                            }
-                                                                         </li>
-                                    }
-                                                     </ul>
-                                                 </li>
-                                             }
-                                             -->
                                 }
                             </ul>
                         }
@@ -217,9 +164,9 @@
                                                 class="nav-item prom-nav-link col-12 col-sm-2 @(item.Navigations.Count() > 0 ? "dropdown" : "")">
                                                 @if (item.Navigations.Count() > 0)
                                                 {
-                                                    <a class="nav-link col-12 p-3 p-sm-1 @(item.Navigations.Count() > 0 ? "dropdown-toggle" : "")"
+                                                    <a class="nav-link middle-nav-dropdown col-12 p-3 p-sm-1 @(item.Navigations.Count() > 0 ? "dropdown-toggle" : "")"
                                                        data-bs-toggle="dropdown"
-                                                       href="@(item.Navigations.Count() == 0 ? item.NavigationText.Link : "#")"
+                                                       href="@item.NavigationText.Link"
                                                        role="button"
                                                        aria-haspopup="true"
                                                        aria-expanded="false">
@@ -596,6 +543,10 @@
                 escape(document.getElementById("textboxTerm").value);
         else document.getElementById("textboxTerm").focus();
     }
+
+    document.querySelectorAll('.middle-nav-dropdown').forEach(nav => {
+        nav.addEventListener('click', e => e.preventDefault());
+    });
 
     document.getElementById("textboxTerm").focus();
 </script>
