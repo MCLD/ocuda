@@ -42,7 +42,6 @@
     </div>
 </div>
 -->
-
 @if (Model.HasCarousels)
 {
     <div class="modal prom-modal-details"
@@ -127,7 +126,7 @@
             @foreach (var card in item.CardDetails)
             {
                 <div class="col-12 col-sm-6 col-md-4 mb-3">
-                    <div class="card">
+                    <div class="card h-100">
                         @if (!string.IsNullOrEmpty(card.Filename))
                         {
                             @if (!string.IsNullOrEmpty(card.Link))
@@ -159,6 +158,21 @@
                             }
                             <p class="card-text">@Html.Raw(card.Text)</p>
                         </div>
+                        @if (!string.IsNullOrEmpty(card.Footer))
+                        {
+                            <div class="card-footer">
+                                @if (!string.IsNullOrEmpty(card.FooterLink))
+                                {
+                                    <a href="@card.FooterLink">
+                                        @card.Footer
+                                    </a>
+                                }
+                                else
+                                {
+                                    @card.Footer
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
             }
@@ -187,12 +201,27 @@
                                     {
                                         <text>data-button-@button.Order='{"Sort":"@button.Order","Button":"@button.LabelText.Text","Link":"@button.Url"}' </text>
                                     }>
-                                                                                                                                                                                                    <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p>
-                                                                                                                                                                                                </a>
+                                                    <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p>
+                                                </a>
                                 </div>
                             }
                         </div>
                     </div>
+                    @if (!string.IsNullOrEmpty(item.Carousel.CarouselText?.Footer))
+                    {
+                        <div class="card-footer">
+                            @if (!string.IsNullOrEmpty(item.Carousel.CarouselText.FooterLink))
+                            {
+                                <a href="@item.Carousel.CarouselText.FooterLink">
+                                    @item.Carousel.CarouselText.Footer
+                                </a>
+                            }
+                            else
+                            {
+                                @item.Carousel.CarouselText.Footer
+                            }
+                        </div>
+                    }
                 </div>
             </div>
         </div>

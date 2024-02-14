@@ -2,6 +2,13 @@
     background-color: white;
 }
 
+.prom-content{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 span.prom-fa-space {
     margin-right: 0.5rem;
 }
@@ -44,6 +51,7 @@ span.prom-fa-space {
 footer {
     background-color: #333;
     flex-direction: row-reverse;
+    float: bottom;
 }
 
 footer .prom-logo {
@@ -117,6 +125,10 @@ footer .prom-logo {
 
 .prom-carousel .prom-carousel-next {
     right: 0;
+}
+
+.card-footer a {
+    text-decoration: none;
 }
 
 /* top nav bar */
