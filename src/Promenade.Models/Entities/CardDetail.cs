@@ -21,6 +21,14 @@ namespace Ocuda.Promenade.Models.Entities
         public string Filename { get; set; }
 
         [MaxLength(255)]
+        [DisplayName("Footer (optional)")]
+        public string Footer { get; set; }
+
+        [MaxLength(255)]
+        [DisplayName("Footer Link (optional)")]
+        public string FooterLink { get; set; }
+
+        [MaxLength(255)]
         [DisplayName("Header (optional)")]
         public string Header { get; set; }
 

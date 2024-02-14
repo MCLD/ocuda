@@ -394,7 +394,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (string.IsNullOrEmpty(viewModel.CardDetail.AltText?.Trim())
                 && string.IsNullOrEmpty(viewModel.CardDetail.Header?.Trim())
                 && string.IsNullOrEmpty(viewModel.CardDetail.Link?.Trim())
-                && string.IsNullOrEmpty(viewModel.CardDetail.Text?.Trim()))
+                && string.IsNullOrEmpty(viewModel.CardDetail.Text?.Trim())
+                && string.IsNullOrEmpty(viewModel.CardDetail.Footer?.Trim())
+                && string.IsNullOrEmpty(viewModel.CardDetail.FooterLink?.Trim()))
             {
                 ShowAlertWarning("Cannot create empty card.");
                 return RedirectToAction(nameof(Detail), new
