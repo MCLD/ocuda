@@ -142,42 +142,12 @@ namespace Ocuda.Ops.Service
 
         public async Task<OptimizedImageResult> OptimizeAsync(Uri imageUri)
         {
-            if (Format == Format.Auto)
-            {
-                Format = Format.Jpeg;
-                var optimizedJpeg = await _client.OptimizeAsync(imageUri);
-                Format = Format.Png;
-                var optimizedPng = await _client.OptimizeAsync(imageUri);
-                Format = Format.Auto;
-
-                return optimizedJpeg.File.Length > optimizedPng.File.Length
-                    ? optimizedPng
-                    : optimizedJpeg;
-            }
-            else
-            {
-                return await _client.OptimizeAsync(imageUri);
-            }
+            return await OptimizeAsync(imageUri, null);
         }
 
         public async Task<OptimizedImageResult> OptimizeAsync(string imagePath)
         {
-            if (Format == Format.Auto)
-            {
-                Format = Format.Jpeg;
-                var optimizedJpeg = await _client.OptimizeAsync(imagePath);
-                Format = Format.Png;
-                var optimizedPng = await _client.OptimizeAsync(imagePath);
-                Format = Format.Auto;
-
-                return optimizedJpeg.File.Length > optimizedPng.File.Length
-                    ? optimizedPng
-                    : optimizedJpeg;
-            }
-            else
-            {
-                return await _client.OptimizeAsync(imagePath);
-            }
+            return await OptimizeAsync(null, imagePath);
         }
 
         public async Task<OptimizedImageResult> OptimizeAsync(IFormFile formFile)
@@ -197,8 +167,6 @@ namespace Ocuda.Ops.Service
                 stream.Close();
 
                 optimized = await OptimizeAsync(filePath);
-                _logger.LogInformation("Image optimization took {ElapsedSeconds}s",
-                    optimized.ElapsedSeconds);
             }
             catch (ParameterException pex)
             {
@@ -219,6 +187,49 @@ namespace Ocuda.Ops.Service
             }
 
             return optimized;
+        }
+
+        private async Task<OptimizedImageResult> OptimizeAsync(Uri imageUri, string imagePath)
+        {
+            if (Format == Format.Auto)
+            {
+                Format = Format.Jpeg;
+                var optimizedJpeg = imageUri != null
+                    ? await _client.OptimizeAsync(imageUri)
+                    : await _client.OptimizeAsync(imagePath);
+
+                Format = Format.Png;
+                var optimizedPng = imageUri != null
+                    ? await _client.OptimizeAsync(imageUri)
+                    : await _client.OptimizeAsync(imagePath);
+
+                _logger.LogInformation("Optimized {ImageInfo}, from {OriginalSize:n0} to JPEG size {JpegSize:n0} in {ElapsedJpeg:n2}s, PNG size {PngSize:n0} in {ElapsedPng:n2}s",
+                    imageUri != null ? imageUri.AbsoluteUri : imagePath,
+                    optimizedJpeg.OriginalSize,
+                    optimizedJpeg.File.Length,
+                    optimizedJpeg.ElapsedSeconds,
+                    optimizedPng.File.Length,
+                    optimizedPng.ElapsedSeconds);
+
+                Format = Format.Auto;
+                return optimizedJpeg.File.Length > optimizedPng.File.Length
+                    ? optimizedPng
+                    : optimizedJpeg;
+            }
+            else
+            {
+                var optimized = imageUri != null
+                    ? await _client.OptimizeAsync(imageUri)
+                    : await _client.OptimizeAsync(imagePath);
+
+                _logger.LogInformation("Optimized {ImageInfo}, from {OriginalSize:n0} to {NewSize:n0} in {ElapsedSeconds:n2}s",
+                    imageUri != null ? imageUri.AbsoluteUri : imagePath,
+                    optimized.OriginalSize,
+                    optimized.File.Length,
+                    optimized.ElapsedSeconds);
+
+                return optimized;
+            }
         }
     }
 }
