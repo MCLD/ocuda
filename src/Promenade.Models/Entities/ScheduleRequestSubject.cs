@@ -13,6 +13,11 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int Id { get; set; }
 
+        public bool IsActive { get; set; } = true;
+
+        [Required]
+        public int OrderBy { get; set; }
+
         public int? RelatedEmailSetupId { get; set; }
 
         public bool RequireComments { get; set; }

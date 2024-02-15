@@ -8,16 +8,25 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 {
     public interface ICategoryService
     {
-        Task<ICollection<Category>> GetAllAsync();
-        Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(
-            BaseFilter filter);
-        Task<ICollection<string>> GetCategoryLanguagesAsync(int id);
         Task<Category> CreateAsync(Category category);
-        Task<Category> EditAsync(Category category);
+
         Task DeleteAsync(int id);
+
+        Task<Category> EditAsync(Category category);
+
+        Task<ICollection<Category>> GetAllAsync();
+
         Task<Category> GetByIdAsync(int id);
-        Task<CategoryText> GetTextByCategoryAndLanguageAsync(int categoryId, int languageId);
+
         Task<ICollection<string>> GetCategoryEmediasAsync(int id);
+
+        Task<ICollection<string>> GetCategoryLanguagesAsync(int id);
+
+        Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(
+                                    BaseFilter filter);
+
+        Task<CategoryText> GetTextByCategoryAndLanguageAsync(int categoryId, int languageId);
+
         Task SetCategoryTextAsync(CategoryText categoryText);
     }
 }

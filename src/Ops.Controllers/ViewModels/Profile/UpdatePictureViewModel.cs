@@ -8,7 +8,6 @@ namespace Ocuda.Ops.Controllers.ViewModels.Profile
         public int CropWidth { get; set; }
         public int DisplayDimension { get; set; }
         public string ProfilePicture { get; set; }
-        public string ProfilePictureMetadata { get; set; }
         public User User { get; set; }
         public int UserId { get; set; }
     }

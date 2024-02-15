@@ -113,7 +113,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                  .AsNoTracking()
-                 .Where(_ => _.Username == username)
+                 .Where(_ => !_.IsDeleted && _.Username == username)
                  .Select(_ => _.PictureFilename)
                  .SingleOrDefaultAsync();
         }
@@ -180,19 +180,23 @@ namespace Ocuda.Ops.Data.Ops
             await _context.SaveChangesAsync();
         }
 
-        public async Task<CollectionWithCount<User>> SearchAsync(SearchFilter searchFilter)
+        public async Task<CollectionWithCount<User>> SearchAsync(StaffSearchFilter searchFilter)
         {
             var query = DbSet
                 .AsNoTracking()
                 .Where(_ => !_.IsDeleted);
 
-            searchFilter ??= new SearchFilter();
+            searchFilter ??= new StaffSearchFilter();
 
             if (!string.IsNullOrEmpty(searchFilter.SearchText))
             {
                 query = query.Where(_ => _.Name.Contains(searchFilter.SearchText)
                 || _.Email.Contains(searchFilter.SearchText)
                 || _.Username.Contains(searchFilter.SearchText));
+            }
+            if (searchFilter.AssociatedLocation > 0)
+            {
+                query = query.Where(_ => _.AssociatedLocation == searchFilter.AssociatedLocation);
             }
             return new CollectionWithCount<User>
             {

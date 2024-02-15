@@ -26,21 +26,13 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
-        public async Task<CarouselItem> GetIncludingChildrenAsync(int id)
-        {
-            return await DbSet
-                .Where(_ => _.Id == id)
-                .Include(_ => _.Buttons)
-                .AsNoTracking()
-                .SingleOrDefaultAsync();
-        }
-
-        public async Task<int?> GetMaxSortOrderForCarouselAsync(int carouselId)
+        public async Task<List<CarouselItem>> GetAllByCarouselIdAsync(int carouselId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.CarouselId == carouselId)
-                .MaxAsync(_ => (int?)_.Order);
+                .Include(_ => _.Buttons)
+                .ToListAsync();
         }
 
         public async Task<CarouselItem> GetByCarouselAndOrderAsync(int carouselId, int order)
@@ -57,6 +49,23 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .Where(_ => _.CarouselId == carouselId && _.Order > order)
                 .ToListAsync();
+        }
+
+        public async Task<CarouselItem> GetIncludingChildrenAsync(int id)
+        {
+            return await DbSet
+                .Where(_ => _.Id == id)
+                .Include(_ => _.Buttons)
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<int?> GetMaxSortOrderForCarouselAsync(int carouselId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.CarouselId == carouselId)
+                .MaxAsync(_ => (int?)_.Order);
         }
     }
 }

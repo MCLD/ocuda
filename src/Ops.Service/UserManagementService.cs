@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using MimeKit;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
@@ -14,16 +12,15 @@ using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Services.Interfaces;
-using SixLabors.ImageSharp;
 
 namespace Ocuda.Ops.Service
 {
     public class UserManagementService : BaseService<UserManagementService>, IUserManagementService
     {
         public static readonly string ProfilePicturePath = "profilepicture";
-        private static readonly string[] ProfilePictureValidTypes = { ".jpg", ".png" };
 
         private readonly IOcudaCache _cache;
+        private readonly IImageService _imageService;
         private readonly IPathResolverService _pathResolver;
         private readonly IUserRepository _userRepository;
         private readonly IVolunteerFormService _volunteerFormService;
@@ -33,18 +30,21 @@ namespace Ocuda.Ops.Service
             IOcudaCache cache,
             IPathResolverService pathResolver,
             IUserRepository userRepository,
-            IVolunteerFormService volunteerFormService)
+            IVolunteerFormService volunteerFormService,
+            IImageService imageService)
             : base(logger, httpContextAccessor)
         {
             ArgumentNullException.ThrowIfNull(cache);
             ArgumentNullException.ThrowIfNull(pathResolver);
             ArgumentNullException.ThrowIfNull(userRepository);
             ArgumentNullException.ThrowIfNull(volunteerFormService);
+            ArgumentNullException.ThrowIfNull(imageService);
 
             _cache = cache;
             _pathResolver = pathResolver;
             _userRepository = userRepository;
             _volunteerFormService = volunteerFormService;
+            _imageService = imageService;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
@@ -281,45 +281,20 @@ namespace Ocuda.Ops.Service
 
         public async Task UploadProfilePictureAsync(User user, string profilePictureBase64)
         {
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            byte[] profilePicture;
+            ArgumentNullException.ThrowIfNull(user);
 
             string extension;
+            byte[] profilePicture;
+
             try
             {
-                profilePicture = Convert.FromBase64String(profilePictureBase64);
-                var imageInfo = Image.Identify(profilePicture);
-                if (imageInfo.Height != imageInfo.Width)
-                {
-                    throw new OcudaException("Profile picture must be square.");
-                }
-
-                var imageFormat = imageInfo.Metadata.DecodedImageFormat;
-
-                var validFileType = false;
-                foreach (var validExtension in ProfilePictureValidTypes)
-                {
-                    if (imageFormat.MimeTypes.Contains(MimeTypes.GetMimeType(validExtension)))
-                    {
-                        validFileType = true;
-                        break;
-                    }
-                }
-
-                if (!validFileType)
-                {
-                    throw new OcudaException("Invalid image format, please upload a JPEG or PNG picture");
-                }
-                extension = imageFormat.FileExtensions.First();
+                (extension, profilePicture) = _imageService.ConvertFromBase64(profilePictureBase64, true);
             }
-            catch (UnknownImageFormatException uifex)
+            catch (OcudaException oex)
             {
-                throw new OcudaException("Unknown image type, please upload a JPEG or PNG picture",
-                    uifex);
+                _logger.LogError("Error converting profile picture from base64: {ErrorMessage}",
+                    oex.Message);
+                throw;
             }
 
             var checkPath = GetProfilePictureFilePath(null);

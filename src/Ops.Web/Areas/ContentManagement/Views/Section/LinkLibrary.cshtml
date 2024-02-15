@@ -22,7 +22,7 @@
                                     <input asp-for="LinkLibraryName" value="@Model.LinkLibrary.Name" autocomplete="off" type="hidden" />
                                     <input asp-for="Link.Name" autocomplete="off" formgroup />
                                     <input asp-for="Link.Url" autocomplete="off" formgroup />
-                                    <input asp-for="Link.Icon" class="form-control icon-picker" autocomplete="off" formgroup />
+                                    <input asp-for="Link.Icon" class="form-control icon-picker" type="text" autocomplete="off" formgroup />
                                 </div>
                             </div>
                         </div>
@@ -254,7 +254,6 @@
         $("#listAddModal").modal("show");
     });
     $(document).ready(function () {
-        $('.icon-picker').iconpicker();
         $('[data-bs-toggle="tooltip"]').tooltip();
     });
 </script>

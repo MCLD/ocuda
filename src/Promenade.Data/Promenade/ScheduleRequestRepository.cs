@@ -34,7 +34,11 @@ namespace Ocuda.Promenade.Data.Promenade
                 .AsNoTracking()
                 .CountAsync(_ => !_.IsCancelled
                     && _.RequestedTime.Date == requestTime.Date
-                    && _.RequestedTime.Hour == requestTime.Hour);
+                    /* 
+                     * TODO: confirm whether time slot count should be based on 
+                     * full hour (DateTime.Hour) or half hour (DateTime.TimeOfDay) 
+                     */
+                    && _.RequestedTime.TimeOfDay == requestTime.TimeOfDay);
         }
 
         public async Task<ICollection<DataWithCount<int>>> GetDayRequestCountsAsync(
@@ -77,5 +81,19 @@ namespace Ocuda.Promenade.Data.Promenade
                 })
                 .ToListAsync();
         }
+
+        public async Task<Dictionary<DateTime, int>> GetRequestsForDay(DateTime requestDate)
+        {
+            var requestList = await DbSet
+                .AsNoTracking()
+                .Where(_ => !_.IsCancelled && _.RequestedTime.Date == requestDate.Date)
+                .ToListAsync();
+
+            var dict = requestList.GroupBy(_ => _.RequestedTime)
+                          .ToDictionary(_ => _.Key, _ => _.Count());
+
+            return dict;
+        }
+
     }
 }

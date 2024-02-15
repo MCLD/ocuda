@@ -79,6 +79,9 @@
                            asp-controller="@UsersController.Name"
                            asp-action="@nameof(UsersController.TitleClassList)"
                            class="btn btn-outline-dark mt-1">Title Classifications</a>
+                        <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                           asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.BatchUploadPictures)"
+                           class="btn btn-outline-dark mt-1">Profile Pictures</a>
 
                     }
                     @if (Model.HasRosterPermissions)

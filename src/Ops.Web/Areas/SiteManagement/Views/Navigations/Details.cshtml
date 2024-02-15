@@ -217,7 +217,7 @@
             <input id="addName" asp-for="Navigation.Name" value="" formgroup />
             @if (Model.RoleProperties.ChildrenCanDisplayIcon)
             {
-                <input id="addIcon" asp-for="Navigation.Icon" value="" class="icon-picker" formgroup />
+                <input id="addIcon" asp-for="Navigation.Icon" value="" class="icon-picker" type="text" formgroup />
             }
             @if (Model.RoleProperties.ChildrenCanChangeToLink)
             {
@@ -278,7 +278,7 @@
             <input id="editName" asp-for="Navigation.Name" formgroup />
             @if (Model.RoleProperties.ChildrenCanDisplayIcon)
             {
-                <input id="editIcon" asp-for="Navigation.Icon" class="icon-picker" formgroup />
+                <input id="editIcon" asp-for="Navigation.Icon" class="icon-picker" type="text" formgroup />
             }
             @if (Model.RoleProperties.ChildrenCanChangeToLink)
             {
@@ -373,8 +373,6 @@
         @if (Model.RoleProperties.CanHaveChildren)
         {
             <text>
-                $(".icon-picker").iconpicker({ placement: "bottomLeft" });
-
                 $("#addForm").submit(function (e) {
                     e.preventDefault();
                     var form = $(this);

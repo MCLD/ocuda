@@ -59,6 +59,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToDictionaryAsync(k => k.Id, v => v.Name);
         }
 
+        public async Task<Location> GetLocationByCode(string locationCode)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Code == locationCode && !_.IsDeleted)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<Location> GetLocationByStub(string locationStub)
         {
             return await DbSet
