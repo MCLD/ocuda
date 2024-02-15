@@ -10,17 +10,14 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int Id { get; set; }
 
+        [NotMapped]
+        public NavBannerImage NavBannerImage { get; set; }
+
+        [NotMapped]
+        public ICollection<NavBannerLink> NavBannerLinks { get; }
+
         [Required]
         [MaxLength(255)]
-        public string ImagePath {  get; set; }
-
-        [NotMapped]
-        public ICollection<NavBannerLink> NavBannerLinks { get; set; }
-
-        [NotMapped]
-        public NavBannerText NavBannerText { get; set; }
-
-        [NotMapped]
         public string Name { get; set; }
     }
 }

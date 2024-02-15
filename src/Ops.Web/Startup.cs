@@ -486,6 +486,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.LocationHoursOverrideRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationHoursRepository,
                 Data.Promenade.LocationHoursRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.INavBannerRepository,
+                Data.Promenade.NavBannerRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.INavigationRepository,
                 Data.Promenade.NavigationRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.INavigationTextRepository,
@@ -567,6 +569,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ILocationGroupService, LocationGroupService>();
             services.AddScoped<ILocationFeatureService, LocationFeatureService>();
             services.AddScoped<ILinkService, LinkService>();
+            services.AddScoped<INavBannerService, NavBannerService>();
             services.AddScoped<Utility.Services.Interfaces.IOcudaCache,
                 Utility.Services.OcudaCache>();
             services.AddScoped<INavigationService, NavigationService>();

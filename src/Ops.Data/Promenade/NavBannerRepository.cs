@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Ocuda.Ops.Data.Promenade
 {
@@ -8,8 +11,15 @@ namespace Ocuda.Ops.Data.Promenade
         INavBannerRepository
     {
         public NavBannerRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
-            ILogger<CarouselRepository> logger) : base(repositoryFacade, logger)
+            ILogger<NavBannerRepository> logger) : base(repositoryFacade, logger)
         {
+        }
+        public async Task<NavBanner> GetByIdAsync(int navBannerId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id == navBannerId)
+                .SingleOrDefaultAsync();
         }
 
     }

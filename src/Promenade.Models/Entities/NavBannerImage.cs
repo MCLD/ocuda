@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class NavBannerText
+    public class NavBannerImage
     {
         [Key]
         [Required]
@@ -21,6 +16,10 @@ namespace Ocuda.Promenade.Models.Entities
 
         [Required]
         [MaxLength(255)]
-        public string Title { get; set; }
+        public string ImagePath { get; set; }
+
+        [Required]
+        [MaxLength(255)]
+        public string ImageAltText { get; set; }
     }
 }

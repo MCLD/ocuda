@@ -133,6 +133,19 @@
     </div>
 </form>
 
+<form id="editNavBannerForm" role="form">
+    <input id="editNavBannerLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="editNavBanner" asp-for="PageItem.Id" type="hidden" />
+
+    <div modal
+         id="editNavBannerModal"
+         isLarge="true"
+         name="NavBanner"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editNavBannerName" asp-for="NavBanner.Name" formgroup />
+    </div>
+</form>
+
 <form id="editSegmentForm" role="form">
     <input id="editSegmentLanguage" asp-for="LanguageId" type="hidden" />
     <input id="editSegmentItem" asp-for="PageItem.Id" type="hidden" />
@@ -268,6 +281,13 @@
                                 <td class="align-middle">Carousel</td>
                                 <td class="align-middle">@item.Carousel.Items.Count</td>
                             }
+                            else if (item.NavBannerId.HasValue)
+                            {
+                                <td class="align-middle">@item.NavBanner.Name</td>
+                                <td class="align-middle">Nav Banner</td>
+                                <td></td>
+                                //<td class="align-middle">@item.NavBanner.Items.Count</td>
+                            }
                             else if (item.PageFeatureId.HasValue)
                             {
                                 <td class="align-middle">@item.PageFeature.Name</td>
@@ -381,6 +401,46 @@
                                         <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                     </a>
                                 }
+                                else if (item.PageFeatureId.HasValue)
+                                {
+                                    <button type="button"
+                                class="btn btn-outline-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editFeatureModal"
+                                data-id="@item.Id"
+                                data-name="@item.PageFeature.Name"
+                                title="Edit feature">
+                                        <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
+                                    </button>
+                                    <a asp-controller="@ImageFeaturesController.Name"
+                           asp-action="@(nameof(ImageFeaturesController.Detail))"
+                           asp-route-id="@item.PageFeatureId.Value"
+                           asp-route-pageLayoutId=@Model.PageLayoutId
+                           class="btn btn-outline-primary"
+                           title="Edit feature content">
+                                        <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                                    </a>
+                                }
+                                else if (item.NavBannerId.HasValue)
+                                {
+                                    <button type="button"
+                                            class="btn btn-outline-primary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editNavBannerModal"
+                                            data-id="@item.Id"
+                                            data-name="@item.NavBanner.Name"
+                                            title="Edit NavBanner">
+                                        <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
+                                    </button>
+                                    @* <a asp-controller="@ImageFeaturesController.Name"
+                                       asp-action="@(nameof(ImageFeaturesController.Detail))"
+                                       asp-route-id="@item.PageFeatureId.Value"
+                                       asp-route-pageLayoutId=@Model.PageLayoutId
+                                       class="btn btn-outline-primary"
+                                       title="Edit feature content">
+                                        <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                                    </a> *@
+                                }
                                 else if (item.SegmentId.HasValue)
                                 {
                                     <button type="button"
@@ -425,11 +485,12 @@
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                                 data-id="@item.Id"
-                                data-name="@(item.BannerFeature?.Name ?? item.Carousel?.Name ?? item.Deck?.Name ?? item.PageFeature?.Name ?? item.Segment?.Name ?? item.Webslide?.Name)"
+                                data-name="@(item.BannerFeature?.Name ?? item.Carousel?.Name ?? item.Deck?.Name ?? item.NavBanner?.Name ?? item.PageFeature?.Name ?? item.Segment?.Name ?? item.Webslide?.Name)"
                                 data-banner="@item.BannerFeatureId"
                                 data-carousel="@item.CarouselId"
                                 data-deck="@item.DeckId"
                                 data-feature="@item.PageFeatureId"
+                                data-navbanner="@item.NavBannerId"
                                 data-segment="@item.SegmentId"
                                 data-webslide="@item.WebslideId"
                                 title="Delete layout item">
@@ -494,6 +555,7 @@
             let carousel = button.data("carousel");
             let deck = button.data("deck");
             let feature = button.data("feature");
+            let navbanner = button.data("navbanner");
             let segment = button.data("segment");
             let webslide = button.data("webslide");
             let modal = $(this);
@@ -511,6 +573,9 @@
             }
             else if (feature) {
                 type = "feature";
+            }
+            else if (navbanner) {
+                type = "nav banner"
             }
             else if (segment) {
                 type = "segment";
@@ -580,6 +645,17 @@
         });
 
         $("#editFeatureForm").submit(editItem);
+
+        $("#editNavBannerModal").on("show.bs.modal", function (e) {
+            let button = $(e.relatedTarget);
+            let id = button.data("id");
+            let name = button.data("name");
+
+            $("#editNavBanner").val(id);
+            $("#editNavBannerName").val(name);
+        });
+
+        $("#editNavBannerForm").submit(editItem);
 
         $("#editSegmentModal").on("show.bs.modal", function (e) {
             let button = $(e.relatedTarget);
