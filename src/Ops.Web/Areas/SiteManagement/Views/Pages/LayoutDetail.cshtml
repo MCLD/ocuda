@@ -52,6 +52,7 @@
                     <option value="carousel">Carousel</option>
                     <option value="deck">Deck</option>
                     <option value="feature">Feature</option>
+                    <option value="navBanner">Nav Banner</option>
                     <option value="segment">Segment</option>
                     <option value="webslide">Webslide</option>
                 </select>
@@ -68,6 +69,9 @@
         </div>
         <div id="addFeatureFields" class="d-none">
             <input id="addFeatureName" asp-for="PageFeature.Name" formgroup disabled />
+        </div>
+        <div id="addNavBannerFields" class="d-none">
+            <input id="addNavBannerName" asp-for="NavBanner.Name" formgroup disabled />
         </div>
         <div id="addSegmentFields" class="d-none">
             <input id="addSegmentName" asp-for="Segment.Name" formgroup disabled />
@@ -447,6 +451,7 @@
             $("#addCarouselFields").addClass("d-none").find("input").attr("disabled", "disabled");
             $("#addDeckFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
             $("#addFeatureFields").addClass("d-none").find("input, select").removeAttr("disabled");
+            $("#addNavBannerFields").addClass("d-none").find("input, select").removeAttr("disabled");
             $("#addSegmentFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
             $("#addWebslideFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
             let itemTitleCase = itemType.charAt(0).toUpperCase() + itemType.slice(1);

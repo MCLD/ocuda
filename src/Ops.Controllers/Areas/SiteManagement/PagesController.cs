@@ -359,6 +359,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     && model.Carousel == null
                     && model.Deck == null
                     && model.PageFeature == null
+                    && model.NavBanner == null
                     && model.Segment == null
                     && model.Webslide == null)
                 {
@@ -380,6 +381,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         else if (!string.IsNullOrEmpty(model.Deck?.Name))
                         {
                             model.PageItem.Deck = model.Deck;
+                        }
+                        else if (!string.IsNullOrEmpty(model.NavBanner?.Name))
+                        {
+                            model.PageItem.NavBanner = model.NavBanner;
                         }
                         else if (!string.IsNullOrEmpty(model.PageFeature?.Name))
                         {

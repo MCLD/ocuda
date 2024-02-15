@@ -281,6 +281,7 @@ namespace Ocuda.Ops.Service
             pageItem.BannerFeatureId = null;
             pageItem.CarouselId = null;
             pageItem.DeckId = null;
+            pageItem.NavBanner = null;
             pageItem.PageFeatureId = null;
             pageItem.SegmentId = null;
             pageItem.WebslideId = null;
@@ -289,6 +290,7 @@ namespace Ocuda.Ops.Service
             Carousel carousel = null;
             Deck deck = null;
             ImageFeature pageFeature = null;
+            NavBanner navBanner = null;
             Segment segment = null;
             ImageFeature webslide = null;
 
@@ -315,6 +317,10 @@ namespace Ocuda.Ops.Service
             else if (pageItem.Deck != null)
             {
                 deck = await _deckService.CreateNoSaveAsync(pageItem.Deck);
+            }
+            else if (pageItem.NavBanner != null)
+            {
+                navBanner = await _navBannerService.CreateNoSaveAsync(pageItem.NavBanner);
             }
             else if (pageItem.PageFeature != null)
             {
