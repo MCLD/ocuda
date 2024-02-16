@@ -8,5 +8,9 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<NavBanner> CreateNoSaveAsync(NavBanner navBanner);
 
         Task EditAsync(NavBanner navBanner);
+
+        Task DeleteAsync(int navBannerId);
+
+        Task<NavBanner> GetByIdAsync(int navBannerId);
     }
 }

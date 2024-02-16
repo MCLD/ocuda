@@ -7,9 +7,13 @@ namespace Ocuda.Promenade.Models.Entities
         [Key]
         [Required]
         public int Id { get; set; }
+
+        [MaxLength(60)]
+        public string Icon { get; set; }
         public NavBanner NavBanner { get; set; }
         public int NavBannerId { get; set; }
         public NavBannerLinkText Text { get; set; }
         public int NavBannerLinkTextId { get; set; }
+        public int Order {  get; set; }
     }
 }

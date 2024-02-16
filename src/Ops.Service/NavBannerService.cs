@@ -6,6 +6,7 @@ using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using System.Threading.Tasks;
 using Ocuda.Promenade.Models.Entities;
 using System;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
@@ -42,6 +43,19 @@ namespace Ocuda.Ops.Service
             }
             _navBannerRepository.Update(updateNavBanner);
             await _navBannerRepository.SaveAsync();
+        }
+
+        public async Task DeleteAsync(int navBannerId)
+        {
+            var navBanner = await _navBannerRepository.GetByIdAsync(navBannerId);
+            _navBannerRepository.Remove(navBanner);
+            await _navBannerRepository.SaveAsync();
+        }
+
+        public async Task<NavBanner> GetByIdAsync(int navBannerId)
+        {
+            return await _navBannerRepository.GetByIdAsync(navBannerId)
+                ?? throw new OcudaException("NavBanner does not exist.");
         }
     }
 }

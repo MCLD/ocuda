@@ -401,26 +401,6 @@
                                         <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                     </a>
                                 }
-                                else if (item.PageFeatureId.HasValue)
-                                {
-                                    <button type="button"
-                                class="btn btn-outline-primary"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editFeatureModal"
-                                data-id="@item.Id"
-                                data-name="@item.PageFeature.Name"
-                                title="Edit feature">
-                                        <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
-                                    </button>
-                                    <a asp-controller="@ImageFeaturesController.Name"
-                           asp-action="@(nameof(ImageFeaturesController.Detail))"
-                           asp-route-id="@item.PageFeatureId.Value"
-                           asp-route-pageLayoutId=@Model.PageLayoutId
-                           class="btn btn-outline-primary"
-                           title="Edit feature content">
-                                        <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
-                                    </a>
-                                }
                                 else if (item.NavBannerId.HasValue)
                                 {
                                     <button type="button"
@@ -432,14 +412,13 @@
                                             title="Edit NavBanner">
                                         <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
                                     </button>
-                                    @* <a asp-controller="@ImageFeaturesController.Name"
-                                       asp-action="@(nameof(ImageFeaturesController.Detail))"
-                                       asp-route-id="@item.PageFeatureId.Value"
-                                       asp-route-pageLayoutId=@Model.PageLayoutId
+                                    <a asp-controller="@NavBannerController.Name"
+                                       asp-action="@(nameof(NavBannerController.Detail))"
+                                       asp-route-id="@item.NavBannerId.Value"
                                        class="btn btn-outline-primary"
                                        title="Edit feature content">
                                         <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
-                                    </a> *@
+                                    </a>
                                 }
                                 else if (item.SegmentId.HasValue)
                                 {
