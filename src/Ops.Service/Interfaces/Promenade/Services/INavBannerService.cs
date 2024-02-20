@@ -12,5 +12,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task DeleteAsync(int navBannerId);
 
         Task<NavBanner> GetByIdAsync(int navBannerId);
+
+        Task<int?> GetPageLayoutIdForNavBannerAsync(int id);
     }
 }

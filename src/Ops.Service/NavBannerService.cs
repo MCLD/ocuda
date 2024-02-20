@@ -57,5 +57,10 @@ namespace Ocuda.Ops.Service
             return await _navBannerRepository.GetByIdAsync(navBannerId)
                 ?? throw new OcudaException("NavBanner does not exist.");
         }
+
+        public async Task<int?> GetPageLayoutIdForNavBannerAsync(int id)
+        {
+            return await _navBannerRepository.GetPageLayoutIdForNavBannerAsync(id);
+        }
     }
 }

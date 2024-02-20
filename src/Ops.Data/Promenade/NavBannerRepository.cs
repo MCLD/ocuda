@@ -22,5 +22,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
+        public async Task<int?> GetPageLayoutIdForNavBannerAsync(int id)
+        {
+            return await _context.PageItems
+                .AsNoTracking()
+                .Where(_ => _.NavBannerId == id)
+                .Select(_ => (int?)_.PageLayoutId)
+                .SingleOrDefaultAsync();
+        }
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.NavBannerViewModels
@@ -10,5 +11,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.NavBannerViewMod
         public IFormFile Image { get; set; }
         public NavBannerImage NavBannerImage { get; set; }
         public ICollection<NavBannerLink> Links { get; set; }
+        public int? PageLayoutId { get; set; }
+        public SelectList LanguageList { get; set; }
     }
 }

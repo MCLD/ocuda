@@ -1,5 +1,24 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.NavBannerViewModels.DetailViewModel
 
-<div>
-    @Model.Name
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Nav Banner
+            <small class="text-muted">@Model.Name</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        @if (Model.PageLayoutId.HasValue)
+        {
+            <a asp-controller="@PagesController.Name"
+               asp-action="@nameof(PagesController.LayoutDetail)"
+               asp-route-id="@Model.PageLayoutId.Value"
+               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
+        }
+        else
+        {
+            @* <a asp-action="@nameof(NavBannerController.Index)"
+               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Cancel</a> *@
+        }
+    </div>
 </div>
