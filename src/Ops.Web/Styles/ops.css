@@ -163,6 +163,10 @@ a.rowlink {
     padding-left: 1.75rem;
 }
 
+.prom-card-footer p {
+    margin-bottom: 0;
+}
+
 span.format-addr {
     font-style: italic;
 }

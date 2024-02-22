@@ -151,6 +151,10 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 {
                     item.Carousel = await PageContext.CarouselService
                         .GetByIdAsync(item.CarouselId.Value, forceReload);
+                    if (!string.IsNullOrEmpty(item.Carousel?.CarouselText?.Footer))
+                    {
+                        item.Carousel.CarouselText.Footer = CommonMark.CommonMarkConverter.Convert(item.Carousel.CarouselText.Footer);
+                    }
                 }
                 else if (item.DeckId.HasValue)
                 {
@@ -159,6 +163,10 @@ namespace Ocuda.Promenade.Controllers.Abstract
                     foreach (var cardDetail in item.CardDetails)
                     {
                         cardDetail.Text = CommonMark.CommonMarkConverter.Convert(cardDetail.Text);
+                        if (!string.IsNullOrEmpty(cardDetail.Footer))
+                        {
+                            cardDetail.Footer = CommonMark.CommonMarkConverter.Convert(cardDetail.Footer);
+                        }
                     }
                 }
                 else if (item.PageFeatureId.HasValue)

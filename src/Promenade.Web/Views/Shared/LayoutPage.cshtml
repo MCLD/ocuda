@@ -121,6 +121,12 @@
                             }
                             <p class="card-text">@Html.Raw(card.Text)</p>
                         </div>
+                        @if (!string.IsNullOrEmpty(card.Footer))
+                        {
+                            <div class="card-footer prom-card-footer">
+                                @Html.Raw(card.Footer)
+                            </div>
+                        }
                     </div>
                 </div>
             }
@@ -155,6 +161,12 @@
                             }
                         </div>
                     </div>
+                    @if (!string.IsNullOrEmpty(item.Carousel.CarouselText?.Footer))
+                    {
+                        <div class="card-footer prom-card-footer">
+                            @Html.Raw(item.Carousel.CarouselText.Footer)
+                        </div>
+                    }
                 </div>
             </div>
         </div>

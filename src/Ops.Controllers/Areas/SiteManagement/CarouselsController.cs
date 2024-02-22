@@ -391,6 +391,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var viewModel = new DetailViewModel
             {
                 Carousel = carousel,
+                CarouselText = carousel.CarouselText,
                 CarouselId = carousel.Id,
                 FocusItemId = item,
                 ItemErrorMessage = TempData[ItemErrorMessageKey] as string,
