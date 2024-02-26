@@ -17,6 +17,9 @@ namespace Ocuda.Promenade.Models.Entities
 
         public bool IsDisabled { get; set; }
 
+        [DisplayName("Email setup for multiple staff notifications")]
+        public int? NotfiyStaffOverflowEmailSetupId { get; set; }
+
         [DisplayName("Email setup used to notify staff")]
         public int? NotifyStaffEmailSetupId { get; set; }
 

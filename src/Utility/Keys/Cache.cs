@@ -76,6 +76,11 @@
         public static readonly string OpsUserProfilePicture = "user.picture.{0}";
 
         /// <summary>
+        /// A count of how many volunteer emails have been sent recently, {0} is the email addrress
+        /// </summary>
+        public static readonly string OpsVolunteerEmails = "email.notification.volunteer.{0}";
+
+        /// <summary>
         /// Cached card, {0} is the language id and {1} is the card id
         /// </summary>
         public static readonly string PromCardDetail = "card.{0}.{1}";

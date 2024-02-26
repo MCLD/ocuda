@@ -22,6 +22,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<IDictionary<VolunteerFormType, int>> GetEmailSetupMappingAsync();
 
+        Task<IDictionary<VolunteerFormType, int>> GetEmailSetupOverflowMappingAsync();
+
         Task<DataWithCount<ICollection<VolunteerForm>>> GetPaginatedListAsync(BaseFilter filter);
 
         Task UpdateSaveAsync(VolunteerForm form);
