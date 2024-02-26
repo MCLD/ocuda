@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -8,6 +9,10 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int CarouselId { get; set; }
         public Carousel Carousel { get; set; }
+
+        [MaxLength(255)]
+        [DisplayName("Footer (optional)")]
+        public string Footer { get; set; }
 
         [Key]
         [Required]

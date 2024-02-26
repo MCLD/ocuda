@@ -165,6 +165,16 @@ filename = Model.CardDetail.Filename
         </div>
     </div>
     <input asp-for="CardDetail.Link" formgroup />
+    <div class="mb-3 row">
+        <div class="col-md-3 text-md-end">
+            <label asp-for="CardDetail.Footer" class="col-form-label"></label>
+        </div>
+        <div class="mb-3-inner col-md-9">
+            <textarea asp-for="CardDetail.Footer" markdown-editor></textarea>
+            <span asp-validation-for="CardDetail.Footer"
+                  class="validation-message text-danger"></span>
+        </div>
+    </div>
 
     @if (Model.CardDetail == null)
     {
@@ -235,14 +245,25 @@ filename = Model.CardDetail.Filename
 
     <script>
         $(function () {
-            var editor = new Markdown.Editor($("#CardDetail_Text"), {
+            let textEditor = new Markdown.Editor($("#CardDetail_Text"), {
                 allowUploads: false,
                 allowImages: false,
                 allowCode: false,
                 allowHR: false
             });
-            if (editor) {
-                editor.run();
+            if (textEditor) {
+                textEditor.run();
+            }
+        });
+        $(function () {
+            let detailEditor = new Markdown.Editor($("#CardDetail_Footer"), {
+                allowUploads: false,
+                allowImages: false,
+                allowCode: false,
+                allowHR: false
+            });
+            if (detailEditor) {
+                detailEditor.run();
             }
         });
 

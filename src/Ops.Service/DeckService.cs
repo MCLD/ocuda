@@ -69,6 +69,7 @@ namespace Ocuda.Ops.Service
             cardDetails.Header = cardDetails.Header?.Trim();
             cardDetails.Link = cardDetails.Link?.Trim();
             cardDetails.Text = cardDetails.Text?.Trim();
+            cardDetails.Footer = cardDetails.Footer?.Trim();
 
             await _cardDetailRepository.AddAsync(cardDetails);
             await _cardDetailRepository.SaveAsync();
@@ -329,6 +330,7 @@ namespace Ocuda.Ops.Service
             updateDetail.Header = cardDetail.Header?.Trim();
             updateDetail.Link = cardDetail.Link?.Trim();
             updateDetail.Text = cardDetail.Text?.Trim();
+            updateDetail.Footer = cardDetail.Footer?.Trim();
 
             if (isNew)
             {

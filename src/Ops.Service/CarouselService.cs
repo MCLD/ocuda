@@ -223,6 +223,7 @@ namespace Ocuda.Ops.Service
             carouselText.LanguageId = await _languageRepository.GetDefaultLanguageId();
             carouselText.Carousel = carousel;
             carouselText.Title = carouselText.Title?.Trim();
+            carouselText.Footer =carouselText.Footer?.Trim();
 
             await _carouselRepository.AddAsync(carousel);
             await _carouselTextRepository.AddAsync(carouselText);
@@ -437,6 +438,7 @@ namespace Ocuda.Ops.Service
             if (currentText == null)
             {
                 carouselText.Title = carouselText.Title?.Trim();
+                carouselText.Footer = carouselText.Footer?.Trim();
 
                 await _carouselTextRepository.AddAsync(carouselText);
                 await _carouselTextRepository.SaveAsync();
@@ -445,6 +447,7 @@ namespace Ocuda.Ops.Service
             else
             {
                 currentText.Title = carouselText.Title?.Trim();
+                currentText.Footer = carouselText.Footer?.Trim();
 
                 _carouselTextRepository.Update(currentText);
                 await _carouselTextRepository.SaveAsync();
