@@ -45,7 +45,10 @@
 
 <div class="row">
     <div class="col-12">
-        <form method="post" role="form" asp-action="TeenVolunteerForm" asp-controller="Locations">
+        <form method="post" 
+            role="form" 
+            asp-action="@nameof(HomeController.VolunteerTeen)" 
+            asp-controller="@HomeController.Name">
             <h2>@Localizer[Ocuda.i18n.Keys.Promenade.ContactInformation]</h2>
             <input asp-for="Name"
                    type="text"
@@ -57,7 +60,6 @@
             <input asp-for="Email"
                    type="email"
                    formgroup />
-            
             <input asp-for="GuardianName"
                    type="text"
                    formgroup />

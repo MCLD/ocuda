@@ -8,9 +8,10 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
     {
         public bool AdultFormAvailable { get; set; }
 
-        [Required]
         [DisplayName(i18n.Keys.Promenade.PromptGuardianEmail)]
+        [EmailAddress]
         [MaxLength(255)]
+        [Required]
         public string GuardianEmail { get; set; }
 
         [Required]
@@ -18,9 +19,10 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         [MaxLength(255)]
         public string GuardianName { get; set; }
 
-        [Required]
         [DisplayName(i18n.Keys.Promenade.PromptGuardianPhone)]
         [MaxLength(255)]
+        [Phone]
+        [Required]
         public string GuardianPhone { get; set; }
 
         public override VolunteerFormSubmission ToFormSubmission()

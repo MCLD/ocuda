@@ -141,15 +141,10 @@ namespace Ocuda.Promenade.Web
                 app.UseSerilogRequestLogging();
             }
 
-            app.UseRouting();
-
             app.UseSession();
 
-            app.UseEndpoints(_ =>
-            {
-                _.MapControllers();
-                _.MapHealthChecks("/health");
-            });
+            app.UseHealthChecks("/health");
+            app.UseMvc();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability",
@@ -308,7 +303,10 @@ namespace Ocuda.Promenade.Web
             if (_isDevelopment)
             {
                 services.AddControllersWithViews(_ =>
-                        _.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>())
+                    {
+                        _.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>();
+                        _.EnableEndpointRouting = false;
+                    })
                     .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                     .AddDataAnnotationsLocalization(_ =>
                     {
@@ -321,7 +319,10 @@ namespace Ocuda.Promenade.Web
             else
             {
                 services.AddControllersWithViews(_ =>
-                        _.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>())
+                    {
+                        _.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>();
+                        _.EnableEndpointRouting = false;
+                    })
                     .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                     .AddDataAnnotationsLocalization(_ =>
                     {

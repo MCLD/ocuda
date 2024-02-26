@@ -10,9 +10,10 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         [MaxLength(255)]
         public string Availability { get; set; }
 
-        [Required]
         [DisplayName(i18n.Keys.Promenade.PromptEmail)]
+        [EmailAddress]
         [MaxLength(255)]
+        [Required]
         public string Email { get; set; }
 
         [DisplayName(i18n.Keys.Promenade.PromptExperience)]
@@ -29,9 +30,10 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         [MaxLength(255)]
         public string Name { get; set; }
 
-        [Required]
         [DisplayName(i18n.Keys.Promenade.PromptPhone)]
         [MaxLength(255)]
+        [Phone]
+        [Required]
         public string Phone { get; set; }
 
         [DisplayName(i18n.Keys.Promenade.PromptVolunteerRegularity)]
