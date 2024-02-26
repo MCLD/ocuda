@@ -245,25 +245,25 @@ filename = Model.CardDetail.Filename
 
     <script>
         $(function () {
-            var editor = new Markdown.Editor($("#CardDetail_Text"), {
+            let textEditor = new Markdown.Editor($("#CardDetail_Text"), {
                 allowUploads: false,
                 allowImages: false,
                 allowCode: false,
                 allowHR: false
             });
-            if (editor) {
-                editor.run();
+            if (textEditor) {
+                textEditor.run();
             }
         });
         $(function () {
-            var editor = new Markdown.Editor($("#CardDetail_Footer"), {
+            let detailEditor = new Markdown.Editor($("#CardDetail_Footer"), {
                 allowUploads: false,
                 allowImages: false,
                 allowCode: false,
                 allowHR: false
             });
-            if (editor) {
-                editor.run();
+            if (detailEditor) {
+                detailEditor.run();
             }
         });
 
