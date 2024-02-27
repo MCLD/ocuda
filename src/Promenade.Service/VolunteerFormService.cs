@@ -106,6 +106,10 @@ namespace Ocuda.Promenade.Service
 
             form.CreatedAt = _dateTimeProvider.Now;
 
+            _logger.LogInformation("Saving volunteer form submission from {Name} ({Email})",
+                form.Name,
+                form.Email);
+
             await _volunteerFormSubmissionRepository.AddAsync(form);
             await _volunteerFormSubmissionRepository.SaveAsync();
         }
