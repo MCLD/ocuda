@@ -17,7 +17,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ImageOptimizer
             {
                 return Enum.GetNames(typeof(Format))
                     .Where(_ => _ != nameof(Format.H264) && _ != nameof(Format.WebM))
-                    .Select((_, index) => new SelectListItem { Text = _, Value = index.ToString() }).ToList();
+                    .Select(_ => new SelectListItem { Text = _, Value = _ }).ToList();
             }
         }
     }
