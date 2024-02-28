@@ -9,8 +9,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.NavBannerViewMod
     {
         public string Name { get; set; }
         public IFormFile Image { get; set; }
+        public Language Language { get; set; }
         public NavBannerImage NavBannerImage { get; set; }
-        public ICollection<NavBannerLink> Links { get; set; }
+        public NavBannerLink[] Links { get; set; }
         public int? PageLayoutId { get; set; }
         public SelectList LanguageList { get; set; }
     }

@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using ImageOptimApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Feature;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.NavBannerViewModels;
-using Ocuda.Ops.Controllers.Filters;
-using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
-using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
@@ -24,6 +19,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class NavBannerController : BaseController<NavBannerController>
     {
+        private readonly IImageService _imageService;
         private readonly ILanguageService _languageService;
         private readonly INavBannerService _navBannerService;
 
@@ -31,12 +27,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         public static string Area { get { return "SiteManagement"; } }
 
         public NavBannerController(ServiceFacades.Controller<NavBannerController> context,
+            IImageService imageService,
             ILanguageService languageService,
             INavBannerService navBannerService) : base(context)
         {
             ArgumentNullException.ThrowIfNull(languageService);
             ArgumentNullException.ThrowIfNull(navBannerService);
-
+            _imageService = imageService;
             _languageService = languageService;
             _navBannerService = navBannerService;
         }
@@ -71,6 +68,52 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 Console.WriteLine(oex.Message);
                 return NotFound();
             }
+        }
+
+        [HttpPost]
+        [Route("{action}/{id}")]
+        public async Task<IActionResult> Detail(DetailViewModel viewModel)
+        {
+
+            if (viewModel == null)
+            {
+                return View(viewModel);
+            }
+
+            if (viewModel.Language == null)
+            {
+                var languages = await _languageService.GetActiveAsync();
+
+                viewModel.Language = languages.Single(_ => _.IsDefault);
+            }
+
+            if (viewModel.Image != null)
+            {
+                OptimizedImageResult optimized;
+                byte[] imageBytes;
+
+                try
+                {
+                    optimized = await _imageService.OptimizeAsync(viewModel.Image);
+                    imageBytes = optimized.File;
+                    // get an approved filename with path
+                    var filename = await _navBannerService.GetUploadImageFilePathAsync(viewModel.Language.Name,
+                        viewModel.Image.FileName);
+
+                    // copy file
+                    await System.IO.File.WriteAllBytesAsync(filename, imageBytes);
+                }
+                catch (ParameterException pex)
+                {
+                    ModelState.AddModelError("ItemImage",
+                        $"Error optimizing uploaded image: {pex.Message}");
+                }
+
+                // Pick up here... save image path/alt text to a database entry
+                
+            }
+
+            return RedirectToAction(nameof(PagesController.LayoutDetail), PagesController.Name, new { id = viewModel.PageLayoutId });
         }
     }
 }

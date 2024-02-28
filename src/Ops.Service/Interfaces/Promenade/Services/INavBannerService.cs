@@ -14,5 +14,9 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<NavBanner> GetByIdAsync(int navBannerId);
 
         Task<int?> GetPageLayoutIdForNavBannerAsync(int id);
+
+        Task<string> GetFullImageDirectoryPath(string languageName);
+
+        Task<string> GetUploadImageFilePathAsync(string languageName, string filename);
     }
 }

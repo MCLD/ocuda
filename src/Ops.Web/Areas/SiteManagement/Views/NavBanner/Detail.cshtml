@@ -1,6 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.NavBannerViewModels.DetailViewModel
 
-<div class="row mb-2">
+<div class="row mb-2 gap-3">
     <div class="col-sm-6">
         <h1>
             Nav Banner
@@ -21,4 +21,36 @@
                class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Cancel</a> *@
         }
     </div>
+    <form class="d-flex flex-column gap-2" enctype="multipart/form-data" asp-action="@nameof(NavBannerController.Detail)" method="post" role="form">
+
+        <input type="hidden" asp-for="@Model.PageLayoutId" />
+
+        <label asp-for="@Model.Image"></label>
+        <input type="file" asp-for="@Model.Image" />
+
+        <label asp-for="@Model.NavBannerImage.ImageAltText"></label>
+        <input type="text" asp-for="@Model.NavBannerImage.ImageAltText" />
+
+        @for (int i = 0; i < 4; i++)
+        {
+            <div>
+                <label asp-for="@Model.Links[i].Icon"></label>
+                <input asp-for="@Model.Links[i].Icon" type="text" />
+
+                <label asp-for="@Model.Links[i].Text.Text"></label>
+                <input asp-for="@Model.Links[i].Text.Text" type="text" />
+
+                <label asp-for="@Model.Links[i].Text.Link"></label>
+                <input asp-for="@Model.Links[i].Text.Link" type="text" />
+            </div>
+        }
+        <button class="btn btn-success" style="max-width: 140px;" type="submit">Submit</button>
+    </form>
 </div>
+
+@*
+    -- Image uploader
+    -- 4x Link text
+    -- 4x Link href
+    -- 4x Link icon
+*@

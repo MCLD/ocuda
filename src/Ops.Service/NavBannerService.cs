@@ -7,18 +7,37 @@ using System.Threading.Tasks;
 using Ocuda.Promenade.Models.Entities;
 using System;
 using Ocuda.Utility.Exceptions;
+using System.IO;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using System.Globalization;
 
 namespace Ocuda.Ops.Service
 {
     public class NavBannerService : BaseService<NavBannerService>, INavBannerService
     {
         private readonly INavBannerRepository _navBannerRepository;
+        private readonly INavBannerImageRepository _navBannerImageRepository;
+        private readonly ISiteSettingService _siteSettingService;
+
+        private const string ImagesFilePath = "images";
+        private const string NavBannerFilePath = "navbanner";
+
         public NavBannerService(ILogger<NavBannerService> logger,
             IHttpContextAccessor httpContextAccessor,
-            INavBannerRepository navBannerRepository
-            ) : base(logger, httpContextAccessor)
-        { 
+            INavBannerRepository navBannerRepository,
+            INavBannerImageRepository navBannerImageRepository,
+            ISiteSettingService siteSettingService) : base(logger, httpContextAccessor)
+        {
             _navBannerRepository = navBannerRepository;
+            _navBannerImageRepository = navBannerImageRepository;
+            _siteSettingService = siteSettingService;
+        }
+
+        public async Task AddImageAsync(NavBannerImage image)
+        {
+            image.ImageAltText = image.ImageAltText.Trim();
+
+            await _navBannerImageRepository.AddAsync(image);
         }
 
         public async Task<NavBanner> CreateNoSaveAsync(NavBanner navBanner)
@@ -61,6 +80,39 @@ namespace Ocuda.Ops.Service
         public async Task<int?> GetPageLayoutIdForNavBannerAsync(int id)
         {
             return await _navBannerRepository.GetPageLayoutIdForNavBannerAsync(id);
+        }
+
+        public async Task<string> GetFullImageDirectoryPath(string languageName)
+        {
+            string basePath = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var filePath = Path.Combine(basePath,
+                ImagesFilePath,
+                languageName,
+                NavBannerFilePath);
+
+            if (!Directory.Exists(filePath))
+            {
+                _logger.LogInformation("Creating nav banner image directory: {Path}",
+                    filePath);
+                Directory.CreateDirectory(filePath);
+            }
+
+            return filePath;
+        }
+
+        public async Task<string> GetUploadImageFilePathAsync(string languageName, string filename)
+        {
+            var imagePath = await GetFullImageDirectoryPath(languageName);
+            var fullFilePath = Path.Combine(imagePath, filename);
+
+            if (File.Exists(fullFilePath))
+            {
+                File.Delete(fullFilePath);
+            }
+
+            return fullFilePath;
         }
     }
 }

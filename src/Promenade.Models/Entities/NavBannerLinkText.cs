@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -21,6 +16,10 @@ namespace Ocuda.Promenade.Models.Entities
 
         [Required]
         [MaxLength(255)]
+        public string Link { get; set; }
+
+        [Required]
+        [MaxLength(60)]
         public string Text { get; set; }
     }
 }
