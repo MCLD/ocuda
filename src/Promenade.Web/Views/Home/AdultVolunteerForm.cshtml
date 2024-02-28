@@ -46,7 +46,10 @@
 
 <div class="row mt-2">
     <div class="col-12">
-        <form method="post" role="form" asp-action="AdultVolunteerForm" asp-controller="Locations">
+        <form method="post" 
+            role="form"
+            asp-action="@nameof(HomeController.VolunteerAdult)"
+            asp-controller="@HomeController.Name">
             <h2>@Localizer[Ocuda.i18n.Keys.Promenade.ContactInformation]</h2>
             <input asp-for="Name"
                    type="text"

@@ -138,6 +138,11 @@ namespace Ocuda.Ops.Service
                 .ToDictionary(_ => _.ToString(), _ => (int)_);
         }
 
+        public async Task<IDictionary<VolunteerFormType, int>> GetEmailSetupOverflowMappingAsync()
+        {
+            return await _volunteerFormRepository.GetEmailSetupOverflowMappingAsync();
+        }
+
         public async Task<VolunteerForm> GetFormByIdAsync(int Id)
         {
             return await _volunteerFormRepository.FindAsync(Id);
@@ -208,10 +213,15 @@ namespace Ocuda.Ops.Service
             return await _volunteerFormSubmissionRepository.GetAllAsync(locationId, form.Id);
         }
 
-        public async Task NotifiedStaffAsync(int formSubmissionId, int emailRecordId, int userId)
+        public async Task NotifiedStaffAsync(int formSubmissionId, int? emailRecordId, int userId)
         {
             await _volunteerFormSubmissionRepository.StaffNotifiedAsync(formSubmissionId);
-            await _emailRecordRepository.AddSaveAsync(formSubmissionId, emailRecordId, userId);
+            if (emailRecordId.HasValue)
+            {
+                await _emailRecordRepository.AddSaveAsync(formSubmissionId,
+                    emailRecordId.Value,
+                    userId);
+            }
         }
 
         public async Task RemoveFormUserMapping(int locationId, int userId, VolunteerFormType type)

@@ -1,5 +1,9 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels.DetailViewModel
 
+@section styles {
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+}
+
 <div class="row mb-2">
     <div class="col-sm-6">
         <h1>
@@ -10,20 +14,17 @@
     <div class="col-sm-6">
         @if (Model.PageLayoutId.HasValue)
         {
-            <a asp-controller="@PagesController.Name"
-               asp-action="@nameof(PagesController.LayoutDetail)"
-               asp-route-id="@Model.PageLayoutId.Value"
-               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
+            <a asp-controller="@PagesController.Name" asp-action="@nameof(PagesController.LayoutDetail)"
+                asp-route-id="@Model.PageLayoutId.Value" class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
         }
         else
         {
             <a asp-action="@nameof(CarouselsController.Index)"
-               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Cancel</a>
+                class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Cancel</a>
         }
 
-        <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
-                data-bs-toggle="modal"
-                data-bs-target="#addItemModal">
+        <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end" data-bs-toggle="modal"
+            data-bs-target="#addItemModal">
             <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
             Add Carousel Item
         </button>
@@ -32,21 +33,13 @@
 
 <form id="addItemForm" role="form">
     <input id="addItemLanguage" asp-for="LanguageId" type="hidden" />
-    <input id="addItemCarouselId"
-           asp-for="CarouselItem.CarouselId"
-           value="@Model.CarouselId"
-           type="hidden" />
-    <div modal id="addItemModal"
-         isLarge="true"
-         name="Item"
-         type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+    <input id="addItemCarouselId" asp-for="CarouselItem.CarouselId" value="@Model.CarouselId" type="hidden" />
+    <div modal id="addItemModal" isLarge="true" name="Item" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addItemLabel" asp-for="CarouselItem.CarouselItemText.Label" formgroup />
         <input id="addItemImageUrl" asp-for="CarouselItem.CarouselItemText.ImageUrl" formgroup
-               info-tooltip="@(!string.IsNullOrWhiteSpace(Model.AllowedImageDomains) ? $"Images are restricted to the following domains: {Model.AllowedImageDomains}" : null )" />
+            info-tooltip="@(!string.IsNullOrWhiteSpace(Model.AllowedImageDomains) ? $"Images are restricted to the following domains: {Model.AllowedImageDomains}" : null )" />
         <input id="addItemTitle" asp-for="CarouselItem.CarouselItemText.Title" formgroup />
-        <textarea id="addItemDescription"
-                  asp-for="CarouselItem.CarouselItemText.Description"
-                  formgroup></textarea>
+        <textarea id="addItemDescription" asp-for="CarouselItem.CarouselItemText.Description" formgroup></textarea>
     </div>
 </form>
 
@@ -55,27 +48,20 @@
     <input id="deleteItemLanguage" asp-for="LanguageId" type="hidden" />
     <input id="deleteItemId" asp-for="CarouselItem.Id" type="hidden" />
     <input id="deleteItemName" asp-for="CarouselItem.Name" type="hidden" />
-    <div modal
-         id="deleteItemModal"
-         name="Item"
-         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+    <div modal id="deleteItemModal" name="Item" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
 <form id="addButtonForm" role="form">
     <input id="addButtonCarousel" asp-for="CarouselId" type="hidden" />
     <input id="addButtonLanguage" asp-for="LanguageId" type="hidden" />
     <input id="addButtonItem" asp-for="CarouselButton.CarouselItemId" type="hidden" />
-    <div modal id="addButtonModal"
-         isLarge="true"
-         name="Button" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
-        <select id="addButtonLabel"
-                asp-for="CarouselButton.LabelId"
-                asp-items="Model.LabelList" formgroup>
+    <div modal id="addButtonModal" isLarge="true" name="Button" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <select id="addButtonLabel" asp-for="CarouselButton.LabelId" asp-items="Model.LabelList" formgroup>
             <option></option>
         </select>
         <input id="addButtonUrl" asp-for="CarouselButton.Url" formgroup
-               label-name="@(!string.IsNullOrWhiteSpace(Model.CarouselTemplate?.ButtonUrlLabel) ? Model.CarouselTemplate.ButtonUrlLabel : nameof(CarouselButton.Url))"
-               info-tooltip="@(!string.IsNullOrWhiteSpace(Model.ButtonUrlInfoMessage) ? Model.ButtonUrlInfoMessage : null )" />
+            label-name="@(!string.IsNullOrWhiteSpace(Model.CarouselTemplate?.ButtonUrlLabel) ? Model.CarouselTemplate.ButtonUrlLabel : nameof(CarouselButton.Url))"
+            info-tooltip="@(!string.IsNullOrWhiteSpace(Model.ButtonUrlInfoMessage) ? Model.ButtonUrlInfoMessage : null )" />
     </div>
 </form>
 
@@ -83,16 +69,11 @@
     <input id="editButtonCarousel" asp-for="CarouselId" type="hidden" />
     <input id="editButtonLanguage" asp-for="LanguageId" type="hidden" />
     <input id="editButtonId" asp-for="CarouselButton.Id" type="hidden" />
-    <div modal id="editButtonModal"
-         isLarge="true"
-         name="Button"
-         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
-        <select id="editButtonLabel"
-                asp-for="CarouselButton.LabelId"
-                asp-items="Model.LabelList" formgroup></select>
+    <div modal id="editButtonModal" isLarge="true" name="Button" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <select id="editButtonLabel" asp-for="CarouselButton.LabelId" asp-items="Model.LabelList" formgroup></select>
         <input id="editButtonUrl" asp-for="CarouselButton.Url" formgroup
-               label-name="@(!string.IsNullOrWhiteSpace(Model.CarouselTemplate?.ButtonUrlLabel) ? Model.CarouselTemplate.ButtonUrlLabel : nameof(CarouselButton.Url))"
-               info-tooltip="@(!string.IsNullOrWhiteSpace(Model.ButtonUrlInfoMessage) ? Model.ButtonUrlInfoMessage : null )" />
+            label-name="@(!string.IsNullOrWhiteSpace(Model.CarouselTemplate?.ButtonUrlLabel) ? Model.CarouselTemplate.ButtonUrlLabel : nameof(CarouselButton.Url))"
+            info-tooltip="@(!string.IsNullOrWhiteSpace(Model.ButtonUrlInfoMessage) ? Model.ButtonUrlInfoMessage : null )" />
     </div>
 </form>
 
@@ -101,10 +82,7 @@
     <input id="deleteButtonanguage" asp-for="LanguageId" type="hidden" />
     <input id="deleteButtonId" asp-for="CarouselButton.Id" type="hidden" />
     <input id="deleteButtonItem" asp-for="CarouselButton.CarouselItemId" type="hidden" />
-    <div modal
-         id="deleteButtonModal"
-         name="Button"
-         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+    <div modal id="deleteButtonModal" name="Button" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
 <div class="row pt-1">
@@ -121,25 +99,22 @@
 
 <div class="row pb-1">
     <div class="col-12">
-        <form asp-action="@nameof(CarouselsController.EditCarouselText)"
-              method="post"
-              role="form">
+        <form asp-action="@nameof(CarouselsController.EditCarouselText)" method="post" role="form">
             <input asp-for="CarouselText.CarouselId" value="@Model.CarouselId" type="hidden" />
             <input asp-for="CarouselText.LanguageId" value="@Model.LanguageId" type="hidden" />
-            <input asp-for="CarouselText.Title"
-                   value="@Model.Carousel.CarouselText?.Title"
-                   formgroup />
-            <input asp-for="CarouselText.Footer"
-                   value="@Model.Carousel.CarouselText?.Footer"
-                   formgroup />
-            <input asp-for="CarouselText.FooterLink"
-                   value="@Model.Carousel.CarouselText?.FooterLink"
-                   formgroup />
+            <input asp-for="CarouselText.Title" value="@Model.Carousel.CarouselText?.Title" formgroup />
+            <div class="mb-3 row">
+                <div class="col-md-3 text-md-end">
+                    <label asp-for="CarouselText.Footer" class="col-form-label"></label>
+                </div>
+                <div class="mb-3-inner col-md-9">
+                    <textarea asp-for="CarouselText.Footer" markdown-editor>
+                </textarea>
+                </div>
+            </div>
             <div class="row">
                 <div class="offset-md-3 col-md-9">
-                    <button type="submit"
-                            class="btn btn-outline-success btn-lg"
-                            button-spinner>
+                    <button type="submit" class="btn btn-outline-success btn-lg" button-spinner>
                         <span class="fa-regular fa-floppy-disk"></span>
                         Save
                     </button>
@@ -164,44 +139,30 @@
                 <div class="accordion mt-2" id="accordion@(item.Id)">
                     <div class="accordion-item">
                         <div class="accordion-header d-flex" id="heading@(item.Id)">
-                            <button class="accordion-button collapsed"
-                                 data-bs-toggle="collapse"
-                                 data-bs-target="#collapse@(item.Id)"
-                                 aria-controls="collapse@(item.Id)"
-                                 aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
+                            <button class="accordion-button collapsed" data-bs-toggle="collapse"
+                                data-bs-target="#collapse@(item.Id)" aria-controls="collapse@(item.Id)"
+                                aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
                                 @item.Name
                             </button>
                             <div class="btn-group" role="group">
-                                <button class="btn btn-sm btn-outline-primary changeSort decreaseSortButton"
-                                        data-id="@item.Id"
-                                        data-increase="false"
-                                        data-item="true"
-                                        disabled="@(item.Id == Model.Carousel.Items.First().Id ? "disabled" : null)"
-                                        type="button">
+                                <button class="btn btn-sm btn-outline-primary changeSort decreaseSortButton" data-id="@item.Id"
+                                    data-increase="false" data-item="true"
+                                    disabled="@(item.Id == Model.Carousel.Items.First().Id ? "disabled" : null)" type="button">
                                     <span class="fa-solid fa-arrow-up"></span>
                                 </button>
-                                <button class="btn btn-sm btn-outline-primary changeSort increaseSortButton"
-                                        data-id="@item.Id"
-                                        data-increase="true"
-                                        data-item="true"
-                                        disabled="@(item.Id == Model.Carousel.Items.Last().Id ? "disabled" : null)"
-                                        type="button">
+                                <button class="btn btn-sm btn-outline-primary changeSort increaseSortButton" data-id="@item.Id"
+                                    data-increase="true" data-item="true"
+                                    disabled="@(item.Id == Model.Carousel.Items.Last().Id ? "disabled" : null)" type="button">
                                     <span class="fa-solid fa-arrow-down"></span>
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteItemModal"
-                                        data-id="@item.Id"
-                                        data-name="@item.Name"
-                                        type="button">
+                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteItemModal" data-id="@item.Id" data-name="@item.Name" type="button">
                                     <span class="fa-solid fa-circle-minus"></span>
                                 </button>
                             </div>
                         </div>
-                        <div id="collapse@(item.Id)"
-                             class="accordion-collapse collapse"
-                             data-parent="#accordion@(item.Id)"
-                             aria-labelledby="heading@(item.Id)">
+                        <div id="collapse@(item.Id)" class="accordion-collapse collapse" data-parent="#accordion@(item.Id)"
+                            aria-labelledby="heading@(item.Id)">
                             <div class="accordion-body">
                                 @if (Model.FocusItemId == item.Id && !string.IsNullOrWhiteSpace(Model.ItemErrorMessage))
                                 {
@@ -212,49 +173,32 @@
                                     </div>
                                 }
                                 <form asp-controller="@CarouselsController.Name"
-                                      asp-action="@nameof(CarouselsController.EditCarouselItemText)">
-                                    <input id="carouselItem@(item.Id)Carousel"
-                                           asp-for="CarouselId"
-                                           type="hidden" />
-                                    <input id="carouselItem@(item.Id)Id"
-                                           asp-for="CarouselItemText.CarouselItemId"
-                                           value="@item.Id"
-                                           type="hidden" />
-                                    <input id="carouselItem@(item.Id)Language"
-                                           asp-for="CarouselItemText.LanguageId"
-                                           value="@(item.CarouselItemText?.LanguageId ?? Model.LanguageId)"
-                                           type="hidden" />
-                                    <input id="carouselItem@(item.Id)Label"
-                                           asp-for="CarouselItemText.Label"
-                                           value="@item.CarouselItemText?.Label"
-                                           formgroup />
-                                    <input id="carouselItem@(item.Id)ImageUrl"
-                                           asp-for="CarouselItemText.ImageUrl"
-                                           value="@item.CarouselItemText?.ImageUrl"
-                                           formgroup
-                                           info-tooltip="@(!string.IsNullOrWhiteSpace(Model.AllowedImageDomains) ? $"Images are restricted to the following domains: {Model.AllowedImageDomains}" : null )" />
-                                    <input id="carouselItem@(item.Id)Title"
-                                           asp-for="CarouselItemText.Title"
-                                           value="@item.CarouselItemText?.Title"
-                                           formgroup />
-                                    <textarea id="carouselItem@(item.Id)Description"
-                                              asp-for="CarouselItemText.Description"
-                                              formgroup>@item.CarouselItemText?.Description</textarea>
+                                    asp-action="@nameof(CarouselsController.EditCarouselItemText)">
+                                    <input id="carouselItem@(item.Id)Carousel" asp-for="CarouselId" type="hidden" />
+                                    <input id="carouselItem@(item.Id)Id" asp-for="CarouselItemText.CarouselItemId"
+                                        value="@item.Id" type="hidden" />
+                                    <input id="carouselItem@(item.Id)Language" asp-for="CarouselItemText.LanguageId"
+                                        value="@(item.CarouselItemText?.LanguageId ?? Model.LanguageId)" type="hidden" />
+                                    <input id="carouselItem@(item.Id)Label" asp-for="CarouselItemText.Label"
+                                        value="@item.CarouselItemText?.Label" formgroup />
+                                    <input id="carouselItem@(item.Id)ImageUrl" asp-for="CarouselItemText.ImageUrl"
+                                        value="@item.CarouselItemText?.ImageUrl" formgroup
+                                        info-tooltip="@(!string.IsNullOrWhiteSpace(Model.AllowedImageDomains) ? $"Images are restricted to the following domains: {Model.AllowedImageDomains}" : null )" />
+                                    <input id="carouselItem@(item.Id)Title" asp-for="CarouselItemText.Title"
+                                        value="@item.CarouselItemText?.Title" formgroup />
+                                    <textarea id="carouselItem@(item.Id)Description" asp-for="CarouselItemText.Description"
+                                        formgroup>@item.CarouselItemText?.Description</textarea>
                                     <div class="row">
                                         <div class="offset-md-3 col-md-9">
-                                            <button type="submit"
-                                                    class="btn btn-outline-success"
-                                                    button-spinner>
+                                            <button type="submit" class="btn btn-outline-success" button-spinner>
                                                 <span class="fa-regular fa-floppy-disk"></span>
                                                 Save
                                             </button>
                                         </div>
                                     </div>
                                 </form>
-                                <button class="btn btn-outline-primary mb-2"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#addButtonModal"
-                                        data-id="@item.Id">
+                                <button class="btn btn-outline-primary mb-2" data-bs-toggle="modal"
+                                    data-bs-target="#addButtonModal" data-id="@item.Id">
                                     <span class="fa-solid fa-circle-plus"></span>
                                     Add button
                                 </button>
@@ -270,33 +214,23 @@
                                                     </div>
                                                     <div>
                                                         <button class="btn btn-sm btn-outline-info changeSort decreaseSortButton"
-                                                                data-id="@button.Id"
-                                                                data-increase="false"
-                                                                data-item="false"
-                                                                disabled="@(button.Id == item.Buttons.First().Id ? "disabled" : null)">
+                                                            data-id="@button.Id" data-increase="false" data-item="false"
+                                                            disabled="@(button.Id == item.Buttons.First().Id ? "disabled" : null)">
                                                             <span class="fa-solid fa-arrow-up"></span>
                                                         </button>
                                                         <button class="btn btn-sm btn-outline-info changeSort increaseSortButton"
-                                                                data-id="@button.Id"
-                                                                data-increase="true"
-                                                                data-item="false"
-                                                                disabled="@(button.Id == item.Buttons.Last().Id ? "disabled" : null)">
+                                                            data-id="@button.Id" data-increase="true" data-item="false"
+                                                            disabled="@(button.Id == item.Buttons.Last().Id ? "disabled" : null)">
                                                             <span class="fa-solid fa-arrow-down"></span>
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-info"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#editButtonModal"
-                                                                data-id="@button.Id"
-                                                                data-label="@button.LabelId"
-                                                                data-url="@button.Url">
+                                                        <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
+                                                            data-bs-target="#editButtonModal" data-id="@button.Id"
+                                                            data-label="@button.LabelId" data-url="@button.Url">
                                                             <span class="fa-solid fa-pencil"></span>
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-danger"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#deleteButtonModal"
-                                                                data-id="@button.Id"
-                                                                data-item="@button.CarouselItemId"
-                                                                data-name="@button.Label.Name">
+                                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                                            data-bs-target="#deleteButtonModal" data-id="@button.Id"
+                                                            data-item="@button.CarouselItemId" data-name="@button.Label.Name">
                                                             <span class="fa-solid fa-circle-minus"></span>
                                                         </button>
                                                     </div>
@@ -305,7 +239,7 @@
                                         }
                                     </div>
                                 }
-                            </div>                                
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -315,22 +249,37 @@
 </div>
 
 @section scripts {
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
+
     <script>
+
+        $(function () {
+            var editor = new Markdown.Editor($("#CarouselText_Footer"), {
+                allowUploads: false,
+                allowImages: false,
+                allowCode: false,
+                allowHR: false
+            });
+            if (editor) {
+                editor.run();
+            }
+        });
+
         @if (Model.FocusItemId.HasValue)
         {
             <text>
-            $(function () {
-                var focusAccordion = $("#accordion@(Model.FocusItemId.Value)");
-                if (focusAccordion.length > 0) {
-                    $("#accordion@(Model.FocusItemId.Value)")[0].scrollIntoView();
-                }
-            });
+                    $(function () {
+                        var focusAccordion = $("#accordion@(Model.FocusItemId.Value)");
+                        if (focusAccordion.length > 0) {
+                        $("#accordion@(Model.FocusItemId.Value)")[0].scrollIntoView();
+                        }
+                    });
             </text>
         }
 
-        $("#SelectLanguage").on("change", function () {
-            window.location.href = "@Url.Action(nameof(CarouselsController.Detail), new { id = Model.CarouselId})" + "?language=" + $(this).val();
-        });
+            $("#SelectLanguage").on("change", function () {
+                window.location.href = "@Url.Action(nameof(CarouselsController.Detail), new { id = Model.CarouselId })" + "?language=" + $(this).val();
+            });
 
         $("#addItemForm").submit(function (e) {
             e.preventDefault();
@@ -338,14 +287,14 @@
             $.post("@(Url.Action(nameof(CarouselsController.AddCarouselItem), CarouselsController.Name))",
                 form.serialize(),
                 function (response) {
-                if (response.success == true) {
-                    location.href = response.url;
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
         });
 
         $("#deleteItemModal").on("show.bs.modal", function (e) {
@@ -370,14 +319,14 @@
             $.post("@(Url.Action(nameof(CarouselsController.AddItemButton)))",
                 form.serialize(),
                 function (response) {
-                if (response.success == true) {
-                    location.href = response.url;
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
         });
 
         $("#editButtonModal").on("show.bs.modal", function (e) {
@@ -397,14 +346,14 @@
             $.post("@(Url.Action(nameof(CarouselsController.EditItemButton)))",
                 form.serialize(),
                 function (response) {
-                if (response.success == true) {
-                    location.href = response.url;
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
         });
 
         $("#deleteButtonModal").on("show.bs.modal", function (e) {
@@ -474,19 +423,19 @@
                         else {
                             alert(response.message);
                         }
-                });
+                    });
             }
         });
 
-        @foreach(var item in Model.Carousel.Items)
+        @foreach (var item in Model.Carousel.Items)
         {
             <text>
-            $('#collapse@(item.Id)').on('show.bs.collapse', function () {
-                $('#disclosure@(item.Id)').addClass('rotate90');
-            });
-            $('#collapse@(item.Id)').on('hide.bs.collapse', function() {
-                $('#disclosure@(item.Id)').removeClass('rotate90');
-            });
+                    $('#collapse@(item.Id)').on('show.bs.collapse', function () {
+                        $('#disclosure@(item.Id)').addClass('rotate90');
+                    });
+                    $('#collapse@(item.Id)').on('hide.bs.collapse', function() {
+                        $('#disclosure@(item.Id)').removeClass('rotate90');
+                    });
             </text>
             @if (Model.FocusItemId == item.Id)
             {

@@ -69,6 +69,15 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToDictionaryAsync(k => k.VolunteerFormType, v => v.NotifyStaffEmailSetupId.Value);
         }
 
+        public async Task<IDictionary<VolunteerFormType, int>> GetEmailSetupOverflowMappingAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.NotfiyStaffOverflowEmailSetupId.HasValue)
+                .ToDictionaryAsync(k => k.VolunteerFormType, 
+                    v => v.NotfiyStaffOverflowEmailSetupId.Value);
+        }
+
         public async Task<DataWithCount<ICollection<VolunteerForm>>> GetPaginatedListAsync(
             BaseFilter filter)
         {

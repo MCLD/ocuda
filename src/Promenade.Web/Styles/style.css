@@ -111,6 +111,10 @@ footer .prom-logo {
             padding-bottom: 1rem;
         }
 
+.prom-carousel-footer p {
+    margin-bottom: 0;
+}
+
 .prom-carousel .prom-carousel-nav {
     color: #47484a;
     cursor: pointer;
@@ -506,6 +510,10 @@ a.prom-leftnav-header:hover {
     }
 
 .prom-alert > p:last-child {
+    margin-bottom: 0;
+}
+
+.prom-card-footer  p {
     margin-bottom: 0;
 }
 

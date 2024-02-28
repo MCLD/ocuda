@@ -101,6 +101,12 @@ filename = cardDetail.Filename
                         }
                         <p class="card-text">@cardDetail.Text</p>
                     </div>
+                    @if (!string.IsNullOrEmpty(cardDetail.Footer))
+                    {
+                        <div class="card-footer prom-card-footer">
+                            @Html.Raw(cardDetail.Footer)
+                        </div>
+                    }
                     <div class="card-footer d-flex justify-content-between">
                         <div>
                             <a class="btn btn-sm btn-outline-dark"

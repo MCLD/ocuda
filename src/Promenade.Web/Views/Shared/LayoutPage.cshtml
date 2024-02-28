@@ -162,17 +162,8 @@
                         </div>
                         @if (!string.IsNullOrEmpty(card.Footer))
                         {
-                            <div class="card-footer">
-                                @if (!string.IsNullOrEmpty(card.FooterLink))
-                                {
-                                    <a href="@card.FooterLink">
-                                        @card.Footer
-                                    </a>
-                                }
-                                else
-                                {
-                                    @card.Footer
-                                }
+                            <div class="card-footer prom-card-footer">
+                                @Html.Raw(card.Footer)
                             </div>
                         }
                     </div>
@@ -211,17 +202,8 @@
                     </div>
                     @if (!string.IsNullOrEmpty(item.Carousel.CarouselText?.Footer))
                     {
-                        <div class="card-footer">
-                            @if (!string.IsNullOrEmpty(item.Carousel.CarouselText.FooterLink))
-                            {
-                                <a href="@item.Carousel.CarouselText.FooterLink">
-                                    @item.Carousel.CarouselText.Footer
-                                </a>
-                            }
-                            else
-                            {
-                                @item.Carousel.CarouselText.Footer
-                            }
+                        <div class="card-footer prom-card-footer">
+                            @Html.Raw(item.Carousel.CarouselText.Footer)
                         </div>
                     }
                 </div>

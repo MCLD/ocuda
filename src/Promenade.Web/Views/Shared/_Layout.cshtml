@@ -512,7 +512,7 @@
     {
         foreach (var jsUrl in (List<string>)Context.Items[ItemKey.ExternalJS])
         {
-            <script src="@jsUrl"></script>
+            <script src="@jsUrl">    </script>
         }
     }
     @RenderSection("Scripts", required: false)

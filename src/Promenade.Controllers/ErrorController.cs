@@ -9,6 +9,7 @@ using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
+using Serilog.Context;
 
 namespace Ocuda.Promenade.Controllers
 {
@@ -16,6 +17,7 @@ namespace Ocuda.Promenade.Controllers
     [Route("{culture:cultureConstraint?}/[Controller]")]
     public class ErrorController : BasePageController<ErrorController>
     {
+        private const string ErrorMessage = "HTTP {Method} Error {StatusCode} {StatusName}: {RequestPath}";
         private readonly PageService _pageService;
         private readonly RedirectService _redirectService;
 
@@ -39,6 +41,8 @@ namespace Ocuda.Promenade.Controllers
 
         [HttpGet("")]
         [HttpGet("{id}")]
+        [HttpPost("")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> Index(int id)
         {
             string originalPath = "unknown";
@@ -61,7 +65,8 @@ namespace Ocuda.Promenade.Controllers
                         : Redirect(redirect.Url + statusFeature?.OriginalQueryString);
                 }
 
-                _logger.LogWarning("HTTP Error {StatusCode} {StatusName}: {RequestPath}",
+                _logger.LogWarning(ErrorMessage,
+                    HttpContext.Request.Method,
                     id,
                     Enum.GetName(typeof(HttpStatusCode), id),
                     originalPath);
@@ -83,10 +88,14 @@ namespace Ocuda.Promenade.Controllers
                 }
             }
 
-            _logger.LogCritical("HTTP Error {StatusCode} {StatusName}: {RequestPath}",
-                id,
-                Enum.GetName(typeof(HttpStatusCode), id),
-                originalPath);
+            using (LogContext.PushProperty("FormContent", HttpContext.Request.Form))
+            {
+                _logger.LogCritical(ErrorMessage,
+                    HttpContext.Request.Method,
+                    id,
+                    Enum.GetName(typeof(HttpStatusCode), id),
+                    originalPath);
+            }
 
             var errorPageHeader
                 = await _pageService.GetHeaderByStubAndTypeAsync(Utility.ErrorPageSlug.Error,

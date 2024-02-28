@@ -23,6 +23,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         IDictionary<string, int> GetAllVolunteerFormTypes();
 
+        Task<IDictionary<VolunteerFormType, int>> GetEmailSetupOverflowMappingAsync();
+
         Task<VolunteerForm> GetFormByIdAsync(int Id);
 
         Task<ICollection<VolunteerForm>> GetFormBySegmentIdAsync(int segmentId);
@@ -53,7 +55,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<ICollection<VolunteerFormSubmission>>
             GetVolunteerFormSubmissionsAsync(int locationId, int typeId);
 
-        Task NotifiedStaffAsync(int formSubmissionId, int emailRecordId, int userId);
+        Task NotifiedStaffAsync(int formSubmissionId, int? emailRecordId, int userId);
 
         Task RemoveFormUserMapping(int locationId, int userId, VolunteerFormType type);
     }

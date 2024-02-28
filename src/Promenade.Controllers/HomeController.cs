@@ -434,6 +434,7 @@ namespace Ocuda.Promenade.Controllers
         }
 
         [HttpPost("{locationSlug:locationSlugConstraint}/volunteer/adult")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> VolunteerAdult(string locationSlug,
             AdultVolunteerFormViewModel viewModel)
         {
@@ -464,6 +465,7 @@ namespace Ocuda.Promenade.Controllers
         }
 
         [HttpPost("{locationSlug:locationSlugConstraint}/volunteer/teen")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> VolunteerTeen(string locationSlug,
             TeenVolunteerFormViewModel viewModel)
         {

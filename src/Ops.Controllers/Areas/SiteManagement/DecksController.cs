@@ -289,6 +289,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var cards = await _deckService.GetCardDetailsByDeckAsync(deckId, selectedLanguage.Id);
 
+            if (cards != null)
+            {
+                foreach (var card in cards)
+                {
+                    if (!string.IsNullOrEmpty(card.Footer))
+                    {
+                        card.Footer = CommonMark.CommonMarkConverter.Convert(card.Footer);
+                    }
+                }
+            }
+
             return View(new DetailViewModel
             {
                 BackLink = Url.Action(nameof(PagesController.LayoutDetail),
@@ -395,8 +406,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 && string.IsNullOrEmpty(viewModel.CardDetail.Header?.Trim())
                 && string.IsNullOrEmpty(viewModel.CardDetail.Link?.Trim())
                 && string.IsNullOrEmpty(viewModel.CardDetail.Text?.Trim())
-                && string.IsNullOrEmpty(viewModel.CardDetail.Footer?.Trim())
-                && string.IsNullOrEmpty(viewModel.CardDetail.FooterLink?.Trim()))
+                && string.IsNullOrEmpty(viewModel.CardDetail.Footer?.Trim()))
             {
                 ShowAlertWarning("Cannot create empty card.");
                 return RedirectToAction(nameof(Detail), new
