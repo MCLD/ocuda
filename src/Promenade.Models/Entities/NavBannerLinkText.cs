@@ -1,15 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ocuda.Promenade.Models.Entities
 {
+    [PrimaryKey(nameof(LanguageId), nameof(NavBannerLinkId))]
     public class NavBannerLinkText
     {
-        [Key]
         [Required]
         public int LanguageId { get; set; }
         public Language Language { get; set; }
 
-        [Key]
         [Required]
         public int NavBannerLinkId { get; set; }
         public NavBannerLink NavBannerLink { get; set; }

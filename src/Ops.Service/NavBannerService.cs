@@ -19,6 +19,7 @@ namespace Ocuda.Ops.Service
         private readonly INavBannerImageRepository _navBannerImageRepository;
         private readonly ISiteSettingService _siteSettingService;
 
+        private const string AssetBasePath = "assets";
         private const string ImagesFilePath = "images";
         private const string NavBannerFilePath = "navbanner";
 
@@ -38,6 +39,7 @@ namespace Ocuda.Ops.Service
             image.ImageAltText = image.ImageAltText.Trim();
 
             await _navBannerImageRepository.AddAsync(image);
+            await _navBannerImageRepository.SaveAsync();
         }
 
         public async Task<NavBanner> CreateNoSaveAsync(NavBanner navBanner)
@@ -77,6 +79,11 @@ namespace Ocuda.Ops.Service
                 ?? throw new OcudaException("NavBanner does not exist.");
         }
 
+        public async Task<NavBannerImage> GetImageByNavBannerIdAsync(int navBannerId)
+        {
+            return await _navBannerImageRepository.GetByNavBannerIdAsync(navBannerId);
+        }
+
         public async Task<int?> GetPageLayoutIdForNavBannerAsync(int id)
         {
             return await _navBannerRepository.GetPageLayoutIdForNavBannerAsync(id);
@@ -100,6 +107,15 @@ namespace Ocuda.Ops.Service
             }
 
             return filePath;
+        }
+
+        public string GetImageAssetPath(string fileName, string languageName)
+        {
+            return Path.Combine(
+                AssetBasePath,
+                ImagesFilePath, 
+                languageName,
+                fileName);
         }
 
         public async Task<string> GetUploadImageFilePathAsync(string languageName, string filename)

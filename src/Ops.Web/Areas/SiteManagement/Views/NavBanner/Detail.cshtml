@@ -24,6 +24,7 @@
     <form class="d-flex flex-column gap-2" enctype="multipart/form-data" asp-action="@nameof(NavBannerController.Detail)" method="post" role="form">
 
         <input type="hidden" asp-for="@Model.PageLayoutId" />
+        <input type="hidden" asp-for="@Model.NavBannerId" />
 
         <label asp-for="@Model.Image"></label>
         <input type="file" asp-for="@Model.Image" />

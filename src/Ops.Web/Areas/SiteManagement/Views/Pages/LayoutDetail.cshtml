@@ -415,6 +415,7 @@
                                     <a asp-controller="@NavBannerController.Name"
                                        asp-action="@(nameof(NavBannerController.Detail))"
                                        asp-route-id="@item.NavBannerId.Value"
+                                       asp-route-pageLayoutId=@Model.PageLayoutId
                                        class="btn btn-outline-primary"
                                        title="Edit feature content">
                                         <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>

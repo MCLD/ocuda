@@ -10,6 +10,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.NavBannerViewMod
         public string Name { get; set; }
         public IFormFile Image { get; set; }
         public Language Language { get; set; }
+        public int NavBannerId { get; set; }
         public NavBannerImage NavBannerImage { get; set; }
         public NavBannerLink[] Links { get; set; }
         public int? PageLayoutId { get; set; }

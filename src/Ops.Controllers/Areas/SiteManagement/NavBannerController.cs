@@ -52,12 +52,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
                     ?? languages.Single(_ => _.IsDefault);
 
+                var navBannerImage = await _navBannerService.GetImageByNavBannerIdAsync(id);
+
                 var viewModel = new DetailViewModel
                 {
                     Name = navBanner.Name,
                     LanguageList = new SelectList(languages, nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
-                    PageLayoutId = await _navBannerService.GetPageLayoutIdForNavBannerAsync(navBanner.Id)
+                    PageLayoutId = await _navBannerService.GetPageLayoutIdForNavBannerAsync(navBanner.Id),
+                    NavBannerId = id,
+                    NavBannerImage = navBannerImage
                 };
 
 
@@ -87,6 +91,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 viewModel.Language = languages.Single(_ => _.IsDefault);
             }
 
+            var navBanner = await _navBannerService.GetByIdAsync(viewModel.NavBannerId);
+
             if (viewModel.Image != null)
             {
                 OptimizedImageResult optimized;
@@ -102,6 +108,18 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                     // copy file
                     await System.IO.File.WriteAllBytesAsync(filename, imageBytes);
+
+                    var navBannerImage = await _navBannerService.GetImageByNavBannerIdAsync(viewModel.NavBannerId)
+                        ?? new NavBannerImage();
+
+                    var navBannerImagePath = _navBannerService.GetImageAssetPath(viewModel.Image.FileName, viewModel.Language.Name);
+
+                    navBannerImage.NavBannerId = navBanner.Id;
+                    navBannerImage.ImageAltText = viewModel.NavBannerImage.ImageAltText;
+                    navBannerImage.LanguageId = viewModel.Language.Id;
+                    navBannerImage.ImagePath = navBannerImagePath;
+
+                    await _navBannerService.AddImageAsync(navBannerImage);
                 }
                 catch (ParameterException pex)
                 {

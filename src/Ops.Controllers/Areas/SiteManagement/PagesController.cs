@@ -454,6 +454,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                                 DecksController.Name,
                                 new { deckId = pageItem.Deck.Id });
                         }
+                        else if (pageItem.NavBanner != null)
+                        {
+                            url = Url.Action(nameof(NavBannerController.Detail),
+                                NavBannerController.Name,
+                                new { id = pageItem.NavBanner.Id });
+                        }
                         else if (pageItem.PageFeature != null)
                         {
                             var header = await _pageService.GetHeaderByIdAsync(layout.PageHeaderId);
