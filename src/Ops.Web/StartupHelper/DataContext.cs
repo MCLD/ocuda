@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -9,6 +10,15 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Web.StartupHelper
 {
+    public static class DataContextExtensions
+    {
+        public static IApplicationBuilder InitialSetup(this IApplicationBuilder builder)
+        {
+            new DataContext(builder).InitialSetup();
+            return builder;
+        }
+    }
+
     public class DataContext
     {
         private readonly IApplicationBuilder _app;
@@ -37,7 +47,7 @@ namespace Ocuda.Ops.Web.StartupHelper
 
             // verify initial setup data is accurate
             var initialSetup = scope.ServiceProvider.GetRequiredService<IInitialSetupService>();
-            Task.Run(() => initialSetup.VerifyInitialSetupAsync()).Wait();
+            Task.Run(initialSetup.VerifyInitialSetupAsync).Wait();
         }
 
         private void MigrateContext(IMigratableContext context, string contextName)
@@ -46,7 +56,7 @@ namespace Ocuda.Ops.Web.StartupHelper
             try
             {
                 var pending = context.GetPendingMigrationList();
-                hasMigrations = pending != null && pending.Any();
+                hasMigrations = pending?.Any() == true;
                 if (hasMigrations)
                 {
                     _logger.LogWarning("Applying {MigrationsCount} db migrations for {ContextName}, last is: {LastMigration}",
@@ -67,7 +77,11 @@ namespace Ocuda.Ops.Web.StartupHelper
             {
                 if (hasMigrations)
                 {
+                    var migrationTimer = Stopwatch.StartNew();
                     context.Migrate();
+                    _logger.LogWarning("Migrations applied for {ContextName} successfully in {ElapsedMs} ms",
+                        contextName,
+                        migrationTimer.ElapsedMilliseconds);
                 }
             }
             catch (Exception ex)
@@ -78,15 +92,6 @@ namespace Ocuda.Ops.Web.StartupHelper
                     ex.Message);
                 throw;
             }
-        }
-    }
-
-    public static class DataContextExtensions
-    {
-        public static IApplicationBuilder InitialSetup(this IApplicationBuilder builder)
-        {
-            new DataContext(builder).InitialSetup();
-            return builder;
         }
     }
 }
