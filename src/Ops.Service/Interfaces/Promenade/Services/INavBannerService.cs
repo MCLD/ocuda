@@ -8,7 +8,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
     {
         Task AddImageAsync(NavBannerImage image);
 
-        Task AddLinksAsync(List<NavBannerLink> links);
+        Task AddUpdateLinksAsync(List<NavBannerLink> links);
+
         Task<NavBanner> CreateNoSaveAsync(NavBanner navBanner);
 
         Task EditAsync(NavBanner navBanner);

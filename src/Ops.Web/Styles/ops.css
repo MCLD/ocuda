@@ -77,6 +77,19 @@ a.rowlink {
     color: green;
 }
 
+/* Nav Banner Preview */
+.banner-link-grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+.banner-link-grid-container a {
+    text-decoration: none;
+    color: inherit;
+}
+/* -------- */
+
 .navcolumn {
     height: 100%;
     width: 0;

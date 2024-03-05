@@ -18,7 +18,7 @@
         else
         {
             @* <a asp-action="@nameof(NavBannerController.Index)"
-               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Cancel</a> *@
+        class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Cancel</a> *@
         }
     </div>
     <form class="d-flex flex-column gap-2" enctype="multipart/form-data" asp-action="@nameof(NavBannerController.Detail)" method="post" role="form">
@@ -26,12 +26,46 @@
         <input type="hidden" asp-for="@Model.PageLayoutId" />
         <input type="hidden" asp-for="@Model.NavBannerId" />
 
-        @if (Model.NavBannerId != null && Model.NavBannerImage != null)
-        {
-            <div class="col-md-7">
-                <img class="img-fluid" src="@Url.Action(nameof(NavBannerController.BannerImage), new { navBannerId = Model.NavBannerId, languageName = Model.Language.Name})" />
+        <div class="card">
+            <div class="card-header">Preview</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-4">
+                                    <div class="row g-0">
+                                        <div class="col-12 col-md-7">
+                                            <img id="imagePreview"
+                                                 class="img-fluid"
+                                                 src="@(Model.NavBannerImage == null
+                                                    ? ""
+                                                    : Url.Action(
+                                                        nameof(NavBannerController.BannerImage),
+                                                        new { navBannerId = Model.NavBannerId,
+                                                            languageName = Model.Language.Name}))" />
+                                        </div>
+                                        <div class="col-12 col-md-5 p-2 gap-2 fs-5 text-bold" style="background:lightgray; box-sizing: border-box">
+                                            <div class="banner-link-grid-container gap-2 h-100">
+                                                @foreach (var link in Model.Links)
+                                                {
+                                                    <a class="banner-link-href h-100" href="@link.Text.Link">
+                                                        <div class="d-flex align-items-center justify-content-center py-4 py-md-1 gap-2 h-100" style="background:white">
+                                                            <span class="@link.Icon mb-1 banner-link-icon"></span>
+                                                            <span class="text-bold banner-link-text">@link.Text.Text</span>
+                                                        </div>
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        }
+        </div>
 
         <label asp-for="@Model.Image"></label>
         <input type="file" asp-for="@Model.Image" />
@@ -43,18 +77,67 @@
         {
             <div>
                 <label asp-for="@Model.Links[i].Icon"></label>
-                <input asp-for="@Model.Links[i].Icon" type="text" />
+                <input class="banner-link-icon-input" asp-for="@Model.Links[i].Icon" type="text" />
 
                 <label asp-for="@Model.Links[i].Text.Text"></label>
-                <input asp-for="@Model.Links[i].Text.Text" type="text" />
+                <input class="banner-link-text-input" asp-for="@Model.Links[i].Text.Text" type="text" />
 
                 <label asp-for="@Model.Links[i].Text.Link"></label>
-                <input asp-for="@Model.Links[i].Text.Link" type="text" />
+                <input class="banner-link-href-input" asp-for="@Model.Links[i].Text.Link" type="text" />
             </div>
         }
         <button class="btn btn-success" style="max-width: 140px;" type="submit">Submit</button>
     </form>
 </div>
+
+<script>
+    const bannerImage = document.querySelector('#imagePreview');
+    const bannerImageInput = document.querySelector('#Image');
+
+    const bannerLinkIcons = document.querySelectorAll('.banner-link-icon');
+    const bannerLinkIconInputs = document.querySelectorAll('.banner-link-icon-input');
+
+    const bannerLinkTexts = document.querySelectorAll('.banner-link-text');
+    const bannerLinkTextInputs = document.querySelectorAll('.banner-link-text-input');
+
+    const bannerLinkHrefs = document.querySelectorAll('.banner-link-href');
+    const bannerLinkHrefInputs = document.querySelectorAll('.banner-link-href-input');
+
+    bannerImageInput.addEventListener('change', updateBannerImage);
+
+    bannerLinkIconInputs.forEach(input => input.addEventListener('change', updateLinkIcons));
+    bannerLinkTextInputs.forEach(input => input.addEventListener('change', updateLinkTexts));
+    bannerLinkHrefInputs.forEach(input => input.addEventListener('change', updateLinkHrefs));
+
+    function updateBannerImage() {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            bannerImage.src = e.target.result;
+        };
+
+        reader.readAsDataURL(bannerImageInput.files[0]);
+    }
+
+    function updateLinkIcons() {
+        for (let i = 0; i < 4; ++i) {
+            bannerLinkIcons[i].className = `${bannerLinkIconInputs[i].value} mb-1 banner-link-icon`;
+        }
+    }
+
+    function updateLinkTexts() {
+        for (let i = 0; i < 4; ++i) {
+            bannerLinkTexts[i].innerText = bannerLinkTextInputs[i].value;
+        }
+    }
+
+    function updateLinkHrefs() {
+        for (let i = 0; i < 4; ++i) {
+            bannerLinkHrefs[i].href = bannerLinkHrefInputs[i].value;
+        }
+    }
+
+</script>
 
 @*
     -- Image uploader

@@ -56,14 +56,22 @@ namespace Ocuda.Ops.Service
             await _navBannerRepository.SaveAsync();
         }
 
-        public async Task AddLinksAsync(List<NavBannerLink> links)
+        public async Task AddUpdateLinksAsync(List<NavBannerLink> links)
         {
             ArgumentNullException.ThrowIfNull(links);
 
             foreach (var link in links)
             {
-                await _navBannerLinkRepository.AddAsync(link);
-                await _navBannerLinkTextRepository.AddAsync(link.Text);
+                if (link.Id == 0)
+                {
+                    await _navBannerLinkRepository.AddAsync(link);
+                    await _navBannerLinkTextRepository.AddAsync(link.Text);
+                }
+                else
+                {
+                    _navBannerLinkRepository.Update(link);
+                    _navBannerLinkTextRepository.Update(link.Text);
+                }
             }
 
             await _navBannerRepository.SaveAsync();
