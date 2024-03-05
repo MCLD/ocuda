@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ImageOptimApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.StaticFiles;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.NavBannerViewModels;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -39,6 +42,37 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [HttpGet]
+        [Route("{action}")]
+        public async Task<IActionResult> BannerImage(int navBannerId, string languageName)
+        {
+            var promBasePath = await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var navBannerImage = await _navBannerService.GetImageByNavBannerIdAsync(navBannerId);
+
+            var basePath = await _navBannerService.GetFullImageDirectoryPath(languageName);
+
+            var bannerImagePath = Path.Combine(
+                promBasePath,
+                basePath,
+                Path.GetFileName(navBannerImage.ImagePath));
+
+            if (!System.IO.File.Exists(bannerImagePath))
+            {
+                return StatusCode(404);
+            }
+            else
+            {
+                new FileExtensionContentTypeProvider()
+                    .TryGetContentType(bannerImagePath, out string fileType);
+
+                return PhysicalFile(bannerImagePath, fileType
+                    ?? System.Net.Mime.MediaTypeNames.Application.Octet);
+            }
+
+        }
+
+        [HttpGet]
         [Route("{action}/{id}")]
         public async Task<IActionResult> Detail(int id, string language)
         {
@@ -54,6 +88,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                 var navBannerImage = await _navBannerService.GetImageByNavBannerIdAsync(id);
 
+                var navBannerLinks = await _navBannerService.GetLinksByNavBannerIdAsync(navBanner.Id, selectedLanguage.Id);
+
                 var viewModel = new DetailViewModel
                 {
                     Name = navBanner.Name,
@@ -61,7 +97,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     nameof(Language.Description), selectedLanguage.Name),
                     PageLayoutId = await _navBannerService.GetPageLayoutIdForNavBannerAsync(navBanner.Id),
                     NavBannerId = id,
-                    NavBannerImage = navBannerImage
+                    NavBannerImage = navBannerImage,
+                    Links = navBannerLinks.ToArray(),
+                    Language = selectedLanguage
                 };
 
 
@@ -110,7 +148,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     await System.IO.File.WriteAllBytesAsync(filename, imageBytes);
 
                     var navBannerImage = await _navBannerService.GetImageByNavBannerIdAsync(viewModel.NavBannerId)
-                        ?? new NavBannerImage();
+                        ?? new NavBannerImage();                 
 
                     var navBannerImagePath = _navBannerService.GetImageAssetPath(viewModel.Image.FileName, viewModel.Language.Name);
 
@@ -126,9 +164,40 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     ModelState.AddModelError("ItemImage",
                         $"Error optimizing uploaded image: {pex.Message}");
                 }
-
-                // Pick up here... save image path/alt text to a database entry
                 
+            }
+
+            if (viewModel.Links != null)
+            {
+                /*
+                 * query DB for existing navBannerLinks associated with navBanner, then
+                 * update them if they exist instead of creating new links
+                 */
+
+                var navBannerLinks = await _navBannerService.GetLinksByNavBannerIdAsync(navBanner.Id, viewModel.Language.Id)
+                    ?? new List<NavBannerLink>();
+
+                if (navBannerLinks.Count == 0)
+                {
+                    for (int i = 0; i < viewModel.Links.Length; i++)
+                    {
+                        navBannerLinks.Add(new NavBannerLink
+                        {
+                            Text = new NavBannerLinkText
+                            {
+                                Text = viewModel.Links[i].Text.Text,
+                                LanguageId = viewModel.Language.Id,
+                                NavBannerLink = navBannerLinks[i],
+                                Link = viewModel.Links[i].Text.Link
+                            },
+                            Icon = viewModel.Links[i].Icon,
+                            NavBannerId = navBanner.Id,
+                            Order = i
+                        });
+                    }
+                }
+
+                await _navBannerService.AddLinksAsync(navBannerLinks);
             }
 
             return RedirectToAction(nameof(PagesController.LayoutDetail), PagesController.Name, new { id = viewModel.PageLayoutId });

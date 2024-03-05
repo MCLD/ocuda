@@ -1,4 +1,5 @@
 ﻿using Ocuda.Promenade.Models.Entities;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
@@ -6,6 +7,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
     public interface INavBannerService
     {
         Task AddImageAsync(NavBannerImage image);
+
+        Task AddLinksAsync(List<NavBannerLink> links);
         Task<NavBanner> CreateNoSaveAsync(NavBanner navBanner);
 
         Task EditAsync(NavBanner navBanner);
@@ -15,6 +18,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<NavBanner> GetByIdAsync(int navBannerId);
 
         Task<NavBannerImage> GetImageByNavBannerIdAsync(int navBannerId);
+
+        Task<List<NavBannerLink>> GetLinksByNavBannerIdAsync(int navBannerId, int languageId);
 
         Task<int?> GetPageLayoutIdForNavBannerAsync(int id);
 

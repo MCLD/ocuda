@@ -66,7 +66,7 @@ namespace Ocuda.Ops.Data
         public DbSet<NavBanner> NavBanners { get; set; }
         public DbSet<NavBannerImage> NavBannerImages { get; set; }
         public DbSet<NavBannerLink> NavBannerLinks { get; set; }
-        public DbSet<NavBannerLinkText> NavBannerTexts { get; set; }
+        public DbSet<NavBannerLinkText> NavBannerLinkTexts { get; set; }
         public DbSet<Navigation> Navigations { get; set; }
         public DbSet<NavigationText> NavigationTexts { get; set; }
         public DbSet<PageHeader> PageHeaders { get; set; }

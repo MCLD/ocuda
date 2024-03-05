@@ -488,6 +488,10 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.LocationHoursRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.INavBannerImageRepository,
                 Data.Promenade.NavBannerImageRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.INavBannerLinkRepository,
+                Data.Promenade.NavBannerLinkRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.INavBannerLinkTextRepository,
+                Data.Promenade.NavBannerLinkTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.INavBannerRepository,
                 Data.Promenade.NavBannerRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.INavigationRepository,

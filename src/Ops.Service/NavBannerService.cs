@@ -10,6 +10,7 @@ using Ocuda.Utility.Exceptions;
 using System.IO;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using System.Globalization;
+using System.Collections.Generic;
 
 namespace Ocuda.Ops.Service
 {
@@ -18,7 +19,8 @@ namespace Ocuda.Ops.Service
         private readonly INavBannerRepository _navBannerRepository;
         private readonly INavBannerImageRepository _navBannerImageRepository;
         private readonly ISiteSettingService _siteSettingService;
-
+        private readonly INavBannerLinkRepository _navBannerLinkRepository;
+        private readonly INavBannerLinkTextRepository _navBannerLinkTextRepository;
         private const string AssetBasePath = "assets";
         private const string ImagesFilePath = "images";
         private const string NavBannerFilePath = "navbanner";
@@ -27,23 +29,50 @@ namespace Ocuda.Ops.Service
             IHttpContextAccessor httpContextAccessor,
             INavBannerRepository navBannerRepository,
             INavBannerImageRepository navBannerImageRepository,
-            ISiteSettingService siteSettingService) : base(logger, httpContextAccessor)
+            INavBannerLinkRepository navBannerLinkRepository,
+            ISiteSettingService siteSettingService,
+            INavBannerLinkTextRepository navBannerLinkTextRepository) : base(logger, httpContextAccessor)
         {
+            ArgumentNullException.ThrowIfNull(navBannerRepository);
+            ArgumentNullException.ThrowIfNull(navBannerImageRepository);
+            ArgumentNullException.ThrowIfNull(navBannerLinkRepository);
+            ArgumentNullException.ThrowIfNull(siteSettingService);
+            ArgumentNullException.ThrowIfNull(navBannerLinkTextRepository);
+
             _navBannerRepository = navBannerRepository;
             _navBannerImageRepository = navBannerImageRepository;
+            _navBannerLinkRepository = navBannerLinkRepository;
             _siteSettingService = siteSettingService;
+            _navBannerLinkTextRepository = navBannerLinkTextRepository;
         }
 
         public async Task AddImageAsync(NavBannerImage image)
         {
+            ArgumentNullException.ThrowIfNull(image);
+
             image.ImageAltText = image.ImageAltText.Trim();
 
             await _navBannerImageRepository.AddAsync(image);
-            await _navBannerImageRepository.SaveAsync();
+            await _navBannerRepository.SaveAsync();
+        }
+
+        public async Task AddLinksAsync(List<NavBannerLink> links)
+        {
+            ArgumentNullException.ThrowIfNull(links);
+
+            foreach (var link in links)
+            {
+                await _navBannerLinkRepository.AddAsync(link);
+                await _navBannerLinkTextRepository.AddAsync(link.Text);
+            }
+
+            await _navBannerRepository.SaveAsync();
         }
 
         public async Task<NavBanner> CreateNoSaveAsync(NavBanner navBanner)
         {
+            ArgumentNullException.ThrowIfNull(navBanner);
+
             navBanner.Name = navBanner.Name?.Trim();
 
             await _navBannerRepository.AddAsync(navBanner);
@@ -52,10 +81,7 @@ namespace Ocuda.Ops.Service
 
         public async Task EditAsync(NavBanner navBanner)
         {
-            if (navBanner == null)
-            {
-                throw new ArgumentNullException(nameof(navBanner));
-            }
+            ArgumentNullException.ThrowIfNull(navBanner);
 
             var updateNavBanner = await _navBannerRepository.GetByIdAsync(navBanner.Id);
             if (navBanner != null)
@@ -64,6 +90,21 @@ namespace Ocuda.Ops.Service
             }
             _navBannerRepository.Update(updateNavBanner);
             await _navBannerRepository.SaveAsync();
+        }
+
+        public async Task<List<NavBannerLink>> GetLinksByNavBannerIdAsync(int navBannerId, int languageId)
+        {
+            var links = await _navBannerLinkRepository.GetLinksByNavBannerIdAsync(navBannerId);
+
+            if (links?.Count > 0)
+            {
+                foreach(var link in links)
+                {
+                    link.Text = await _navBannerLinkTextRepository.GetLinkTextAsync(link.Id, languageId);
+                }
+            }
+
+            return links;
         }
 
         public async Task DeleteAsync(int navBannerId)

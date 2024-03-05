@@ -13,7 +13,6 @@ namespace Ocuda.Promenade.Models.Entities
         public NavBanner NavBanner { get; set; }
         public int NavBannerId { get; set; }
         public NavBannerLinkText Text { get; set; }
-        public int NavBannerLinkTextId { get; set; }
         public int Order {  get; set; }
     }
 }

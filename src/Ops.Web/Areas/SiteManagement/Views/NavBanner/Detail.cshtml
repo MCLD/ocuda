@@ -26,6 +26,13 @@
         <input type="hidden" asp-for="@Model.PageLayoutId" />
         <input type="hidden" asp-for="@Model.NavBannerId" />
 
+        @if (Model.NavBannerId != null && Model.NavBannerImage != null)
+        {
+            <div class="col-md-7">
+                <img class="img-fluid" src="@Url.Action(nameof(NavBannerController.BannerImage), new { navBannerId = Model.NavBannerId, languageName = Model.Language.Name})" />
+            </div>
+        }
+
         <label asp-for="@Model.Image"></label>
         <input type="file" asp-for="@Model.Image" />
 
