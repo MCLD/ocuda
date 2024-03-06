@@ -1,13 +1,13 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.NavBannerViewModels.DetailViewModel
 
-<div class="row mb-2 gap-3">
-    <div class="col-sm-6">
+<div class="row mb-2 g-3">
+    <div class="col-sm-8">
         <h1>
             Nav Banner
             <small class="text-muted">@Model.Name</small>
         </h1>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-4">
         @if (Model.PageLayoutId.HasValue)
         {
             <a asp-controller="@PagesController.Name"
@@ -26,7 +26,7 @@
         <input type="hidden" asp-for="@Model.PageLayoutId" />
         <input type="hidden" asp-for="@Model.NavBannerId" />
 
-        <div class="card">
+        <div id="bannerPreview" class="card @(Model.NavBannerImage?.ImagePath == null ? "d-none" : "")">
             <div class="card-header">Preview</div>
             <div class="card-body">
                 <div class="row">
@@ -75,73 +75,104 @@
 
         @for (int i = 0; i < 4; i++)
         {
-            <div>
-                <label asp-for="@Model.Links[i].Icon"></label>
-                <input class="banner-link-icon-input" asp-for="@Model.Links[i].Icon" type="text" />
+            <div class="row mb-2">
+                <div class="col-12">
+                    <div class="accordion" id="accordionTemplate@(i)">
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#accordionTemplateContent@(i)"
+                                        aria-expanded="false"
+                                        aria-controls="accordionTemplateContent@(i)">
+                                    Link @(i + 1)
+                                </button>
+                            </div>
+                            <div id="accordionTemplateContent@(i)" class="accordion-collapse collapse @(string.IsNullOrEmpty(Model.Links[i].Text.Text) ? " show" : "")" data-parent="#accordionTemplate@(i)">
+                                <div class="accordion-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <input class="banner-link-icon-input" asp-for="@Model.Links[i].Icon" type="text" formgroup />
+                                        </div>
+                                    </div>
 
-                <label asp-for="@Model.Links[i].Text.Text"></label>
-                <input class="banner-link-text-input" asp-for="@Model.Links[i].Text.Text" type="text" />
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <input class="banner-link-text-input" asp-for="@Model.Links[i].Text.Text" type="text" formgroup />
+                                        </div>
+                                    </div>
 
-                <label asp-for="@Model.Links[i].Text.Link"></label>
-                <input class="banner-link-href-input" asp-for="@Model.Links[i].Text.Link" type="text" />
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <input class="banner-link-href-input" asp-for="@Model.Links[i].Text.Link" type="text" formgroup />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         }
         <button class="btn btn-success" style="max-width: 140px;" type="submit">Submit</button>
     </form>
 </div>
 
-<script>
-    const bannerImage = document.querySelector('#imagePreview');
-    const bannerImageInput = document.querySelector('#Image');
+@section scripts
+    {
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
 
-    const bannerLinkIcons = document.querySelectorAll('.banner-link-icon');
-    const bannerLinkIconInputs = document.querySelectorAll('.banner-link-icon-input');
+    <script>
+        const bannerPreview = document.querySelector('#bannerPreview');
 
-    const bannerLinkTexts = document.querySelectorAll('.banner-link-text');
-    const bannerLinkTextInputs = document.querySelectorAll('.banner-link-text-input');
+        const bannerImage = document.querySelector('#imagePreview');
+        const bannerImageInput = document.querySelector('#Image');
 
-    const bannerLinkHrefs = document.querySelectorAll('.banner-link-href');
-    const bannerLinkHrefInputs = document.querySelectorAll('.banner-link-href-input');
+        const bannerLinkIcons = document.querySelectorAll('.banner-link-icon');
+        const bannerLinkIconInputs = document.querySelectorAll('.banner-link-icon-input');
 
-    bannerImageInput.addEventListener('change', updateBannerImage);
+        const bannerLinkTexts = document.querySelectorAll('.banner-link-text');
+        const bannerLinkTextInputs = document.querySelectorAll('.banner-link-text-input');
 
-    bannerLinkIconInputs.forEach(input => input.addEventListener('change', updateLinkIcons));
-    bannerLinkTextInputs.forEach(input => input.addEventListener('change', updateLinkTexts));
-    bannerLinkHrefInputs.forEach(input => input.addEventListener('change', updateLinkHrefs));
+        const bannerLinkHrefs = document.querySelectorAll('.banner-link-href');
+        const bannerLinkHrefInputs = document.querySelectorAll('.banner-link-href-input');
 
-    function updateBannerImage() {
-        const reader = new FileReader();
+        bannerImageInput.addEventListener('change', updateBannerImage);
 
-        reader.onload = function (e) {
-            bannerImage.src = e.target.result;
-        };
+        bannerLinkIconInputs.forEach(input => input.addEventListener('change', updateLinkIcons));
+        bannerLinkTextInputs.forEach(input => input.addEventListener('change', updateLinkTexts));
+        bannerLinkHrefInputs.forEach(input => input.addEventListener('change', updateLinkHrefs));
 
-        reader.readAsDataURL(bannerImageInput.files[0]);
-    }
+        function updateBannerImage() {
+            bannerPreview.classList.remove('d-none');
 
-    function updateLinkIcons() {
-        for (let i = 0; i < 4; ++i) {
-            bannerLinkIcons[i].className = `${bannerLinkIconInputs[i].value} mb-1 banner-link-icon`;
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                bannerImage.src = e.target.result;
+            };
+
+            reader.readAsDataURL(bannerImageInput.files[0]);
         }
-    }
 
-    function updateLinkTexts() {
-        for (let i = 0; i < 4; ++i) {
-            bannerLinkTexts[i].innerText = bannerLinkTextInputs[i].value;
+        function updateLinkIcons() {
+            for (let i = 0; i < 4; ++i) {
+                bannerLinkIcons[i].className = `${bannerLinkIconInputs[i].value} mb-1 banner-link-icon`;
+            }
         }
-    }
 
-    function updateLinkHrefs() {
-        for (let i = 0; i < 4; ++i) {
-            bannerLinkHrefs[i].href = bannerLinkHrefInputs[i].value;
+        function updateLinkTexts() {
+            for (let i = 0; i < 4; ++i) {
+                bannerLinkTexts[i].innerText = bannerLinkTextInputs[i].value;
+            }
         }
-    }
 
-</script>
+        function updateLinkHrefs() {
+            for (let i = 0; i < 4; ++i) {
+                bannerLinkHrefs[i].href = bannerLinkHrefInputs[i].value;
+            }
+        }
 
-@*
-    -- Image uploader
-    -- 4x Link text
-    -- 4x Link href
-    -- 4x Link icon
-*@
+    </script>
+}

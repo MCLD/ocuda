@@ -106,7 +106,7 @@ namespace Ocuda.Ops.Service
 
             if (links?.Count > 0)
             {
-                foreach(var link in links)
+                foreach (var link in links)
                 {
                     link.Text = await _navBannerLinkTextRepository.GetLinkTextAsync(link.Id, languageId);
                 }
@@ -162,7 +162,7 @@ namespace Ocuda.Ops.Service
         {
             return Path.Combine(
                 AssetBasePath,
-                ImagesFilePath, 
+                ImagesFilePath,
                 languageName,
                 fileName);
         }

@@ -88,7 +88,20 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                 var navBannerImage = await _navBannerService.GetImageByNavBannerIdAsync(id);
 
-                var navBannerLinks = await _navBannerService.GetLinksByNavBannerIdAsync(navBanner.Id, selectedLanguage.Id);
+                var navBannerLinks = (await _navBannerService
+                    .GetLinksByNavBannerIdAsync(navBanner.Id, selectedLanguage.Id))
+                    .ToArray();
+
+                if (navBannerLinks.Length == 0)
+                {
+                    navBannerLinks = new NavBannerLink[]
+                    {
+                        new() { Text = new NavBannerLinkText() },
+                        new() { Text = new NavBannerLinkText() },
+                        new() { Text = new NavBannerLinkText() },
+                        new() { Text = new NavBannerLinkText() }
+                    };
+                }
 
                 var viewModel = new DetailViewModel
                 {
@@ -98,7 +111,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     PageLayoutId = await _navBannerService.GetPageLayoutIdForNavBannerAsync(navBanner.Id),
                     NavBannerId = id,
                     NavBannerImage = navBannerImage,
-                    Links = navBannerLinks.ToArray(),
+                    Links = navBannerLinks,
                     Language = selectedLanguage
                 };
 
@@ -140,6 +153,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     optimized = await _imageService.OptimizeAsync(viewModel.Image);
                     imageBytes = optimized.File;
+
                     // get an approved filename with path
                     var filename = await _navBannerService.GetUploadImageFilePathAsync(viewModel.Language.Name,
                         viewModel.Image.FileName);
@@ -148,7 +162,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     await System.IO.File.WriteAllBytesAsync(filename, imageBytes);
 
                     var navBannerImage = await _navBannerService.GetImageByNavBannerIdAsync(viewModel.NavBannerId)
-                        ?? new NavBannerImage();                 
+                        ?? new NavBannerImage();
 
                     var navBannerImagePath = _navBannerService.GetImageAssetPath(viewModel.Image.FileName, viewModel.Language.Name);
 
@@ -164,16 +178,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     ModelState.AddModelError("ItemImage",
                         $"Error optimizing uploaded image: {pex.Message}");
                 }
-                
+
             }
 
             if (viewModel.Links != null)
             {
-                /*
-                 * query DB for existing navBannerLinks associated with navBanner, then
-                 * update them if they exist instead of creating new links
-                 */
-
                 var navBannerLinks = await _navBannerService.GetLinksByNavBannerIdAsync(navBanner.Id, viewModel.Language.Id)
                     ?? new List<NavBannerLink>();
 
@@ -183,21 +192,31 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     {
                         navBannerLinks.Add(new NavBannerLink
                         {
-                            Text = new NavBannerLinkText
-                            {
-                                Text = viewModel.Links[i].Text.Text,
-                                LanguageId = viewModel.Language.Id,
-                                NavBannerLink = navBannerLinks[i],
-                                Link = viewModel.Links[i].Text.Link
-                            },
                             Icon = viewModel.Links[i].Icon,
                             NavBannerId = navBanner.Id,
                             Order = i
                         });
+
+                        navBannerLinks[i].Text = new NavBannerLinkText
+                        {
+                            Text = viewModel.Links[i].Text.Text,
+                            LanguageId = viewModel.Language.Id,
+                            NavBannerLink = navBannerLinks[i],
+                            Link = viewModel.Links[i].Text.Link
+                        };
+                    }
+                }
+                else
+                {
+                    for (int i = 0; (i < viewModel.Links.Length); i++)
+                    {
+                        navBannerLinks[i].Icon = viewModel.Links[i].Icon ?? navBannerLinks[i].Icon;
+                        navBannerLinks[i].Text.Text = viewModel.Links[i].Text?.Text ?? navBannerLinks[i].Text.Text;
+                        navBannerLinks[i].Text.Link = viewModel.Links[i].Text?.Link ?? navBannerLinks[i].Text.Link;
                     }
                 }
 
-                await _navBannerService.AddLinksAsync(navBannerLinks);
+                await _navBannerService.AddUpdateLinksAsync(navBannerLinks);
             }
 
             return RedirectToAction(nameof(PagesController.LayoutDetail), PagesController.Name, new { id = viewModel.PageLayoutId });
