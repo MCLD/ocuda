@@ -136,6 +136,10 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.DayOfWeek, _.LocationId });
             modelBuilder.Entity<NavigationText>()
                 .HasKey(_ => new { _.NavigationId, _.LanguageId });
+            modelBuilder.Entity<NavBannerImage>()
+                .HasKey(_ => new { _.NavBannerId, _.LanguageId });
+            modelBuilder.Entity<NavBannerLinkText>()
+                .HasKey(_ => new { _.NavBannerLinkId, _.LanguageId });
             modelBuilder.Entity<Page>()
                 .HasKey(_ => new { _.LanguageId, _.PageHeaderId });
             modelBuilder.Entity<PageLayoutText>()

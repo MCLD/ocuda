@@ -9,8 +9,8 @@ using System;
 using Ocuda.Utility.Exceptions;
 using System.IO;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using System.Globalization;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Ocuda.Ops.Service
 {
@@ -53,28 +53,20 @@ namespace Ocuda.Ops.Service
             image.ImageAltText = image.ImageAltText.Trim();
 
             await _navBannerImageRepository.AddAsync(image);
-            await _navBannerRepository.SaveAsync();
+            await SaveAsync();
         }
 
-        public async Task AddUpdateLinksAsync(List<NavBannerLink> links)
+        public async Task AddLinksAndTextsAsync(List<NavBannerLink> links)
         {
             ArgumentNullException.ThrowIfNull(links);
 
-            foreach (var link in links)
-            {
-                if (link.Id == 0)
-                {
-                    await _navBannerLinkRepository.AddAsync(link);
-                    await _navBannerLinkTextRepository.AddAsync(link.Text);
-                }
-                else
-                {
-                    _navBannerLinkRepository.Update(link);
-                    _navBannerLinkTextRepository.Update(link.Text);
-                }
-            }
+            await _navBannerLinkRepository.AddRangeAsync(links);
 
-            await _navBannerRepository.SaveAsync();
+            var texts = links.Select(_ => _.Text).ToList();
+
+            await _navBannerLinkTextRepository.AddRangeAsync(texts);
+
+            await SaveAsync();
         }
 
         public async Task<NavBanner> CreateNoSaveAsync(NavBanner navBanner)
@@ -97,7 +89,7 @@ namespace Ocuda.Ops.Service
                 updateNavBanner.Name = navBanner.Name;
             }
             _navBannerRepository.Update(updateNavBanner);
-            await _navBannerRepository.SaveAsync();
+            await SaveAsync();
         }
 
         public async Task<List<NavBannerLink>> GetLinksByNavBannerIdAsync(int navBannerId, int languageId)
@@ -119,7 +111,7 @@ namespace Ocuda.Ops.Service
         {
             var navBanner = await _navBannerRepository.GetByIdAsync(navBannerId);
             _navBannerRepository.Remove(navBanner);
-            await _navBannerRepository.SaveAsync();
+            await SaveAsync();
         }
 
         public async Task<NavBanner> GetByIdAsync(int navBannerId)
@@ -128,9 +120,9 @@ namespace Ocuda.Ops.Service
                 ?? throw new OcudaException("NavBanner does not exist.");
         }
 
-        public async Task<NavBannerImage> GetImageByNavBannerIdAsync(int navBannerId)
+        public async Task<NavBannerImage> GetImageByNavBannerIdAsync(int navBannerId, int languageId)
         {
-            return await _navBannerImageRepository.GetByNavBannerIdAsync(navBannerId);
+            return await _navBannerImageRepository.GetByNavBannerIdAsync(navBannerId, languageId);
         }
 
         public async Task<int?> GetPageLayoutIdForNavBannerAsync(int id)
@@ -178,6 +170,21 @@ namespace Ocuda.Ops.Service
             }
 
             return fullFilePath;
+        }
+
+        public async Task AddLinkTextsNoSaveAsync(List<NavBannerLinkText> texts)
+        {
+            await _navBannerLinkTextRepository.AddRangeAsync(texts);
+        }
+
+        public void UpdateLinksNoSave(List<NavBannerLink> links)
+        {
+            _navBannerLinkRepository.UpdateRange(links);
+        }
+
+        public async Task SaveAsync()
+        {
+            await _navBannerRepository.SaveAsync();
         }
     }
 }

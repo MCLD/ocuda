@@ -1,19 +1,20 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    [PrimaryKey(nameof(NavBannerId), nameof(LanguageId))]
     public class NavBannerImage
     {
-        [Required]
-        public int NavBannerId { get; set; }
-        public NavBanner NavBanner { get; set; }
 
+        [Key]
         [Required]
         public int LanguageId { get; set; }
         public Language Language { get; set; }
+        
+        [Key]
+        [Required]
+        public int NavBannerId { get; set; }
+        public NavBanner NavBanner { get; set; }
 
         [MaxLength(255)]
         public string ImagePath { get; set; }

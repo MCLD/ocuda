@@ -1,5 +1,6 @@
 ﻿using Ocuda.Promenade.Models.Entities;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
@@ -8,7 +9,9 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
     {
         Task AddImageAsync(NavBannerImage image);
 
-        Task AddUpdateLinksAsync(List<NavBannerLink> links);
+        Task AddLinksAndTextsAsync(List<NavBannerLink> links);
+
+        Task AddLinkTextsNoSaveAsync(List<NavBannerLinkText> texts);
 
         Task<NavBanner> CreateNoSaveAsync(NavBanner navBanner);
 
@@ -18,7 +21,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task<NavBanner> GetByIdAsync(int navBannerId);
 
-        Task<NavBannerImage> GetImageByNavBannerIdAsync(int navBannerId);
+        Task<NavBannerImage> GetImageByNavBannerIdAsync(int navBannerId, int languageId);
 
         Task<List<NavBannerLink>> GetLinksByNavBannerIdAsync(int navBannerId, int languageId);
 
@@ -29,5 +32,9 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         string GetImageAssetPath(string fileName, string languageName);
 
         Task<string> GetUploadImageFilePathAsync(string languageName, string filename);
+
+        void UpdateLinksNoSave(List<NavBannerLink> links);
+
+        Task SaveAsync();
     }
 }

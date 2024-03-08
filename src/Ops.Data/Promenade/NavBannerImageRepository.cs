@@ -15,11 +15,11 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
-        public async Task<NavBannerImage> GetByNavBannerIdAsync(int navBannerId)
+        public async Task<NavBannerImage> GetByNavBannerIdAsync(int navBannerId, int languageId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.NavBannerId == navBannerId)
+                .Where(_ => _.NavBannerId == navBannerId && _.LanguageId == languageId)
                 .SingleOrDefaultAsync();
         }
     }

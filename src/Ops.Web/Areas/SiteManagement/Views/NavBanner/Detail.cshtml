@@ -21,11 +21,34 @@
         class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Cancel</a> *@
         }
     </div>
+
+
     <form class="d-flex flex-column gap-2" enctype="multipart/form-data" asp-action="@nameof(NavBannerController.Detail)" method="post" role="form">
 
-        <input type="hidden" asp-for="@Model.PageLayoutId" />
-        <input type="hidden" asp-for="@Model.NavBannerId" />
+        <input type="hidden" asp-for="PageLayoutId" />
+        <input type="hidden" asp-for="NavBannerId" />
+        <input type="hidden" asp-for="Language.Id" />
 
+        @if (Model.LanguageList?.Count() > 1)
+        {
+            <div class="mb-3 row">
+                <div class="col-md-9">
+                    <label asp-for="Language" class="col-form-label me-3"></label>
+                    @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
+                    {
+                        <a href="@Url.Action(nameof(NavBannerController.Detail), new { id = Model.NavBannerId, language = item.Value })"
+                           class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">@item.Text</a>
+                    }
+                </div>
+            </div>
+            <div class="row d-none oc-save-warning">
+                <div class="offset-md-3 col-md-9">
+                    <div class="alert alert-warning">
+                        <span class="fa-solid fa-circle-arrow-up"></span> Unsaved changes will be lost if you change languages.
+                    </div>
+                </div>
+            </div>
+        }
         <div id="bannerPreview" class="card @(Model.NavBannerImage?.ImagePath == null ? "d-none" : "")">
             <div class="card-header">Preview</div>
             <div class="card-body">
