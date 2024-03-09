@@ -355,6 +355,11 @@ footer .prom-logo {
     grid-template-rows: 1fr 1fr;
 }
 
+    .banner-link-grid-container a {
+        text-decoration: none;
+        color: inherit;
+    }
+
 .prom-leftnav-container {
     padding: 1rem 0.5rem;
 }

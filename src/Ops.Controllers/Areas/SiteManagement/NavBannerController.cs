@@ -161,12 +161,31 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var navBanner = await _navBannerService.GetByIdAsync(viewModel.NavBannerId);
 
 
-            // UPDATE IMAGE ALT TEXT EVEN IF NEW IMAGE NOT UPLOADED!!!
+            // CLEAN UP THIS LOGIC!!!
 
+            var navBannerImage = await _navBannerService.GetImageByNavBannerIdAsync(viewModel.NavBannerId, viewModel.Language.Id);
 
-
-            if (viewModel.Image != null)
+            if (navBannerImage != null) 
             {
+                if (viewModel.Image != null)
+                {
+                    var navBannerImagePath = _navBannerService.GetImageAssetPath(viewModel.Image.FileName, viewModel.Language.Name);
+                    navBannerImage.ImagePath = navBannerImagePath;
+                }
+
+                navBannerImage.ImageAltText = string.IsNullOrEmpty(viewModel.NavBannerImage?.ImageAltText)
+                    ? navBannerImage.ImageAltText
+                    : viewModel.NavBannerImage.ImageAltText;
+
+                await _navBannerService.UpdateImageAsync(navBannerImage);
+            }
+            else if (viewModel.Image != null)
+            {
+                if (navBannerImage == null)
+                {
+                    navBannerImage = new NavBannerImage();
+                }
+
                 OptimizedImageResult optimized;
                 byte[] imageBytes;
 
@@ -181,9 +200,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                     // copy file
                     await System.IO.File.WriteAllBytesAsync(filename, imageBytes);
-
-                    var navBannerImage = await _navBannerService.GetImageByNavBannerIdAsync(viewModel.NavBannerId, viewModel.Language.Id)
-                        ?? new NavBannerImage();
 
                     var navBannerImagePath = _navBannerService.GetImageAssetPath(viewModel.Image.FileName, viewModel.Language.Name);
 
@@ -214,8 +230,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         navBannerLinks.Add(new NavBannerLink
                         {
                             Icon = viewModel.Links[i].Icon,
+                            Link = viewModel.Links[i].Link,
                             NavBannerId = navBanner.Id,
-                            Order = i
+                            Order = i,
                         });
 
                         navBannerLinks[i].Text = new NavBannerLinkText
@@ -223,7 +240,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             Text = viewModel.Links[i].Text.Text,
                             LanguageId = viewModel.Language.Id,
                             NavBannerLink = navBannerLinks[i],
-                            Link = viewModel.Links[i].Text.Link
                         };
                     }
 
@@ -255,12 +271,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             navBannerLinks[i].Icon = string.IsNullOrEmpty(viewModel.Links[i].Icon)
                                 ? navBannerLinks[i].Icon
                                 : viewModel.Links[i].Icon;
+                            navBannerLinks[i].Link = string.IsNullOrEmpty(viewModel.Links[i].Link)
+                                ? navBannerLinks[i].Link
+                                : viewModel.Links[i].Link;
                             navBannerLinks[i].Text.Text = string.IsNullOrEmpty(viewModel.Links[i].Text?.Text)
                                 ? navBannerLinks[i].Text.Text
                                 : viewModel.Links[i].Text?.Text;
-                            navBannerLinks[i].Text.Link = string.IsNullOrEmpty(viewModel.Links[i].Text?.Link)
-                                ? navBannerLinks[i].Text.Link
-                                : viewModel.Links[i].Text?.Link;
                         }
                     }
                 }

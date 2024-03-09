@@ -43,6 +43,10 @@ namespace Ocuda.Promenade.Data
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
         public DbSet<LocationProductMap> LocationProductMaps { get; }
         public DbSet<Location> Locations { get; }
+        public DbSet<NavBanner> NavBanners { get; }
+        public DbSet<NavBannerImage> NavBannerImages { get; }
+        public DbSet<NavBannerLink> NavBannerLinks { get; }
+        public DbSet<NavBannerLinkText> NavBannerLinkTexts { get; }
         public DbSet<Navigation> Navigations { get; }
         public DbSet<NavigationText> NavigationTexts { get; }
         public DbSet<PageHeader> PageHeaders { get; set; }
@@ -104,6 +108,10 @@ namespace Ocuda.Promenade.Data
                 .HasKey(_ => new { _.DayOfWeek, _.LocationId });
             modelBuilder.Entity<NavigationText>()
                 .HasKey(_ => new { _.NavigationId, _.LanguageId });
+            modelBuilder.Entity<NavBannerImage>()
+                .HasKey(_ => new { _.NavBannerId, _.LanguageId });
+            modelBuilder.Entity<NavBannerLinkText>()
+                .HasKey(_ => new { _.NavBannerLinkId, _.LanguageId });
             modelBuilder.Entity<Page>()
                 .HasKey(_ => new { _.LanguageId, _.PageHeaderId });
             modelBuilder.Entity<PageLayoutText>()

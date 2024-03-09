@@ -14,7 +14,7 @@ namespace Ocuda.Promenade.Models.Entities
         public NavBannerImage NavBannerImage { get; set; }
 
         [NotMapped]
-        public ICollection<NavBannerLink> NavBannerLinks { get; }
+        public ICollection<NavBannerLink> NavBannerLinks { get; set; }
 
         [MaxLength(255)]
         public string Name { get; set; }

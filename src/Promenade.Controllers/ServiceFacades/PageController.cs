@@ -8,28 +8,35 @@ namespace Ocuda.Promenade.Controllers.ServiceFacades
         public PageController(CarouselService carouselService,
             DeckService deckService,
             ImageFeatureService imageFeatureService,
+            NavBannerService navBannerService,
             PageService pageService,
             RedirectService redirectService,
             SegmentService segmentService,
             SocialCardService socialCardService)
         {
-            CarouselService = carouselService
-                ?? throw new ArgumentNullException(nameof(carouselService));
-            DeckService = deckService ?? throw new ArgumentNullException(nameof(deckService));
-            ImageFeatureService = imageFeatureService
-                ?? throw new ArgumentNullException(nameof(imageFeatureService));
-            PageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            RedirectService = redirectService
-                ?? throw new ArgumentNullException(nameof(redirectService));
-            SegmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
-            SocialCardService = socialCardService
-                ?? throw new ArgumentNullException(nameof(socialCardService));
+            ArgumentNullException.ThrowIfNull(carouselService);
+            ArgumentNullException.ThrowIfNull(deckService);
+            ArgumentNullException.ThrowIfNull(imageFeatureService);
+            ArgumentNullException.ThrowIfNull(navBannerService);
+            ArgumentNullException.ThrowIfNull(pageService);
+            ArgumentNullException.ThrowIfNull(redirectService);
+            ArgumentNullException.ThrowIfNull(segmentService);
+            ArgumentNullException.ThrowIfNull(socialCardService);
+
+            CarouselService = carouselService;
+            DeckService = deckService;
+            ImageFeatureService = imageFeatureService;
+            NavBannerService = navBannerService;
+            PageService = pageService;
+            RedirectService = redirectService;
+            SegmentService = segmentService;
+            SocialCardService = socialCardService;
         }
 
         public CarouselService CarouselService { get; }
         public DeckService DeckService { get; }
         public ImageFeatureService ImageFeatureService { get; }
+        public NavBannerService NavBannerService { get; }
         public PageService PageService { get; }
         public RedirectService RedirectService { get; }
         public SegmentService SegmentService { get; }

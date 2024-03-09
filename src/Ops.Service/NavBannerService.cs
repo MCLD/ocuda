@@ -152,10 +152,11 @@ namespace Ocuda.Ops.Service
 
         public string GetImageAssetPath(string fileName, string languageName)
         {
-            return Path.Combine(
+            return Path.Combine(Path.DirectorySeparatorChar +
                 AssetBasePath,
                 ImagesFilePath,
                 languageName,
+                NavBannerFilePath,
                 fileName);
         }
 
@@ -175,6 +176,12 @@ namespace Ocuda.Ops.Service
         public async Task AddLinkTextsNoSaveAsync(List<NavBannerLinkText> texts)
         {
             await _navBannerLinkTextRepository.AddRangeAsync(texts);
+        }
+
+        public async Task UpdateImageAsync(NavBannerImage image)
+        {
+            _navBannerImageRepository.Update(image);
+            await SaveAsync();
         }
 
         public void UpdateLinksNoSave(List<NavBannerLink> links)

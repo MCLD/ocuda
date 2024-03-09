@@ -72,7 +72,7 @@
                                             <div class="banner-link-grid-container gap-2 h-100">
                                                 @foreach (var link in Model.Links)
                                                 {
-                                                    <a class="banner-link-href h-100" href="@link.Text.Link">
+                                                    <a class="banner-link-href h-100" href="@link.Link">
                                                         <div class="d-flex align-items-center justify-content-center py-4 py-md-1 gap-2 h-100" style="background:white">
                                                             <span class="@link.Icon mb-1 banner-link-icon"></span>
                                                             <span class="text-bold banner-link-text">@link.Text.Text</span>
@@ -128,7 +128,7 @@
 
                                     <div class="row">
                                         <div class="col-12">
-                                            <input class="banner-link-href-input" asp-for="@Model.Links[i].Text.Link" type="text" formgroup />
+                                            <input class="banner-link-href-input" asp-for="@Model.Links[i].Link" type="text" formgroup />
                                         </div>
                                     </div>
                                 </div>

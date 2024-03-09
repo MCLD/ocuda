@@ -33,6 +33,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task<string> GetUploadImageFilePathAsync(string languageName, string filename);
 
+        Task UpdateImageAsync(NavBannerImage image);
+
         void UpdateLinksNoSave(List<NavBannerLink> links);
 
         Task SaveAsync();

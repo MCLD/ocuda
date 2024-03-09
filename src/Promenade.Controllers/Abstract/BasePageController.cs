@@ -169,6 +169,11 @@ namespace Ocuda.Promenade.Controllers.Abstract
                         }
                     }
                 }
+                else if (item.NavBannerId.HasValue)
+                {
+                    item.NavBanner = await PageContext.NavBannerService
+                        .GetIncludingChildrenAsync(item.NavBannerId.Value);
+                }
                 else if (item.PageFeatureId.HasValue)
                 {
                     item.PageFeature = await PageContext.ImageFeatureService
