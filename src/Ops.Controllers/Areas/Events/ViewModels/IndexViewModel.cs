@@ -8,7 +8,7 @@ namespace Ocuda.Ops.Controllers.Areas.Events.ViewModels
     {
         public IndexViewModel()
         {
-            ScheduledEvents = [];
+            ScheduledEvents = new List<ScheduledEvent>();
             LocationNames = new Dictionary<int, string>();
         }
 

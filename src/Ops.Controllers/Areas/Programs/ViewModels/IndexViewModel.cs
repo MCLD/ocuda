@@ -8,7 +8,7 @@ namespace Ocuda.Ops.Controllers.Areas.Programs.ViewModels
     {
         public IndexViewModel()
         {
-            LibraryPrograms = [];
+            LibraryPrograms = new List<LibraryProgram>();
             LocationNames = new Dictionary<int, string>();
         }
 
