@@ -103,7 +103,7 @@
                     <div class="accordion" id="accordionTemplate@(i)">
                         <div class="accordion-item">
                             <div class="accordion-header">
-                                <button class="accordion-button collapsed"
+                                <button class="accordion-button @(string.IsNullOrEmpty(Model.Links[i].Text.Text) ? "" : "collapsed")"
                                         type="button"
                                         data-bs-toggle="collapse"
                                         data-bs-target="#accordionTemplateContent@(i)"
