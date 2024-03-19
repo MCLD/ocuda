@@ -3,6 +3,7 @@
     public class IndexViewModel
     {
         public bool HasEmediaPermissions { get; set; }
+        public bool HasImageOptimizePermissions { get; set; }
         public bool HasNavigationPermissions { get; set; }
         public bool HasPagePermissions { get; set; }
 
@@ -12,6 +13,7 @@
             {
                 return IsSiteManager
                     || HasEmediaPermissions
+                    || HasImageOptimizePermissions
                     || HasPagePermissions
                     || HasPodcastPermissions
                     || HasProductPermissions;
@@ -21,6 +23,5 @@
         public bool HasPodcastPermissions { get; set; }
         public bool HasProductPermissions { get; set; }
         public bool IsSiteManager { get; set; }
-        public bool CanOptimizeImages { get; set; }
     }
 }

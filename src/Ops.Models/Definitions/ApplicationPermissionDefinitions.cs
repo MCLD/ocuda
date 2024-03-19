@@ -7,77 +7,70 @@ namespace Ocuda.Ops.Models.Definitions
     {
         public static readonly ApplicationPermissionDefinition[] ApplicationPermissions =
             {
-            new ApplicationPermissionDefinition
-            {
+            new() {
                 Id = ApplicationPermission.CoverIssueManagement,
-                Name = "Cover Issue Management",
-                Info = "Users with this permission are able to mark cover issues as resolved."
+                Info = "Able to mark cover issues as resolved.",
+                Name = "Cover Issue Management"
             },
-            new ApplicationPermissionDefinition
-            {
+            new() {
                 Id = ApplicationPermission.DigitalDisplayContentManagement,
-                Name = "Digital Display Content Management",
-                Info = "Users with this permission can manage assets in digital display sets."
+                Info = "Manage assets in digital display sets.",
+                Name = "Digital Display Content Management"
             },
-            new ApplicationPermissionDefinition
-            {
+            new() {
                 Id = ApplicationPermission.EmediaManagement,
-                Name = "Emedia Management",
-                Info = "Users with this permission can manage the Promenade Emedia page."
+                Info = "Manage the Promenade Emedia page.",
+                Name = "Emedia Management"
             },
-            new ApplicationPermissionDefinition
-            {
+            new() {
+                Id = ApplicationPermission.ImageOptimizer,
+                Info = "Ability to directly access the image optimizer.",
+                Name = "Image Optimizer access"
+            },
+            new() {
                 Id = ApplicationPermission.IntranetFrontPageManagement,
-                Name = "Intranet Front Page Management",
-                Info = "Users with this permission can push section posts to the front page and pin them."
+                Info = "Push section posts to the front page and pin them.",
+                Name = "Intranet Front Page Management"
             },
-            new ApplicationPermissionDefinition
-            {
+            new() {
                 Id = ApplicationPermission.NavigationManagement,
-                Name = "Navigation Management",
-                Info = "Users with this permission can manage the Promenade navigations."
+                Info = "Manage the Promenade navigations.",
+                Name = "Navigation Management"
             },
-            new ApplicationPermissionDefinition
-            {
+            new() {
                 Id = ApplicationPermission.MultiUserAccount,
-                Name = "Multi-user Account",
-                Info = "Users with this permission are accessing via a multi-user domain account."
+                Info = "This permission indicates the user is accessing the site via a multi-user domain account.",
+                Name = "Multi-user Account"
             },
-            new ApplicationPermissionDefinition
-            {
+            new() {
                 Id = ApplicationPermission.PodcastShowNotesManagement,
-                Name = "Podcast Show Notes Management",
-                Info = "Users with this permission can add and edit podcast show notes."
+                Info = "Add and edit podcast show notes.",
+                Name = "Podcast Show Notes Management"
             },
-            new ApplicationPermissionDefinition
-            {
+            new() {
                 Id = ApplicationPermission.RosterManagement,
-                Name = "Roster upload and unit mapping management",
-                Info = "Users with this permission can upload rosters and manage mapping units to locations."
+                Info = "Upload rosters and manage mapping units to locations.",
+                Name = "Roster upload and unit mapping management"
             },
-            new ApplicationPermissionDefinition
-            {
+            new() {
                 Id = ApplicationPermission.UpdateProfilePictures,
-                Name = "Update Profile Pictures",
-                Info = "Users with this permission can update profile pictures for all users."
-            },            
-            new ApplicationPermissionDefinition
-            {
+                Info = "Update profile pictures for all users.",
+                Name = "Update Profile Pictures"
+            },
+            new() {
                 Id = ApplicationPermission.UserSync,
-                Name = "User sync with LDAP/AD",
-                Info = "Users with this permission can synchronize users and locations with LDAP/AD."
+                Info = "Able to synchronize users and locations with LDAP/AD.",
+                Name = "User sync with LDAP/AD"
             },
-            new ApplicationPermissionDefinition
-            {
+            new() {
                 Id = ApplicationPermission.ViewAllIncidentReports,
-                Name = "View All Incident Reports",
-                Info = "Users with this permission can view all incident reports, not just their own."
+                Info = "View all incident reports, not just their own.",
+                Name = "View All Incident Reports"
             },
-            new ApplicationPermissionDefinition
-            {
+            new() {
                 Id = ApplicationPermission.WebPageContentManagement,
-                Name = "Web Page Content Management",
-                Info = "Users with this permission can edit all pages."
+                Info = "Edit all pages.",
+                Name = "Web Page Content Management"
             }
         };
     }

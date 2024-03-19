@@ -17,7 +17,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]")]
     public class HomeController : BaseController<HomeController>
     {
-        private readonly bool _canOptimizeImages;
+        private readonly bool _isOptimizeConfigured;
         private readonly IPermissionGroupService _permissionGroupService;
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
@@ -30,7 +30,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             _permissionGroupService = permissionGroupService;
 
-            _canOptimizeImages = config[Configuration.OpsImageOptimizerUsername] != null;
+            _isOptimizeConfigured = config[Configuration.OpsImageOptimizerUsername] != null;
         }
 
         public static string Name
@@ -42,7 +42,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var viewModel = new IndexViewModel
             {
                 IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
-                CanOptimizeImages = _canOptimizeImages
             };
 
             var permissionIds = UserClaims(ClaimType.PermissionId);
@@ -63,6 +62,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .HasAPermissionAsync<PermissionGroupPodcastItem>(numericPermissionIds);
                 viewModel.HasProductPermissions = await _permissionGroupService
                     .HasAPermissionAsync<PermissionGroupProductManager>(numericPermissionIds);
+                viewModel.HasImageOptimizePermissions = _isOptimizeConfigured
+                    && await HasAppPermissionAsync(_permissionGroupService,
+                        ApplicationPermission.ImageOptimizer);
             }
 
             return View(viewModel);
