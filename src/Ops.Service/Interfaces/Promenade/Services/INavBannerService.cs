@@ -13,6 +13,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task AddLinkTextsNoSaveAsync(List<NavBannerLinkText> texts);
 
+        Task<NavBanner> CloneAsync(int navBannerId);
+
         Task<NavBanner> CreateNoSaveAsync(NavBanner navBanner);
 
         Task EditAsync(NavBanner navBanner);

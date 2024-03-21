@@ -10,6 +10,7 @@ using System.IO;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using System.Collections.Generic;
 using System.Linq;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
@@ -63,6 +64,52 @@ namespace Ocuda.Ops.Service
             var texts = links.Select(_ => _.Text).ToList();
 
             await _navBannerLinkTextRepository.AddRangeAsync(texts);
+        }
+
+        public async Task<NavBanner> CloneAsync(int navBannerId)
+        {
+            var navBanner = await _navBannerRepository.GetByIdAsync(navBannerId) 
+                ?? throw new OcudaException($"No nav banner found for id {navBannerId}");
+
+            navBanner.Id = 0;
+
+            await _navBannerRepository.AddAsync(navBanner);
+
+            var navBannerImages = await _navBannerImageRepository.GetAllByNavBannerIdAsync(navBannerId);
+
+            foreach (var image in navBannerImages) 
+            {
+                image.NavBannerId = 0;
+                image.NavBanner = navBanner;
+
+                await _navBannerImageRepository.AddAsync(image);
+            }
+
+            var navBannerLinks = await _navBannerLinkRepository.GetLinksByNavBannerIdAsync(navBannerId);
+
+            if (navBannerLinks.Count > 0)
+            {
+                foreach (var link in navBannerLinks)
+                {
+                    var linkTexts = await _navBannerLinkTextRepository.GetAllLanguageTextsAsync(link.Id);
+
+                    link.Id = 0;
+                    link.NavBanner = navBanner;
+                    link.NavBannerId = 0;
+                    
+                    foreach (var text in linkTexts)
+                    {
+                        text.NavBannerLink = link;
+                        text.NavBannerLinkId = 0;
+                    }
+
+                    await _navBannerLinkTextRepository.AddRangeAsync(linkTexts);
+                }
+
+                await _navBannerLinkRepository.AddRangeAsync(navBannerLinks);
+            }
+
+            return navBanner;
         }
 
         public async Task<NavBanner> CreateNoSaveAsync(NavBanner navBanner)

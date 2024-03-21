@@ -217,6 +217,21 @@ namespace Ocuda.Ops.Service
                         newLayout.Id,
                         newItem.Id);
                 }
+                else if (item.NavBannerId.HasValue)
+                {
+                    var newNavBanner = await _navBannerService.CloneAsync((int)item.NavBannerId);
+
+                    var newItem = await CreateItemAsync(new PageItem
+                    {
+                        Order = item.Order,
+                        PageLayoutId = newLayout.Id,
+                        NavBanner = newNavBanner
+                    });
+
+                    _logger.LogDebug("Layout {NewLayoutId}: cloned nav banner to new nav banner id {ItemId}",
+                        newLayout.Id,
+                        newItem.Id);
+                }
             }
 
             return newLayout;

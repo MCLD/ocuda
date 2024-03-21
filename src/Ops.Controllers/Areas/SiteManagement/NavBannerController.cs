@@ -66,7 +66,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .FirstOrDefault(_ => _.Name.Equals(languageName, StringComparison.OrdinalIgnoreCase))
                     ?? languages.Single(_ => _.IsDefault);
 
-            var navBannerImage = await _navBannerService.GetImageByNavBannerIdAsync(navBannerId, selectedLanguage.Id);
+            var navBannerImage = await _navBannerService
+                .GetImageByNavBannerIdAsync(navBannerId, selectedLanguage.Id);
 
             var basePath = await _navBannerService.GetFullImageDirectoryPath(languageName);
 
@@ -181,10 +182,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (navBanner == null)
             {
                 ShowAlertDanger($"No nav banner found with id {viewModel.NavBannerId}.");
-                return RedirectToAction(nameof(PagesController.LayoutDetail), PagesController.Name, new { id = viewModel.PageLayoutId });
+
+                return RedirectToAction(
+                    nameof(PagesController.LayoutDetail), 
+                    PagesController.Name, 
+                    new { id = viewModel.PageLayoutId });
             }
 
-            var navBannerImage = await _navBannerService.GetImageByNavBannerIdAsync(viewModel.NavBannerId, viewModel.Language.Id);
+            var navBannerImage = await _navBannerService
+                .GetImageByNavBannerIdAsync(viewModel.NavBannerId, viewModel.Language.Id);
+
             var deleteImageFilePath = "";
 
             if (viewModel.Image != null)
@@ -197,12 +204,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     if (viewModel.Image.FileName != oldFileName)
                     {
                         deleteImageFilePath = await _navBannerService.GetUploadImageFilePathAsync(
-                            viewModel.Language.Name, 
+                            viewModel.Language.Name,
                             oldFileName);
                     }
 
                     navBannerImage.ImagePath = _navBannerService.GetImageAssetPath(
-                        viewModel.Image.FileName, 
+                        viewModel.Image.FileName,
                         viewModel.Language.Name);
 
                     navBannerImage.ImageAltText = string.IsNullOrEmpty(viewModel.NavBannerImage?.ImageAltText)
@@ -217,7 +224,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     }
                     catch (ParameterException pex)
                     {
-                        ModelState.AddModelError(nameof(viewModel.Image), $"Error optimizing uploaded image. {pex.Message}");
+                        ModelState.AddModelError(
+                            nameof(viewModel.Image), 
+                            $"Error optimizing/saving uploaded image. {pex.Message}");
+
                         return View(viewModel);
                     }
 
@@ -227,8 +237,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     try
                     {
                         await OptimizeAndSaveImageFileAsync(viewModel.Image, viewModel.Language);
-                        
-                        viewModel.NavBannerImage.ImagePath = _navBannerService.GetImageAssetPath(viewModel.Image.FileName, viewModel.Language.Name);
+
+                        viewModel.NavBannerImage.ImagePath = _navBannerService.GetImageAssetPath(
+                            viewModel.Image.FileName,
+                            viewModel.Language.Name);
 
                         viewModel.NavBannerImage.NavBannerId = navBanner.Id;
                         viewModel.NavBannerImage.ImageAltText = viewModel.NavBannerImage.ImageAltText;
@@ -258,7 +270,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             if (viewModel.Links != null)
             {
-                var navBannerLinks = await _navBannerService.GetLinksByNavBannerIdAsync(navBanner.Id, viewModel.Language.Id)
+                var navBannerLinks = await _navBannerService.GetLinksByNavBannerIdAsync(
+                    navBanner.Id,
+                    viewModel.Language.Id)
                     ?? new List<NavBannerLink>();
 
                 if (navBannerLinks.Count == 0)
@@ -322,7 +336,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                     _navBannerService.UpdateLinksNoSave(navBannerLinks);
                 }
-                
+
             }
 
             await _navBannerService.SaveAsync();
@@ -332,7 +346,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 System.IO.File.Delete(deleteImageFilePath);
             }
 
-            return RedirectToAction(nameof(PagesController.LayoutDetail), PagesController.Name, new { id = viewModel.PageLayoutId });
+            return RedirectToAction(
+                nameof(PagesController.LayoutDetail), 
+                PagesController.Name, 
+                new { id = viewModel.PageLayoutId });
         }
 
         private async Task OptimizeAndSaveImageFileAsync(IFormFile image, Language language)
