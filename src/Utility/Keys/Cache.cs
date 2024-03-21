@@ -222,6 +222,26 @@
         public static readonly string PromLocationWeeklyHours = "loc-hours.{0}.{1}";
 
         /// <summary>
+        /// Cached nav banner, {0} is the nav banner id
+        /// </summary>
+        public static readonly string PromNavBanner = "navbanner.{0}";
+
+        /// <summary>
+        /// Cached nav banner image, {0} is the nav banner id, {1} is the language id
+        /// </summary>
+        public static readonly string PromNavBannerImage = "navbannerimage.{0}.{1}";
+
+        /// <summary>
+        /// Cached nav banner links, {0} is the nav banner id
+        /// </summary>
+        public static readonly string PromNavBannerLinks = "navbannerlinks.{0}";
+
+        /// <summary>
+        /// Cached nav banner link text, {0} is the nav banner link id, {1} is the language id
+        /// </summary>
+        public static readonly string PromNavBannerLinkText = "navbannerlinktext.{0}.{1}";
+
+        /// <summary>
         /// Cached navigation element, {0} is the id of the element, {1} is the language id
         /// </summary>
         public static readonly string PromNavLang = "nav.{0}.{1}";

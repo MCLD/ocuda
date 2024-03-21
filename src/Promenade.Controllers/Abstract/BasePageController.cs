@@ -172,7 +172,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 else if (item.NavBannerId.HasValue)
                 {
                     item.NavBanner = await PageContext.NavBannerService
-                        .GetIncludingChildrenAsync(item.NavBannerId.Value);
+                        .GetByIdAsync(item.NavBannerId.Value, forceReload);
                 }
                 else if (item.PageFeatureId.HasValue)
                 {
