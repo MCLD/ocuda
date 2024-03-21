@@ -13,7 +13,6 @@ using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Models.Keys;
-using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
@@ -201,6 +200,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteImageFeatureItem(DetailViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             var featureItem = await _imageFeatureService
                 .GetItemByIdAsync(model.ImageFeatureItem.Id);
 
@@ -384,6 +385,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState(Key = DetailModelStateKey)]
         public async Task<IActionResult> EditImageFeatureItemText(DetailViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             var featureItem = await _imageFeatureService
                 .GetItemByIdAsync(model.ImageFeatureItemText.ImageFeatureItemId);
 
@@ -417,7 +420,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         ModelState.AddModelError("ItemImage",
                             $"Error optimizing uploaded image: {pex.Message}");
                     }
-                    
+                    catch (OcudaConfigurationException)
+                    { }
+
+                    if (imageBytes == null)
+                    {
+                        await using var memoryStream = new MemoryStream();
+                        await model.ItemImage.CopyToAsync(memoryStream);
+                        imageBytes = memoryStream.ToArray();
+                    }
+
                     var template = await _imageFeatureService
                         .GetTemplateForImageFeatureAsync(featureItem.ImageFeatureId);
 

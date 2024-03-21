@@ -12,12 +12,22 @@ namespace Ops.Data.Test
             _fixture = fixture;
         }
 
+        /// <summary>
+        /// Verify context items in Ops and Prom contexts - if this test fails, listed
+        /// properties are present in Ocuda.Ops.Data.PromenadeContext and are missing
+        /// in Ocuda.Promenade.Data.PromenadeContext
+        /// </summary>
         [Fact]
-        public void OpsPromMissingPromProm()
+        public void InOpsDataMissingPromData()
             => Assert.Empty(_fixture.OpsPromDbSets.Except(_fixture.PromPromDbSets));
 
+        /// <summary>
+        /// Verify context items in Ops and Prom contexts - if this test fails, listed
+        /// properties are present in Ocuda.Promenade.Data.PromenadeContext and are
+        /// missing in Ocuda.Ops.Data.PromenadeContext
+        /// </summary>
         [Fact]
-        public void PromPromMissingOpsProm()
+        public void InPromDataMissingOpsData()
             => Assert.Empty(_fixture.PromPromDbSets.Except(_fixture.OpsPromDbSets));
     }
 }

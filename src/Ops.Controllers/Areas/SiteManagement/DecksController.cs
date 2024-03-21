@@ -133,6 +133,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     issues.Add($"Error optimizing uploaded image: {pex.Message}");
                 }
+                catch (OcudaConfigurationException)
+                { }
+
+                if (imageBytes == null)
+                {
+                    await using var memoryStream = new MemoryStream();
+                    await viewModel.CardImage.CopyToAsync(memoryStream);
+                    imageBytes = memoryStream.ToArray();
+                }
 
                 if (imageBytes != null)
                 {
