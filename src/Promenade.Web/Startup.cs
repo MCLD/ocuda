@@ -447,6 +447,10 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.NavBannerLinkRepository>();
             services.AddScoped<Service.Interfaces.Repositories.INavBannerLinkTextRepository,
                 Data.Promenade.NavBannerLinkTextRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ILocationInteriorImageRepository,
+                Data.Promenade.LocationInteriorImageRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IImageAltTextRepository,
+                Data.Promenade.ImageAltTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.INavigationRepository,
                 Data.Promenade.NavigationRepository>();
             services.AddScoped<Service.Interfaces.Repositories.INavigationTextRepository,

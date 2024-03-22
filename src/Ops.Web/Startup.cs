@@ -506,6 +506,10 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.LocationRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationFormRepository,
                 Data.Promenade.LocationFormRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationInteriorImageRepository,
+                Data.Promenade.LocationInteriorImageRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IImageAltTextRepository,
+                Data.Promenade.ImageAltTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
                 Data.Promenade.PageHeaderRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageItemRepository,

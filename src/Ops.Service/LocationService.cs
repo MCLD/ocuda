@@ -14,6 +14,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
@@ -391,7 +392,7 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public async Task UploadLocationMapAsync(byte[] imageBytes, string fileName)
+        public async Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName, string subDirectory = "")
         {
             if (imageBytes == null || fileName == null)
             {
@@ -404,7 +405,7 @@ namespace Ocuda.Ops.Service
             var filePath = Path.Combine(basePath,
                 ImageFilePath,
                 LocationFilePath,
-                MapFilePath);
+                subDirectory);
 
             try
             {
@@ -424,31 +425,43 @@ namespace Ocuda.Ops.Service
                 var assetPath = Path.Combine(assetBase,
                 ImageFilePath,
                 LocationFilePath,
-                MapFilePath,
+                subDirectory,
                 fileName);
 
-                var locationCode = fileName.Split('.')[0];
-
-                var location = await _locationRepository.GetLocationByCode(locationCode);
-
-                var oldFileName = Path.GetFileName(location.MapImagePath);
-
-                location.MapImagePath = assetPath;
-
-                _locationRepository.Update(location);
-                await _locationRepository.SaveAsync();
-
-                if (fileName != oldFileName)
-                {
-                    var oldFilePath = Path.Combine(filePath, oldFileName);
-                    File.Delete(oldFilePath);
-                }
+                return assetPath;
             }
             catch (OcudaException oex)
             {
-                _logger.LogError("Error uploading map image: {ErrorMessage}",
+                _logger.LogError("Error saving image to server: {ErrorMessage}",
                     oex.Message);
-                throw new OcudaException($"Error uploading map image: {oex.Message}");
+                throw new OcudaException($"Error saving image to server: {oex.Message}");
+            }
+        }
+
+        public async Task UpdateLocationMapPathAsync(string locationCode, string mapImagePath)
+        {
+            var location = await _locationRepository.GetLocationByCode(locationCode);
+
+            var fileName = Path.GetFileName(mapImagePath);
+            var oldFileName = Path.GetFileName(location.MapImagePath);
+
+            string basePath = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var filePath = Path.Combine(basePath,
+                ImageFilePath,
+                LocationFilePath,
+                MapFilePath);
+
+            location.MapImagePath = mapImagePath;
+
+            _locationRepository.Update(location);
+            await _locationRepository.SaveAsync();
+
+            if (fileName != oldFileName)
+            {
+                var oldFilePath = Path.Combine(filePath, oldFileName);
+                File.Delete(oldFilePath);
             }
         }
 

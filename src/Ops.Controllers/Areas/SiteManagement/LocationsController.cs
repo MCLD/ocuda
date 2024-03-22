@@ -33,7 +33,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly string _apiKey;
         private readonly string ImageFilePath = "images";
-        private readonly string LocationFilePath = "locations";
         private readonly string MapFilePath = "maps";
         private readonly IFeatureService _featureService;
         private readonly IGroupService _groupService;
@@ -936,7 +935,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var promBasePath = await _siteSettingService.GetSettingStringAsync(
                     Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
 
-            var filePath = HttpUtility.UrlDecode(promImagePath).Split("assets/").Last();
+            var filePath = ImageFilePath + HttpUtility.UrlDecode(promImagePath).Split(ImageFilePath).Last();
 
             var fullImagePath = Path.Combine(promBasePath, filePath);
 
@@ -959,14 +958,61 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             var location = await _locationService.GetLocationByStubAsync(locationStub);
 
+            var languages = await _languageService.GetActiveAsync();
+
+            var altTexts = new List<ImageAltText>();
+
+            for (int i = 0; i < languages.Count; i++)
+            {
+                altTexts.Add(new ImageAltText());
+            }
+
             var viewModel = new LocationImagesViewModel
             {
+                Languages = languages.ToList(),
                 Location = location,
                 LocationName = location.Name,
-                LocationStub = location.Stub
+                LocationStub = location.Stub,
+                NewInteriorImageAltTexts = altTexts
             };
 
             return View(viewModel);
+        }
+
+        [HttpPost("[action]/{locationStub}")]
+        public async Task<IActionResult> AddInteriorImage(LocationImagesViewModel viewModel, string locationStub)
+        {
+            if (viewModel == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (viewModel.Image == null
+                || viewModel.NewInteriorImageAltTexts == null)
+            {
+                ShowAlertDanger("Please provide an image file and alt text when adding a new image");
+                return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
+            }
+
+            var location = await _locationService.GetLocationByStubAsync(locationStub);
+            
+            using (var memoryStream = new MemoryStream())
+            {
+                await viewModel.Image.CopyToAsync(memoryStream);
+                var fileBytes = memoryStream.ToArray();
+            }
+
+
+            return View(nameof(Images), viewModel);
+        }
+
+        [HttpPost("[action]/{locationStub}")]
+        public async Task<IActionResult> UpdateInteriorImage(LocationImagesViewModel viewModel, string locationStub)
+        {
+            var location = await _locationService.GetLocationByStubAsync(locationStub);
+
+            // TODO: update interior image (one at a time, or all simultaneously?)
+            return View(nameof(Images), viewModel);
         }
 
         [HttpGet("")]
@@ -1127,7 +1173,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var (extension, imageBytes) = _imageService.ConvertFromBase64(imageBase64);
                 var fileName = locationCode + extension;
 
-                await _locationService.UploadLocationMapAsync(imageBytes, fileName);
+                var mapImagePath = await _locationService.SaveImageToServerAsync(imageBytes, fileName, MapFilePath);
+
+                await _locationService.UpdateLocationMapPathAsync(locationCode, mapImagePath);
+
                 return new JsonResult("Image updated successfully!");
             }
             catch (ParameterException pex)
