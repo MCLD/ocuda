@@ -930,32 +930,43 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Hours), new { locationStub = model.LocationStub });
         }
 
-        [HttpGet("[action]/{promMapPath}")]
-        public async Task<IActionResult> Image(string promMapPath)
+        [HttpGet("[action]/{promImagePath}")]
+        public async Task<IActionResult> Image(string promImagePath)
         {
             var promBasePath = await _siteSettingService.GetSettingStringAsync(
                     Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
 
-            var filePath = HttpUtility.UrlDecode(promMapPath);
+            var filePath = HttpUtility.UrlDecode(promImagePath).Split("assets/").Last();
 
-            var mapImagePath = Path.Combine(promBasePath,
-                    ImageFilePath,
-                    LocationFilePath,
-                    MapFilePath,
-                    Path.GetFileName(filePath));
+            var fullImagePath = Path.Combine(promBasePath, filePath);
 
-            if (!System.IO.File.Exists(mapImagePath))
+            if (!System.IO.File.Exists(fullImagePath))
             {
                 return StatusCode(404);
             }
             else
             {
                 new FileExtensionContentTypeProvider()
-                    .TryGetContentType(mapImagePath, out string fileType);
+                    .TryGetContentType(fullImagePath, out string fileType);
 
-                return PhysicalFile(mapImagePath, fileType
+                return PhysicalFile(fullImagePath, fileType
                     ?? System.Net.Mime.MediaTypeNames.Application.Octet);
             }
+        }
+
+        [HttpGet("[action]/{locationStub}")]
+        public async Task<IActionResult> Images(string locationStub)
+        {
+            var location = await _locationService.GetLocationByStubAsync(locationStub);
+
+            var viewModel = new LocationImagesViewModel
+            {
+                Location = location,
+                LocationName = location.Name,
+                LocationStub = location.Stub
+            };
+
+            return View(viewModel);
         }
 
         [HttpGet("")]
