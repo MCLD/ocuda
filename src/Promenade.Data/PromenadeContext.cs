@@ -31,6 +31,7 @@ namespace Ocuda.Promenade.Data
         public DbSet<ExternalResource> ExternalResources { get; set; }
         public DbSet<Feature> Features { get; }
         public DbSet<Group> Groups { get; }
+        public DbSet<ImageAltText> ImageAltTexts { get; }
         public DbSet<ImageFeatureItem> ImageFeatureItems { get; }
         public DbSet<ImageFeatureItemText> ImageFeatureItemTexts { get; }
         public DbSet<ImageFeature> ImageFeatures { get; }
@@ -41,6 +42,7 @@ namespace Ocuda.Promenade.Data
         public DbSet<LocationGroup> LocationGroups { get; }
         public DbSet<LocationHours> LocationHours { get; }
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
+        public DbSet<LocationInteriorImage> LocationInteriorsImages { get; }
         public DbSet<LocationProductMap> LocationProductMaps { get; }
         public DbSet<Location> Locations { get; }
         public DbSet<Navigation> Navigations { get; }
@@ -92,6 +94,8 @@ namespace Ocuda.Promenade.Data
                 .HasKey(_ => new { _.CategoryId, _.EmediaId });
             modelBuilder.Entity<EmediaText>()
                 .HasKey(_ => new { _.EmediaId, _.LanguageId });
+            modelBuilder.Entity<ImageAltText>()
+                .HasKey(_ => new { _.ImageId, _.LanguageId });
             modelBuilder.Entity<ImageFeatureItemText>()
                 .HasKey(_ => new { _.LanguageId, _.ImageFeatureItemId });
             modelBuilder.Entity<LocationFeature>()

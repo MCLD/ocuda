@@ -53,3 +53,46 @@
         </table>
     </div>
 </div>
+
+<div class="row mt-2">
+    <div>
+        <h3>Interior Photos</h3>
+        <table class="table table-sm table-bordered table-hover">
+            <tr>
+                <td colspan="3">
+                    <div class="mb-2">Add Interior Image:</div>
+                    <form asp-action="@nameof(LocationsController.AddInteriorImage)"
+                          asp-controller="@LocationsController.Name"
+                          asp-route-locationStub="@Model.LocationStub">
+
+                        <input asp-for="Languages" hidden />
+                        <input asp-for="Location" hidden />
+                        <input class="mb-2" asp-for="Image" type="file" />
+
+                        @for (int i = 0; i < Model.Languages.Count; i++)
+                        {
+                            <input asp-for="NewInteriorImageAltTexts[i].Language" hidden />
+                            <div class="mb-2">
+                                <label asp-for="NewInteriorImageAltTexts[i]"><strong>@Model.Languages[i].Description</strong> Alt Text</label>
+                                <input class="form-control" asp-for="NewInteriorImageAltTexts[i].AltText" type="text" />
+                            </div>
+                        }
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <!-- TODO: display interior image -->
+                    <img class="img-fluid w-100" style="max-width: 500px" src="@Url.Action(nameof(LocationsController.Image), LocationsController.Name, new { promImagePath = Model.Location.MapImagePath })">
+                </td>
+                <td>
+                    <form>
+                        <!-- TODO: update an image -->
+                    </form>
+                    <button>Update Image</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
