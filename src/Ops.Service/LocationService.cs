@@ -26,6 +26,8 @@ namespace Ocuda.Ops.Service
     {
         private const string ndash = "\u2013";
         private readonly IGoogleClient _googleClient;
+        private readonly IImageAltTextRepository _imageAltTextRepository;
+        private readonly ILocationInteriorImageRepository _locationInteriorImageRepository;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
         private readonly ILocationGroupRepository _locationGroupRepository;
         private readonly ILocationHoursOverrideRepository _locationHoursOverrideRepository;
@@ -41,6 +43,8 @@ namespace Ocuda.Ops.Service
         private readonly string MapFilePath = "maps";
 
         public LocationService(IGoogleClient googleClient,
+            IImageAltTextRepository imageAltTextRepository,
+            ILocationInteriorImageRepository locationInteriorImageRepository,
             ILocationFeatureRepository locationFeatureRepository,
             ILocationGroupRepository locationGroupRepository,
             IHttpContextAccessor httpContextAccessor,
@@ -54,23 +58,54 @@ namespace Ocuda.Ops.Service
             ISiteSettingService siteSettingService)
             : base(logger, httpContextAccessor)
         {
-            _googleClient = googleClient ?? throw new ArgumentNullException(nameof(googleClient));
-            _locationFeatureRepository = locationFeatureRepository
-                ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
-            _locationGroupRepository = locationGroupRepository
-                ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
-            _locationHoursOverrideRepository = locationHoursOverrideRepository
-                ?? throw new ArgumentNullException(nameof(locationHoursOverrideRepository));
-            _locationHoursRepository = locationHoursRepository
-                ?? throw new ArgumentNullException(nameof(locationHoursRepository));
-            _locationProductMapRepository = locationProductMapRepository
-                ?? throw new ArgumentNullException(nameof(locationProductMapRepository));
-            _locationRepository = locationRepository ?? throw new ArgumentNullException(nameof(locationRepository));
-            _rosterDivisionRepository = rosterDivisionRepository
-                ?? throw new ArgumentNullException(nameof(rosterDivisionRepository));
-            _rosterLocationRepository = rosterLocationRepository
-                ?? throw new ArgumentNullException(nameof(rosterLocationRepository));
+            ArgumentNullException.ThrowIfNull(googleClient);
+            ArgumentNullException.ThrowIfNull(imageAltTextRepository);
+            ArgumentNullException.ThrowIfNull(locationInteriorImageRepository);
+            ArgumentNullException.ThrowIfNull(locationFeatureRepository);
+            ArgumentNullException.ThrowIfNull(locationGroupRepository);
+            ArgumentNullException.ThrowIfNull(locationHoursOverrideRepository);
+            ArgumentNullException.ThrowIfNull(locationHoursRepository);
+            ArgumentNullException.ThrowIfNull(locationProductMapRepository);
+            ArgumentNullException.ThrowIfNull(locationRepository);
+            ArgumentNullException.ThrowIfNull(rosterDivisionRepository);
+            ArgumentNullException.ThrowIfNull(rosterLocationRepository);
+            ArgumentNullException.ThrowIfNull(siteSettingService);
+
+            _googleClient = googleClient;
+            _imageAltTextRepository = imageAltTextRepository;
+            _locationInteriorImageRepository = locationInteriorImageRepository;
+            _locationFeatureRepository = locationFeatureRepository;
+            _locationGroupRepository = locationGroupRepository;
+            _locationHoursOverrideRepository = locationHoursOverrideRepository;
+            _locationHoursRepository = locationHoursRepository;
+            _locationProductMapRepository = locationProductMapRepository;
+            _locationRepository = locationRepository;
+            _rosterDivisionRepository = rosterDivisionRepository;
+            _rosterLocationRepository = rosterLocationRepository;
             _siteSettingService = siteSettingService;
+        }
+
+        public async Task AddInteriorImageAsync(LocationInteriorImage locationInteriorImage)
+        {
+            await _locationInteriorImageRepository.AddAsync(locationInteriorImage);
+            await _locationInteriorImageRepository.SaveAsync();
+        }
+
+        public async Task AddImageAltTextAsync(ImageAltText imageAltText)
+        {
+            await _imageAltTextRepository.AddAsync(imageAltText);
+            await _locationInteriorImageRepository.SaveAsync();
+        }
+
+        public async Task AddMultipleAltTextsAsync(List<ImageAltText> imageAltTexts)
+        {
+            foreach (var altText in imageAltTexts)
+            {
+                altText.AltText = altText.AltText.Trim();
+            }
+
+            await _imageAltTextRepository.AddRangeAsync(imageAltTexts);
+            await _imageAltTextRepository.SaveAsync();
         }
 
         public async Task<Location> AddLocationAsync(Location location)
@@ -302,6 +337,21 @@ namespace Ocuda.Ops.Service
             }
 
             return formattedDayGroupings;
+        }
+
+        public async Task<List<LocationInteriorImage>> GetLocationInteriorImagesAsync(int locationId)
+        {
+            return await _locationInteriorImageRepository.GetLocationInteriorImagesAsync(locationId);
+        }
+
+        public async Task<ImageAltText> GetImageAltTextAsync(int imageId, int languageId)
+        {
+            return await _imageAltTextRepository.GetImageAltTextAsync(imageId, languageId);
+        }
+
+        public async Task<List<ImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId)
+        {
+            return await _imageAltTextRepository.GetAllLanguageImageAltTextsAsync(imageId);
         }
 
         public async Task<Location> GetLocationByCodeAsync(string locationCode)
