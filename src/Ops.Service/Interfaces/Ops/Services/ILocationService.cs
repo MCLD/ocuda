@@ -9,6 +9,11 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface ILocationService
     {
+        Task AddInteriorImageAsync(LocationInteriorImage locationInteriorImage);
+
+        Task AddImageAltTextAsync(ImageAltText imageAltText);
+
+        Task AddMultipleAltTextsAsync(List<ImageAltText> imageAltTexts);
         Task<Location> AddLocationAsync(Location location);
 
         Task AddLocationMappingAsync(int productId, string importLocation, int locationId);
@@ -33,7 +38,13 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId);
 
-        Task<Location> GetLocationByCodeAsync(string code);
+        Task<List<LocationInteriorImage>> GetLocationInteriorImagesAsync(int locationId);
+
+        Task<ImageAltText> GetImageAltTextAsync(int imageId, int languageId);
+
+        Task<List<ImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId);
+
+        Task<Location> GetLocationByCodeAsync(string locationCode);
 
         Task<Location> GetLocationByIdAsync(int locationId);
 
@@ -53,7 +64,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId);
 
-        Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName, string subDirectory);
+        Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName, string subDirectory = "");
 
         Task UpdateLocationMapPathAsync(string locationCode, string mapImagePath);
     }

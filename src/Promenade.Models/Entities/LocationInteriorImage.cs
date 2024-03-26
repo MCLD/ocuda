@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
@@ -13,5 +14,8 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public ImageAltText AltText { get; set; }
+
+        [NotMapped]
+        public List<ImageAltText> AllAltTexts { get; set; }
     }
 }

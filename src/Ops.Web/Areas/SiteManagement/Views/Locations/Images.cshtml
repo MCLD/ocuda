@@ -19,8 +19,8 @@
 @await Html.PartialAsync("_LocationPartial")
 
 <div class="row mt-2">
-    <div>
-        <h3>Location Photo</h3>
+    <h3>Exterior Image</h3>
+    <div class="col-md-10 offset-md-2">
         <table class="table table-sm table-bordered table-hover">
             <tr>
                 <td>
@@ -37,8 +37,8 @@
 </div>
 
 <div class="row mt-2">
-    <div>
-        <h3>Location map</h3>
+    <h3>Location Map</h3>
+    <div class="col-md-10 offset-md-2">
         <table class="table table-sm table-bordered table-hover">
             <tr>
                 <td>
@@ -55,15 +55,17 @@
 </div>
 
 <div class="row mt-2">
-    <div>
-        <h3>Interior Photos</h3>
+    <h3>Interior Images</h3>
+    <div class="col-md-10 offset-md-2">
+        <h5>Add Interior Image</h5>
         <table class="table table-sm table-bordered table-hover">
             <tr>
-                <td colspan="3">
-                    <div class="mb-2">Add Interior Image:</div>
+                <td>
+                    <img id="image-preview" class="img-fluid d-none" style="max-height: 300px" />
                     <form asp-action="@nameof(LocationsController.AddInteriorImage)"
                           asp-controller="@LocationsController.Name"
-                          asp-route-locationStub="@Model.LocationStub">
+                          asp-route-locationStub="@Model.LocationStub"
+                          enctype="multipart/form-data">
 
                         <input asp-for="Languages" hidden />
                         <input asp-for="Location" hidden />
@@ -71,7 +73,7 @@
 
                         @for (int i = 0; i < Model.Languages.Count; i++)
                         {
-                            <input asp-for="NewInteriorImageAltTexts[i].Language" hidden />
+                            <input asp-for="NewInteriorImageAltTexts[i].LanguageId" value="@Model.Languages[i].Id" hidden />
                             <div class="mb-2">
                                 <label asp-for="NewInteriorImageAltTexts[i]"><strong>@Model.Languages[i].Description</strong> Alt Text</label>
                                 <input class="form-control" asp-for="NewInteriorImageAltTexts[i].AltText" type="text" />
@@ -81,18 +83,71 @@
                     </form>
                 </td>
             </tr>
-            <tr>
-                <td>
-                    <!-- TODO: display interior image -->
-                    <img class="img-fluid w-100" style="max-width: 500px" src="@Url.Action(nameof(LocationsController.Image), LocationsController.Name, new { promImagePath = Model.Location.MapImagePath })">
-                </td>
-                <td>
-                    <form>
-                        <!-- TODO: update an image -->
-                    </form>
-                    <button>Update Image</button>
-                </td>
-            </tr>
+        </table>
+        <h5>Existing Interior Images</h5>
+        <table class="table table-sm table-bordered table-hover">
+            @foreach (var interiorImage in Model.InteriorImages)
+            {
+                int imgIndex = Model.InteriorImages.IndexOf(interiorImage);
+                <form asp-action="@nameof(LocationsController.UpdateInteriorImage)"
+                      asp-controller="@LocationsController.Name"
+                      asp-route-locationStub="@Model.LocationStub"
+                      asp-route-imageId="@interiorImage.Id"
+                      enctype="multipart/form-data">
+                <tr>
+                    <td>
+                            @interiorImage.ImagePath
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+
+                        <img class="img-fluid w-100" style="max-width: 500px" src="@Url.Action(nameof(LocationsController.Image), LocationsController.Name, new { promImagePath = interiorImage.ImagePath })">
+
+                        <input asp-for="Languages" hidden />
+                        <input asp-for="Location" hidden />
+                        <input class="mb-2" asp-for="Image" type="file" />
+
+                    </td>
+                </tr>
+                    @for (int i = 0; i < interiorImage.AllAltTexts.Count; i++)
+                    {
+                    <tr>
+                        <td>
+                            <input asp-for="InteriorImages[imgIndex].AllAltTexts[i].LanguageId" value="@Model.Languages[i].Id" hidden />
+                            <div class="mb-2">
+                                <label asp-for="InteriorImages[imgIndex].AllAltTexts[i].AltText"><strong>@Model.Languages[i].Description</strong> Alt Text</label>
+                                <input class="form-control" asp-for="InteriorImages[imgIndex].AllAltTexts[i].AltText" type="text" />
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                <tr>
+                    <td>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </td>
+                </tr>
+                </form>
+            }
         </table>
     </div>
 </div>
+
+<script>
+    const imageInput = document.querySelector('#Image');
+    const imagePreview = document.querySelector('#image-preview');
+
+    imageInput.addEventListener('change', updateImagePreview);
+
+    function updateImagePreview() {
+        imagePreview.classList.remove('d-none');
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            imagePreview.src = e.target.result;
+        };
+
+        reader.readAsDataURL(imageInput.files[0]);
+    }
+</script>

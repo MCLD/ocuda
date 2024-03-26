@@ -960,11 +960,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var languages = await _languageService.GetActiveAsync();
 
-            var altTexts = new List<ImageAltText>();
+            var interiorImages = await _locationService.GetLocationInteriorImagesAsync(location.Id);
+
+            foreach (var interiorImage in interiorImages)
+            {
+                interiorImage.AllAltTexts = await _locationService
+                    .GetAllLanguageImageAltTextsAsync(interiorImage.Id);
+            }    
+
+            var newAltTexts = new List<ImageAltText>();
 
             for (int i = 0; i < languages.Count; i++)
             {
-                altTexts.Add(new ImageAltText());
+                newAltTexts.Add(new ImageAltText());
             }
 
             var viewModel = new LocationImagesViewModel
@@ -973,7 +981,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 Location = location,
                 LocationName = location.Name,
                 LocationStub = location.Stub,
-                NewInteriorImageAltTexts = altTexts
+                InteriorImages = interiorImages,
+                NewInteriorImageAltTexts = newAltTexts
             };
 
             return View(viewModel);
@@ -995,24 +1004,73 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             var location = await _locationService.GetLocationByStubAsync(locationStub);
-            
-            using (var memoryStream = new MemoryStream())
+
+            using var memoryStream = new MemoryStream();
+            await viewModel.Image.CopyToAsync(memoryStream);
+            var fileBytes = memoryStream.ToArray();
+
+            var filePath = await _locationService.SaveImageToServerAsync(
+                fileBytes, 
+                viewModel.Image.FileName);
+
+            var interiorImage = new LocationInteriorImage
             {
-                await viewModel.Image.CopyToAsync(memoryStream);
-                var fileBytes = memoryStream.ToArray();
+                ImagePath = filePath,
+                LocationId = location.Id
+            };
+
+            await _locationService.AddInteriorImageAsync(interiorImage);
+
+            var altTexts = new List<ImageAltText>();
+
+            foreach (var altText in viewModel.NewInteriorImageAltTexts)
+            {
+                altText.ImageId = interiorImage.Id;
             }
 
+            await _locationService.AddMultipleAltTextsAsync(viewModel.NewInteriorImageAltTexts.ToList());
 
-            return View(nameof(Images), viewModel);
+            return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
         }
 
-        [HttpPost("[action]/{locationStub}")]
-        public async Task<IActionResult> UpdateInteriorImage(LocationImagesViewModel viewModel, string locationStub)
+        [HttpPost("[action]/{locationStub}/{imageId}")]
+        public async Task<IActionResult> UpdateInteriorImage(LocationImagesViewModel viewModel, string locationStub, int imageId)
         {
+            if (viewModel == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            // verify if new Image is uploaded or if alt text is changed. Below code is copied from AddInteriorImage
+
             var location = await _locationService.GetLocationByStubAsync(locationStub);
 
-            // TODO: update interior image (one at a time, or all simultaneously?)
-            return View(nameof(Images), viewModel);
+            using var memoryStream = new MemoryStream();
+            await viewModel.Image.CopyToAsync(memoryStream);
+            var fileBytes = memoryStream.ToArray();
+
+            var filePath = await _locationService.SaveImageToServerAsync(
+                fileBytes,
+                viewModel.Image.FileName);
+
+            var interiorImage = new LocationInteriorImage
+            {
+                ImagePath = filePath,
+                LocationId = location.Id
+            };
+
+            await _locationService.AddInteriorImageAsync(interiorImage);
+
+            var altTexts = new List<ImageAltText>();
+
+            foreach (var altText in viewModel.NewInteriorImageAltTexts)
+            {
+                altText.ImageId = interiorImage.Id;
+            }
+
+            await _locationService.AddMultipleAltTextsAsync(viewModel.NewInteriorImageAltTexts.ToList());
+
+            return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
         }
 
         [HttpGet("")]
