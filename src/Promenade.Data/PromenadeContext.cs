@@ -42,7 +42,7 @@ namespace Ocuda.Promenade.Data
         public DbSet<LocationGroup> LocationGroups { get; }
         public DbSet<LocationHours> LocationHours { get; }
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
-        public DbSet<LocationInteriorImage> LocationInteriorsImages { get; }
+        public DbSet<LocationInteriorImage> LocationInteriorImages { get; }
         public DbSet<LocationProductMap> LocationProductMaps { get; }
         public DbSet<Location> Locations { get; }
         public DbSet<Navigation> Navigations { get; }
