@@ -14,7 +14,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task AddImageAltTextAsync(ImageAltText imageAltText);
 
-        Task AddMultipleAltTextsAsync(List<ImageAltText> imageAltTexts);
+        Task AddAltTextRangeAsync(List<ImageAltText> imageAltTexts);
+
         Task<Location> AddLocationAsync(Location location);
 
         Task AddLocationMappingAsync(int productId, string importLocation, int locationId);
@@ -22,6 +23,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task DeleteAsync(int id);
 
         Task DeleteMappingAsync(int locationMapId);
+
+        Task DeleteInteriorImageAsync(int imageId);
 
         Task<Location> EditAlwaysOpenAsync(Location location);
 
@@ -72,5 +75,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName, string subDirectory = "");
 
         Task UpdateLocationMapPathAsync(string locationCode, string mapImagePath);
+
+        Task<string> AssetPathToFullPath(string imagePath);
     }
 }
