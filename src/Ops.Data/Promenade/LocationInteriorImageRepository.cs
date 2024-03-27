@@ -16,6 +16,14 @@ namespace Ocuda.Ops.Data.Promenade
             ILogger<LocationInteriorImageRepository> logger) : base(repositoryFacade, logger)
         {
         }
+
+        public async Task<LocationInteriorImage> GetInteriorImageByIdAsync(int imageId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id == imageId)
+                .SingleOrDefaultAsync();
+        }
         public async Task<List<LocationInteriorImage>> GetLocationInteriorImagesAsync(int locationId)
         {
             return await DbSet

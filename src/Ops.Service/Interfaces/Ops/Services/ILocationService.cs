@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
@@ -38,6 +39,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId);
 
+        Task<LocationInteriorImage> GetInteriorImageByIdAsync(int imageId);
+
         Task<List<LocationInteriorImage>> GetLocationInteriorImagesAsync(int locationId);
 
         Task<ImageAltText> GetImageAltTextAsync(int imageId, int languageId);
@@ -61,6 +64,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(LocationFilter filter);
 
         Task UndeleteAsync(int id);
+
+        Task UpdateInteriorImageAsync(LocationInteriorImage newInteriorImage, IFormFile imageFile);
 
         Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId);
 

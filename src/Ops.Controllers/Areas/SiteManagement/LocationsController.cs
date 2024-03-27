@@ -1033,42 +1033,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
         }
 
-        [HttpPost("[action]/{locationStub}/{imageId}")]
-        public async Task<IActionResult> UpdateInteriorImage(LocationImagesViewModel viewModel, string locationStub, int imageId)
+        [HttpPost("[action]/{imageId}")]
+        public async Task<IActionResult> UpdateInteriorImage(LocationImagesViewModel viewModel, int imageId)
         {
             if (viewModel == null)
             {
                 return RedirectToAction(nameof(Index));
             }
 
-            // verify if new Image is uploaded or if alt text is changed. Below code is copied from AddInteriorImage
+            var interiorImage = viewModel.InteriorImages.Where(_ => _.Id == imageId).FirstOrDefault();
 
-            var location = await _locationService.GetLocationByStubAsync(locationStub);
-
-            using var memoryStream = new MemoryStream();
-            await viewModel.Image.CopyToAsync(memoryStream);
-            var fileBytes = memoryStream.ToArray();
-
-            var filePath = await _locationService.SaveImageToServerAsync(
-                fileBytes,
-                viewModel.Image.FileName);
-
-            var interiorImage = new LocationInteriorImage
-            {
-                ImagePath = filePath,
-                LocationId = location.Id
-            };
-
-            await _locationService.AddInteriorImageAsync(interiorImage);
-
-            var altTexts = new List<ImageAltText>();
-
-            foreach (var altText in viewModel.NewInteriorImageAltTexts)
-            {
-                altText.ImageId = interiorImage.Id;
-            }
-
-            await _locationService.AddMultipleAltTextsAsync(viewModel.NewInteriorImageAltTexts.ToList());
+            await _locationService.UpdateInteriorImageAsync(interiorImage, viewModel.Image);
 
             return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
         }
