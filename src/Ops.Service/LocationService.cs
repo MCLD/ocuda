@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
@@ -12,6 +13,7 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
+using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Abstract;
@@ -24,6 +26,7 @@ namespace Ocuda.Ops.Service
     {
         private const string ndash = "\u2013";
         private readonly IGoogleClient _googleClient;
+        private readonly IImageService _imageService;
         private readonly IImageAltTextRepository _imageAltTextRepository;
         private readonly ILocationInteriorImageRepository _locationInteriorImageRepository;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
@@ -41,6 +44,7 @@ namespace Ocuda.Ops.Service
         private readonly string MapFilePath = "maps";
 
         public LocationService(IGoogleClient googleClient,
+            IImageService imageService,
             IImageAltTextRepository imageAltTextRepository,
             ILocationInteriorImageRepository locationInteriorImageRepository,
             ILocationFeatureRepository locationFeatureRepository,
@@ -57,6 +61,7 @@ namespace Ocuda.Ops.Service
             : base(logger, httpContextAccessor)
         {
             ArgumentNullException.ThrowIfNull(googleClient);
+            ArgumentNullException.ThrowIfNull(imageService);
             ArgumentNullException.ThrowIfNull(imageAltTextRepository);
             ArgumentNullException.ThrowIfNull(locationInteriorImageRepository);
             ArgumentNullException.ThrowIfNull(locationFeatureRepository);
@@ -70,6 +75,7 @@ namespace Ocuda.Ops.Service
             ArgumentNullException.ThrowIfNull(siteSettingService);
 
             _googleClient = googleClient;
+            _imageService = imageService;
             _imageAltTextRepository = imageAltTextRepository;
             _locationInteriorImageRepository = locationInteriorImageRepository;
             _locationFeatureRepository = locationFeatureRepository;
@@ -95,7 +101,7 @@ namespace Ocuda.Ops.Service
             await _locationInteriorImageRepository.SaveAsync();
         }
 
-        public async Task AddMultipleAltTextsAsync(List<ImageAltText> imageAltTexts)
+        public async Task AddAltTextRangeAsync(List<ImageAltText> imageAltTexts)
         {
             foreach (var altText in imageAltTexts)
             {
@@ -183,6 +189,20 @@ namespace Ocuda.Ops.Service
             location.IsDeleted = true;
             _locationRepository.Update(location);
             await _locationRepository.SaveAsync();
+        }
+        public async Task DeleteInteriorImageAsync(int imageId)
+        {
+            var image = await _locationInteriorImageRepository.GetInteriorImageByIdAsync(imageId);
+            var imageAltTexts = await _imageAltTextRepository.GetAllLanguageImageAltTextsAsync(imageId);
+
+            var imagePath = await AssetPathToFullPath(image.ImagePath);
+
+            _locationInteriorImageRepository.Remove(image);
+            _imageAltTextRepository.RemoveRange(imageAltTexts);
+
+            await _imageAltTextRepository.SaveAsync();
+
+            File.Delete(imagePath);
         }
 
         public async Task DeleteMappingAsync(int locationMapId)
@@ -505,16 +525,26 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException("Invalid map image or filename.");
             }
 
-            string basePath = await _siteSettingService.GetSettingStringAsync(
-                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+            string tempFilePath = Path.Combine(Path.GetTempPath(),
+                Path.GetFileNameWithoutExtension(Path.GetTempFileName())
+                + Path.GetExtension(fileName));
 
-            var filePath = Path.Combine(basePath,
-                ImageFilePath,
-                LocationFilePath,
-                subDirectory);
+            File.WriteAllBytes(tempFilePath, imageBytes);
 
             try
             {
+                var optimized = await _imageService.OptimizeAsync(tempFilePath);
+
+                imageBytes = optimized.File;
+
+                string basePath = await _siteSettingService.GetSettingStringAsync(
+                    Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+                var filePath = Path.Combine(basePath,
+                    ImageFilePath,
+                    LocationFilePath,
+                    subDirectory);
+
                 if (!Directory.Exists(filePath))
                 {
                     _logger.LogInformation("Creating image card directory: {Path}",
@@ -596,6 +626,16 @@ namespace Ocuda.Ops.Service
                     return string.Join(", ", days.Select(_ => dayFormatter.GetAbbreviatedDayName(_)));
                 }
             }
+        }
+
+        public async Task<string> AssetPathToFullPath(string imagePath)
+        {
+            var promBasePath = await _siteSettingService.GetSettingStringAsync(
+                    Ocuda.Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var filePath = ImageFilePath + HttpUtility.UrlDecode(imagePath).Split(ImageFilePath).Last();
+
+            return Path.Combine(promBasePath, filePath);
         }
 
         private async Task ValidateAsync(Location location)

@@ -932,12 +932,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpGet("[action]/{promImagePath}")]
         public async Task<IActionResult> Image(string promImagePath)
         {
-            var promBasePath = await _siteSettingService.GetSettingStringAsync(
-                    Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
 
-            var filePath = ImageFilePath + HttpUtility.UrlDecode(promImagePath).Split(ImageFilePath).Last();
-
-            var fullImagePath = Path.Combine(promBasePath, filePath);
+            var fullImagePath = await _locationService.AssetPathToFullPath(promImagePath);
 
             if (!System.IO.File.Exists(fullImagePath))
             {
@@ -1028,8 +1024,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 altText.ImageId = interiorImage.Id;
             }
 
-            await _locationService.AddMultipleAltTextsAsync(viewModel.NewInteriorImageAltTexts.ToList());
+            await _locationService.AddAltTextRangeAsync(viewModel.NewInteriorImageAltTexts.ToList());
 
+            ShowAlertSuccess($"Image id {interiorImage.Id} added successfully!");
             return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
         }
 
@@ -1045,7 +1042,18 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             await _locationService.UpdateInteriorImageAsync(interiorImage, viewModel.Image);
 
+            ShowAlertSuccess($"Image id {imageId} updated successfully!");
             return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
+        }
+
+        [HttpPost("[action]/{locationStub}/{imageId}")]
+        public async Task<IActionResult> DeleteInteriorImage(string locationStub, int imageId)
+        {
+
+            await _locationService.DeleteInteriorImageAsync(imageId);
+
+            ShowAlertSuccess("Image deleted successfully");
+            return RedirectToAction(nameof(Images), new { locationStub });
         }
 
         [HttpGet("")]

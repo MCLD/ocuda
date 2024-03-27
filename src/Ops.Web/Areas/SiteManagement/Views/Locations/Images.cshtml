@@ -20,117 +20,99 @@
 
 <div class="row mt-2">
     <h3>Exterior Image</h3>
-    <div class="col-md-10 offset-md-2">
-        <table class="table table-sm table-bordered table-hover">
-            <tr>
-                <td>
-                    <img class="img-fluid w-100" style="max-width: 500px" src="@Url.Action(nameof(LocationsController.Image), LocationsController.Name, new { promImagePath = Model.Location.ImagePath })">
-                </td>
-                <td class="align-middle text-end">
-                    <a class="btn btn-primary" href="@Url.Action(nameof(LocationsController.MapImageGenerator), LocationsController.Name, new { locationStub = Model.Location.Stub })">
-                        TODO: This
-                    </a>
-                </td>
-            </tr>
-        </table>
+    <div class="col-md-10 offset-md-2 d-flex flex-column gap-2">
+        <img class="img-fluid w-100" style="max-width: 500px" src="@Url.Action(nameof(LocationsController.Image), LocationsController.Name, new { promImagePath = Model.Location.ImagePath })">
+        <div>
+            <a class="btn btn-primary" href="@Url.Action(nameof(LocationsController.MapImageGenerator), LocationsController.Name, new { locationStub = Model.Location.Stub })">
+                TODO: This
+            </a>
+        </div>
     </div>
 </div>
 
 <div class="row mt-2">
     <h3>Location Map</h3>
-    <div class="col-md-10 offset-md-2">
-        <table class="table table-sm table-bordered table-hover">
-            <tr>
-                <td>
-                    <img class="img-fluid w-100" style="max-width: 500px" src="@Url.Action(nameof(LocationsController.Image), LocationsController.Name, new { promImagePath = Model.Location.MapImagePath })">
-                </td>
-                <td class="align-middle text-end">
-                    <a class="btn btn-primary" href="@Url.Action(nameof(LocationsController.MapImageGenerator), LocationsController.Name, new { locationStub = Model.Location.Stub })">
-                        New Map
-                    </a>
-                </td>
-            </tr>
-        </table>
+    <div class="col-md-10 offset-md-2 d-flex flex-column gap-2">
+        <div>
+            <img class="img-fluid w-100" style="max-width: 500px" src="@Url.Action(nameof(LocationsController.Image), LocationsController.Name, new { promImagePath = Model.Location.MapImagePath })">
+        </div>
+        <div>
+            <a class="btn btn-primary" href="@Url.Action(nameof(LocationsController.MapImageGenerator), LocationsController.Name, new { locationStub = Model.Location.Stub })">
+                New Map
+            </a>
+        </div>
     </div>
 </div>
 
 <div class="row mt-2">
     <h3>Interior Images</h3>
     <div class="col-md-10 offset-md-2">
-        <h5>Add Interior Image</h5>
-        <table class="table table-sm table-bordered table-hover">
-            <tr>
-                <td>
-                    <img id="image-preview" class="img-fluid d-none" style="max-height: 300px" />
-                    <form asp-action="@nameof(LocationsController.AddInteriorImage)"
-                          asp-controller="@LocationsController.Name"
-                          asp-route-locationStub="@Model.LocationStub"
-                          enctype="multipart/form-data">
+        <div class="pb-3 mb-3 border-3 border-bottom border-light-subtle">
+            <h5>Add Interior Image</h5>
+            <img id="image-preview" class="img-fluid d-none" style="max-height: 300px" />
+            <form asp-action="@nameof(LocationsController.AddInteriorImage)"
+                  asp-controller="@LocationsController.Name"
+                  asp-route-locationStub="@Model.LocationStub"
+                  enctype="multipart/form-data">
 
-                        <input asp-for="Languages" hidden />
-                        <input asp-for="Location" hidden />
-                        <input class="mb-2" asp-for="Image" type="file" />
+                <input asp-for="Languages" hidden />
+                <input asp-for="Location" hidden />
+                <input class="mb-2" asp-for="Image" type="file" />
 
-                        @for (int i = 0; i < Model.Languages.Count; i++)
-                        {
-                            <input asp-for="NewInteriorImageAltTexts[i].LanguageId" value="@Model.Languages[i].Id" hidden />
-                            <div class="mb-2">
-                                <label asp-for="NewInteriorImageAltTexts[i]"><strong>@Model.Languages[i].Description</strong> Alt Text</label>
-                                <input class="form-control" asp-for="NewInteriorImageAltTexts[i].AltText" type="text" />
-                            </div>
-                        }
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </td>
-            </tr>
-        </table>
+                @for (int i = 0; i < Model.Languages.Count; i++)
+                {
+                    <input asp-for="NewInteriorImageAltTexts[i].LanguageId" value="@Model.Languages[i].Id" hidden />
+                    <div class="mb-2">
+                        <label asp-for="NewInteriorImageAltTexts[i]"><strong>@Model.Languages[i].Description</strong> Alt Text</label>
+                        <input class="form-control" asp-for="NewInteriorImageAltTexts[i].AltText" type="text" />
+                    </div>
+                }
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
         <h5>Existing Interior Images</h5>
-        <table class="table table-sm table-bordered table-hover">
-            @foreach (var interiorImage in Model.InteriorImages)
-            {
-                int imgIndex = Model.InteriorImages.IndexOf(interiorImage);
+        @foreach (var interiorImage in Model.InteriorImages)
+        {
+            int imgIndex = Model.InteriorImages.IndexOf(interiorImage);
+            <div class="pb-3 mb-3 border-3 d-flex justify-content-between align-items-end border-bottom border-light-subtle">
                 <form asp-action="@nameof(LocationsController.UpdateInteriorImage)"
                       asp-controller="@LocationsController.Name"
                       asp-route-locationStub="@Model.LocationStub"
                       asp-route-imageId="@interiorImage.Id"
                       enctype="multipart/form-data">
-                <tr>
-                    <td>
-                            @interiorImage.ImagePath
-                    </td>
-                </tr>
-                <tr>
-                    <td>
+                    <div class="mb-2">
+                        @interiorImage.ImagePath
+                    </div>
 
-                        <img class="img-fluid w-100" style="max-width: 500px" src="@Url.Action(nameof(LocationsController.Image), LocationsController.Name, new { promImagePath = interiorImage.ImagePath })">
+                    <img class="img-fluid w-100" style="max-width: 500px" src="@Url.Action(nameof(LocationsController.Image), LocationsController.Name, new { promImagePath = interiorImage.ImagePath })">
 
-                        <input asp-for="Languages" hidden />
-                        <input asp-for="Location" hidden />
-                        <input asp-for="InteriorImages[imgIndex].Id" hidden />
-                        <input class="mb-2" asp-for="Image" type="file" />
+                    <input asp-for="Languages" hidden />
+                    <input asp-for="Location" hidden />
+                    <input asp-for="InteriorImages[imgIndex].Id" hidden />
+                    <input class="mb-2" asp-for="Image" type="file" />
 
-                    </td>
-                </tr>
                     @for (int i = 0; i < interiorImage.AllAltTexts.Count; i++)
                     {
-                    <tr>
-                        <td>
-                            <input asp-for="InteriorImages[imgIndex].AllAltTexts[i].LanguageId" value="@Model.Languages[i].Id" hidden />
-                            <div class="mb-2">
-                                <label asp-for="InteriorImages[imgIndex].AllAltTexts[i].AltText"><strong>@Model.Languages[i].Description</strong> Alt Text</label>
-                                <input class="form-control" asp-for="InteriorImages[imgIndex].AllAltTexts[i].AltText" type="text" />
-                            </div>
-                        </td>
-                    </tr>
+
+                        <input asp-for="InteriorImages[imgIndex].AllAltTexts[i].LanguageId" value="@Model.Languages[i].Id" hidden />
+                        <div class="mb-2">
+                            <label asp-for="InteriorImages[imgIndex].AllAltTexts[i].AltText"><strong>@Model.Languages[i].Description</strong> Alt Text</label>
+                            <input class="form-control" asp-for="InteriorImages[imgIndex].AllAltTexts[i].AltText" type="text" />
+                        </div>
+
                     }
-                <tr>
-                    <td>
-                        <button type="submit" class="btn btn-primary">Update</button>
-                    </td>
-                </tr>
+
+                    <button type="submit" class="btn btn-primary">Update</button>
                 </form>
-            }
-        </table>
+                <form asp-action="@nameof(LocationsController.DeleteInteriorImage)"
+                      asp-controller="@LocationsController.Name"
+                      asp-route-locationStub="@Model.LocationStub"
+                      asp-route-imageId="@interiorImage.Id">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        }
+
     </div>
 </div>
 
