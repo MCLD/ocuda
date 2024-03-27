@@ -68,6 +68,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task UndeleteAsync(int id);
 
+        Task UpdateExteriorImage(IFormFile imageFile, string locationStub);
+
         Task UpdateInteriorImageAsync(LocationInteriorImage newInteriorImage, IFormFile imageFile);
 
         Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId);

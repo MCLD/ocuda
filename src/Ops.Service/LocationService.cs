@@ -446,6 +446,42 @@ namespace Ocuda.Ops.Service
             await _locationRepository.SaveAsync();
         }
 
+        public async Task UpdateExteriorImage(IFormFile imageFile, string locationStub)
+        {
+            ArgumentNullException.ThrowIfNull(imageFile);
+
+            var location = await _locationRepository.GetLocationByStub(locationStub);
+
+            using var memoryStream = new MemoryStream();
+            await imageFile.CopyToAsync(memoryStream);
+            var fileBytes = memoryStream.ToArray();
+
+            var imageRelativePath = await SaveImageToServerAsync(
+                fileBytes,
+                imageFile.FileName);
+
+            var imageName = imageFile.FileName;
+            var oldImageName = Path.GetFileName(location.ImagePath);
+
+            string basePath = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var imageDirectoryPath = Path.Combine(basePath,
+                ImageFilePath,
+                LocationFilePath);
+
+            location.ImagePath = imageRelativePath;
+
+            _locationRepository.Update(location);
+            await _locationRepository.SaveAsync();
+
+            if (imageName != oldImageName)
+            {
+                var oldFilePath = Path.Combine(imageDirectoryPath, oldImageName);
+                File.Delete(oldFilePath);
+            }
+        }
+
         public async Task UpdateInteriorImageAsync(LocationInteriorImage newInteriorImage, IFormFile imageFile)
         {
             ArgumentNullException.ThrowIfNull(newInteriorImage);
