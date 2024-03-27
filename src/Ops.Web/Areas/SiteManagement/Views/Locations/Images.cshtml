@@ -23,9 +23,13 @@
     <div class="col-md-10 offset-md-2 d-flex flex-column gap-2">
         <img class="img-fluid w-100" style="max-width: 500px" src="@Url.Action(nameof(LocationsController.Image), LocationsController.Name, new { promImagePath = Model.Location.ImagePath })">
         <div>
-            <a class="btn btn-primary" href="@Url.Action(nameof(LocationsController.MapImageGenerator), LocationsController.Name, new { locationStub = Model.Location.Stub })">
-                TODO: This
-            </a>
+            <form asp-action="@nameof(LocationsController.UpdateExteriorImage)"
+                  asp-controller="@LocationsController.Name"
+                  asp-route-locationStub="@Model.LocationStub"
+                  enctype="multipart/form-data">
+                <input class="mb-2" asp-for="Image" type="file" />
+                <button type="submit" class="btn btn-primary">Update</button>
+            </form>
         </div>
     </div>
 </div>
@@ -57,7 +61,7 @@
 
                 <input asp-for="Languages" hidden />
                 <input asp-for="Location" hidden />
-                <input class="mb-2" asp-for="Image" type="file" />
+                <input class="image-input mb-2" asp-for="Image" type="file" />
 
                 @for (int i = 0; i < Model.Languages.Count; i++)
                 {
@@ -88,16 +92,25 @@
 
                     <input asp-for="Languages" hidden />
                     <input asp-for="Location" hidden />
-                    <input asp-for="InteriorImages[imgIndex].Id" hidden />
+                    <input asp-for="InteriorImages[0].Id" value="@Model.InteriorImages[imgIndex].Id" hidden />
+                    <input asp-for="InteriorImages[0].LocationId" hidden />
+                    <input asp-for="InteriorImages[0].ImagePath" value="@Model.InteriorImages[imgIndex].ImagePath" hidden />
+                    
                     <input class="mb-2" asp-for="Image" type="file" />
+
+                    <div>
+                        <strong><label asp-for="InteriorImages[0].SortOrder">Sort Order</label></strong>
+                    </div>
+
+                    <input class="form-control" asp-for="InteriorImages[0].SortOrder" value="@Model.InteriorImages[imgIndex].SortOrder" type="number" />
 
                     @for (int i = 0; i < interiorImage.AllAltTexts.Count; i++)
                     {
 
-                        <input asp-for="InteriorImages[imgIndex].AllAltTexts[i].LanguageId" value="@Model.Languages[i].Id" hidden />
+                        <input asp-for="InteriorImages[0].AllAltTexts[i].LanguageId" value="@Model.Languages[i].Id" hidden />
                         <div class="mb-2">
-                            <label asp-for="InteriorImages[imgIndex].AllAltTexts[i].AltText"><strong>@Model.Languages[i].Description</strong> Alt Text</label>
-                            <input class="form-control" asp-for="InteriorImages[imgIndex].AllAltTexts[i].AltText" type="text" />
+                            <label asp-for="InteriorImages[0].AllAltTexts[i].AltText"><strong>@Model.Languages[i].Description</strong> Alt Text</label>
+                            <input class="form-control" asp-for="InteriorImages[0].AllAltTexts[i].AltText" type="text" value="@Model.InteriorImages[imgIndex].AllAltTexts[i].AltText" />
                         </div>
 
                     }
@@ -117,7 +130,7 @@
 </div>
 
 <script>
-    const imageInput = document.querySelector('#Image');
+    const imageInput = document.querySelector('.image-input');
     const imagePreview = document.querySelector('#image-preview');
 
     imageInput.addEventListener('change', updateImagePreview);

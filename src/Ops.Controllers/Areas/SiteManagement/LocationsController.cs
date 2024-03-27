@@ -32,7 +32,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class LocationsController : BaseController<LocationsController>
     {
         private readonly string _apiKey;
-        private readonly string ImageFilePath = "images";
         private readonly string MapFilePath = "maps";
         private readonly IFeatureService _featureService;
         private readonly IGroupService _groupService;
@@ -1225,6 +1224,26 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return StatusCode(StatusCodes.Status500InternalServerError,
                         pex.Message);
             }
+        }
+
+        [HttpPost("[action]/{locationStub}")]
+        public async Task<IActionResult> UpdateExteriorImage(LocationImagesViewModel viewModel, string locationStub)
+        {
+            if (viewModel == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (viewModel.Image == null)
+            {
+                ShowAlertDanger("Please provide an exterior image");
+                return RedirectToAction(nameof(Images), new { locationStub });
+            }
+
+            await _locationService.UpdateExteriorImage(viewModel.Image, locationStub);
+
+            ShowAlertSuccess($"Location {locationStub} exterior image updated successfully!");
+            return RedirectToAction(nameof(Images), new { locationStub });
         }
 
         [HttpPost]
