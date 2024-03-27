@@ -7,6 +7,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 {
     public interface ILocationInteriorImageRepository : IGenericRepository<LocationInteriorImage>
     {
+        Task<LocationInteriorImage> GetInteriorImageByIdAsync(int imageId);
         Task<List<LocationInteriorImage>> GetLocationInteriorImagesAsync(int locationId);
     }
 }

@@ -14,11 +14,9 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
-using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
-using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Service
 {
@@ -339,6 +337,11 @@ namespace Ocuda.Ops.Service
             return formattedDayGroupings;
         }
 
+        public async Task<LocationInteriorImage> GetInteriorImageByIdAsync(int imageId)
+        {
+            return await _locationInteriorImageRepository.GetInteriorImageByIdAsync(imageId);
+        }
+
         public async Task<List<LocationInteriorImage>> GetLocationInteriorImagesAsync(int locationId)
         {
             return await _locationInteriorImageRepository.GetLocationInteriorImagesAsync(locationId);
@@ -421,6 +424,59 @@ namespace Ocuda.Ops.Service
             location.IsDeleted = false;
             _locationRepository.Update(location);
             await _locationRepository.SaveAsync();
+        }
+
+        public async Task UpdateInteriorImageAsync(LocationInteriorImage newInteriorImage, IFormFile imageFile)
+        {
+            ArgumentNullException.ThrowIfNull(newInteriorImage);
+
+            var interiorImage = await GetInteriorImageByIdAsync(newInteriorImage.Id);
+
+            if (imageFile != null)
+            {
+                using var memoryStream = new MemoryStream();
+                await imageFile.CopyToAsync(memoryStream);
+                var fileBytes = memoryStream.ToArray();
+
+                var imageRelativePath = await SaveImageToServerAsync(
+                    fileBytes,
+                    imageFile.FileName);
+
+                var imageName = imageFile.FileName;
+                var oldImageName = Path.GetFileName(interiorImage.ImagePath);
+
+                string basePath = await _siteSettingService.GetSettingStringAsync(
+                    Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+                var imageDirectoryPath = Path.Combine(basePath,
+                    ImageFilePath,
+                    LocationFilePath);
+
+                interiorImage.ImagePath = imageRelativePath;
+
+                _locationInteriorImageRepository.Update(interiorImage);
+                await _locationInteriorImageRepository.SaveAsync();
+
+                if (imageName != oldImageName)
+                {
+                    var oldFilePath = Path.Combine(imageDirectoryPath, oldImageName);
+                    File.Delete(oldFilePath);
+                }
+            }
+
+            var imageAltTexts = await GetAllLanguageImageAltTextsAsync(newInteriorImage.Id);
+
+            foreach (var altText in imageAltTexts)
+            {
+                altText.AltText = newInteriorImage.AllAltTexts
+                    .Where(_ => _.LanguageId == altText.LanguageId)
+                    .Single()
+                    .AltText;
+            }
+
+            _imageAltTextRepository.UpdateRange(imageAltTexts);
+            await _imageAltTextRepository.SaveAsync();
+
         }
 
         public async Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId)
