@@ -10,25 +10,29 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface ILocationService
     {
-        Task AddInteriorImageAsync(LocationInteriorImage locationInteriorImage);
+        Task AddAltTextRangeAsync(List<ImageAltText> imageAltTexts);
 
         Task AddImageAltTextAsync(ImageAltText imageAltText);
 
-        Task AddAltTextRangeAsync(List<ImageAltText> imageAltTexts);
+        Task AddInteriorImageAsync(LocationInteriorImage locationInteriorImage);
 
         Task<Location> AddLocationAsync(Location location);
 
         Task AddLocationMappingAsync(int productId, string importLocation, int locationId);
 
+        Task<string> AssetPathToFullPath(string imagePath);
+
         Task DeleteAsync(int id);
 
-        Task DeleteMappingAsync(int locationMapId);
-
         Task DeleteInteriorImageAsync(int imageId);
+
+        Task DeleteMappingAsync(int locationMapId);
 
         Task<Location> EditAlwaysOpenAsync(Location location);
 
         Task<Location> EditAsync(Location location);
+
+        Task<List<ImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId);
 
         Task<IEnumerable<LocationProductMap>> GetAllLocationProductMapsAsync(int productId);
 
@@ -42,19 +46,17 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId);
 
-        Task<LocationInteriorImage> GetInteriorImageByIdAsync(int imageId);
-
-        Task<List<LocationInteriorImage>> GetLocationInteriorImagesAsync(int locationId);
-
         Task<ImageAltText> GetImageAltTextAsync(int imageId, int languageId);
 
-        Task<List<ImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId);
+        Task<LocationInteriorImage> GetInteriorImageByIdAsync(int imageId);
 
         Task<Location> GetLocationByCodeAsync(string locationCode);
 
         Task<Location> GetLocationByIdAsync(int locationId);
 
         Task<Location> GetLocationByStubAsync(string locationStub);
+
+        Task<List<LocationInteriorImage>> GetLocationInteriorImagesAsync(int locationId);
 
         Task<string> GetLocationLinkAsync(string placeId);
 
@@ -66,18 +68,18 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(LocationFilter filter);
 
+        Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName, string subDirectory);
+
+        Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName);
+
         Task UndeleteAsync(int id);
 
         Task UpdateExteriorImage(IFormFile imageFile, string locationStub);
 
         Task UpdateInteriorImageAsync(LocationInteriorImage newInteriorImage, IFormFile imageFile);
 
-        Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId);
-
-        Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName, string subDirectory = "");
-
         Task UpdateLocationMapPathAsync(string locationCode, string mapImagePath);
 
-        Task<string> AssetPathToFullPath(string imagePath);
+        Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId);
     }
 }
