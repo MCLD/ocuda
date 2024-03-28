@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
@@ -12,12 +13,12 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
+using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
-using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Service
 {
@@ -25,6 +26,9 @@ namespace Ocuda.Ops.Service
     {
         private const string ndash = "\u2013";
         private readonly IGoogleClient _googleClient;
+        private readonly IImageService _imageService;
+        private readonly IImageAltTextRepository _imageAltTextRepository;
+        private readonly ILocationInteriorImageRepository _locationInteriorImageRepository;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
         private readonly ILocationGroupRepository _locationGroupRepository;
         private readonly ILocationHoursOverrideRepository _locationHoursOverrideRepository;
@@ -40,6 +44,9 @@ namespace Ocuda.Ops.Service
         private readonly string MapFilePath = "maps";
 
         public LocationService(IGoogleClient googleClient,
+            IImageService imageService,
+            IImageAltTextRepository imageAltTextRepository,
+            ILocationInteriorImageRepository locationInteriorImageRepository,
             ILocationFeatureRepository locationFeatureRepository,
             ILocationGroupRepository locationGroupRepository,
             IHttpContextAccessor httpContextAccessor,
@@ -53,23 +60,56 @@ namespace Ocuda.Ops.Service
             ISiteSettingService siteSettingService)
             : base(logger, httpContextAccessor)
         {
-            _googleClient = googleClient ?? throw new ArgumentNullException(nameof(googleClient));
-            _locationFeatureRepository = locationFeatureRepository
-                ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
-            _locationGroupRepository = locationGroupRepository
-                ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
-            _locationHoursOverrideRepository = locationHoursOverrideRepository
-                ?? throw new ArgumentNullException(nameof(locationHoursOverrideRepository));
-            _locationHoursRepository = locationHoursRepository
-                ?? throw new ArgumentNullException(nameof(locationHoursRepository));
-            _locationProductMapRepository = locationProductMapRepository
-                ?? throw new ArgumentNullException(nameof(locationProductMapRepository));
-            _locationRepository = locationRepository ?? throw new ArgumentNullException(nameof(locationRepository));
-            _rosterDivisionRepository = rosterDivisionRepository
-                ?? throw new ArgumentNullException(nameof(rosterDivisionRepository));
-            _rosterLocationRepository = rosterLocationRepository
-                ?? throw new ArgumentNullException(nameof(rosterLocationRepository));
+            ArgumentNullException.ThrowIfNull(googleClient);
+            ArgumentNullException.ThrowIfNull(imageService);
+            ArgumentNullException.ThrowIfNull(imageAltTextRepository);
+            ArgumentNullException.ThrowIfNull(locationInteriorImageRepository);
+            ArgumentNullException.ThrowIfNull(locationFeatureRepository);
+            ArgumentNullException.ThrowIfNull(locationGroupRepository);
+            ArgumentNullException.ThrowIfNull(locationHoursOverrideRepository);
+            ArgumentNullException.ThrowIfNull(locationHoursRepository);
+            ArgumentNullException.ThrowIfNull(locationProductMapRepository);
+            ArgumentNullException.ThrowIfNull(locationRepository);
+            ArgumentNullException.ThrowIfNull(rosterDivisionRepository);
+            ArgumentNullException.ThrowIfNull(rosterLocationRepository);
+            ArgumentNullException.ThrowIfNull(siteSettingService);
+
+            _googleClient = googleClient;
+            _imageService = imageService;
+            _imageAltTextRepository = imageAltTextRepository;
+            _locationInteriorImageRepository = locationInteriorImageRepository;
+            _locationFeatureRepository = locationFeatureRepository;
+            _locationGroupRepository = locationGroupRepository;
+            _locationHoursOverrideRepository = locationHoursOverrideRepository;
+            _locationHoursRepository = locationHoursRepository;
+            _locationProductMapRepository = locationProductMapRepository;
+            _locationRepository = locationRepository;
+            _rosterDivisionRepository = rosterDivisionRepository;
+            _rosterLocationRepository = rosterLocationRepository;
             _siteSettingService = siteSettingService;
+        }
+
+        public async Task AddInteriorImageAsync(LocationInteriorImage locationInteriorImage)
+        {
+            await _locationInteriorImageRepository.AddAsync(locationInteriorImage);
+            await _locationInteriorImageRepository.SaveAsync();
+        }
+
+        public async Task AddImageAltTextAsync(ImageAltText imageAltText)
+        {
+            await _imageAltTextRepository.AddAsync(imageAltText);
+            await _locationInteriorImageRepository.SaveAsync();
+        }
+
+        public async Task AddAltTextRangeAsync(List<ImageAltText> imageAltTexts)
+        {
+            foreach (var altText in imageAltTexts)
+            {
+                altText.AltText = altText.AltText.Trim();
+            }
+
+            await _imageAltTextRepository.AddRangeAsync(imageAltTexts);
+            await _imageAltTextRepository.SaveAsync();
         }
 
         public async Task<Location> AddLocationAsync(Location location)
@@ -149,6 +189,20 @@ namespace Ocuda.Ops.Service
             location.IsDeleted = true;
             _locationRepository.Update(location);
             await _locationRepository.SaveAsync();
+        }
+        public async Task DeleteInteriorImageAsync(int imageId)
+        {
+            var image = await _locationInteriorImageRepository.GetInteriorImageByIdAsync(imageId);
+            var imageAltTexts = await _imageAltTextRepository.GetAllLanguageImageAltTextsAsync(imageId);
+
+            var imagePath = await AssetPathToFullPath(image.ImagePath);
+
+            _locationInteriorImageRepository.Remove(image);
+            _imageAltTextRepository.RemoveRange(imageAltTexts);
+
+            await _imageAltTextRepository.SaveAsync();
+
+            File.Delete(imagePath);
         }
 
         public async Task DeleteMappingAsync(int locationMapId)
@@ -303,6 +357,26 @@ namespace Ocuda.Ops.Service
             return formattedDayGroupings;
         }
 
+        public async Task<LocationInteriorImage> GetInteriorImageByIdAsync(int imageId)
+        {
+            return await _locationInteriorImageRepository.GetInteriorImageByIdAsync(imageId);
+        }
+
+        public async Task<List<LocationInteriorImage>> GetLocationInteriorImagesAsync(int locationId)
+        {
+            return await _locationInteriorImageRepository.GetLocationInteriorImagesAsync(locationId);
+        }
+
+        public async Task<ImageAltText> GetImageAltTextAsync(int imageId, int languageId)
+        {
+            return await _imageAltTextRepository.GetImageAltTextAsync(imageId, languageId);
+        }
+
+        public async Task<List<ImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId)
+        {
+            return await _imageAltTextRepository.GetAllLanguageImageAltTextsAsync(imageId);
+        }
+
         public async Task<Location> GetLocationByCodeAsync(string locationCode)
         {
             var location = await _locationRepository.GetLocationByCode(locationCode);
@@ -372,6 +446,95 @@ namespace Ocuda.Ops.Service
             await _locationRepository.SaveAsync();
         }
 
+        public async Task UpdateExteriorImage(IFormFile imageFile, string locationStub)
+        {
+            ArgumentNullException.ThrowIfNull(imageFile);
+
+            var location = await _locationRepository.GetLocationByStub(locationStub);
+
+            using var memoryStream = new MemoryStream();
+            await imageFile.CopyToAsync(memoryStream);
+            var fileBytes = memoryStream.ToArray();
+
+            var imageRelativePath = await SaveImageToServerAsync(
+                fileBytes,
+                imageFile.FileName);
+
+            var imageName = imageFile.FileName;
+            var oldImageName = Path.GetFileName(location.ImagePath);
+
+            string basePath = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var imageDirectoryPath = Path.Combine(basePath,
+                ImageFilePath,
+                LocationFilePath);
+
+            location.ImagePath = imageRelativePath;
+
+            _locationRepository.Update(location);
+            await _locationRepository.SaveAsync();
+
+            if (imageName != oldImageName)
+            {
+                var oldFilePath = Path.Combine(imageDirectoryPath, oldImageName);
+                File.Delete(oldFilePath);
+            }
+        }
+
+        public async Task UpdateInteriorImageAsync(LocationInteriorImage newInteriorImage, IFormFile imageFile)
+        {
+            ArgumentNullException.ThrowIfNull(newInteriorImage);
+
+            var interiorImage = await GetInteriorImageByIdAsync(newInteriorImage.Id);
+
+            interiorImage.SortOrder = newInteriorImage.SortOrder;
+
+            if (imageFile != null)
+            {
+                using var memoryStream = new MemoryStream();
+                await imageFile.CopyToAsync(memoryStream);
+                var fileBytes = memoryStream.ToArray();
+
+                var imageRelativePath = await SaveImageToServerAsync(
+                    fileBytes,
+                    imageFile.FileName);
+
+                var imageName = imageFile.FileName;
+                var oldImageName = Path.GetFileName(interiorImage.ImagePath);
+
+                string basePath = await _siteSettingService.GetSettingStringAsync(
+                    Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+                var imageDirectoryPath = Path.Combine(basePath,
+                    ImageFilePath,
+                    LocationFilePath);
+
+                interiorImage.ImagePath = imageRelativePath;
+
+                if (imageName != oldImageName)
+                {
+                    var oldFilePath = Path.Combine(imageDirectoryPath, oldImageName);
+                    File.Delete(oldFilePath);
+                }
+            }
+
+            var imageAltTexts = await GetAllLanguageImageAltTextsAsync(newInteriorImage.Id);
+
+            foreach (var altText in imageAltTexts)
+            {
+                altText.AltText = newInteriorImage.AllAltTexts
+                    .Where(_ => _.LanguageId == altText.LanguageId)
+                    .Single()
+                    .AltText;
+            }
+
+            _locationInteriorImageRepository.Update(interiorImage);
+            _imageAltTextRepository.UpdateRange(imageAltTexts);
+            await _imageAltTextRepository.SaveAsync();
+
+        }
+
         public async Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId)
         {
             var existing = await _locationProductMapRepository.FindAsync(locationMapId)
@@ -391,23 +554,33 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public async Task UploadLocationMapAsync(byte[] imageBytes, string fileName)
+        public async Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName, string subDirectory = "")
         {
             if (imageBytes == null || fileName == null)
             {
                 throw new OcudaException("Invalid map image or filename.");
             }
 
-            string basePath = await _siteSettingService.GetSettingStringAsync(
-                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+            string tempFilePath = Path.Combine(Path.GetTempPath(),
+                Path.GetFileNameWithoutExtension(Path.GetTempFileName())
+                + Path.GetExtension(fileName));
 
-            var filePath = Path.Combine(basePath,
-                ImageFilePath,
-                LocationFilePath,
-                MapFilePath);
+            File.WriteAllBytes(tempFilePath, imageBytes);
 
             try
             {
+                var optimized = await _imageService.OptimizeAsync(tempFilePath);
+
+                imageBytes = optimized.File;
+
+                string basePath = await _siteSettingService.GetSettingStringAsync(
+                    Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+                var filePath = Path.Combine(basePath,
+                    ImageFilePath,
+                    LocationFilePath,
+                    subDirectory);
+
                 if (!Directory.Exists(filePath))
                 {
                     _logger.LogInformation("Creating image card directory: {Path}",
@@ -424,31 +597,43 @@ namespace Ocuda.Ops.Service
                 var assetPath = Path.Combine(assetBase,
                 ImageFilePath,
                 LocationFilePath,
-                MapFilePath,
+                subDirectory,
                 fileName);
 
-                var locationCode = fileName.Split('.')[0];
-
-                var location = await _locationRepository.GetLocationByCode(locationCode);
-
-                var oldFileName = Path.GetFileName(location.MapImagePath);
-
-                location.MapImagePath = assetPath;
-
-                _locationRepository.Update(location);
-                await _locationRepository.SaveAsync();
-
-                if (fileName != oldFileName)
-                {
-                    var oldFilePath = Path.Combine(filePath, oldFileName);
-                    File.Delete(oldFilePath);
-                }
+                return assetPath;
             }
             catch (OcudaException oex)
             {
-                _logger.LogError("Error uploading map image: {ErrorMessage}",
+                _logger.LogError("Error saving image to server: {ErrorMessage}",
                     oex.Message);
-                throw new OcudaException($"Error uploading map image: {oex.Message}");
+                throw new OcudaException($"Error saving image to server: {oex.Message}");
+            }
+        }
+
+        public async Task UpdateLocationMapPathAsync(string locationCode, string mapImagePath)
+        {
+            var location = await _locationRepository.GetLocationByCode(locationCode);
+
+            var fileName = Path.GetFileName(mapImagePath);
+            var oldFileName = Path.GetFileName(location.MapImagePath);
+
+            string basePath = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var filePath = Path.Combine(basePath,
+                ImageFilePath,
+                LocationFilePath,
+                MapFilePath);
+
+            location.MapImagePath = mapImagePath;
+
+            _locationRepository.Update(location);
+            await _locationRepository.SaveAsync();
+
+            if (fileName != oldFileName)
+            {
+                var oldFilePath = Path.Combine(filePath, oldFileName);
+                File.Delete(oldFilePath);
             }
         }
 
@@ -477,6 +662,16 @@ namespace Ocuda.Ops.Service
                     return string.Join(", ", days.Select(_ => dayFormatter.GetAbbreviatedDayName(_)));
                 }
             }
+        }
+
+        public async Task<string> AssetPathToFullPath(string imagePath)
+        {
+            var promBasePath = await _siteSettingService.GetSettingStringAsync(
+                    Ocuda.Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var filePath = ImageFilePath + HttpUtility.UrlDecode(imagePath).Split(ImageFilePath).Last();
+
+            return Path.Combine(promBasePath, filePath);
         }
 
         private async Task ValidateAsync(Location location)

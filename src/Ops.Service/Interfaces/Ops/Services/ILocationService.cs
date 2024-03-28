@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
@@ -9,6 +10,12 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface ILocationService
     {
+        Task AddInteriorImageAsync(LocationInteriorImage locationInteriorImage);
+
+        Task AddImageAltTextAsync(ImageAltText imageAltText);
+
+        Task AddAltTextRangeAsync(List<ImageAltText> imageAltTexts);
+
         Task<Location> AddLocationAsync(Location location);
 
         Task AddLocationMappingAsync(int productId, string importLocation, int locationId);
@@ -16,6 +23,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task DeleteAsync(int id);
 
         Task DeleteMappingAsync(int locationMapId);
+
+        Task DeleteInteriorImageAsync(int imageId);
 
         Task<Location> EditAlwaysOpenAsync(Location location);
 
@@ -33,7 +42,15 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId);
 
-        Task<Location> GetLocationByCodeAsync(string code);
+        Task<LocationInteriorImage> GetInteriorImageByIdAsync(int imageId);
+
+        Task<List<LocationInteriorImage>> GetLocationInteriorImagesAsync(int locationId);
+
+        Task<ImageAltText> GetImageAltTextAsync(int imageId, int languageId);
+
+        Task<List<ImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId);
+
+        Task<Location> GetLocationByCodeAsync(string locationCode);
 
         Task<Location> GetLocationByIdAsync(int locationId);
 
@@ -51,8 +68,16 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task UndeleteAsync(int id);
 
+        Task UpdateExteriorImage(IFormFile imageFile, string locationStub);
+
+        Task UpdateInteriorImageAsync(LocationInteriorImage newInteriorImage, IFormFile imageFile);
+
         Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId);
 
-        Task UploadLocationMapAsync(byte[] imageBytes, string fileName);
+        Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName, string subDirectory = "");
+
+        Task UpdateLocationMapPathAsync(string locationCode, string mapImagePath);
+
+        Task<string> AssetPathToFullPath(string imagePath);
     }
 }
