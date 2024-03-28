@@ -976,8 +976,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 Location = location,
                 LocationName = location.Name,
                 LocationStub = location.Stub,
-                InteriorImages = interiorImages,
-                NewInteriorImageAltTexts = newAltTexts
+                InteriorImages = interiorImages
             };
 
             return View(viewModel);
@@ -992,7 +991,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             if (viewModel.Image == null
-                || viewModel.NewInteriorImageAltTexts == null)
+                || viewModel.InteriorImages[0].AllAltTexts.All(_ => string.IsNullOrEmpty(_.AltText)))
             {
                 ShowAlertDanger("Please provide an image file and alt text when adding a new image");
                 return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
@@ -1011,19 +1010,20 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var interiorImage = new LocationInteriorImage
             {
                 ImagePath = filePath,
-                LocationId = location.Id
+                LocationId = location.Id,
+                SortOrder = viewModel.InteriorImages[0].SortOrder
             };
 
             await _locationService.AddInteriorImageAsync(interiorImage);
 
             var altTexts = new List<ImageAltText>();
 
-            foreach (var altText in viewModel.NewInteriorImageAltTexts)
+            foreach (var altText in viewModel.InteriorImages[0].AllAltTexts)
             {
                 altText.ImageId = interiorImage.Id;
             }
 
-            await _locationService.AddAltTextRangeAsync(viewModel.NewInteriorImageAltTexts.ToList());
+            await _locationService.AddAltTextRangeAsync(viewModel.InteriorImages[0].AllAltTexts.ToList());
 
             ShowAlertSuccess($"Image id {interiorImage.Id} added successfully!");
             return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });

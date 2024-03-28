@@ -10,6 +10,5 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location
         public IFormFile Image { get; set; }
         public List<Language> Languages { get; set; }
         public List<LocationInteriorImage> InteriorImages { get; set; }
-        public List<ImageAltText> NewInteriorImageAltTexts { get; set; }
     }
 }

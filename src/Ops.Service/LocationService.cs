@@ -488,6 +488,8 @@ namespace Ocuda.Ops.Service
 
             var interiorImage = await GetInteriorImageByIdAsync(newInteriorImage.Id);
 
+            interiorImage.SortOrder = newInteriorImage.SortOrder;
+
             if (imageFile != null)
             {
                 using var memoryStream = new MemoryStream();
@@ -510,9 +512,6 @@ namespace Ocuda.Ops.Service
 
                 interiorImage.ImagePath = imageRelativePath;
 
-                _locationInteriorImageRepository.Update(interiorImage);
-                await _locationInteriorImageRepository.SaveAsync();
-
                 if (imageName != oldImageName)
                 {
                     var oldFilePath = Path.Combine(imageDirectoryPath, oldImageName);
@@ -530,6 +529,7 @@ namespace Ocuda.Ops.Service
                     .AltText;
             }
 
+            _locationInteriorImageRepository.Update(interiorImage);
             _imageAltTextRepository.UpdateRange(imageAltTexts);
             await _imageAltTextRepository.SaveAsync();
 
