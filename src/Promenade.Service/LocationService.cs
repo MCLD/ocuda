@@ -33,10 +33,12 @@ namespace Ocuda.Promenade.Service
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IGoogleClient _googleClient;
         private readonly IGroupRepository _groupRepository;
+        private readonly IImageAltTextRepository _imageAltTextRepository;
         private readonly LanguageService _languageService;
         private readonly IStringLocalizer<i18n.Resources.Shared> _localizer;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
         private readonly ILocationGroupRepository _locationGroupRepository;
+        private readonly ILocationInteriorImageRepository _locationInteriorImageRepository;
         private readonly ILocationHoursOverrideRepository _locationHoursOverrideRepository;
         private readonly ILocationHoursRepository _locationHoursRepository;
         private readonly ILocationRepository _locationRepository;
@@ -46,10 +48,12 @@ namespace Ocuda.Promenade.Service
             IGoogleClient googleClient,
             IGroupRepository groupRepository,
             IHttpContextAccessor contextAccessor,
+            IImageAltTextRepository imageAltTextRepository,
             ILocationFeatureRepository locationFeatureRepository,
             ILocationGroupRepository locationGroupRepository,
             ILocationHoursOverrideRepository locationHoursOverrideRepository,
             ILocationHoursRepository locationHoursRepository,
+            ILocationInteriorImageRepository locationInteriorImageRepository,
             ILocationRepository locationRepository,
             ILogger<LocationService> logger,
             IOcudaCache cache,
@@ -62,12 +66,14 @@ namespace Ocuda.Promenade.Service
             ArgumentNullException.ThrowIfNull(contextAccessor);
             ArgumentNullException.ThrowIfNull(googleClient);
             ArgumentNullException.ThrowIfNull(groupRepository);
+            ArgumentNullException.ThrowIfNull(imageAltTextRepository);
             ArgumentNullException.ThrowIfNull(languageService);
             ArgumentNullException.ThrowIfNull(localizer);
             ArgumentNullException.ThrowIfNull(locationFeatureRepository);
             ArgumentNullException.ThrowIfNull(locationGroupRepository);
             ArgumentNullException.ThrowIfNull(locationHoursOverrideRepository);
             ArgumentNullException.ThrowIfNull(locationHoursRepository);
+            ArgumentNullException.ThrowIfNull(locationInteriorImageRepository);
             ArgumentNullException.ThrowIfNull(locationRepository);
             ArgumentNullException.ThrowIfNull(segmentService);
 
@@ -75,12 +81,14 @@ namespace Ocuda.Promenade.Service
             _contextAccessor = contextAccessor;
             _googleClient = googleClient;
             _groupRepository = groupRepository;
+            _imageAltTextRepository = imageAltTextRepository;
             _languageService = languageService;
             _localizer = localizer;
             _locationFeatureRepository = locationFeatureRepository;
             _locationGroupRepository = locationGroupRepository;
             _locationHoursOverrideRepository = locationHoursOverrideRepository;
             _locationHoursRepository = locationHoursRepository;
+            _locationInteriorImageRepository = locationInteriorImageRepository;
             _locationRepository = locationRepository;
             _segmentService = segmentService;
         }
@@ -401,6 +409,24 @@ namespace Ocuda.Promenade.Service
                 // cache location info but segment and status info caches individually below
                 await _cache.SaveToCacheAsync(cacheKey, location, CacheLocationHours);
             }
+
+            var interiorImages = await _locationInteriorImageRepository
+                .GetLocationInteriorImagesAsync(id);
+
+            // TODO: cache images
+
+            var currentDefaultLanguageId = await GetCurrentDefaultLanguageIdAsync(_contextAccessor,
+                _languageService);
+
+            foreach (var image in interiorImages)
+            {
+                image.AltText = await _imageAltTextRepository
+                    .GetByImageIdAsync(image.Id, currentDefaultLanguageId.First());
+
+                // TODO: cache alt text
+            }
+
+            location.InteriorImages = interiorImages;
 
             location.DescriptionSegment = await _segmentService
                 .GetSegmentTextBySegmentIdAsync(location.DescriptionSegmentId,
