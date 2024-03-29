@@ -976,7 +976,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 Location = location,
                 LocationName = location.Name,
                 LocationStub = location.Stub,
-                InteriorImages = interiorImages
+                InteriorImages = interiorImages,
+                NewInteriorImage = new LocationInteriorImage(),
+                UpdatedInteriorImage = new LocationInteriorImage()
             };
 
             return View(viewModel);
@@ -991,7 +993,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             if (viewModel.Image == null
-                || viewModel.InteriorImages[0].AllAltTexts.All(_ => string.IsNullOrEmpty(_.AltText)))
+                || viewModel.NewInteriorImage.AllAltTexts.All(_ => string.IsNullOrEmpty(_.AltText)))
             {
                 ShowAlertDanger("Please provide an image file and alt text when adding a new image");
                 return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
@@ -1011,19 +1013,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 ImagePath = filePath,
                 LocationId = location.Id,
-                SortOrder = viewModel.InteriorImages[0].SortOrder
+                SortOrder = viewModel.NewInteriorImage.SortOrder
             };
 
             await _locationService.AddInteriorImageAsync(interiorImage);
 
             var altTexts = new List<ImageAltText>();
 
-            foreach (var altText in viewModel.InteriorImages[0].AllAltTexts)
+            foreach (var altText in viewModel.NewInteriorImage.AllAltTexts)
             {
                 altText.ImageId = interiorImage.Id;
             }
 
-            await _locationService.AddAltTextRangeAsync(viewModel.InteriorImages[0].AllAltTexts.ToList());
+            await _locationService.AddAltTextRangeAsync(viewModel.NewInteriorImage.AllAltTexts.ToList());
 
             ShowAlertSuccess($"Image id {interiorImage.Id} added successfully!");
             return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
@@ -1037,9 +1039,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToAction(nameof(Index));
             }
 
-            var interiorImage = viewModel.InteriorImages.Where(_ => _.Id == imageId).FirstOrDefault();
-
-            await _locationService.UpdateInteriorImageAsync(interiorImage, viewModel.Image);
+            await _locationService.UpdateInteriorImageAsync(viewModel.UpdatedInteriorImage, viewModel.Image);
 
             ShowAlertSuccess($"Image id {imageId} updated successfully!");
             return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
