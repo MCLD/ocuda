@@ -288,90 +288,13 @@
                 </div>
             </header>
             <div class="row prom-content-container">
-                @{
-                    var leftNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.LeftNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
-                    leftNavigation = null; //TODO: REMOVE THIS WHEN FINISHED
-                    int leftNavigationSectionNumber = 0;
-                    int leftNavigationFeaturetteNumber = 0;
-                }
-                <div class="col-12 @(leftNavigation?.Navigations.Count() > 0 ? "col-sm-9 col-lg-10 order-sm-last" : null) d-print-inline-block prom-body-content-container"
+
+                <div class="col-12 d-print-inline-block prom-body-content-container"
                      role="main" id="mainContent">
                     <div class="prom-body-content">
                         @RenderBody()
                     </div>
                 </div>
-                @if (leftNavigation?.Navigations.Count() > 0)
-                {
-                    <div role="complementary"
-                         class="col-12 col-sm-3 col-lg-2 order-sm-first prom-leftnav-container d-print-none">
-
-                        <div class="prom-leftnav">
-                            <div class="accordion" id="prom-leftnav-accordion">
-                                @foreach (var item in leftNavigation.Navigations)
-                                {
-                                    if (item?.Navigations?.Count() > 0)
-                                    {
-                                        leftNavigationSectionNumber++;
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header"
-                                                id="left-navigation-heading-@leftNavigationSectionNumber">
-                                                <button class="accordion-button collapsed"
-                                                        type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#left-navigation-@leftNavigationSectionNumber"
-                                                        aria-expanded="false"
-                                                        aria-controls="left-navigation-@leftNavigationSectionNumber">
-                                                    @item.NavigationText.Label
-                                                </button>
-                                            </h2>
-                                            <div id="left-navigation-@leftNavigationSectionNumber"
-                                                 class="accordion-collapse collapse"
-                                                 aria-labelledby="left-navigation-heading-@leftNavigationSectionNumber"
-                                                 data-bs-parent="#prom-leftnav-accordion">
-                                                <div class="accordion-body">
-                                                    <ul>
-                                                        @foreach (var subItem in item.Navigations)
-                                                        {
-                                                            <li>
-                                                                @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
-                                                               && !string.IsNullOrEmpty(subItem.Icon)
-                                                               && !string.IsNullOrEmpty(subItem.NavigationText.Title))
-                                                                {
-                                                                    <a href="@subItem.NavigationText.Link"
-                                                                       target="@(subItem.TargetNewWindow ? "_blank" : null)"
-                                                                       title="@subItem.NavigationText.Title"
-                                                                       aria-label="@(subItem.TargetNewWindow ? Localizer[Promenade.NewWindow] : null)">
-                                                                        <span class="@subItem.Icon"></span>
-                                                                    </a>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <a href="@subItem.NavigationText.Link"
-                                                                       target="@(subItem.TargetNewWindow ? "_blank" : null)"
-                                                                       aria-label="@(subItem.TargetNewWindow ? Localizer[Promenade.NewWindowItem, subItem.NavigationText.Label] : null)">
-                                                                        @subItem.NavigationText.Label
-                                                                    </a>
-                                                                }
-                                                            </li>
-                                                        }
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        leftNavigationFeaturetteNumber++;
-                                        <div class="d-grid">
-                                            <a href="@item.NavigationText.Link"
-                                               class="btn btn-secondary prom-leftnav-featurette-button prom-leftnav-featurette-button-@leftNavigationFeaturetteNumber">@item.NavigationText.Label</a>
-                                        </div>
-                                    }
-                                }
-                            </div>
-                        </div>
-                    </div>
-                }
             </div>
         </div>
         <footer class="row d-print-none" role="contentinfo">

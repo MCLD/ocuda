@@ -16,15 +16,14 @@ namespace Ocuda.Promenade.Service
 {
     public class NavBannerService : BaseService<NavBannerService>
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly LanguageService _languageService;
         private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
-        private readonly INavBannerRepository _navBannerRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly LanguageService _languageService;
         private readonly INavBannerImageRepository _navBannerImageRepository;
         private readonly INavBannerLinkRepository _navBannerLinkRepository;
         private readonly INavBannerLinkTextRepository _navBannerLinkTextRepository;
-
+        private readonly INavBannerRepository _navBannerRepository;
         public NavBannerService(IHttpContextAccessor httpContextAccessor,
             LanguageService languageService,
             ILogger<NavBannerService> logger,
@@ -59,8 +58,7 @@ namespace Ocuda.Promenade.Service
         {
             NavBanner navBanner = null;
 
-            // TODO: revert this line before submission
-            var cachePagesInHours = 2; //GetPageCacheDuration(_config);
+            var cachePagesInHours = GetPageCacheDuration(_config);
             string navBannerCacheKey = string.Format(CultureInfo.InvariantCulture,
                 Utility.Keys.Cache.PromNavBanner,
                 navBannerId);
@@ -133,7 +131,6 @@ namespace Ocuda.Promenade.Service
                 await _cache.SaveToCacheAsync(navBannerLinksCacheKey, navBannerLinks, cachePagesInHours);
             }
 
-            // TODO: cache texts
             foreach (var link in navBannerLinks)
             {
                 var navBannerLinkTextCacheKey = string.Format(CultureInfo.InvariantCulture,

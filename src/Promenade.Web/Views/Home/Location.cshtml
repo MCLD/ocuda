@@ -262,12 +262,18 @@
             @if (Model.Location.InteriorImages.Count > 0)
             {
                 <div class="col-12 col-md-8" style="background-color: white;">
-                    <!-- TODO: Add location image carousel here -->
                     <div id="interiorPhotoCarousel" class="carousel slide">
                         <div class="carousel-indicators">
                             @for (int i = 0; i < Model.Location.InteriorImages.Count; i++)
                             {
-                                <button type="button" data-bs-target="#interiorPhotoCarousel" data-bs-slide-to="@i" @if(i == 0){<text>class="active" aria-current="true"</text>} aria-label="@Model.Location.InteriorImages[i].AltText"></button>
+                                @if (i == 0)
+                                {
+                                    <button type="button" data-bs-target="#interiorPhotoCarousel" data-bs-slide-to="@i" class="active" aria-current="true" aria-label="@Model.Location.InteriorImages[i].AltText"></button>
+                                }
+                                else
+                                {
+                                    <button type="button" data-bs-target="#interiorPhotoCarousel" data-bs-slide-to="@i" aria-label="@Model.Location.InteriorImages[i].AltText"></button>
+                                }
                             }
                         </div>
                         <div class="carousel-inner">
@@ -292,7 +298,6 @@
         </div>
     </div>
 
-    <!-- TODO: Remove hard coded text and add links -->
     <div class="row g-0">
         <div class="row g-0 col-lg-10 offset-lg-1 border-4 border-bottom">
             <div class="mx-auto" style="max-width: 740px;">
@@ -301,11 +306,13 @@
                     {
                         <div class="col-12 col-sm-6 mb-4 location-feature-link">
                             <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]"
+                            @Model.Location.Facebook
                                target="_blank"
                                class="text-reset">
                                 <div class="d-flex gap-4 align-items-center prom-box-border p-3 h-100">
                                     <span class="fa-brands fa-facebook display-4 prom-text-color"></span>
                                     <span class="location-feature-link prom-faq-icons">
+                                        <!-- TODO: Replace hard coded text -->
                                         Follow Maricopa County Library District on Facebook!
                                     </span>
                                 </div>
@@ -314,11 +321,11 @@
                     }
 
                     <div class="col-12 col-sm-6 mb-4 location-feature-link">
-                        <!-- TODO: Dynamically generate subscribe link path -->
-                        <a href="/news/subscribe?list=@Model.Location.Id">
+                        <a href="@Model.Location.SubscriptionLink">
                             <div class="d-flex gap-4 align-items-center prom-box-border p-3 h-100">
                                 <span class="fa-solid fa-envelope-open-text display-4 prom-text-color"></span>
                                 <span class="location-feature-link prom-faq-icons">
+                                    <!-- TODO: Replace hard coded text -->
                                     Sign up for our email newsletter!
                                 </span>
                             </div>

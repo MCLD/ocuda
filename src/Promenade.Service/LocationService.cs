@@ -410,20 +410,43 @@ namespace Ocuda.Promenade.Service
                 await _cache.SaveToCacheAsync(cacheKey, location, CacheLocationHours);
             }
 
-            var interiorImages = await _locationInteriorImageRepository
-                .GetLocationInteriorImagesAsync(id);
+            string interiorImagesCacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.PromLocationInteriorImages,
+                id);
 
-            // TODO: cache images
+            var interiorImages = await _cache
+                .GetObjectFromCacheAsync<List<LocationInteriorImage>>(interiorImagesCacheKey);
+
+            if (interiorImages == null)
+            {
+                interiorImages = await _locationInteriorImageRepository
+                    .GetLocationInteriorImagesAsync(id);
+
+                await _cache.SaveToCacheAsync(interiorImagesCacheKey, interiorImages, CacheLocationHours);
+            }
+
 
             var currentDefaultLanguageId = await GetCurrentDefaultLanguageIdAsync(_contextAccessor,
                 _languageService);
 
             foreach (var image in interiorImages)
             {
-                image.AltText = await _imageAltTextRepository
-                    .GetByImageIdAsync(image.Id, currentDefaultLanguageId.First());
+                var imageAltTextCacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.PromLocationImageAltText,
+                id,
+                currentDefaultLanguageId.First());
 
-                // TODO: cache alt text
+                image.AltText = await _cache.
+                    GetObjectFromCacheAsync<ImageAltText>(imageAltTextCacheKey);
+
+                if (image.AltText == null)
+                {
+                    image.AltText = await _imageAltTextRepository
+                        .GetByImageIdAsync(image.Id, currentDefaultLanguageId.First());
+
+                    await _cache.SaveToCacheAsync(imageAltTextCacheKey, image.AltText, CacheLocationHours);
+                }
+
             }
 
             location.InteriorImages = interiorImages;

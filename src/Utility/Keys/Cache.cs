@@ -202,6 +202,16 @@
         public static readonly string PromLocationIds = "loc-ids.{0}";
 
         /// <summary>
+        /// Alt text for a location interior image, {0} is image id, {1} is language id
+        /// </summary>
+        public static readonly string PromLocationImageAltText = "loc-image-alt.{0}.{1}";
+
+        /// <summary>
+        /// A list of location interior images, {0} is the location id
+        /// </summary>
+        public static readonly string PromLocationInteriorImages = "loc-interior-images.{0}";
+
+        /// <summary>
         /// Location neighbor group
         /// </summary>
         public static readonly string PromLocationNeighborGroup = "loc-neighbor-group.{0}";
