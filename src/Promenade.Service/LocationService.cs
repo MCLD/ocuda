@@ -414,7 +414,7 @@ namespace Ocuda.Promenade.Service
                 Utility.Keys.Cache.PromLocationInteriorImages,
                 id);
 
-            var interiorImages = await _cache
+            var interiorImages = forceReload ? null : await _cache
                 .GetObjectFromCacheAsync<List<LocationInteriorImage>>(interiorImagesCacheKey);
 
             if (interiorImages == null)
@@ -436,7 +436,7 @@ namespace Ocuda.Promenade.Service
                 id,
                 currentDefaultLanguageId.First());
 
-                image.AltText = await _cache.
+                image.AltText = forceReload ? null : await _cache.
                     GetObjectFromCacheAsync<ImageAltText>(imageAltTextCacheKey);
 
                 if (image.AltText == null)
