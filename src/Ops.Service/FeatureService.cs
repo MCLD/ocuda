@@ -86,7 +86,7 @@ namespace Ocuda.Ops.Service
                 currentFeature.Icon = feature.Icon;
                 currentFeature.Name = feature.Name?.Trim();
                 currentFeature.Stub = feature.Stub?.Trim();
-                currentFeature.IsLocationService = feature.IsLocationService;
+                currentFeature.IsAtThisLocation = feature.IsAtThisLocation;
 
                 _featureRepository.Update(feature);
                 await _featureRepository.SaveAsync();

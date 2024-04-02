@@ -24,7 +24,7 @@ namespace Ocuda.Promenade.Models.Entities
         public string ImagePath { get; set; }
 
         [DisplayName("Location Page Section")]
-        public bool IsLocationService { get; set; }
+        public bool IsAtThisLocation { get; set; }
 
         [NotMapped]
         public bool IsNewFeature { get; set; }
