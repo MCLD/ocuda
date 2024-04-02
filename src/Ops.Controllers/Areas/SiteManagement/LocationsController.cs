@@ -1029,7 +1029,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 LocationName = location.Name,
                 LocationStub = location.Stub,
                 InteriorImages = interiorImages,
-                NewInteriorImage = new LocationInteriorImage()
+                NewInteriorImage = new LocationInteriorImage
                 {
                     SortOrder = interiorImages.Select(_ => _.SortOrder).DefaultIfEmpty(0).Max() + 1
                 },
