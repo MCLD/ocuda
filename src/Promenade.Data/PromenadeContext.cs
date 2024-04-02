@@ -45,10 +45,10 @@ namespace Ocuda.Promenade.Data
         public DbSet<LocationInteriorImage> LocationInteriorImages { get; }
         public DbSet<LocationProductMap> LocationProductMaps { get; }
         public DbSet<Location> Locations { get; }
-        public DbSet<NavBanner> NavBanners { get; }
         public DbSet<NavBannerImage> NavBannerImages { get; }
         public DbSet<NavBannerLink> NavBannerLinks { get; }
         public DbSet<NavBannerLinkText> NavBannerLinkTexts { get; }
+        public DbSet<NavBanner> NavBanners { get; }
         public DbSet<Navigation> Navigations { get; }
         public DbSet<NavigationText> NavigationTexts { get; }
         public DbSet<PageHeader> PageHeaders { get; set; }

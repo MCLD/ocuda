@@ -7,38 +7,6 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class Feature
     {
-        [Key]
-        [Required]
-        public int Id { get; set; }
-
-        [MaxLength(255)]
-        [Required]
-        public string Name { get; set; }
-
-        [MaxLength(48)]
-        [Required]
-        public string Icon { get; set; }
-
-        [MaxLength(255)]
-        public string ImagePath { get; set; }
-
-        [MaxLength(80)]
-        public string Stub { get; set; }
-
-        [MaxLength(2000)]
-        public string BodyText { get; set; }
-
-        [MaxLength(5)]
-        public string IconText { get; set; }
-
-        public int? SortOrder { get; set; }
-
-        [NotMapped]
-        public bool IsNewFeature { get; set; }
-
-        [NotMapped]
-        public bool NeedsPopup { get; set; }
-
         [NotMapped]
         private static readonly Dictionary<string, string> LocationFeatureNames = new(StringComparer.InvariantCultureIgnoreCase)
         {
@@ -58,6 +26,7 @@ namespace Ocuda.Promenade.Models.Entities
             { "ukuleles", "🎵 Ukuleles" },
             { "volunteer", "🙋 Volunteer" }
         };
+
         [NotMapped]
         private static readonly Dictionary<string, string> LocationServiceNames = new(StringComparer.InvariantCultureIgnoreCase)
         {
@@ -75,15 +44,48 @@ namespace Ocuda.Promenade.Models.Entities
             { "facebook", "Facebook" },
         };
 
+        [MaxLength(2000)]
+        public string BodyText { get; set; }
+
+        [MaxLength(48)]
+        [Required]
+        public string Icon { get; set; }
+
+        [MaxLength(5)]
+        public string IconText { get; set; }
+
+        [Key]
+        [Required]
+        public int Id { get; set; }
+
+        [MaxLength(255)]
+        public string ImagePath { get; set; }
+
+        [NotMapped]
+        public bool IsNewFeature { get; set; }
+
+        [MaxLength(255)]
+        [Required]
+        public string Name { get; set; }
+
+        [NotMapped]
+        public bool NeedsPopup { get; set; }
+
+        public int? SortOrder { get; set; }
+
+        [MaxLength(80)]
+        public string Stub { get; set; }
+
         public static string GetDisplayName(string name)
         {
             var sanitized = name?.Trim();
             if (LocationFeatureNames.ContainsKey(sanitized))
             {
                 return LocationFeatureNames[sanitized];
-            } else if (LocationServiceNames.ContainsKey(sanitized)) 
-            { 
-                return LocationServiceNames[sanitized]; 
+            }
+            else if (LocationServiceNames.ContainsKey(sanitized))
+            {
+                return LocationServiceNames[sanitized];
             }
             return "";
         }

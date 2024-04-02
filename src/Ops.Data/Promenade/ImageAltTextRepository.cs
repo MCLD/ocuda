@@ -17,14 +17,6 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
-        public async Task<ImageAltText> GetImageAltTextAsync(int imageId, int languageId)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.ImageId == imageId && _.LanguageId == languageId)
-                .FirstOrDefaultAsync();
-        }
-
         public async Task<List<ImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId)
         {
             return await DbSet
@@ -32,7 +24,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .Where(_ => _.ImageId == imageId)
                 .Include(_ => _.Language)
                 .ToListAsync();
+        }
 
+        public async Task<ImageAltText> GetImageAltTextAsync(int imageId, int languageId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.ImageId == imageId && _.LanguageId == languageId)
+                .FirstOrDefaultAsync();
         }
     }
 }
