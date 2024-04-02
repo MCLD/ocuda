@@ -75,7 +75,7 @@ namespace Ocuda.Ops.Service
         public async Task<Feature> EditAsync(Feature feature)
         {
             var currentFeature = await _featureRepository.FindAsync(feature.Id);
-            await ValidateAsync(currentFeature);
+            await ValidateAsync(feature);
             if (currentFeature != null)
             {
                 if (!feature.Icon.Contains("fa-inverse"))
@@ -86,6 +86,7 @@ namespace Ocuda.Ops.Service
                 currentFeature.Icon = feature.Icon;
                 currentFeature.Name = feature.Name?.Trim();
                 currentFeature.Stub = feature.Stub?.Trim();
+                currentFeature.IsAtThisLocation = feature.IsAtThisLocation;
 
                 _featureRepository.Update(feature);
                 await _featureRepository.SaveAsync();

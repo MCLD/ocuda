@@ -437,7 +437,7 @@ namespace Ocuda.Promenade.Service
                 currentDefaultLanguageId.First());
 
                 image.AltText = forceReload ? null : await _cache.
-                    GetObjectFromCacheAsync<ImageAltText>(imageAltTextCacheKey);
+                    GetObjectFromCacheAsync<LocationInteriorImageAltText>(imageAltTextCacheKey);
 
                 if (image.AltText == null)
                 {

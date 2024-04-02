@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Ocuda.Promenade.Data;
 using Ocuda.Promenade.Data.ServiceFacade;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Interfaces.Repositories;

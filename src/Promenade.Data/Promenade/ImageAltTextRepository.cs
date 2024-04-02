@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class ImageAltTextRepository : GenericRepository<PromenadeContext, ImageAltText>,
+    public class ImageAltTextRepository : GenericRepository<PromenadeContext, LocationInteriorImageAltText>,
         IImageAltTextRepository
     {
         public ImageAltTextRepository(Repository<PromenadeContext> repositoryFacade,
@@ -16,11 +16,11 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<ImageAltText> GetByImageIdAsync(int imageId, int languageId)
+        public async Task<LocationInteriorImageAltText> GetByImageIdAsync(int imageId, int languageId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.ImageId == imageId && _.LanguageId == languageId)
+                .Where(_ => _.LocationInteriorImageId == imageId && _.LanguageId == languageId)
                 .FirstOrDefaultAsync();
         }
     }

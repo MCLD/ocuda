@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using ImageOptimApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -102,7 +101,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             if (viewModel.Image == null
-                || viewModel.InteriorImages[0].AllAltTexts.All(_ => string.IsNullOrEmpty(_.AltText)))
+                || viewModel.NewInteriorImage.AllAltTexts.All(_ => string.IsNullOrEmpty(_.AltText)))
             {
                 ShowAlertDanger("Please provide an image file and alt text when adding a new image");
                 return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
@@ -110,7 +109,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var location = await _locationService.GetLocationByStubAsync(locationStub);
 
-            using var memoryStream = new MemoryStream();
+            await using var memoryStream = new MemoryStream();
             await viewModel.Image.CopyToAsync(memoryStream);
             var fileBytes = memoryStream.ToArray();
 
@@ -122,19 +121,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 ImagePath = filePath,
                 LocationId = location.Id,
-                SortOrder = viewModel.InteriorImages[0].SortOrder
+                SortOrder = viewModel.NewInteriorImage.SortOrder
             };
 
             await _locationService.AddInteriorImageAsync(interiorImage);
 
-            var altTexts = new List<ImageAltText>();
-
-            foreach (var altText in viewModel.InteriorImages[0].AllAltTexts)
+            foreach (var altText in viewModel.NewInteriorImage.AllAltTexts)
             {
-                altText.ImageId = interiorImage.Id;
+                altText.LocationInteriorImageId = interiorImage.Id;
             }
 
-            await _locationService.AddAltTextRangeAsync(viewModel.InteriorImages[0].AllAltTexts.ToList());
+            await _locationService.AddAltTextRangeAsync(viewModel.NewInteriorImage.AllAltTexts.ToList());
 
             ShowAlertSuccess($"Image id {interiorImage.Id} added successfully!");
             return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
@@ -1018,11 +1015,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .GetAllLanguageImageAltTextsAsync(interiorImage.Id);
             }
 
-            var newAltTexts = new List<ImageAltText>();
+            var newAltTexts = new List<LocationInteriorImageAltText>();
 
             for (int i = 0; i < languages.Count; i++)
             {
-                newAltTexts.Add(new ImageAltText());
+                newAltTexts.Add(new LocationInteriorImageAltText());
             }
 
             var viewModel = new LocationImagesViewModel
@@ -1436,10 +1433,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var (extension, imageBytes) = _imageService.ConvertFromBase64(imageBase64);
                 var fileName = locationCode + extension;
 
-                var mapImagePath = await _locationService.SaveImageToServerAsync(imageBytes, fileName, MapFilePath);
-
-                await _locationService.UpdateLocationMapPathAsync(locationCode, mapImagePath);
-
+                await _locationService.UploadLocationMapAsync(imageBytes, fileName);
                 return new JsonResult("Image updated successfully!");
             }
             catch (ParameterException pex)

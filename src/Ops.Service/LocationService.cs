@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using ImageOptimApi;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
@@ -89,8 +90,10 @@ namespace Ocuda.Ops.Service
             _siteSettingService = siteSettingService;
         }
 
-        public async Task AddAltTextRangeAsync(List<ImageAltText> imageAltTexts)
+        public async Task AddAltTextRangeAsync(List<LocationInteriorImageAltText> imageAltTexts)
         {
+            ArgumentNullException.ThrowIfNull(imageAltTexts);
+
             foreach (var altText in imageAltTexts)
             {
                 altText.AltText = altText.AltText.Trim();
@@ -100,7 +103,7 @@ namespace Ocuda.Ops.Service
             await _imageAltTextRepository.SaveAsync();
         }
 
-        public async Task AddImageAltTextAsync(ImageAltText imageAltText)
+        public async Task AddImageAltTextAsync(LocationInteriorImageAltText imageAltText)
         {
             await _imageAltTextRepository.AddAsync(imageAltText);
             await _locationInteriorImageRepository.SaveAsync();
@@ -254,7 +257,7 @@ namespace Ocuda.Ops.Service
             return location;
         }
 
-        public async Task<List<ImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId)
+        public async Task<List<LocationInteriorImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId)
         {
             return await _imageAltTextRepository.GetAllLanguageImageAltTextsAsync(imageId);
         }
@@ -373,7 +376,7 @@ namespace Ocuda.Ops.Service
             return formattedDayGroupings;
         }
 
-        public async Task<ImageAltText> GetImageAltTextAsync(int imageId, int languageId)
+        public async Task<LocationInteriorImageAltText> GetImageAltTextAsync(int imageId, int languageId)
         {
             return await _imageAltTextRepository.GetImageAltTextAsync(imageId, languageId);
         }
@@ -449,12 +452,17 @@ namespace Ocuda.Ops.Service
             return await _locationRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName, string subDirectory = "")
+        public async Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName)
         {
-            if (imageBytes == null || fileName == null)
-            {
-                throw new OcudaException("Invalid map image or filename.");
-            }
+            return await SaveImageToServerAsync(imageBytes, fileName, string.Empty);
+        }
+
+        public async Task<string> SaveImageToServerAsync(byte[] imageBytes,
+            string fileName,
+            string subDirectory)
+        {
+            ArgumentNullException.ThrowIfNull(imageBytes);
+            ArgumentNullException.ThrowIfNull(fileName);
 
             string tempFilePath = Path.Combine(Path.GetTempPath(),
                 Path.GetFileNameWithoutExtension(Path.GetTempFileName())
@@ -464,9 +472,17 @@ namespace Ocuda.Ops.Service
 
             try
             {
-                var optimized = await _imageService.OptimizeAsync(tempFilePath);
-
-                imageBytes = optimized.File;
+                try
+                {
+                    var optimized = await _imageService.OptimizeAsync(tempFilePath);
+                    imageBytes = optimized.File;
+                }
+                catch (ParameterException pex)
+                {
+                    throw new OcudaException($"Error optimizing file: {pex.Message}", pex);
+                }
+                catch (OcudaConfigurationException)
+                { }
 
                 string basePath = await _siteSettingService.GetSettingStringAsync(
                     Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
@@ -489,19 +505,17 @@ namespace Ocuda.Ops.Service
 
                 var assetBase = Path.DirectorySeparatorChar + AssetBasePath;
 
-                var assetPath = Path.Combine(assetBase,
-                ImageFilePath,
-                LocationFilePath,
-                subDirectory,
-                fileName);
-
-                return assetPath;
+                return Path.Combine(assetBase,
+                    ImageFilePath,
+                    LocationFilePath,
+                    subDirectory,
+                    fileName);
             }
             catch (OcudaException oex)
             {
                 _logger.LogError("Error saving image to server: {ErrorMessage}",
                     oex.Message);
-                throw new OcudaException($"Error saving image to server: {oex.Message}");
+                throw;
             }
         }
 
@@ -644,6 +658,67 @@ namespace Ocuda.Ops.Service
             catch (Exception ex)
             {
                 throw new OcudaException(ex.Message, ex);
+            }
+        }
+
+        public async Task UploadLocationMapAsync(byte[] imageBytes, string fileName)
+        {
+            if (imageBytes == null || fileName == null)
+            {
+                throw new OcudaException("Invalid map image or filename.");
+            }
+
+            string basePath = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var filePath = Path.Combine(basePath,
+                ImageFilePath,
+                LocationFilePath,
+                MapFilePath);
+
+            try
+            {
+                if (!Directory.Exists(filePath))
+                {
+                    _logger.LogInformation("Creating image card directory: {Path}",
+                        filePath);
+                    Directory.CreateDirectory(filePath);
+                }
+
+                var fileWritePath = Path.Combine(filePath, fileName);
+
+                await File.WriteAllBytesAsync(fileWritePath, imageBytes);
+
+                var assetBase = Path.DirectorySeparatorChar + AssetBasePath;
+
+                var assetPath = Path.Combine(assetBase,
+                ImageFilePath,
+                LocationFilePath,
+                MapFilePath,
+                fileName);
+
+                var locationCode = fileName.Split('.')[0];
+
+                var location = await _locationRepository.GetLocationByCode(locationCode);
+
+                var oldFileName = Path.GetFileName(location.MapImagePath);
+
+                location.MapImagePath = assetPath;
+
+                _locationRepository.Update(location);
+                await _locationRepository.SaveAsync();
+
+                if (fileName != oldFileName)
+                {
+                    var oldFilePath = Path.Combine(filePath, oldFileName);
+                    File.Delete(oldFilePath);
+                }
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogError("Error uploading map image: {ErrorMessage}",
+                    oex.Message);
+                throw new OcudaException($"Error uploading map image: {oex.Message}");
             }
         }
 

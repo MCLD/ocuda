@@ -4,10 +4,9 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 {
-    public interface IImageAltTextRepository : IGenericRepository<ImageAltText>
+    public interface IImageAltTextRepository : IGenericRepository<LocationInteriorImageAltText>
     {
-        Task<List<ImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId);
-
-        Task<ImageAltText> GetImageAltTextAsync(int imageId, int languageId);
+        Task<LocationInteriorImageAltText> GetImageAltTextAsync(int imageId, int languageId);
+        Task<List<LocationInteriorImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId);
     }
 }

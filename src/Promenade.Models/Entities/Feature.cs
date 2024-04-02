@@ -61,6 +61,9 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string ImagePath { get; set; }
 
+        [Required]
+        public bool IsAtThisLocation { get; set; }
+
         [NotMapped]
         public bool IsNewFeature { get; set; }
 

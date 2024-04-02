@@ -10,5 +10,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location
         public List<LocationInteriorImage> InteriorImages { get; set; }
         public List<Language> Languages { get; set; }
         public Promenade.Models.Entities.Location Location { get; set; }
+        public LocationInteriorImage NewInteriorImage { get; set; }
+        public LocationInteriorImage UpdatedInteriorImage { get; set; }
     }
 }
