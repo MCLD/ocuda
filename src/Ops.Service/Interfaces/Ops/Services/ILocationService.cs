@@ -10,9 +10,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface ILocationService
     {
-        Task AddAltTextRangeAsync(List<ImageAltText> imageAltTexts);
+        Task AddAltTextRangeAsync(List<LocationInteriorImageAltText> imageAltTexts);
 
-        Task AddImageAltTextAsync(ImageAltText imageAltText);
+        Task AddImageAltTextAsync(LocationInteriorImageAltText imageAltText);
 
         Task AddInteriorImageAsync(LocationInteriorImage locationInteriorImage);
 
@@ -32,7 +32,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<Location> EditAsync(Location location);
 
-        Task<List<ImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId);
+        Task<List<LocationInteriorImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId);
 
         Task<IEnumerable<LocationProductMap>> GetAllLocationProductMapsAsync(int productId);
 
@@ -46,7 +46,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId);
 
-        Task<ImageAltText> GetImageAltTextAsync(int imageId, int languageId);
+        Task<LocationInteriorImageAltText> GetImageAltTextAsync(int imageId, int languageId);
 
         Task<LocationInteriorImage> GetInteriorImageByIdAsync(int imageId);
 

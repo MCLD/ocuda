@@ -90,7 +90,7 @@ namespace Ocuda.Ops.Service
             _siteSettingService = siteSettingService;
         }
 
-        public async Task AddAltTextRangeAsync(List<ImageAltText> imageAltTexts)
+        public async Task AddAltTextRangeAsync(List<LocationInteriorImageAltText> imageAltTexts)
         {
             ArgumentNullException.ThrowIfNull(imageAltTexts);
 
@@ -103,7 +103,7 @@ namespace Ocuda.Ops.Service
             await _imageAltTextRepository.SaveAsync();
         }
 
-        public async Task AddImageAltTextAsync(ImageAltText imageAltText)
+        public async Task AddImageAltTextAsync(LocationInteriorImageAltText imageAltText)
         {
             await _imageAltTextRepository.AddAsync(imageAltText);
             await _locationInteriorImageRepository.SaveAsync();
@@ -257,7 +257,7 @@ namespace Ocuda.Ops.Service
             return location;
         }
 
-        public async Task<List<ImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId)
+        public async Task<List<LocationInteriorImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId)
         {
             return await _imageAltTextRepository.GetAllLanguageImageAltTextsAsync(imageId);
         }
@@ -376,7 +376,7 @@ namespace Ocuda.Ops.Service
             return formattedDayGroupings;
         }
 
-        public async Task<ImageAltText> GetImageAltTextAsync(int imageId, int languageId)
+        public async Task<LocationInteriorImageAltText> GetImageAltTextAsync(int imageId, int languageId)
         {
             return await _imageAltTextRepository.GetImageAltTextAsync(imageId, languageId);
         }

@@ -128,7 +128,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             foreach (var altText in viewModel.NewInteriorImage.AllAltTexts)
             {
-                altText.ImageId = interiorImage.Id;
+                altText.LocationInteriorImageId = interiorImage.Id;
             }
 
             await _locationService.AddAltTextRangeAsync(viewModel.NewInteriorImage.AllAltTexts.ToList());
@@ -1015,11 +1015,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .GetAllLanguageImageAltTextsAsync(interiorImage.Id);
             }
 
-            var newAltTexts = new List<ImageAltText>();
+            var newAltTexts = new List<LocationInteriorImageAltText>();
 
             for (int i = 0; i < languages.Count; i++)
             {
-                newAltTexts.Add(new ImageAltText());
+                newAltTexts.Add(new LocationInteriorImageAltText());
             }
 
             var viewModel = new LocationImagesViewModel
