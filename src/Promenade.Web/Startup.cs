@@ -439,6 +439,10 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.LocationHoursRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILocationHoursOverrideRepository,
                 Data.Promenade.LocationHoursOverrideRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ILocationInteriorImageRepository,
+                Data.Promenade.LocationInteriorImageRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IImageAltTextRepository,
+                Data.Promenade.ImageAltTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.INavigationRepository,
                 Data.Promenade.NavigationRepository>();
             services.AddScoped<Service.Interfaces.Repositories.INavigationTextRepository,

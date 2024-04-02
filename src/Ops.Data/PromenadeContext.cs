@@ -61,6 +61,8 @@ namespace Ocuda.Ops.Data
         public DbSet<LocationGroup> LocationGroups { get; set; }
         public DbSet<LocationHours> LocationHours { get; set; }
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; set; }
+        public DbSet<LocationInteriorImageAltText> LocationInteriorImageAltTexts { get; set; }
+        public DbSet<LocationInteriorImage> LocationInteriorImages { get; set; }
         public DbSet<LocationProductMap> LocationProductMaps { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Navigation> Navigations { get; set; }
@@ -120,6 +122,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.CategoryId, _.EmediaId });
             modelBuilder.Entity<EmediaText>()
                 .HasKey(_ => new { _.EmediaId, _.LanguageId });
+            modelBuilder.Entity<LocationInteriorImageAltText>()
+                .HasKey(_ => new { _.LocationInteriorImageId, _.LanguageId });
             modelBuilder.Entity<ImageFeatureItemText>()
                 .HasKey(_ => new { _.LanguageId, _.ImageFeatureItemId });
             modelBuilder.Entity<LocationFeature>()
