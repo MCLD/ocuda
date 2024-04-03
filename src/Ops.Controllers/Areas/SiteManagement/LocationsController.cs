@@ -1032,9 +1032,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 InteriorImages = interiorImages,
                 NewInteriorImage = new LocationInteriorImage
                 {
-                    SortOrder = interiorImages.Select(_ => _.SortOrder).DefaultIfEmpty(0).Max() + 1
+                    SortOrder = interiorImages.Select(_ => _.SortOrder).DefaultIfEmpty(0).Max() + 1,
+                    AllAltTexts= newAltTexts
                 },
-                UpdatedInteriorImage = new LocationInteriorImage()
+                UpdatedInteriorImage = new LocationInteriorImage
+                {
+                    AllAltTexts = newAltTexts
+                }
             };
 
             return View(viewModel);
@@ -1423,9 +1427,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToAction(nameof(Index));
             }
 
-            var interiorImage = viewModel.InteriorImages.Where(_ => _.Id == imageId).FirstOrDefault();
-
-            await _locationService.UpdateInteriorImageAsync(interiorImage, viewModel.Image);
+            await _locationService.UpdateInteriorImageAsync(viewModel.UpdatedInteriorImage, viewModel.Image);
 
             ShowAlertSuccess($"Image id {imageId} updated successfully!");
             return RedirectToAction(nameof(Images), new { locationStub = viewModel.LocationStub });
