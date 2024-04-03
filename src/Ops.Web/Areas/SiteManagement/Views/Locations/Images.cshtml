@@ -61,19 +61,21 @@
 
                 <input asp-for="Languages" hidden />
                 <input asp-for="Location" hidden />
-                <input class="image-input mb-2" asp-for="Image" type="file" />
-
+                <input class="image-input form-control mb-2"
+                       asp-for="Image"
+                       type="file"
+                       accept=".jpg,.png" />
                 <div>
-                    <strong><label asp-for="InteriorImages[0].SortOrder">Sort Order</label></strong>
+                    <strong><label asp-for="NewInteriorImage.SortOrder">Sort Order</label></strong>
                 </div>
-                <input class="form-control" asp-for="InteriorImages[0].SortOrder" value="0" type="number" />
+                <input class="form-control" asp-for="NewInteriorImage.SortOrder" type="number" />
 
                 @for (int i = 0; i < Model.Languages.Count; i++)
                 {
-                    <input asp-for="InteriorImages[0].AllAltTexts[i].LanguageId" value="@Model.Languages[i].Id" hidden />
+                    <input asp-for="NewInteriorImage.AllAltTexts[i].LanguageId" value="@Model.Languages[i].Id" hidden />
                     <div class="mb-2">
-                        <label asp-for="InteriorImages[0].AllAltTexts[i]"><strong>@Model.Languages[i].Description</strong> Alt Text</label>
-                        <input class="form-control" asp-for="InteriorImages[0].AllAltTexts[i].AltText" value="" type="text" />
+                        <label asp-for="NewInteriorImage.AllAltTexts[i]"><strong>@Model.Languages[i].Description</strong> Alt Text</label>
+                        <input class="form-control" asp-for="NewInteriorImage.AllAltTexts[i].AltText" value="" type="text" />
                     </div>
                 }
                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -96,25 +98,25 @@
 
                     <input asp-for="Languages" hidden />
                     <input asp-for="Location" hidden />
-                    <input asp-for="InteriorImages[0].Id" value="@interiorImage.Id" hidden />
-                    <input asp-for="InteriorImages[0].LocationId" hidden />
-                    <input asp-for="InteriorImages[0].ImagePath" value="@interiorImage.ImagePath" hidden />
+                    <input asp-for="UpdatedInteriorImage.Id" value="@interiorImage.Id" hidden />
+                    <input asp-for="UpdatedInteriorImage.LocationId" hidden />
+                    <input asp-for="UpdatedInteriorImage.ImagePath" value="@interiorImage.ImagePath" hidden />
 
                     <input class="mb-2" asp-for="Image" type="file" />
 
                     <div>
-                        <strong><label asp-for="InteriorImages[0].SortOrder">Sort Order</label></strong>
+                        <strong><label asp-for="UpdatedInteriorImage.SortOrder">Sort Order</label></strong>
                     </div>
 
-                    <input class="form-control" asp-for="InteriorImages[0].SortOrder" value="@interiorImage.SortOrder" type="number" />
+                    <input class="form-control" asp-for="UpdatedInteriorImage.SortOrder" value="@interiorImage.SortOrder" type="number" />
 
                     @for (int i = 0; i < interiorImage.AllAltTexts.Count; i++)
                     {
 
-                        <input asp-for="InteriorImages[0].AllAltTexts[i].LanguageId" value="@Model.Languages[i].Id" hidden />
+                        <input asp-for="UpdatedInteriorImage.AllAltTexts[i].LanguageId" value="@Model.Languages[i].Id" hidden />
                         <div class="mb-2">
-                            <label asp-for="InteriorImages[0].AllAltTexts[i].AltText"><strong>@Model.Languages[i].Description</strong> Alt Text</label>
-                            <input class="form-control" asp-for="InteriorImages[0].AllAltTexts[i].AltText" type="text" value="@interiorImage.AllAltTexts[i].AltText" />
+                            <label asp-for="UpdatedInteriorImage.AllAltTexts[i].AltText"><strong>@Model.Languages[i].Description</strong> Alt Text</label>
+                            <input class="form-control" asp-for="UpdatedInteriorImage.AllAltTexts[i].AltText" type="text" value="@interiorImage.AllAltTexts[i].AltText" />
                         </div>
 
                     }

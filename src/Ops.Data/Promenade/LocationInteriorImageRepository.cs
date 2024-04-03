@@ -24,11 +24,13 @@ namespace Ocuda.Ops.Data.Promenade
                 .Where(_ => _.Id == imageId)
                 .SingleOrDefaultAsync();
         }
+
         public async Task<List<LocationInteriorImage>> GetLocationInteriorImagesAsync(int locationId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.LocationId == locationId)
+                .OrderBy(_ => _.SortOrder)
                 .ToListAsync();
         }
     }

@@ -6,16 +6,23 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class LocationInteriorImage
     {
+        [NotMapped]
+        public List<LocationInteriorImageAltText> AllAltTexts { get; set; }
+
+        [NotMapped]
+        public LocationInteriorImageAltText AltText { get; set; }
+
         [Key]
         public int Id { get; set; }
-        public int LocationId { get; set; }
+
+        [Required]
+        [MaxLength(255)]
         public string ImagePath { get; set; }
+
+        [Required]
+        public int LocationId { get; set; }
+
+        [Required]
         public int SortOrder { get; set; }
-
-        [NotMapped]
-        public ImageAltText AltText { get; set; }
-
-        [NotMapped]
-        public List<ImageAltText> AllAltTexts { get; set; }
     }
 }

@@ -9,7 +9,7 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class ImageAltTextRepository : GenericRepository<PromenadeContext, ImageAltText>,
+    public class ImageAltTextRepository : GenericRepository<PromenadeContext, LocationInteriorImageAltText>,
         IImageAltTextRepository
     {
         public ImageAltTextRepository(Repository<PromenadeContext> repositoryFacade,
@@ -17,22 +17,21 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
-        public async Task<ImageAltText> GetImageAltTextAsync(int imageId, int languageId)
+        public async Task<List<LocationInteriorImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.ImageId == imageId && _.LanguageId == languageId)
-                .FirstOrDefaultAsync();
-        }
-
-        public async Task<List<ImageAltText>> GetAllLanguageImageAltTextsAsync(int imageId)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.ImageId == imageId)
+                .Where(_ => _.LocationInteriorImageId == imageId)
                 .Include(_ => _.Language)
                 .ToListAsync();
+        }
 
+        public async Task<LocationInteriorImageAltText> GetImageAltTextAsync(int imageId, int languageId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.LocationInteriorImageId == imageId && _.LanguageId == languageId)
+                .FirstOrDefaultAsync();
         }
     }
 }
