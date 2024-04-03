@@ -195,6 +195,9 @@ namespace Ocuda.Promenade.Controllers
             viewModel.LocationFeatures = locationFeatures
                 .Select(_ => new LocationsFeaturesViewModel(_));
 
+            viewModel.AtThisLocation = viewModel.LocationFeatures.Where(_ => _.IsAtThisLocation);
+            viewModel.ServicesAvailable = viewModel.LocationFeatures.Where(_ => !_.IsAtThisLocation);
+
             if (viewModel.Location.DisplayGroupId.HasValue)
             {
                 viewModel.LocationNeighborGroup = await _locationService

@@ -17,6 +17,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
             Stub = locationsFeatures?.Feature?.Stub;
             Text = CommonMarkConverter.Convert(locationsFeatures?.Text);
             IconText = locationsFeatures?.Feature?.IconText;
+            IsAtThisLocation = locationsFeatures.Feature?.IsAtThisLocation ?? false;
         }
 
         [Required]
@@ -30,6 +31,8 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
 
         [MaxLength(255)]
         public string ImagePath { get; set; }
+
+        public bool IsAtThisLocation { get; set; }
 
         [MaxLength(255)]
         [Required]

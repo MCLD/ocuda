@@ -60,7 +60,6 @@ namespace Ocuda.Ops.Service
 
         public async Task<Feature> AddFeatureAsync(Feature feature)
         {
-            feature.Icon = "fa-inverse " + feature.Icon + " fa-stack-1x";
             feature.Name = feature.Name?.Trim();
             feature.BodyText = feature.BodyText?.Trim();
             feature.Stub = feature.Stub?.Trim();
@@ -78,10 +77,6 @@ namespace Ocuda.Ops.Service
             await ValidateAsync(feature);
             if (currentFeature != null)
             {
-                if (!feature.Icon.Contains("fa-inverse"))
-                {
-                    feature.Icon = "fa-inverse " + feature.Icon + " fa-stack-1x";
-                }
                 currentFeature.BodyText = feature.BodyText?.Trim();
                 currentFeature.Icon = feature.Icon;
                 currentFeature.Name = feature.Name?.Trim();

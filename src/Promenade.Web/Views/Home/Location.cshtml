@@ -4,23 +4,6 @@
     <link rel="canonical" href="@Model.CanonicalLink" />
 }
 
-@{
-    List<Ocuda.Promenade.Controllers.ViewModels.Home.LocationsFeaturesViewModel> locationFeatures = new();
-    List<Ocuda.Promenade.Controllers.ViewModels.Home.LocationsFeaturesViewModel> locationServices = new();
-
-    @foreach (var feature in Model.LocationFeatures)
-    {
-        if (Ocuda.Promenade.Models.Entities.Feature.IsLocationFeature(feature.Name))
-        {
-            locationFeatures.Add(feature);
-        }
-        else if (Ocuda.Promenade.Models.Entities.Feature.IsLocationService(feature.Name))
-        {
-            locationServices.Add(feature);
-        }
-    }
-}
-
 @if (!string.IsNullOrEmpty(Model.PreFeatureSegmentText))
 {
     <div class="row prom-feature-segment">
@@ -111,7 +94,7 @@
                     <div class="col-12 col-sm-6 bg-white px-0 py-4 px-sm-4 location-feature-link">
                         <!-- TODO: Remove hard coded string -->
                         <h2>At this location</h2>
-                        @foreach (var feature in locationFeatures)
+                        @foreach (var feature in Model.AtThisLocation)
                         {
                             @if (string.IsNullOrEmpty(feature.RedirectLink))
                             {
@@ -190,7 +173,7 @@
         <div class="row p-0 mt-0 gx-0 gy-3 gx-sm-3 col-lg-10 offset-lg-1">
             <!-- TODO: Remove hard coded string -->
             <h2 class="mt-0 px-lg-0">Services Available</h2>
-            @foreach (var feature in locationServices)
+            @foreach (var feature in Model.ServicesAvailable)
             {
                 <div class="col-12 col-sm-4 location-feature-link">
                     @if (string.IsNullOrEmpty(feature.RedirectLink))

@@ -11,6 +11,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
             NearbyLocationGroups = new List<LocationGroup>();
         }
 
+        public IEnumerable<LocationsFeaturesViewModel> AtThisLocation { get; set; }
         public string CanonicalLink { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
         public string DescriptionSegmentText { get; set; }
@@ -26,6 +27,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         public string PreFeatureSegmentHeader { get; set; }
         public string PreFeatureSegmentText { get; set; }
         public Schema.NET.Thing Schema { get; set; }
+        public IEnumerable<LocationsFeaturesViewModel> ServicesAvailable { get; set; }
         public string ShowMessage { get; set; }
     }
 }
