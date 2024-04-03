@@ -69,6 +69,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var navBannerImage = await _navBannerService
                 .GetImageByNavBannerIdAsync(navBannerId, selectedLanguage.Id);
 
+            if (navBannerImage == null)
+            {
+                return StatusCode(404);
+            }
+
             var basePath = await _navBannerService.GetFullImageDirectoryPath(languageName);
 
             var bannerImagePath = Path.Combine(
@@ -111,7 +116,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
                     ?? languages.Single(_ => _.IsDefault);
 
-                var navBannerImage = await _navBannerService.GetImageByNavBannerIdAsync(id, selectedLanguage.Id);
+                var navBannerImage = await _navBannerService
+                    .GetImageByNavBannerIdAsync(id, selectedLanguage.Id)
+                    ?? new NavBannerImage();
 
                 var navBannerLinks = (await _navBannerService
                     .GetLinksByNavBannerIdAsync(navBanner.Id, selectedLanguage.Id));

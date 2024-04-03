@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ImageOptimApi;
+using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -1028,7 +1029,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 Location = location,
                 LocationName = location.Name,
                 LocationStub = location.Stub,
-                InteriorImages = interiorImages
+                InteriorImages = interiorImages,
+                NewInteriorImage = new LocationInteriorImage
+                {
+                    SortOrder = interiorImages.Select(_ => _.SortOrder).DefaultIfEmpty(0).Max() + 1
+                },
+                UpdatedInteriorImage = new LocationInteriorImage()
             };
 
             return View(viewModel);
@@ -1433,7 +1439,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var (extension, imageBytes) = _imageService.ConvertFromBase64(imageBase64);
                 var fileName = locationCode + extension;
 
-                await _locationService.UploadLocationMapAsync(imageBytes, fileName);
+                var mapImagePath = await _locationService.SaveImageToServerAsync(imageBytes, fileName, MapFilePath);
+                await _locationService.UpdateLocationMapPathAsync(locationCode, mapImagePath);
+
                 return new JsonResult("Image updated successfully!");
             }
             catch (ParameterException pex)
