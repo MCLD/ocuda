@@ -680,7 +680,7 @@ namespace Ocuda.Ops.Service
             {
                 if (!Directory.Exists(filePath))
                 {
-                    _logger.LogInformation("Creating image card directory: {Path}",
+                    _logger.LogInformation("Creating location map image directory: {Path}",
                         filePath);
                     Directory.CreateDirectory(filePath);
                 }
