@@ -31,6 +31,7 @@ namespace Ocuda.Ops.Controllers.Abstract
 
         protected BaseController(ServiceFacades.Controller<T> context)
         {
+            ArgumentNullException.ThrowIfNull(context);
             _logger = context.Logger;
             _siteSettingService = context.SiteSettingService;
             _userContextProvider = context.UserContextProvider;
@@ -173,6 +174,7 @@ namespace Ocuda.Ops.Controllers.Abstract
             string applicationPermission)
         {
             if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
+                && !string.IsNullOrEmpty(applicationPermission)
                 && !applicationPermission.Equals(ApplicationPermission.MultiUserAccount,
                     StringComparison.OrdinalIgnoreCase))
             {
@@ -286,11 +288,10 @@ namespace Ocuda.Ops.Controllers.Abstract
             return _userContextProvider.UserClaim(AuthUser, claimType);
         }
 
-        protected List<string> UserClaims(string claimType)
+        protected IList<string> UserClaims(string claimType)
         {
             return _userContextProvider.UserClaims(AuthUser, claimType);
         }
-
 
         /// <summary>
         /// Shorthand method to output an icon from FontAwesome, also outputs the fa-solid tag.
@@ -301,7 +302,6 @@ namespace Ocuda.Ops.Controllers.Abstract
         {
             return Fa(iconName, "fa-solid");
         }
-
 
         /// <summary>
         /// Shorthand method to output an icon from FontAwesome

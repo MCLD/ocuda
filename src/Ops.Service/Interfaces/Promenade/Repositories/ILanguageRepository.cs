@@ -6,10 +6,16 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 {
     public interface ILanguageRepository : IGenericRepository<Language>
     {
-        Task<ICollection<Language>> GetAllAsync();
         Task<ICollection<Language>> GetActiveAsync();
+
         Task<Language> GetActiveByIdAsync(int id);
+
+        Task<IDictionary<int, string>> GetActiveNamesAsync();
+
+        Task<ICollection<Language>> GetAllAsync();
+
         Task<int> GetDefaultLanguageId();
+
         Task<int> GetLanguageId(string culture);
     }
 }

@@ -16,15 +16,6 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
-        public async Task<ICollection<Language>> GetAllAsync()
-        {
-            return await DbSet
-                .AsNoTracking()
-                .OrderByDescending(_ => _.IsDefault)
-                .ThenBy(_ => _.Name)
-                .ToListAsync();
-        }
-
         public async Task<ICollection<Language>> GetActiveAsync()
         {
             return await DbSet
@@ -41,6 +32,23 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .Where(_ => _.IsActive && _.Id == id)
                 .SingleOrDefaultAsync();
+        }
+
+        public async Task<IDictionary<int, string>> GetActiveNamesAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.IsActive)
+                .ToDictionaryAsync(k => k.Id, v => v.Name);
+        }
+
+        public async Task<ICollection<Language>> GetAllAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .OrderByDescending(_ => _.IsDefault)
+                .ThenBy(_ => _.Name)
+                .ToListAsync();
         }
 
         public async Task<int> GetDefaultLanguageId()

@@ -7,6 +7,14 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class Navigation
     {
+        public Navigation()
+        {
+            NavigationLanguages = new List<string>();
+        }
+
+        [NotMapped]
+        public IEnumerable<NavigationText> AllNavigationTexts { get; set; }
+
         [DisplayName("Change to Link When XS")]
         public bool ChangeToLinkWhenExtraSmall { get; set; }
 
@@ -26,7 +34,10 @@ namespace Ocuda.Promenade.Models.Entities
         public int? NavigationId { get; set; }
 
         [NotMapped]
-        public ICollection<string> NavigationLanguages { get; set; }
+        public ICollection<string> NavigationLanguages { get; }
+
+        [NotMapped]
+        public string NavigationRole { get; set; }
 
         public IEnumerable<Navigation> Navigations { get; set; }
 
