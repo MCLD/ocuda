@@ -8,8 +8,10 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     {
         Task<NavigationText> GetByNavigationAndLanguageAsync(int navigationId, int languageId);
 
-        Task<ICollection<NavigationText>> GetByNavigationIdsAsync(List<int> navigationIds);
+        Task<ICollection<NavigationText>> GetByNavigationIdsAsync(ICollection<int> navigationIds);
 
         Task<List<string>> GetUsedLanguageNamesByNavigationId(int navigationId);
+
+        Task RemoveAllAsync();
     }
 }

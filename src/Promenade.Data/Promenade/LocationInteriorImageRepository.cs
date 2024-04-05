@@ -6,7 +6,7 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class LocationInteriorImageRepository : GenericRepository<PromenadeContext, LocationInteriorImage>, 
+    public class LocationInteriorImageRepository : GenericRepository<PromenadeContext, LocationInteriorImage>,
         ILocationInteriorImageRepository
     {
         public LocationInteriorImageRepository(Repository<PromenadeContext> repositoryFacade,

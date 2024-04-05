@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -14,28 +16,31 @@ namespace Ocuda.Ops.Service
 {
     public class NavigationService : BaseService<NavigationService>, INavigationService
     {
-        private readonly ILanguageRepository _languageRepository;
+        private readonly ILanguageService _languageService;
         private readonly INavigationRepository _navigationRepository;
         private readonly INavigationTextRepository _navigationTextRepository;
         private readonly ISiteSettingPromService _siteSettingPromService;
         private readonly string DefaultNavigationSiteSettingId = "-1";
 
+        private IDictionary<int, string> _activeLanguageNames;
+
         public NavigationService(ILogger<NavigationService> logger,
-            IHttpContextAccessor httpContextAccessor,
-            ILanguageRepository languageRepository,
+                    IHttpContextAccessor httpContextAccessor,
+            ILanguageService languageService,
             INavigationRepository navigationRepository,
             INavigationTextRepository navigationTextRepository,
             ISiteSettingPromService siteSettingPromService)
             : base(logger, httpContextAccessor)
         {
-            _languageRepository = languageRepository
-                ?? throw new ArgumentNullException(nameof(languageRepository));
-            _navigationRepository = navigationRepository
-                ?? throw new ArgumentNullException(nameof(navigationRepository));
-            _navigationTextRepository = navigationTextRepository
-                ?? throw new ArgumentNullException(nameof(navigationTextRepository));
-            _siteSettingPromService = siteSettingPromService
-                ?? throw new ArgumentNullException(nameof(siteSettingPromService));
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(navigationRepository);
+            ArgumentNullException.ThrowIfNull(navigationTextRepository);
+            ArgumentNullException.ThrowIfNull(siteSettingPromService);
+
+            _languageService = languageService;
+            _navigationRepository = navigationRepository;
+            _navigationTextRepository = navigationTextRepository;
+            _siteSettingPromService = siteSettingPromService;
         }
 
         public async Task<Navigation> CreateAsync(Navigation navigation, string siteSetting = null)
@@ -74,7 +79,7 @@ namespace Ocuda.Ops.Service
                     Link = navigation.NavigationText.Link?.Trim(),
                     Title = navigation.NavigationText.Title?.Trim(),
 
-                    LanguageId = await _languageRepository.GetDefaultLanguageId(),
+                    LanguageId = await _languageService.GetDefaultLanguageId(),
                     Navigation = navigation
                 });
             }
@@ -124,12 +129,8 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAsync(int id)
         {
-            var navigation = await _navigationRepository.FindAsync(id);
-
-            if (navigation == null)
-            {
-                throw new OcudaException("Navigation does not exist.");
-            }
+            var navigation = await _navigationRepository.FindAsync(id)
+                ?? throw new OcudaException("Navigation does not exist.");
 
             (var navigations, var navigationIds) = await GetFlattenedNavigationsAsync(navigation);
 
@@ -165,7 +166,7 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteNavigationTextAsync(int navigationId, int languageId)
         {
-            var defaultLanguageId = await _languageRepository.GetDefaultLanguageId();
+            var defaultLanguageId = await _languageService.GetDefaultLanguageId();
 
             if (languageId == defaultLanguageId)
             {
@@ -270,6 +271,17 @@ namespace Ocuda.Ops.Service
             return navigationRoles;
         }
 
+        public async Task<IEnumerable<Navigation>> GetNavigationTreeAsync(int navigationId)
+        {
+            var children = await GetNavigationChildrenAsync(navigationId);
+            await AddNavigationTextsAsync(children);
+            foreach (var child in children)
+            {
+                child.Navigations = await GetNavigationTreeAsync(child.Id);
+            }
+            return children;
+        }
+
         public async Task<RoleProperties> GetRolePropertiesForNavigationAsync(int id)
         {
             // denotes if a navigation is a parent, child or grandchild
@@ -335,7 +347,7 @@ namespace Ocuda.Ops.Service
             return roleProperties;
         }
 
-        public async Task<int> GetSubnavigationCountAsnyc(int id)
+        public async Task<int> GetSubnavigationCountAsync(int id)
         {
             return await _navigationRepository.GetSubnavigationCountAsync(id);
         }
@@ -350,6 +362,21 @@ namespace Ocuda.Ops.Service
         public async Task<ICollection<Navigation>> GetTopLevelNavigationsAsync()
         {
             return await _navigationRepository.GetTopLevelNavigationsAsync();
+        }
+
+        public async Task ReplaceAllNavigationAsync(IEnumerable<Navigation> navigations)
+        {
+            ArgumentNullException.ThrowIfNull(navigations);
+
+            // delete existing navigations, navigation texts
+            await _navigationTextRepository.RemoveAllAsync();
+            await _navigationRepository.RemoveAllAsync();
+
+            // walk navigations and insert new ones
+            foreach (var navigation in navigations)
+            {
+                await InsertNavigationAsync(navigation, null);
+            }
         }
 
         public async Task SetNavigationTextAsync(NavigationText navigationText)
@@ -422,13 +449,8 @@ namespace Ocuda.Ops.Service
 
             var navigationInPosition = await _navigationRepository.GetByOrderAndParentAsync(
                 newSortOrder,
-                navigation.NavigationId.Value);
-
-            if (navigationInPosition == null)
-            {
-                throw new OcudaException("Navigation is already in the last position.");
-            }
-
+                navigation.NavigationId.Value)
+                ?? throw new OcudaException("Navigation is already in the last position.");
             navigationInPosition.Order = navigation.Order;
             navigation.Order = newSortOrder;
 
@@ -437,7 +459,53 @@ namespace Ocuda.Ops.Service
             await _navigationRepository.SaveAsync();
         }
 
-        private async Task<(List<Navigation>, List<int>)> GetFlattenedNavigationsAsync(
+        private async Task AddNavigationTextsAsync(IEnumerable<Navigation> navigations)
+        {
+            if (navigations == null)
+            {
+                return;
+            }
+
+            var texts = await _navigationTextRepository.
+                GetByNavigationIdsAsync(navigations.Select(_ => _.Id).ToList());
+
+            foreach (var navigation in navigations)
+            {
+                navigation.AllNavigationTexts = texts.Where(_ => _.NavigationId == navigation.Id);
+                foreach (var navigationText in navigation.AllNavigationTexts)
+                {
+                    var activeLanguageName = await
+                        GetActiveLanguageNameAsync(navigationText.LanguageId);
+
+                    if (!string.IsNullOrEmpty(activeLanguageName))
+                    {
+                        navigationText.Language = new Language
+                        {
+                            Name = activeLanguageName
+                        };
+                    }
+                }
+            }
+        }
+
+        private async Task<int?> GetActiveLanguageIdAsync(string name)
+        {
+            _activeLanguageNames ??= await _languageService.GetActiveNamesAsync();
+            return _activeLanguageNames
+                .Where(_ => _.Value == name)
+                .Select(_ => _.Key)
+                .SingleOrDefault();
+        }
+
+        private async Task<string> GetActiveLanguageNameAsync(int id)
+        {
+            _activeLanguageNames ??= await _languageService.GetActiveNamesAsync();
+            return _activeLanguageNames.TryGetValue(id, out string value)
+                ? value
+                : null;
+        }
+
+        private async Task<(ICollection<Navigation>, ICollection<int>)> GetFlattenedNavigationsAsync(
             Navigation navigation)
         {
             var navigations = new List<Navigation>() { navigation };
@@ -479,6 +547,90 @@ namespace Ocuda.Ops.Service
             }
 
             return null;
+        }
+
+        private async Task InsertNavigationAsync(Navigation navigation, int? parentId)
+        {
+            navigation.Id = default;
+            navigation.NavigationId = null;
+            var children = navigation.Navigations;
+            navigation.Navigations = null;
+
+            if (parentId.HasValue)
+            {
+                navigation.NavigationId = parentId.Value;
+            }
+
+            await _navigationRepository.AddAsync(navigation);
+            await _navigationRepository.SaveAsync();
+
+            // update system setting if necessary
+            if (!string.IsNullOrEmpty(navigation.NavigationRole))
+            {
+                await UpdateNavigationRoleAsync(navigation.Id, navigation.NavigationRole);
+            }
+
+            // handle text
+            if (navigation.AllNavigationTexts != null)
+            {
+                foreach (var navigationText in navigation.AllNavigationTexts)
+                {
+                    var requestedLanguageName = navigationText.Language?.Name;
+                    navigationText.NavigationId = navigation.Id;
+                    navigationText.Language = null;
+                    navigationText.LanguageId = 0;
+                    if (!string.IsNullOrEmpty(requestedLanguageName))
+                    {
+                        var languageLookup
+                            = await GetActiveLanguageIdAsync(requestedLanguageName);
+                        if (languageLookup.HasValue)
+                        {
+                            navigationText.LanguageId = languageLookup.Value;
+                            await _navigationTextRepository.AddAsync(navigationText);
+                        }
+                    }
+                }
+            }
+            await _navigationTextRepository.SaveAsync();
+
+            // handle children
+            foreach (var childNavigation in children)
+            {
+                await InsertNavigationAsync(childNavigation, navigation.Id);
+            }
+        }
+
+        private async Task UpdateNavigationRoleAsync(int navigationId, string role)
+        {
+            if (string.IsNullOrEmpty(role))
+            {
+                return;
+            }
+
+            string setting = null;
+
+            if (role == nameof(NavigationRoles.Top))
+            {
+                setting = Promenade.Models.Keys.SiteSetting.Site.NavigationIdTop;
+            }
+            else if (role == nameof(NavigationRoles.Left))
+            {
+                setting = Promenade.Models.Keys.SiteSetting.Site.NavigationIdLeft;
+            }
+            else if (role == nameof(NavigationRoles.Middle))
+            {
+                setting = Promenade.Models.Keys.SiteSetting.Site.NavigationIdMiddle;
+            }
+            else if (role == nameof(NavigationRoles.Footer))
+            {
+                setting = Promenade.Models.Keys.SiteSetting.Site.NavigationIdFooter;
+            }
+
+            if (!string.IsNullOrEmpty(setting))
+            {
+                await _siteSettingPromService.UpdateAsync(setting,
+                    navigationId.ToString(CultureInfo.InvariantCulture));
+            }
         }
     }
 }

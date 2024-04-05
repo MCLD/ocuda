@@ -26,7 +26,7 @@ namespace Ocuda.Ops.Data.Promenade
         }
 
         public async Task<ICollection<NavigationText>> GetByNavigationIdsAsync(
-            List<int> navigationIds)
+            ICollection<int> navigationIds)
         {
             return await DbSet
                 .AsNoTracking()
@@ -43,6 +43,11 @@ namespace Ocuda.Ops.Data.Promenade
                 .ThenBy(_ => _.Language.Name)
                 .Select(_ => _.Language.Name)
                 .ToListAsync();
+        }
+
+        public async Task RemoveAllAsync()
+        {
+            await _context.Database.ExecuteSqlRawAsync($"TRUNCATE TABLE {nameof(PromenadeContext.NavigationTexts)}");
         }
     }
 }
