@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
@@ -14,7 +16,10 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Ops.Service.Models.Navigation;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility;
+using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Extensions;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
@@ -22,31 +27,36 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class NavigationsController : BaseController<NavigationsController>
     {
+        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILanguageService _languageService;
         private readonly INavigationService _navigationService;
         private readonly IPermissionGroupService _permissionGroupService;
 
         public NavigationsController(ServiceFacades.Controller<NavigationsController> context,
+            IDateTimeProvider dateTimeProvider,
             ILanguageService languageService,
             INavigationService navigationService,
             IPermissionGroupService permissionGroupService)
             : base(context)
         {
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
-            _navigationService = navigationService
-                ?? throw new ArgumentNullException(nameof(navigationService));
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
+            ArgumentNullException.ThrowIfNull(dateTimeProvider);
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(navigationService);
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+
+            _dateTimeProvider = dateTimeProvider;
+            _languageService = languageService;
+            _navigationService = navigationService;
+            _permissionGroupService = permissionGroupService;
         }
 
         public static string Area
         { get { return "SiteManagement"; } }
+
         public static string Name
         { get { return "Navigations"; } }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<JsonResult> ChangeSort(int id, bool increase)
         {
             JsonResponse response;
@@ -83,8 +93,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> CreateNavigation(Navigation navigation, string role)
         {
             JsonResponse response;
@@ -135,8 +144,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> DeleteNavigation(Navigation navigation)
         {
             if (!await HasAppPermissionAsync(_permissionGroupService,
@@ -145,7 +153,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToUnauthorized();
             }
 
-            if(navigation == null)
+            if (navigation == null)
             {
                 ShowAlertDanger("Unable to create navigation: navigation is null.");
                 return RedirectToAction(nameof(Index));
@@ -177,11 +185,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> DeleteText(DetailsViewModel model)
         {
-            if(model == null)
+            if (model == null)
             {
                 ShowAlertDanger("Unable to delete empty navigation.");
                 return RedirectToAction(nameof(Index));
@@ -221,7 +228,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             });
         }
 
-        [Route("{id}")]
+        [HttpGet("{id}")]
         [RestoreModelState]
         public async Task<IActionResult> Details(int id, string language)
         {
@@ -274,13 +281,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                 foreach (var childNavigation in childNavigations)
                 {
-                    childNavigation.NavigationLanguages = await _navigationService
-                        .GetNavigationLanguagesByIdAsync(childNavigation.Id);
+                    childNavigation.NavigationLanguages.AddRange(await _navigationService
+                        .GetNavigationLanguagesByIdAsync(childNavigation.Id));
 
                     if (viewModel.RoleProperties.CanHaveGrandchildren)
                     {
                         childNavigation.SubnavigationCount = await _navigationService
-                            .GetSubnavigationCountAsnyc(childNavigation.Id);
+                            .GetSubnavigationCountAsync(childNavigation.Id);
                     }
                 }
 
@@ -290,8 +297,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return View(viewModel);
         }
 
-        [HttpPost]
-        [Route("{id}")]
+        [HttpPost("{id}")]
         [SaveModelState]
         public async Task<IActionResult> Details(DetailsViewModel model)
         {
@@ -301,7 +307,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToUnauthorized();
             }
 
-            if(model == null)
+            if (model == null)
             {
                 ShowAlertDanger("Unable to save empty navigation.");
                 return RedirectToAction(nameof(Index));
@@ -335,8 +341,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             });
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> EditNavigation(Navigation navigation)
         {
             JsonResponse response;
@@ -385,8 +390,46 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-        [Route("")]
-        public async Task<IActionResult> Index()
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Export()
+        {
+            var baseNavigationTree = await _navigationService.GetTopLevelNavigationsAsync();
+            var navigationRoles = await _navigationService.GetNavigationRolesAsync();
+            var navigationTree = baseNavigationTree
+                .OrderByDescending(_ => _.Id == navigationRoles.Top)
+                .ThenByDescending(_ => _.Id == navigationRoles.Middle)
+                .ThenByDescending(_ => _.Id == navigationRoles.Left)
+                .ThenByDescending(_ => _.Id == navigationRoles.Footer)
+                .ToList();
+
+            foreach (var navigation in navigationTree)
+            {
+                navigation.Navigations = await _navigationService
+                    .GetNavigationTreeAsync(navigation.Id);
+                navigation.NavigationRole = GetNavigationRole(navigationRoles, navigation.Id);
+            }
+
+            string publicSitePath = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl);
+
+            string intranetPath = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.UserInterface.BaseIntranetLink);
+
+            return File(JsonSerializer.SerializeToUtf8Bytes(new PortableList<Navigation>
+            {
+                ExportedAt = _dateTimeProvider.Now,
+                ExportedBy = CurrentUsername,
+                Items = navigationTree,
+                Source = $"{publicSitePath} (via {intranetPath})",
+                Type = nameof(Navigation),
+                Version = 1
+            }),
+                System.Net.Mime.MediaTypeNames.Application.Json,
+                $"{_dateTimeProvider.Now:yyyyMMdd}-{nameof(Navigation)}.json");
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Import(IFormFile navigationJson)
         {
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.NavigationManagement))
@@ -394,23 +437,49 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToUnauthorized();
             }
 
+            if (navigationJson == null)
+            {
+                return StatusCode(500);
+            }
+
+            var jsonStream = navigationJson.OpenReadStream();
+            var navigationsFromFile = await JsonSerializer
+                .DeserializeAsync<PortableList<Navigation>>(jsonStream);
+
+            await _navigationService.ReplaceAllNavigationAsync(navigationsFromFile.Items);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet("")]
+        public async Task<IActionResult> Index()
+        {
+            var hasEditPermission = await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.NavigationManagement);
+
+            if (!hasEditPermission)
+            {
+                return RedirectToUnauthorized();
+            }
+
             var viewModel = new IndexViewModel
             {
+                HasEditPermission = hasEditPermission,
                 NavigationRoles = await _navigationService.GetNavigationRolesAsync()
             };
 
             var topLevelNavigations = await _navigationService.GetTopLevelNavigationsAsync();
-            viewModel.Navigations = topLevelNavigations
+            viewModel.Navigations.AddRange(topLevelNavigations
                 .OrderByDescending(_ => _.Id == viewModel.NavigationRoles.Top)
                 .ThenByDescending(_ => _.Id == viewModel.NavigationRoles.Middle)
                 .ThenByDescending(_ => _.Id == viewModel.NavigationRoles.Left)
                 .ThenByDescending(_ => _.Id == viewModel.NavigationRoles.Footer)
-                .ToList();
+                .ToList());
 
             foreach (var navigation in viewModel.Navigations)
             {
                 navigation.SubnavigationCount = await _navigationService
-                    .GetSubnavigationCountAsnyc(navigation.Id);
+                    .GetSubnavigationCountAsync(navigation.Id);
             }
 
             var openRoles = new List<SelectListItem>();
@@ -435,9 +504,33 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     Promenade.Models.Keys.SiteSetting.Site.NavigationIdFooter));
             }
 
-            viewModel.OpenRoles = openRoles;
+            viewModel.OpenRoles.AddRange(openRoles);
 
             return View(viewModel);
+        }
+
+        private static string GetNavigationRole(NavigationRoles roles, int? navigationId)
+        {
+            if (roles.Top == navigationId)
+            {
+                return nameof(roles.Top);
+            }
+            else if (roles.Middle == navigationId)
+            {
+                return nameof(roles.Middle);
+            }
+            else if (roles.Left == navigationId)
+            {
+                return nameof(roles.Left);
+            }
+            else if (roles.Footer == navigationId)
+            {
+                return nameof(roles.Footer);
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

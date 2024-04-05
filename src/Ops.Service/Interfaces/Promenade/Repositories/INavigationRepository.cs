@@ -19,5 +19,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<List<Navigation>> GetSubsequentNavigationsAsync(int order, int parentNav);
 
         Task<ICollection<Navigation>> GetTopLevelNavigationsAsync();
+
+        Task RemoveAllAsync();
     }
 }

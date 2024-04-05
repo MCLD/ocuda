@@ -19,6 +19,16 @@
                 Add Navigation
             </button>
         }
+        @if (Model.HasEditPermission)
+        {
+            <button data-bs-toggle="modal"
+                    data-bs-target="#uploadModal"
+                    class="btn btn-outline-info mt-2 mb-1 me-2 float-end">
+                Import
+            </button>
+        }
+        <a asp-action="@nameof(NavigationsController.Export)"
+           class="btn btn-outline-info mt-2 mb-1 me-2 float-end">Export</a>
     </div>
 </div>
 
@@ -105,7 +115,10 @@
     </div>
 </form>
 
-<form asp-controller="@NavigationsController.Name" asp-action="@(nameof(NavigationsController.DeleteNavigation))" method="post" role="form">
+<form asp-controller="@NavigationsController.Name"
+      asp-action="@(nameof(NavigationsController.DeleteNavigation))"
+      method="post"
+      role="form">
     <input id="deleteId" asp-for="Navigation.Id" type="hidden" />
     <input id="deleteName" asp-for="Navigation.Name" type="hidden" />
 
@@ -116,9 +129,51 @@
     </div>
 </form>
 
+@if (Model.HasEditPermission)
+{
+    <form asp-action="@nameof(NavigationsController.Import)"
+          enctype="multipart/form-data"
+          method="post"
+          role="form">
+        <div class="modal" tabindex="-1" id="uploadModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Upload new navigation</h5>
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            Upload a <code>.json</code> file containing a new site navigation. This
+                            process will first <strong>entirely erase all navigation items</strong>
+                            from the site. Following that, it will attempt to insert new navigation
+                            items from the uploaded <code>.json</code> file.
+                        </p>
+                        <div class="input-group">
+                            <input type="file"
+                                   class="form-control"
+                                   name="navigationJson"
+                                   accept=".json" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-outline-primary">Upload file</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+}
+
+
 @section scripts {
     <script>
-        @if (Model.OpenRoles.Count > 0) {
+        @if (Model.OpenRoles.Count > 0)
+        {
             <text>
                 $("#addForm").submit(function (e) {
                     e.preventDefault();
@@ -133,19 +188,19 @@
                                 alert(response.message);
                                 ResetSpinners(form.find(".btn-spinner"));
                             }
-                    });
+                        });
                 });
             </text>
         }
 
-        $("#editModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-                
-            $("#editNavigation").val(id);
-            $("#editName").val(name);
-        });
+            $("#editModal").on("show.bs.modal", function (e) {
+                var button = $(e.relatedTarget);
+                var id = button.data("id");
+                var name = button.data("name");
+
+                $("#editNavigation").val(id);
+                $("#editName").val(name);
+            });
 
         $("#editForm").submit(function (e) {
             e.preventDefault();
@@ -153,14 +208,14 @@
             $.post("@(Url.Action(nameof(NavigationsController.EditNavigation), NavigationsController.Name))",
                 form.serialize(),
                 function (response) {
-                if (response.success == true) {
-                    location.reload();
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
+                    if (response.success == true) {
+                        location.reload();
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
         });
 
         $("#deleteModal").on("show.bs.modal", function (e) {

@@ -23,13 +23,17 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task<NavigationRoles> GetNavigationRolesAsync();
 
+        Task<IEnumerable<Navigation>> GetNavigationTreeAsync(int navigationId);
+
         Task<RoleProperties> GetRolePropertiesForNavigationAsync(int id);
 
-        Task<int> GetSubnavigationCountAsnyc(int id);
+        Task<int> GetSubnavigationCountAsync(int id);
 
         Task<NavigationText> GetTextByNavigationAndLanguageAsync(int navigationId, int languageId);
 
         Task<ICollection<Navigation>> GetTopLevelNavigationsAsync();
+
+        Task ReplaceAllNavigationAsync(IEnumerable<Navigation> navigations);
 
         Task SetNavigationTextAsync(NavigationText navigationText);
 

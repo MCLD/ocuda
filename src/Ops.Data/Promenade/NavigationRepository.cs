@@ -75,5 +75,11 @@ namespace Ocuda.Ops.Data.Promenade
                 .OrderBy(_ => _.Name)
                 .ToListAsync();
         }
+
+        public async Task RemoveAllAsync()
+        {
+            await _context.Database.ExecuteSqlRawAsync($"DELETE FROM [{nameof(PromenadeContext.Navigations)}] WHERE [{nameof(Navigation.NavigationId)}] IS NOT NULL");
+            await _context.Database.ExecuteSqlRawAsync($"DELETE FROM {nameof(PromenadeContext.Navigations)}");
+        }
     }
 }
