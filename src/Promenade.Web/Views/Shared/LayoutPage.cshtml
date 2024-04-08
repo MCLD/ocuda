@@ -66,17 +66,17 @@
                     <div class="col-12">
                         <div class="mb-4">
                             <div class="row g-0">
-                                <div class="col-12 col-md-7">
+                                <div class="col-12 col-lg-7">
                                     <img class="img-fluid" 
                                          src="@item.NavBanner.NavBannerImage.ImagePath" 
                                          alt="@item.NavBanner.NavBannerImage.ImageAltText" />
                                 </div>
-                                <div class="col-12 col-md-5 p-2 gap-2 fs-5 text-bold" style="background:lightgray; box-sizing: border-box">
+                                <div class="col-12 col-lg-5 p-2 gap-2 fs-5 text-bold" style="background:lightgray; box-sizing: border-box">
                                     <div class="banner-link-grid-container gap-2 h-100">
                                         @foreach (var link in item.NavBanner.NavBannerLinks)
                                         {
                                             <a class="banner-link-href h-100" href="@link.Link">
-                                                <div class="d-flex align-items-center justify-content-center py-4 py-md-1 gap-2 h-100" style="background:white">
+                                                <div class="d-flex align-items-center justify-content-center py-4 py-lg-1 gap-2 h-100" style="background:white">
                                                     <span class="@link.Icon mb-1 banner-link-icon"></span>
                                                     <span class="text-bold banner-link-text">@link.Text.Text</span>
                                                 </div>
