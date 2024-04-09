@@ -7,7 +7,7 @@
     "@fortawesome/fontawesome-free": "^6.4.0",
     "@popperjs/core": "^2.11.7",
     "bootstrap": "^5.2.3",
-    "commonmark": "^0.30.0",
+    "commonmark": "^0.31.0",
     "cropperjs": "^1.5.13",
     "jquery": "^3.6.4",
     "jquery-validation": "^1.19.5",
