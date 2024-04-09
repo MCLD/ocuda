@@ -360,6 +360,11 @@ footer .prom-logo {
         color: inherit;
     }
 
+.banner-link-text {
+    text-align: center;
+    max-width: 80%;
+}
+
 .prom-leftnav-container {
     padding: 1rem 0.5rem;
 }
