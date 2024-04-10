@@ -92,8 +92,7 @@
                         }
                     </div>
                     <div class="col-12 col-sm-6 bg-white px-0 py-4 px-sm-4 location-feature-link">
-                        <!-- TODO: Remove hard coded string -->
-                        <h2>At this location</h2>
+                        <h2>@Localizer[Promenade.AtThisLocation]</h2>
                         @foreach (var feature in Model.AtThisLocation)
                         {
                             @if (string.IsNullOrEmpty(feature.RedirectLink))
@@ -171,8 +170,7 @@
 
     <div class="row g-0 mx-auto mb-4 text-start">
         <div class="row p-0 mt-0 gx-0 gy-3 gx-sm-3 col-lg-10 offset-lg-1">
-            <!-- TODO: Remove hard coded string -->
-            <h2 class="mt-0 px-lg-0">Services Available</h2>
+            <h2 class="mt-0 px-lg-0">@Localizer[Promenade.ServicesAvailable]</h2>
             @foreach (var feature in Model.ServicesAvailable)
             {
                 <div class="col-12 col-sm-4 location-feature-link">
@@ -228,6 +226,8 @@
                     }
                 </div>
             }
+            <!-- TODO: See Services At All link -->
+            <em><a href="#">@Localizer[Promenade.SeeServicesAtAll]</a></em>
         </div>
     </div>
 
@@ -295,21 +295,18 @@
                                 <div class="d-flex gap-4 align-items-center prom-box-border p-3 h-100">
                                     <span class="fa-brands fa-facebook display-4 prom-text-color"></span>
                                     <span class="location-feature-link prom-faq-icons">
-                                        <!-- TODO: Replace hard coded text -->
-                                        Follow Maricopa County Library District on Facebook!
+                                        @Localizer[Promenade.ConnectSocialOn, nameof(Model.Location.Facebook)]!
                                     </span>
                                 </div>
                             </a>
                         </div>
                     }
-
                     <div class="col-12 col-sm-6 mb-4 location-feature-link">
                         <a href="@Model.Location.SubscriptionLink">
                             <div class="d-flex gap-4 align-items-center prom-box-border p-3 h-100">
                                 <span class="fa-solid fa-envelope-open-text display-4 prom-text-color"></span>
                                 <span class="location-feature-link prom-faq-icons">
-                                    <!-- TODO: Replace hard coded text -->
-                                    Sign up for our email newsletter!
+                                    @Localizer[Promenade.SignUpForEmailNewsletter]!
                                 </span>
                             </div>
                         </a>
@@ -443,12 +440,10 @@
                                     @if (Model.NearbyCount == Model.NearbyEventsCount)
                                     {
                                         @Localizer[Promenade.LocationUpdatesFromAllCount, Model.NearbyEventsCount]
-                                        ;
                                     }
                                     else
                                     {
                                         @Localizer[Promenade.LocationUpdatesFromCount, Model.NearbyEventsCount]
-                                        ;
                                     }
                                     <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
                                 </a>

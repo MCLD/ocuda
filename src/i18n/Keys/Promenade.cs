@@ -4,6 +4,7 @@
     // change values in resource files since these are const and not static readonly.
     public static class Promenade
     {
+        public const string AtThisLocation = "At This Location";
         public const string AvailabilityExperience = "Availability & Experience";
         public const string ButtonBack = "Back";
         public const string ButtonBackToSite = "Back to the site";
@@ -15,6 +16,7 @@
         public const string ConnectSocialMedia = "Connect with us on social media!";
         public const string ConnectSocialOn = "Connect with us on {0}";
         public const string ContactInformation = "Contact Information";
+        public const string ContactUs = "Contact Us";
         public const string CoordinatesErrorItem = "There was a problem locating these coordinates: {0}, {1}";
         public const string Error = "Error";
         public const string ErrorAvailableDaysItem = "This service is only available on the following days: {0}";
@@ -106,7 +108,10 @@
         public const string ScheduleRequiredNotes = "Please help us out by telling us a little about your request.";
         public const string ScheduleYourTime = "Schedule your time";
         public const string ScheduleYourTimeIsScheduled = "Your time is scheduled";
+        public const string SeeServicesAtAll = "See services at all of our libraries";
+        public const string ServicesAvailable = "Services Available";
         public const string ShowNotesFor = "Show notes for: {0}";
+        public const string SignUpForEmailNewsletter = "Sign up for our email newsletter";
         public const string SpecialHours = "Special Hours";
         public const string TodaysHours = "Today's Hours: {0}";
         public const string ViewShowNotes = "View show notes";

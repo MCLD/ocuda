@@ -117,431 +117,431 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Phone">
+  <data name="Phone" xml:space="preserve">
     <value>Teléfono</value>
     <comment>Label prompting a customer to enter their telephone number</comment>
   </data>
-  <data name="Requested date">
+  <data name="Requested date" xml:space="preserve">
     <value>Fecha solicitada</value>
     <comment>Label prompting a customer to select a date</comment>
   </data>
-  <data name="Requested date and time">
+  <data name="Requested date and time" xml:space="preserve">
     <value>Fecha y hora solicitadas</value>
     <comment>Label to show a customer what date and time they selected</comment>
   </data>
-  <data name="Requested time">
+  <data name="Requested time" xml:space="preserve">
     <value>Tiempo solicitado</value>
     <comment>Label prompting a customer to select a time</comment>
   </data>
-  <data name="Subject">
+  <data name="Subject" xml:space="preserve">
     <value>Tema</value>
     <comment>Label next to a drop-down with a list of subjects</comment>
   </data>
-  <data name="Back">
+  <data name="Back" xml:space="preserve">
     <value>Regresar</value>
     <comment>Navigation button: go back to a previous page</comment>
   </data>
-  <data name="Back to the site">
+  <data name="Back to the site" xml:space="preserve">
     <value>Volver al sitio</value>
     <comment>Navigation button: go back to the Web site</comment>
   </data>
-  <data name="Go">
+  <data name="Go" xml:space="preserve">
     <value>Ir</value>
     <comment>Navigation button: perform a search or other action</comment>
   </data>
-  <data name="Next">
+  <data name="Next" xml:space="preserve">
     <value>Próximo</value>
     <comment>Navigation button: go forward to the next page in a process</comment>
   </data>
-  <data name="Submit">
+  <data name="Submit" xml:space="preserve">
     <value>Enviar</value>
     <comment>Button: submit form data</comment>
   </data>
-  <data name="Subscribe">
+  <data name="Subscribe" xml:space="preserve">
     <value>Suscribir</value>
     <comment>Button: subscribe to a mailing list</comment>
   </data>
-  <data name="Use my location">
+  <data name="Use my location" xml:space="preserve">
     <value>Usa mi ubicación</value>
     <comment>Button: engage a mobile device's GPS to look up the customer's location</comment>
   </data>
-  <data name="Connect with us on social media!">
+  <data name="Connect with us on social media!" xml:space="preserve">
     <value>¡Conéctese con nosotros en las redes sociales!</value>
     <comment>Call to action: visit social media accounts</comment>
   </data>
-  <data name="Connect with us on {0}">
+  <data name="Connect with us on {0}" xml:space="preserve">
     <value>Conéctese con nosotros en {0}</value>
     <comment>Call to action: visit a specific social media account; {0} is replaced with the platform (e.g. "Twitter" or "Instagram")</comment>
   </data>
-  <data name="There was a problem locating these coordinates: {0}, {1}">
+  <data name="There was a problem locating these coordinates: {0}, {1}" xml:space="preserve">
     <value>Hubo un problema al localizar estas coordenadas: {0}, {1}</value>
     <comment>Error message: that the customer's geographic location couldn't be located; {0} and {1} are the GPS coordinates</comment>
   </data>
-  <data name="Error">
+  <data name="Error" xml:space="preserve">
     <value>Error</value>
     <comment>Message indicating a general, unspecified error</comment>
   </data>
-  <data name="This service is only available on the following days: {0}">
+  <data name="This service is only available on the following days: {0}" xml:space="preserve">
     <value>Este servicio solo está disponible los siguientes días: {0}</value>
     <comment>Error message: showing which days a service is available; {0} are the days the service is available</comment>
   </data>
-  <data name="That date is not available for scheduling: {0}">
+  <data name="That date is not available for scheduling: {0}" xml:space="preserve">
     <value>Esa fecha no está disponible para programación: {0}</value>
     <comment>Error message: a day is not available for a service; {0} is the date the customer selected</comment>
   </data>
-  <data name="You must request a date on or after: {0}">
+  <data name="You must request a date on or after: {0}" xml:space="preserve">
     <value>Debe solicitar una fecha a partir del: {0}</value>
     <comment>Error message: the earliest day a service can be engaged; {0} is the earliest date</comment>
   </data>
-  <data name="The earliest time you can select is: {0}">
+  <data name="The earliest time you can select is: {0}" xml:space="preserve">
     <value>La primera hora que puede seleccionar es: {0}</value>
     <comment>Error message: the earliest time a service can be engaged; {0} is the earliest time</comment>
   </data>
-  <data name="The furthest date you can schedule a call is: {0}">
+  <data name="The furthest date you can schedule a call is: {0}" xml:space="preserve">
     <value>La fecha más lejana en la que puede programar una llamada es: {0}</value>
     <comment>Error message: the latest date that a telephone call can be scheduled; {0} is the furthest date a call can be scheduled</comment>
   </data>
-  <data name="There was a problem finding this ZIP code: {0}">
+  <data name="There was a problem finding this ZIP code: {0}" xml:space="preserve">
     <value>Hubo un problema para encontrar este código postal: {0}</value>
     <comment>Error message: that a ZIP code could not be found; {0} is the ZIP code the customer entered</comment>
   </data>
-  <data name="No available times for scheduling could be found.">
+  <data name="No available times for scheduling could be found." xml:space="preserve">
     <value>No se pudieron encontrar horarios disponibles para la programación.</value>
     <comment>Error message: there are no times available to schedule</comment>
   </data>
-  <data name="Page not found">
+  <data name="Page not found" xml:space="preserve">
     <value>Página no encontrada</value>
     <comment>Web error when a page is not found (a 404 error)</comment>
   </data>
-  <data name="An error occurred while processing your request.">
+  <data name="An error occurred while processing your request." xml:space="preserve">
     <value>Se produjo un error al procesar su solicitud.</value>
     <comment>Message indicating a general, unspecified error</comment>
   </data>
-  <data name="Unfortunately your session has timed out. Please reselect your time and subject.">
+  <data name="Unfortunately your session has timed out. Please reselect your time and subject." xml:space="preserve">
     <value>Lamentablemente, se agotó el tiempo de espera de su sesión. Vuelva a seleccionar su hora y tema.</value>
     <comment>Too long has elapsed while the user was viewing a form and their session expired.</comment>
   </data>
-  <data name="Please enter a telephone number in the format: ###-###-####">
+  <data name="Please enter a telephone number in the format: ###-###-####" xml:space="preserve">
     <value>Ingrese un número de teléfono en el formato: ### - ### - ####</value>
     <comment>Error message: telephone number was not entered in the proper format</comment>
   </data>
-  <data name="You must request a time before: {0}">
+  <data name="You must request a time before: {0}" xml:space="preserve">
     <value>Debe solicitar una hora antes: {0}</value>
     <comment>Error message: the latest time a service can be requested; {0} is the latest time</comment>
   </data>
-  <data name="Please enter a 5 digit numeric ZIP code.">
+  <data name="Please enter a 5 digit numeric ZIP code." xml:space="preserve">
     <value>Ingrese un código postal numérico de 5 dígitos.</value>
     <comment>Error message: the ZIP code format was not correct</comment>
   </data>
-  <data name="{0} help">
+  <data name="{0} help" xml:space="preserve">
     <value>{0} ayuda</value>
     <comment>Title for help on a specific resource; {0} is the name of the resource (e.g. "ConsumerReports.org" or "OverDrive")</comment>
   </data>
-  <data name="Keywords: {0}">
+  <data name="Keywords: {0}" xml:space="preserve">
     <value>Palabras clave: {0}</value>
     <comment>Display a list of keywords; {0} is replaced with a comma-separated list of keywords</comment>
   </data>
-  <data name="Back to {0}">
+  <data name="Back to {0}" xml:space="preserve">
     <value>Volver a {0}</value>
     <comment>Button: return to the page detailing a location; {0} is the name of the location</comment>
   </data>
-  <data name="Details">
+  <data name="Details" xml:space="preserve">
     <value>Detalles</value>
     <comment>Button: view details</comment>
   </data>
-  <data name="Events">
+  <data name="Events" xml:space="preserve">
     <value>Eventos</value>
     <comment>Button: view events</comment>
   </data>
-  <data name="Call us at {0}">
+  <data name="Call us at {0}" xml:space="preserve">
     <value>Llámanos al {0}</value>
     <comment>Call to action: message to call us; {0} is replaced with the telephone number</comment>
   </data>
-  <data name="Closed">
+  <data name="Closed" xml:space="preserve">
     <value>Cerrado</value>
     <comment>Location status message, the location is closed</comment>
   </data>
-  <data name="Closed today">
+  <data name="Closed today" xml:space="preserve">
     <value>Hoy está cerrado</value>
     <comment>Location status message, the location is closed for today</comment>
   </data>
-  <data name="Our current operating hours are:">
+  <data name="Our current operating hours are:" xml:space="preserve">
     <value>Nuestras horas de funcionamiento actuales son:</value>
     <comment>Label prefixing the current operating hours of a location</comment>
   </data>
-  <data name="{0} at {1} Library">
+  <data name="{0} at {1} Library" xml:space="preserve">
     <value>{0} en {1} Biblioteca</value>
     <comment>Location feature heading; {0} is the feature of the location, {1} is the name of the location</comment>
   </data>
-  <data name="Find my Library">
+  <data name="Find my Library" xml:space="preserve">
     <value>Encuentra mi biblioteca</value>
     <comment>Title of the page to locate the nearest library</comment>
   </data>
-  <data name="Library Information">
+  <data name="Library Information" xml:space="preserve">
     <value>Información de la biblioteca</value>
     <comment>Page header for information section of location page</comment>
   </data>
-  <data name="Interested in updates from every library in this area?">
+  <data name="Interested in updates from every library in this area?" xml:space="preserve">
     <value>¿Está interesado en las actualizaciones de todas las bibliotecas de esta área?</value>
     <comment>Prompt before button to subscribe to multiple mailing lists</comment>
   </data>
-  <data name="Nearby Locations">
+  <data name="Nearby Locations" xml:space="preserve">
     <value>Ubicaciones cercanas</value>
     <comment>Page header for other locations which are narby</comment>
   </data>
-  <data name="Open">
+  <data name="Open" xml:space="preserve">
     <value>Abierto</value>
     <comment>Location status message, the location is open</comment>
   </data>
-  <data name="Opens at {0}">
+  <data name="Opens at {0}" xml:space="preserve">
     <value>Abre a las {0}</value>
     <comment>Location status message, the location opens at a time; {0} is replaced with the time</comment>
   </data>
-  <data name="Opens {0} at {1}">
+  <data name="Opens {0} at {1}" xml:space="preserve">
     <value>Abre {0} a las {1}</value>
     <comment>Location status message, the location opens at a date and time; {0} is the day of the week, {1} is the time</comment>
   </data>
-  <data name="Open until {0}">
+  <data name="Open until {0}" xml:space="preserve">
     <value>Abierto hasta las {0}</value>
     <comment>Location status message, open until a time; {0} is the time that the location closes</comment>
   </data>
-  <data name="Our address:">
+  <data name="Our address:" xml:space="preserve">
     <value>Nuestra dirección:</value>
     <comment>Label indicating the location address follows</comment>
   </data>
-  <data name="There was a problem determining your location.">
+  <data name="There was a problem determining your location." xml:space="preserve">
     <value>Hubo un problema al determinar su ubicación.</value>
     <comment>Error message: location could not be determined for finding the nearest location via GPS</comment>
   </data>
-  <data name="See a map to this location">
+  <data name="See a map to this location" xml:space="preserve">
     <value>Ver un mapa de esta ubicación</value>
     <comment>Label indicating a link takes the customer to a map of the location</comment>
   </data>
-  <data name="Locations">
+  <data name="Locations" xml:space="preserve">
     <value>Ubicaciones</value>
     <comment>Page header for showing locations</comment>
   </data>
-  <data name="Subscribe to updates from all of these libraries.">
+  <data name="Subscribe to updates from all of these libraries." xml:space="preserve">
     <value>Suscríbase a las actualizaciones de todas estas bibliotecas.</value>
     <comment>Link to subscribe to mailing lists for all libraries which are listed</comment>
   </data>
-  <data name="Subscribe to updates from: {0}">
+  <data name="Subscribe to updates from: {0}" xml:space="preserve">
     <value>Suscríbase para recibir actualizaciones de: {0}</value>
     <comment>Link to subscribe to a mailing list for a location; {0} is the name of the location</comment>
   </data>
-  <data name="tomorrow">
+  <data name="tomorrow" xml:space="preserve">
     <value>mañana</value>
     <comment>Location status message, word to indicate the next open date is tomorrow</comment>
   </data>
-  <data name="Updates from all {0} locations">
+  <data name="Updates from all {0} locations" xml:space="preserve">
     <value>Actualizaciones de todas las {0} ubicaciones</value>
     <comment>Button to subscribe to updates from all listed locations; {0} is the number of locations</comment>
   </data>
-  <data name="Updates from {0} locations">
+  <data name="Updates from {0} locations" xml:space="preserve">
     <value>Actualizaciones de {0} ubicaciones</value>
     <comment>Button to subscribe to updates from a number of listed locations; {0} is the number of locations</comment>
   </data>
-  <data name="View events at: {0}">
+  <data name="View events at: {0}" xml:space="preserve">
     <value>Ver eventos en: {0}</value>
     <comment>Link to view events at a location; {0} is the name of the location</comment>
   </data>
-  <data name="(opens in a new window)">
+  <data name="(opens in a new window)" xml:space="preserve">
     <value>(Se abre en una nueva ventana)</value>
     <comment>Information added to buttons or links to indicate they open in a new window</comment>
   </data>
-  <data name="{0} (opens in a new window)">
+  <data name="{0} (opens in a new window)" xml:space="preserve">
     <value>{0} (se abre en una nueva ventana)</value>
     <comment>Description of a link with information added to indicate the link opens in a new window; {0} is the link description</comment>
   </data>
-  <data name="{0} offers:">
+  <data name="{0} offers:" xml:space="preserve">
     <value>{0} ofertas:</value>
     <comment>Label indicating what type of materials a service offers; {0} is the name of the service (e.g. "ConsumerReports.org", "OverDrive")</comment>
   </data>
-  <data name="Episode {0}, published {1}.">
+  <data name="Episode {0}, published {1}." xml:space="preserve">
     <value>Episodio {0}, publicado {1}.</value>
     <comment>Podcast details message; {0} is the episode number, {1} is the publication date</comment>
   </data>
-  <data name="You can listen to our podcast on:">
+  <data name="You can listen to our podcast on:" xml:space="preserve">
     <value>Puede escuchar nuestro podcast en:</value>
     <comment>Label prompting external services which carry a podcast</comment>
   </data>
-  <data name="Podcasts">
+  <data name="Podcasts" xml:space="preserve">
     <value>Podcasts</value>
     <comment>Page header for podcasts</comment>
   </data>
-  <data name="{0} Podcast">
+  <data name="{0} Podcast" xml:space="preserve">
     <value>{0} Podcast</value>
     <comment>Podcast title; {0} is the name of the podcast</comment>
   </data>
-  <data name="Email">
+  <data name="Email" xml:space="preserve">
     <value>Correo electrónico</value>
     <comment>Label prompting a customer to enter their email address</comment>
   </data>
-  <data name="Language">
+  <data name="Language" xml:space="preserve">
     <value>Idioma</value>
     <comment>Label prompting a customer to select a language</comment>
   </data>
-  <data name="Name">
+  <data name="Name" xml:space="preserve">
     <value>Nombre</value>
     <comment>Label prompting a customer to enter their name</comment>
   </data>
-  <data name="Notes">
+  <data name="Notes" xml:space="preserve">
     <value>Notas</value>
     <comment>Label prompting a customer to enter notes regarding their service request</comment>
   </data>
-  <data name="You must supply a value for: {0}">
+  <data name="You must supply a value for: {0}" xml:space="preserve">
     <value>Debe proporcionar un valor para: {0}</value>
     <comment>Error message: required field; {0} is the required field</comment>
   </data>
-  <data name="The {0} field is required.">
+  <data name="The {0} field is required." xml:space="preserve">
     <value>El área {0} es obligatorio.</value>
     <comment>Label noting that a field is required; {0} is the required field</comment>
   </data>
-  <data name="Here are the details of your appointment:">
+  <data name="Here are the details of your appointment:" xml:space="preserve">
     <value>Aquí están los detalles de su cita:</value>
     <comment>Label indicating the details for a customer's service appointment</comment>
   </data>
-  <data name="Please check your email for important information about this appointment.">
+  <data name="Please check your email for important information about this appointment." xml:space="preserve">
     <value>Consulte su correo electrónico para obtener información importante sobre esta cita.</value>
     <comment>Label indicating the customer should check their email for details about the appointment</comment>
   </data>
-  <data name="How can we help?">
+  <data name="How can we help?" xml:space="preserve">
     <value>¿Cómo podemos ayudar?</value>
     <comment>Label asking what sort of assistance the customer needs</comment>
   </data>
-  <data name="Scheduling is currently not available.">
+  <data name="Scheduling is currently not available." xml:space="preserve">
     <value>La programación no está disponible actualmente.</value>
     <comment>Label asserting that scheduling appointments is currently not available</comment>
   </data>
-  <data name="Request a different time">
+  <data name="Request a different time" xml:space="preserve">
     <value>Solicite una hora diferente</value>
     <comment>Label encouraging selection of a different time if the selected time is not available</comment>
   </data>
-  <data name="Please help us out by telling us a little about your request.">
+  <data name="Please help us out by telling us a little about your request." xml:space="preserve">
     <value>Ayúdenos contándonos un poco sobre su solicitud.</value>
     <comment>Label encouraging customer to describe their help request</comment>
   </data>
-  <data name="Schedule your time">
+  <data name="Schedule your time" xml:space="preserve">
     <value>Programe su tiempo</value>
     <comment>Header for customers to schedule a time for their help request</comment>
   </data>
-  <data name="Your time is scheduled">
+  <data name="Your time is scheduled" xml:space="preserve">
     <value>Su tiempo está programado</value>
     <comment>Header for success page once a customer's time is scheduled</comment>
   </data>
-  <data name="Visit home page">
+  <data name="Visit home page" xml:space="preserve">
     <value>Visite la página de inicio</value>
     <comment>Label describing the home page link</comment>
   </data>
-  <data name="Libraries closest to ZIP code: {0}">
+  <data name="Libraries closest to ZIP code: {0}" xml:space="preserve">
     <value>Bibliotecas más cercanas al código postal: {0}</value>
     <comment>Label describing the search results for libraries close to a ZIP code; {0} is the ZIP code</comment>
   </data>
-  <data name="Enter a 5 digit ZIP code">
+  <data name="Enter a 5 digit ZIP code" xml:space="preserve">
     <value>Ingrese un código postal de 5 dígitos</value>
     <comment>Prompt to enter a five digit ZIP code to find the nearest locations</comment>
   </data>
-  <data name="Requested date">
+  <data name="Requested date" xml:space="preserve">
     <value>Fecha solicitada</value>
     <comment>Label prompting a customer to select a date</comment>
   </data>
-  <data name="Requested date and time">
+  <data name="Requested date and time" xml:space="preserve">
     <value>Fecha y hora solicitadas</value>
     <comment>Label to show a customer what date and time they selected</comment>
   </data>
-  <data name="Requested time">
+  <data name="Requested time" xml:space="preserve">
     <value>Tiempo solicitado</value>
     <comment>Label prompting a customer to select a time</comment>
   </data>
-  <data name="Back to the site">
+  <data name="Back to the site" xml:space="preserve">
     <value>Volver al sitio</value>
     <comment>Navigation button: go back to the Web site</comment>
   </data>
-  <data name="Use my location">
+  <data name="Use my location" xml:space="preserve">
     <value>Usa mi ubicación</value>
     <comment>Button: engage a mobile device's GPS to look up the customer's location</comment>
   </data>
-  <data name="Page not found">
+  <data name="Page not found" xml:space="preserve">
     <value>Página no encontrada</value>
     <comment>Web error when a page is not found (a 404 error)</comment>
   </data>
-  <data name="Please enter a telephone number in the format: ###-###-####">
+  <data name="Please enter a telephone number in the format: ###-###-####" xml:space="preserve">
     <value>Ingrese un número de teléfono en el formato: ### - ### - ####</value>
     <comment>Error message: telephone number was not entered in the proper format</comment>
   </data>
-  <data name="Closed today">
+  <data name="Closed today" xml:space="preserve">
     <value>Hoy está cerrado</value>
     <comment>Location status message, the location is closed for today</comment>
   </data>
-  <data name="Find my Library">
+  <data name="Find my Library" xml:space="preserve">
     <value>Encuentra mi biblioteca</value>
     <comment>Title of the page to locate the nearest library</comment>
   </data>
-  <data name="Library Information">
+  <data name="Library Information" xml:space="preserve">
     <value>Información de la biblioteca</value>
     <comment>Page header for information section of location page</comment>
   </data>
-  <data name="Nearby Locations">
+  <data name="Nearby Locations" xml:space="preserve">
     <value>Ubicaciones cercanas</value>
     <comment>Page header for other locations which are narby</comment>
   </data>
-  <data name="See a map to this location">
+  <data name="See a map to this location" xml:space="preserve">
     <value>Ver un mapa de esta ubicación</value>
     <comment>Label indicating a link takes the customer to a map of the location</comment>
   </data>
-  <data name="(opens in a new window)">
+  <data name="(opens in a new window)" xml:space="preserve">
     <value>(Se abre en una nueva ventana)</value>
     <comment>Information added to buttons or links to indicate they open in a new window</comment>
   </data>
-  <data name="Request a different time">
+  <data name="Request a different time" xml:space="preserve">
     <value>Solicite una hora diferente</value>
     <comment>Label encouraging selection of a different time if the selected time is not available</comment>
   </data>
-  <data name="Schedule your time">
+  <data name="Schedule your time" xml:space="preserve">
     <value>Programe su tiempo</value>
     <comment>Header for customers to schedule a time for their help request</comment>
   </data>
-  <data name="Your time is scheduled">
+  <data name="Your time is scheduled" xml:space="preserve">
     <value>Su tiempo está programado</value>
     <comment>Header for success page once a customer's time is scheduled</comment>
   </data>
-  <data name="Visit home page">
+  <data name="Visit home page" xml:space="preserve">
     <value>Visite la página de inicio</value>
     <comment>Label describing the home page link</comment>
   </data>
-  <data name="Enter a 5 digit ZIP code">
+  <data name="Enter a 5 digit ZIP code" xml:space="preserve">
     <value>Ingrese un código postal de 5 dígitos</value>
     <comment>Prompt to enter a five digit ZIP code to find the nearest locations</comment>
   </data>
-  <data name="Location">
+  <data name="Location" xml:space="preserve">
     <value>Ubicación</value>
     <comment>Column header for a location</comment>
   </data>
-  <data name="Hours">
+  <data name="Hours" xml:space="preserve">
     <value>Horario</value>
     <comment>Column header describing when the location is open</comment>
   </data>
-  <data name="Status">
+  <data name="Status" xml:space="preserve">
     <value>Estatus</value>
     <comment>Column header with product inventory status</comment>
   </data>
-  <data name="Last Update">
+  <data name="Last Update" xml:space="preserve">
     <value>Última Actualización</value>
     <comment>Column header describing when data was last updated</comment>
   </data>
-  <data name="Has {0}">
+  <data name="Has {0}" xml:space="preserve">
     <value>Tiene {0}</value>
     <comment>Text indicating that a location has an item. {0} will be replaced with the name of the item</comment>
   </data>
-  <data name="Does not have {0}">
+  <data name="Does not have {0}" xml:space="preserve">
     <value>No Tiene {0}</value>
     <comment>Text indicating that a location does not have an item. {0} will be replaced with the name of the item</comment>
   </data>
-  <data name="Show notes for: {0}">
+  <data name="Show notes for: {0}" xml:space="preserve">
     <value>Mostrar notas para: {0}</value>
     <comment>Header for a podcast's show notes; {0} is the episode title</comment>
   </data>
-  <data name="View show notes">
+  <data name="View show notes" xml:space="preserve">
     <value>Ver notas del programa</value>
     <comment>Label that links to a podcast's show notes</comment>
   </data>
@@ -628,5 +628,25 @@
   <data name="Thank you for your interest! Someone will be in touch with you very soon." xml:space="preserve">
     <value>¡Gracias por su interés! Una persona de nuestro equipo se pondrá en contacto con usted muy pronto.</value>
     <comment>Default follow-up shown to customer after submitting volunteer form.</comment>
+  </data>
+  <data name="At This Location" xml:space="preserve">
+    <value>En este biblioteca</value>
+    <comment>Header for displaying services available at this particular location</comment>
+  </data>
+  <data name="Contact Us" xml:space="preserve">
+    <value />
+    <comment>Link to instructions on how to contact the site owner</comment>
+  </data>
+  <data name="See services at all of our libraries" xml:space="preserve">
+    <value />
+    <comment>Textual link on the location page for showing services at all locations</comment>
+  </data>
+  <data name="Services Available" xml:space="preserve">
+    <value>Servicios</value>
+    <comment>Header for displaying services available for a location</comment>
+  </data>
+  <data name="Sign up for our email newsletter" xml:space="preserve">
+    <value />
+    <comment>Button for call to action - subscribe to newsletter</comment>
   </data>
 </root>

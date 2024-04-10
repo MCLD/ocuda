@@ -287,7 +287,6 @@
                 </div>
             </header>
             <div class="row prom-content-container">
-
                 <div class="col-12 d-print-inline-block prom-body-content-container"
                      role="main" id="mainContent">
                     <div class="prom-body-content">
@@ -300,8 +299,7 @@
             <div class="col-12 col-md-3 prom-footer-contact text-center">
                 <div class="row flex-md-column mx-auto w-100">
                     <div class="col-12 col-sm-4 col-md-12 py-2 footer-contact">
-                        <!-- TODO: Fix this hard coded string -->
-                        Contact Us
+                        @Localizer[Promenade.ContactUs]
                     </div>
                     <div class="col-12 col-sm-4 col-md-12 py-2 footer-contact">
                         @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.MainPhoneNumber]?.ToString()))
