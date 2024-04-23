@@ -5,6 +5,6 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface INavBannerImageRepository : IGenericRepository<NavBannerImage>
     {
-        Task<NavBannerImage> GetByNavBannerIdAsync(int navBannerId, int languageId);
+        Task<NavBannerImage> GetByNavBannerIdAsync(int id, int languageId);
     }
 }

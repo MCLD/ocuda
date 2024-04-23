@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Data.ServiceFacade;
@@ -19,9 +18,8 @@ namespace Ocuda.Promenade.Data.Promenade
         public async Task<NavBanner> GetByIdAsync(int id)
         {
             return await DbSet
-                .Where(_ => _.Id == id)
                 .AsNoTracking()
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(_ => _.Id == id);
         }
     }
 }

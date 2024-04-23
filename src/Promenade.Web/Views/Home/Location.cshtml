@@ -247,23 +247,33 @@
                 <div class="col-12 col-md-8" style="background-color: white;">
                     <div id="interiorPhotoCarousel" class="carousel slide">
                         <div class="carousel-indicators">
-                            @for (int i = 0; i < Model.Location.InteriorImages.Count; i++)
+                            @foreach (var interiorImage in Model.Location.InteriorImages)
                             {
-                                @if (i == 0)
-                                {
-                                    <button type="button" data-bs-target="#interiorPhotoCarousel" data-bs-slide-to="@i" class="active" aria-current="true" aria-label="@Model.Location.InteriorImages[i].AltText"></button>
-                                }
-                                else
-                                {
-                                    <button type="button" data-bs-target="#interiorPhotoCarousel" data-bs-slide-to="@i" aria-label="@Model.Location.InteriorImages[i].AltText"></button>
-                                }
+                                <button type="button"
+                                        data-bs-target="#interiorPhotoCarousel"
+                                        data-bs-slide-to="@interiorImage.SortOrder"
+                                        class="@Model.ActiveIfFirstInteriorImage(interiorImage.SortOrder)"
+                                        aria-current="true"
+                                        aria-label="@interiorImage.AltText"></button>
+
+                            }
+                            @foreach (var interiorImage in Model.Location.InteriorImages)
+                            {
+                                <button type="button"
+                                        data-bs-target="#interiorPhotoCarousel"
+                                        data-bs-slide-to="@interiorImage.SortOrder"
+                                        class="@Model.ActiveIfFirstInteriorImage(interiorImage.SortOrder)"
+                                        aria-current="true"
+                                        aria-label="@interiorImage.AltText"></button>
                             }
                         </div>
                         <div class="carousel-inner">
-                            @for (int i = 0; i < Model.Location.InteriorImages.Count; i++)
+                            @foreach (var interiorImage in Model.Location.InteriorImages)
                             {
-                                <div class="carousel-item @(i == 0 ? "active" : "")">
-                                    <img src="@Model.Location.InteriorImages[i].ImagePath" class="d-block w-100" alt="@Model.Location.InteriorImages[i].AltText">
+                                <div class="carousel-item @Model.ActiveIfFirstInteriorImage(interiorImage.SortOrder)">
+                                    <img src="@interiorImage.ImagePath"
+                                         class="d-block w-100"
+                                         alt="@interiorImage.AltText">
                                 </div>
                             }
                         </div>

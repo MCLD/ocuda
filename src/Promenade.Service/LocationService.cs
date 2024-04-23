@@ -38,9 +38,9 @@ namespace Ocuda.Promenade.Service
         private readonly IStringLocalizer<i18n.Resources.Shared> _localizer;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
         private readonly ILocationGroupRepository _locationGroupRepository;
-        private readonly ILocationInteriorImageRepository _locationInteriorImageRepository;
         private readonly ILocationHoursOverrideRepository _locationHoursOverrideRepository;
         private readonly ILocationHoursRepository _locationHoursRepository;
+        private readonly ILocationInteriorImageRepository _locationInteriorImageRepository;
         private readonly ILocationRepository _locationRepository;
         private readonly SegmentService _segmentService;
 
@@ -414,8 +414,10 @@ namespace Ocuda.Promenade.Service
                 Utility.Keys.Cache.PromLocationInteriorImages,
                 id);
 
-            var interiorImages = forceReload ? null : await _cache
-                .GetObjectFromCacheAsync<List<LocationInteriorImage>>(interiorImagesCacheKey);
+            ICollection<LocationInteriorImage> interiorImages = forceReload
+                ? null
+                : await _cache
+                    .GetObjectFromCacheAsync<List<LocationInteriorImage>>(interiorImagesCacheKey);
 
             if (interiorImages == null)
             {
@@ -425,16 +427,15 @@ namespace Ocuda.Promenade.Service
                 await _cache.SaveToCacheAsync(interiorImagesCacheKey, interiorImages, CacheLocationHours);
             }
 
-
             var currentDefaultLanguageId = await GetCurrentDefaultLanguageIdAsync(_contextAccessor,
                 _languageService);
 
             foreach (var image in interiorImages)
             {
                 var imageAltTextCacheKey = string.Format(CultureInfo.InvariantCulture,
-                Utility.Keys.Cache.PromLocationImageAltText,
-                id,
-                currentDefaultLanguageId.First());
+                    Utility.Keys.Cache.PromLocationImageAltText,
+                    id,
+                    currentDefaultLanguageId.First());
 
                 image.AltText = forceReload ? null : await _cache.
                     GetObjectFromCacheAsync<LocationInteriorImageAltText>(imageAltTextCacheKey);
@@ -446,7 +447,6 @@ namespace Ocuda.Promenade.Service
 
                     await _cache.SaveToCacheAsync(imageAltTextCacheKey, image.AltText, CacheLocationHours);
                 }
-
             }
 
             location.InteriorImages = interiorImages;
@@ -750,7 +750,6 @@ namespace Ocuda.Promenade.Service
                 format.ToString(),
                 openTime,
                 closeTime);
-
         }
 
         private static string GetFormattedDayGroupings(List<DayOfWeek> days)
@@ -768,17 +767,13 @@ namespace Ocuda.Promenade.Service
 
                 if (days.Count == 2)
                 {
-
                     return dayFormatter.GetAbbreviatedDayName(firstDay)
                         + " & " + dayFormatter.GetAbbreviatedDayName(lastDay);
-
                 }
                 else if (days.Count == lastDay - firstDay + 1)
                 {
-
                     return dayFormatter.GetAbbreviatedDayName(firstDay) +
                         $" {ndash} {dayFormatter.GetAbbreviatedDayName(lastDay)}";
-
                 }
                 else
                 {

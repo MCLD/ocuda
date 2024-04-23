@@ -6,7 +6,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 {
     public interface INavBannerLinkTextRepository : IGenericRepository<NavBannerLinkText>
     {
-        Task<List<NavBannerLinkText>> GetAllLanguageTextsAsync(int navBannerLinkId);
-        Task<NavBannerLinkText> GetLinkTextAsync(int navBannerLinkId, int languageId);
+        Task<NavBannerLinkText> FindAsync(int navBannerLinkId, int languageId);
+
+        Task<ICollection<NavBannerLinkText>> GetAllLanguageTextsAsync(int id);
     }
 }

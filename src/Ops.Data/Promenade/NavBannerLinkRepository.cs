@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Data.Promenade
 {
@@ -16,11 +17,19 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
-        public async Task<List<NavBannerLink>> GetLinksByNavBannerIdAsync(int navBannerId)
+        public async Task<NavBannerLink> FindAsync(int id)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.NavBannerId == navBannerId)
+                .SingleOrDefaultAsync(_ => _.Id == id)
+                ?? throw new OcudaException($"Unable to find {nameof(NavBannerLink)} id {id}");
+        }
+
+        public async Task<ICollection<NavBannerLink>> GetLinksByNavBannerIdAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.NavBannerId == id)
                 .ToListAsync();
         }
     }

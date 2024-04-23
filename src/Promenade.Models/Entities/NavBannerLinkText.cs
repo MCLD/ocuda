@@ -1,19 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
 
 namespace Ocuda.Promenade.Models.Entities
 {
     public class NavBannerLinkText
     {
-        [Key]
-        [Required]
-        public int LanguageId { get; set; }
         public Language Language { get; set; }
 
         [Key]
         [Required]
-        public int NavBannerLinkId { get; set; }
+        public int LanguageId { get; set; }
+
         public NavBannerLink NavBannerLink { get; set; }
+
+        [Key]
+        [Required]
+        public int NavBannerLinkId { get; set; }
 
         [Required]
         [MaxLength(60)]

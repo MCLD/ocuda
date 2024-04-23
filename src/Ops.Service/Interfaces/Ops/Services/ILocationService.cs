@@ -10,7 +10,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface ILocationService
     {
-        Task AddAltTextRangeAsync(List<LocationInteriorImageAltText> imageAltTexts);
+        Task AddAltTextRangeAsync(ICollection<LocationInteriorImageAltText> imageAltTexts);
 
         Task AddImageAltTextAsync(LocationInteriorImageAltText imageAltText);
 
@@ -68,7 +68,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(LocationFilter filter);
 
-        Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName, string subDirectory = "");
+        Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName, string subDirectory);
 
         Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName);
 

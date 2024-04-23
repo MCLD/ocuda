@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Controllers.ViewModels.Home
@@ -29,5 +30,10 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         public Schema.NET.Thing Schema { get; set; }
         public IEnumerable<LocationsFeaturesViewModel> ServicesAvailable { get; set; }
         public string ShowMessage { get; set; }
+
+        public string ActiveIfFirstInteriorImage(int itemSortOrder) =>
+            Location?.InteriorImages?.Min(_ => _.SortOrder) == itemSortOrder
+                ? "active"
+                : null;
     }
 }

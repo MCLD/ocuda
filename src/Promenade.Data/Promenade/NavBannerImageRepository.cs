@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Data.ServiceFacade;
@@ -16,12 +15,11 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<NavBannerImage> GetByNavBannerIdAsync(int navBannerId, int languageId)
+        public async Task<NavBannerImage> GetByNavBannerIdAsync(int id, int languageId)
         {
             return await DbSet
-                .Where(_ => _.NavBannerId == navBannerId && _.LanguageId == languageId)
                 .AsNoTracking()
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(_ => _.NavBannerId == id && _.LanguageId == languageId);
         }
     }
 }

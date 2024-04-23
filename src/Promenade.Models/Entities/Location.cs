@@ -81,7 +81,7 @@ namespace Ocuda.Promenade.Models.Entities
         public string ImagePath { get; set; }
 
         [NotMapped]
-        public List<LocationInteriorImage> InteriorImages { get; set; }
+        public ICollection<LocationInteriorImage> InteriorImages { get; set; }
 
         public bool IsAccessibleForFree { get; set; }
 

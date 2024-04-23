@@ -2,7 +2,7 @@
     background-color: white;
 }
 
-.prom-content{
+.prom-content {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -32,9 +32,9 @@ span.prom-fa-space {
     font-weight: bold;
 }
 
-.location-feature-link a {
-    text-decoration: none;
-}
+    .location-feature-link a {
+        text-decoration: none;
+    }
 
 .prom-box-border {
     border: 3px solid gray;
@@ -51,12 +51,11 @@ span.prom-fa-space {
 footer {
     background-color: #333;
     flex-direction: row-reverse;
-    float: bottom;
 }
 
-footer .prom-logo {
-    max-height: 90px;
-}
+    footer .prom-logo {
+        max-height: 90px;
+    }
 
     footer.row-nowrap {
         flex-wrap: nowrap;
@@ -78,7 +77,6 @@ footer .prom-logo {
 }
 
 @media (min-width:576px) {
-
     .footer-navigation-list {
         -webkit-columns: 2;
         -moz-columns: 2;
@@ -203,6 +201,7 @@ footer .prom-logo {
     padding-left: 0;
     padding-right: 0;
 }
+
     .prom-footer-contact .footer-contact {
         font-size: 1rem;
         display: flex;
@@ -249,13 +248,13 @@ footer .prom-logo {
         padding: 0.5rem;
     }
 
-    .prom-nav-middle .prom-nav-link .nav-link {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-        min-height: 45px;
-    }
+.prom-nav-middle .prom-nav-link .nav-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    min-height: 45px;
+}
 
 .prom-nav-middle li.prom-nav-link:first-child {
     display: none;
@@ -295,9 +294,9 @@ footer .prom-logo {
     gap: 10px;
 }
 
-.prom-top-searchbar .dropdown-item {
-    font-weight: bold;
-}
+    .prom-top-searchbar .dropdown-item {
+        font-weight: bold;
+    }
 
     .prom-top-searchbar .dual-search-button {
         padding: 0.5rem;
@@ -330,9 +329,9 @@ footer .prom-logo {
         flex-direction: row;
     }
 
-    .prom-footer-contact .footer-contact {
-        padding: 5px 0;
-    }
+        .prom-footer-contact .footer-contact {
+            padding: 5px 0;
+        }
 
     .prom-nav-middle li.prom-nav-link:first-child {
         display: block;
@@ -349,20 +348,29 @@ footer .prom-logo {
 
 /* content */
 
-.banner-link-grid-container {
+.navbanner-link-grid-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
 }
 
-    .banner-link-grid-container a {
+    .navbanner-link-grid-container a {
         text-decoration: none;
         color: inherit;
     }
 
-.banner-link-text {
+.navbanner-link-text {
     text-align: center;
     max-width: 80%;
+}
+
+.navbanner-link-container {
+    background: lightgray;
+    box-sizing: border-box;
+}
+
+.navbanner-link-box {
+    background: white;
 }
 
 .prom-leftnav-container {
@@ -523,7 +531,7 @@ a.prom-leftnav-header:hover {
     margin-bottom: 0;
 }
 
-.prom-card-footer  p {
+.prom-card-footer p {
     margin-bottom: 0;
 }
 

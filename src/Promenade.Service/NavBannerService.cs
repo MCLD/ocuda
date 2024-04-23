@@ -16,6 +16,8 @@ namespace Ocuda.Promenade.Service
 {
     public class NavBannerService : BaseService<NavBannerService>
     {
+        private const string NavBannerFilePath = "navbanner";
+
         private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -23,139 +25,106 @@ namespace Ocuda.Promenade.Service
         private readonly INavBannerImageRepository _navBannerImageRepository;
         private readonly INavBannerLinkRepository _navBannerLinkRepository;
         private readonly INavBannerLinkTextRepository _navBannerLinkTextRepository;
-        private readonly INavBannerRepository _navBannerRepository;
+        private readonly IPathResolverService _pathResolverService;
+
         public NavBannerService(IHttpContextAccessor httpContextAccessor,
             LanguageService languageService,
             ILogger<NavBannerService> logger,
             IDateTimeProvider dateTimeProvider,
             IOcudaCache cache,
             IConfiguration config,
-            INavBannerRepository navBannerRepository,
             INavBannerImageRepository navBannerImageRepository,
             INavBannerLinkRepository navBannerLinkRepository,
-            INavBannerLinkTextRepository navBannerLinkTextRepository) : base(logger, dateTimeProvider)
+            INavBannerLinkTextRepository navBannerLinkTextRepository,
+            IPathResolverService pathResolverService) : base(logger, dateTimeProvider)
         {
             ArgumentNullException.ThrowIfNull(httpContextAccessor);
             ArgumentNullException.ThrowIfNull(languageService);
             ArgumentNullException.ThrowIfNull(cache);
             ArgumentNullException.ThrowIfNull(config);
-            ArgumentNullException.ThrowIfNull(navBannerRepository);
             ArgumentNullException.ThrowIfNull(navBannerImageRepository);
             ArgumentNullException.ThrowIfNull(navBannerLinkRepository);
             ArgumentNullException.ThrowIfNull(navBannerLinkTextRepository);
+            ArgumentNullException.ThrowIfNull(pathResolverService);
 
             _httpContextAccessor = httpContextAccessor;
             _languageService = languageService;
             _cache = cache;
             _config = config;
-            _navBannerRepository = navBannerRepository;
             _navBannerImageRepository = navBannerImageRepository;
             _navBannerLinkRepository = navBannerLinkRepository;
             _navBannerLinkTextRepository = navBannerLinkTextRepository;
+            _pathResolverService = pathResolverService;
         }
 
         public async Task<NavBanner> GetByIdAsync(int navBannerId, bool forceReload)
         {
-            NavBanner navBanner = null;
-
-            var cachePagesInHours = GetPageCacheDuration(_config);
-            string navBannerCacheKey = string.Format(CultureInfo.InvariantCulture,
-                Utility.Keys.Cache.PromNavBanner,
-                navBannerId);
-
-            if (cachePagesInHours > 0 && !forceReload)
+            var navBanner = new NavBanner
             {
-                navBanner = await _cache.GetObjectFromCacheAsync<NavBanner>(navBannerCacheKey);
-            }
-
-
-            if (navBanner == null)
-            {
-                navBanner = await _navBannerRepository.GetByIdAsync(navBannerId);
-                if (navBanner == null)
-                {
-                    return null;
-                }
-
-                await _cache.SaveToCacheAsync(navBannerCacheKey, navBanner, cachePagesInHours);
-            }
-
-
-            var languageIds
-                = await GetCurrentDefaultLanguageIdAsync(
-                    _httpContextAccessor,
-                    _languageService);
-
-            var languageId = languageIds.FirstOrDefault();
-
-            string navBannerImageCacheKey = string.Format(CultureInfo.InvariantCulture,
-                Utility.Keys.Cache.PromNavBannerImage,
-                navBannerId,
-                languageId);
-
-            if (cachePagesInHours > 0 && !forceReload)
-            {
-                navBanner.NavBannerImage = await _cache.GetObjectFromCacheAsync<NavBannerImage>(navBannerImageCacheKey);
-            }
-                
+                Id = navBannerId,
+                NavBannerImage = await GetFromCacheDatabaseAsync(
+                    Utility.Keys.Cache.PromNavBannerImage,
+                    navBannerId,
+                    await GetCurrentDefaultLanguageIdAsync(_httpContextAccessor, _languageService),
+                    GetPageCacheDuration(_config),
+                    _cache,
+                    forceReload,
+                    _navBannerImageRepository.GetByNavBannerIdAsync)
+            };
 
             if (navBanner.NavBannerImage == null)
             {
-                navBanner.NavBannerImage = await _navBannerImageRepository.GetByNavBannerIdAsync(navBannerId, languageId);
-
-                if (navBanner.NavBannerImage == null)
-                {
-                    _logger.LogError($"No image found for navBanner id: {navBannerId}");
-                    return null;
-                }
-                
-                await _cache.SaveToCacheAsync(navBannerImageCacheKey, navBanner.NavBannerImage, cachePagesInHours);
+                _logger.LogError("No NavBannerImage found for NavBanner id {Id}",
+                    navBannerId);
+                return null;
             }
+
+            var navBannerImageLanguageName = await _languageService
+                .GetLanguageNameAsync(navBanner.NavBannerImage.LanguageId, forceReload);
+
+            navBanner.NavBannerImage.ImageLinkPath = _pathResolverService
+                .GetPublicContentLink(ImagesFilePath,
+                    navBannerImageLanguageName,
+                    NavBannerFilePath,
+                    navBanner.NavBannerImage.Filename);
 
             string navBannerLinksCacheKey = string.Format(CultureInfo.InvariantCulture,
                 Utility.Keys.Cache.PromNavBannerLinks,
                 navBannerId);
 
-            var navBannerLinks = await _cache.GetObjectFromCacheAsync<List<NavBannerLink>>(navBannerLinksCacheKey);
-                
-            if (navBannerLinks == null)
-            {
-                navBannerLinks = await _navBannerLinkRepository.GetByNavBannerIdAsync(navBannerId);
+            navBanner.NavBannerLinks = await _cache
+                .GetObjectFromCacheAsync<ICollection<NavBannerLink>>(navBannerLinksCacheKey);
 
-                if (!navBannerLinks.Any())
+            if (navBanner.NavBannerLinks == null)
+            {
+                navBanner.NavBannerLinks = await _navBannerLinkRepository
+                    .GetByNavBannerIdAsync(navBannerId);
+
+                if (!navBanner.NavBannerLinks.Any())
                 {
-                    _logger.LogError($"No links found for navBanner id: {navBannerId}");
+                    _logger.LogError("No NavBannerLinks found for NavBanner id {Id}",
+                        navBannerId);
                     return null;
                 }
 
-                await _cache.SaveToCacheAsync(navBannerLinksCacheKey, navBannerLinks, cachePagesInHours);
+                await _cache.SaveToCacheAsync(navBannerLinksCacheKey,
+                    navBanner.NavBannerLinks,
+                    GetPageCacheDuration(_config));
             }
 
-            foreach (var link in navBannerLinks)
+            foreach (var navBannerLink in navBanner.NavBannerLinks)
             {
-                var navBannerLinkTextCacheKey = string.Format(CultureInfo.InvariantCulture,
-                Utility.Keys.Cache.PromNavBannerLinkText,
-                link.Id,
-                languageId);
+                var navBannerLinkText = await GetFromCacheDatabaseAsync(
+                    Utility.Keys.Cache.PromNavBannerLinkText,
+                    navBannerLink.Id,
+                    await GetCurrentDefaultLanguageIdAsync(_httpContextAccessor, _languageService),
+                    GetPageCacheDuration(_config),
+                    _cache,
+                    forceReload,
+                    _navBannerLinkTextRepository.GetByLinkIdAsync);
 
-                link.Text = await _cache.GetObjectFromCacheAsync<NavBannerLinkText>(navBannerLinkTextCacheKey);
-
-                if (link.Text == null)
-                {
-                    link.Text = await _navBannerLinkTextRepository.GetByLinkIdAsync(link.Id, languageId);
-
-                    if (link.Text == null)
-                    {
-                        _logger.LogError($"No link text found for navBanner link id: {link.Id}");
-                        return null;
-                    }
-
-                    await _cache.SaveToCacheAsync(navBannerLinkTextCacheKey, link.Text, cachePagesInHours);
-                }
-
+                navBannerLink.LocalizedText = navBannerLinkText?.Text;
             }
-
-            navBanner.NavBannerLinks = navBannerLinks;
 
             return navBanner;
         }

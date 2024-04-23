@@ -17,11 +17,12 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<List<NavBannerLink>> GetByNavBannerIdAsync(int navBannerId)
+        public async Task<ICollection<NavBannerLink>> GetByNavBannerIdAsync(int id)
         {
             return await DbSet
-                .Where(_ => _.NavBannerId == navBannerId)
                 .AsNoTracking()
+                .Where(_ => _.NavBannerId == id)
+                .OrderBy(_ => _.Order)
                 .ToListAsync();
         }
     }

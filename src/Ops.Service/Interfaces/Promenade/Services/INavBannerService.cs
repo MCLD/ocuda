@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Ocuda.Promenade.Models.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 {
@@ -9,9 +8,9 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
     {
         Task AddImageNoSaveAsync(NavBannerImage image);
 
-        Task AddLinksAndTextsNoSaveAsync(List<NavBannerLink> links);
+        Task AddLinkAsync(NavBannerLink navBannerLink);
 
-        Task AddLinkTextsNoSaveAsync(List<NavBannerLinkText> texts);
+        Task AddLinkTextAsync(NavBannerLinkText navBannerLinkText);
 
         Task<NavBanner> CloneAsync(int navBannerId);
 
@@ -19,30 +18,24 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task EditAsync(NavBanner navBanner);
 
-        Task DeleteAsync(int navBannerId);
-
         Task<NavBanner> GetByIdAsync(int navBannerId);
 
         Task<NavBannerImage> GetImageByNavBannerIdAsync(int navBannerId, int languageId);
 
-        Task<List<NavBannerLink>> GetLinksByNavBannerIdAsync(int navBannerId, int languageId);
-
-        Task<int?> GetPageLayoutIdForNavBannerAsync(int id);
+        Task<ICollection<NavBannerLink>> GetLinksByNavBannerIdAsync(int navBannerId, int languageId);
 
         Task<int?> GetPageHeaderIdAsync(int navBannerId);
 
-        Task<string> GetFullImageDirectoryPath(string languageName);
+        Task<int?> GetPageLayoutIdForNavBannerAsync(int id);
 
-        string GetImageAssetPath(string fileName, string languageName);
+        Task<string> GetUploadImageFilePathAsync(string languageName);
 
-        Task<string> GetUploadImageFilePathAsync(string languageName, string filename);
+        Task<int> ImageUseCountAsync(int languageId, string navBannerImageFilename);
 
         void UpdateImageNoSave(NavBannerImage image);
 
-        void UpdateLinksNoSave(List<NavBannerLink> links);
+        Task UpdateLinkAsync(NavBannerLink navBannerLink);
 
-        void UpdateLinkTextNoSave(NavBannerLinkText linkText);
-
-        Task SaveAsync();
+        Task UpdateLinkTextAsync(NavBannerLinkText navBannerLinkText);
     }
 }

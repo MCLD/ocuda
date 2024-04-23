@@ -52,7 +52,7 @@
                     <option value="carousel">Carousel</option>
                     <option value="deck">Deck</option>
                     <option value="feature">Feature</option>
-                    <option value="navBanner">Nav Banner</option>
+                    <option value="navBanner">NavBanner</option>
                     <option value="segment">Segment</option>
                     <option value="webslide">Webslide</option>
                 </select>
@@ -284,7 +284,7 @@
                             else if (item.NavBannerId.HasValue)
                             {
                                 <td class="align-middle">@item.NavBanner.Name</td>
-                                <td class="align-middle">Nav Banner</td>
+                                <td class="align-middle">NavBanner</td>
                                 <td></td>
                             }
                             else if (item.PageFeatureId.HasValue)
@@ -554,7 +554,7 @@
                 type = "feature";
             }
             else if (navbanner) {
-                type = "nav banner"
+                type = "navbanner"
             }
             else if (segment) {
                 type = "segment";

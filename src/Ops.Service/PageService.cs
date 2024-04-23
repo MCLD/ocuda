@@ -161,7 +161,9 @@ namespace Ocuda.Ops.Service
                         item.SegmentId,
                         languageIds);
                 }
-                else if (item.PageFeatureId.HasValue || item.WebslideId.HasValue || item.BannerFeatureId.HasValue)
+                else if (item.PageFeatureId.HasValue
+                    || item.WebslideId.HasValue
+                    || item.BannerFeatureId.HasValue)
                 {
                     var newItem = await ConnectImageFeatureAsync(new PageItem
                     {
@@ -204,13 +206,11 @@ namespace Ocuda.Ops.Service
                 }
                 else if (item.CarouselId.HasValue)
                 {
-                    var newCarousel = await _carouselService.CloneAsync((int)item.CarouselId);
-
                     var newItem = await CreateItemAsync(new PageItem
                     {
                         Order = item.Order,
                         PageLayoutId = newLayout.Id,
-                        Carousel = newCarousel
+                        Carousel = await _carouselService.CloneAsync(item.CarouselId.Value)
                     });
 
                     _logger.LogDebug("Layout {NewLayoutId}: cloned carousel to new carousel id {ItemId}",
@@ -219,16 +219,14 @@ namespace Ocuda.Ops.Service
                 }
                 else if (item.NavBannerId.HasValue)
                 {
-                    var newNavBanner = await _navBannerService.CloneAsync((int)item.NavBannerId);
-
                     var newItem = await CreateItemAsync(new PageItem
                     {
                         Order = item.Order,
                         PageLayoutId = newLayout.Id,
-                        NavBanner = newNavBanner
+                        NavBanner = await _navBannerService.CloneAsync(item.NavBannerId.Value)
                     });
 
-                    _logger.LogDebug("Layout {NewLayoutId}: cloned nav banner to new nav banner id {ItemId}",
+                    _logger.LogDebug("Layout {NewLayoutId}: cloned NavBanner to new id {ItemId}",
                         newLayout.Id,
                         newItem.Id);
                 }
@@ -466,9 +464,13 @@ namespace Ocuda.Ops.Service
             {
                 await _segmentService.DeleteNoSaveAsync(pageItem.SegmentId.Value);
             }
-            if (pageItem.BannerFeatureId.HasValue || pageItem.PageFeatureId.HasValue || pageItem.WebslideId.HasValue)
+            if (pageItem.BannerFeatureId.HasValue
+                || pageItem.PageFeatureId.HasValue
+                || pageItem.WebslideId.HasValue)
             {
-                var imageFeatureId = pageItem.BannerFeatureId ?? pageItem.PageFeatureId ?? pageItem.WebslideId;
+                var imageFeatureId = pageItem.BannerFeatureId
+                    ?? pageItem.PageFeatureId
+                    ?? pageItem.WebslideId;
                 var usage = await _pageItemRepository
                     .GetImageFeatureUseCountAsync(imageFeatureId.Value);
                 if (usage <= 1)

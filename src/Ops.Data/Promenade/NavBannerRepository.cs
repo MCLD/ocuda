@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using Ocuda.Promenade.Models.Entities;
-using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
+using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
@@ -14,11 +14,21 @@ namespace Ocuda.Ops.Data.Promenade
             ILogger<NavBannerRepository> logger) : base(repositoryFacade, logger)
         {
         }
-        public async Task<NavBanner> GetByIdAsync(int navBannerId)
+
+        public async Task<NavBanner> GetByIdAsync(int id)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id == navBannerId)
+                .Where(_ => _.Id == id)
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<int?> GetPageHeaderIdAsync(int id)
+        {
+            return await _context.PageItems
+                .AsNoTracking()
+                .Where(_ => _.NavBannerId == id)
+                .Select(_ => _.PageLayout.PageHeaderId)
                 .SingleOrDefaultAsync();
         }
 
@@ -27,18 +37,8 @@ namespace Ocuda.Ops.Data.Promenade
             return await _context.PageItems
                 .AsNoTracking()
                 .Where(_ => _.NavBannerId == id)
-                .Select(_ => (int?)_.PageLayoutId)
+                .Select(_ => _.PageLayoutId)
                 .SingleOrDefaultAsync();
         }
-
-        public async Task<int?> GetPageHeaderIdAsync(int navBannerId)
-        {
-            return await _context.PageItems
-                .AsNoTracking()
-                .Where(_ => _.NavBannerId == navBannerId)
-                .Select(_ => (int?)_.PageLayout.PageHeaderId)
-                .SingleOrDefaultAsync();
-        }
-
     }
 }

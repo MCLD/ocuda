@@ -10,14 +10,14 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         {
             BodyText = CommonMarkConverter.Convert(locationsFeatures?.Feature?.BodyText);
             Icon = locationsFeatures?.Feature?.Icon;
+            IconText = locationsFeatures?.Feature?.IconText;
             ImagePath = locationsFeatures?.Feature?.ImagePath;
+            IsAtThisLocation = locationsFeatures.Feature?.IsAtThisLocation ?? false;
             Name = locationsFeatures?.Feature?.Name;
-            RedirectLink = locationsFeatures?.RedirectUrl;
             NewTab = locationsFeatures?.NewTab;
+            RedirectLink = locationsFeatures?.RedirectUrl;
             Stub = locationsFeatures?.Feature?.Stub;
             Text = CommonMarkConverter.Convert(locationsFeatures?.Text);
-            IconText = locationsFeatures?.Feature?.IconText;
-            IsAtThisLocation = locationsFeatures.Feature?.IsAtThisLocation ?? false;
         }
 
         [Required]

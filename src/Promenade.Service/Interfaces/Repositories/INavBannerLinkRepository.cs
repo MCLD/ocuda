@@ -6,6 +6,6 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface INavBannerLinkRepository : IGenericRepository<NavBannerLink>
     {
-        Task<List<NavBannerLink>> GetByNavBannerIdAsync(int navBannerId);
+        Task<ICollection<NavBannerLink>> GetByNavBannerIdAsync(int id);
     }
 }

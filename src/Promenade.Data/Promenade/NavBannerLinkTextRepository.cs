@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Data.ServiceFacade;
@@ -9,7 +7,8 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class NavBannerLinkTextRepository : GenericRepository<PromenadeContext, NavBannerLinkText>,
+    public class NavBannerLinkTextRepository
+        : GenericRepository<PromenadeContext, NavBannerLinkText>,
         INavBannerLinkTextRepository
     {
         public NavBannerLinkTextRepository(Repository<PromenadeContext> repositoryFacade,
@@ -17,12 +16,11 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<NavBannerLinkText> GetByLinkIdAsync(int navBannerLinkId, int languageId)
+        public async Task<NavBannerLinkText> GetByLinkIdAsync(int id, int languageId)
         {
             return await DbSet
-                .Where(_ => _.NavBannerLinkId == navBannerLinkId && _.LanguageId == languageId)
                 .AsNoTracking()
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(_ => _.NavBannerLinkId == id && _.LanguageId == languageId);
         }
     }
 }

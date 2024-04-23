@@ -16,19 +16,26 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
-        public async Task<List<NavBannerImage>> GetAllByNavBannerIdAsync(int navBannerId)
+        public async Task<int> CountAsync(int languageId, string filename)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.NavBannerId ==  navBannerId)
+                .CountAsync(_ => _.Filename == filename && _.LanguageId == languageId);
+        }
+
+        public async Task<ICollection<NavBannerImage>> GetAllByNavBannerIdAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.NavBannerId == id)
                 .ToListAsync();
         }
 
-        public async Task<NavBannerImage> GetByNavBannerIdAsync(int navBannerId, int languageId)
+        public async Task<NavBannerImage> GetByNavBannerIdAsync(int id, int languageId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.NavBannerId == navBannerId && _.LanguageId == languageId)
+                .Where(_ => _.NavBannerId == id && _.LanguageId == languageId)
                 .SingleOrDefaultAsync();
         }
     }

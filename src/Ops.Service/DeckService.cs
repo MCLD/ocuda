@@ -18,7 +18,6 @@ namespace Ocuda.Ops.Service
     public class DeckService : BaseService<DeckService>, IDeckService
     {
         private const string CardsFilePath = "cards";
-        private const string ImagesFilePath = "images";
 
         private readonly ICardDetailRepository _cardDetailRepository;
         private readonly ICardRepository _cardRepository;
@@ -223,8 +222,11 @@ namespace Ocuda.Ops.Service
             if (cardDetail != null && !string.IsNullOrEmpty(cardDetail?.Filename))
             {
                 var language = await _languageService.GetActiveByIdAsync(languageId);
-                cardDetail.ImagePath = Path.Combine(await GetFullImageDirectoryPath(language.Name),
-                    cardDetail.Filename);
+                var imageBasePath = await GetFullImageDirectoryPath(_siteSettingService,
+                    language.Name,
+                    CardsFilePath);
+
+                cardDetail.ImagePath = Path.Combine(imageBasePath, cardDetail.Filename);
             }
             return cardDetail;
         }
@@ -241,22 +243,9 @@ namespace Ocuda.Ops.Service
 
         public async Task<string> GetFullImageDirectoryPath(string languageName)
         {
-            string basePath = await _siteSettingService.GetSettingStringAsync(
-                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
-
-            var filePath = Path.Combine(basePath,
-                ImagesFilePath,
-                languageName,
-                CardsFilePath);
-
-            if (!Directory.Exists(filePath))
-            {
-                _logger.LogInformation("Creating image card directory: {Path}",
-                    filePath);
-                Directory.CreateDirectory(filePath);
-            }
-
-            return filePath;
+            return await GetFullImageDirectoryPath(_siteSettingService,
+                    languageName,
+                    CardsFilePath);
         }
 
         public async Task<int?> GetPageHeaderIdAsync(int deckId)
@@ -273,7 +262,9 @@ namespace Ocuda.Ops.Service
             string filename,
             bool overwriteIfExists)
         {
-            var cardPath = await GetFullImageDirectoryPath(languageName);
+            var cardPath = await GetFullImageDirectoryPath(_siteSettingService,
+                languageName,
+                CardsFilePath);
             var fullFilePath = Path.Combine(cardPath, filename);
 
             if (!overwriteIfExists)
@@ -374,9 +365,10 @@ namespace Ocuda.Ops.Service
                     }
                     else
                     {
-                        var cardPath = Path.Combine(await GetFullImageDirectoryPath(languageName),
-                            card.Filename);
-                        File.Delete(cardPath);
+                        var baseImagePath = await GetFullImageDirectoryPath(_siteSettingService,
+                            languageName,
+                            CardsFilePath);
+                        File.Delete(Path.Combine(baseImagePath, card.Filename));
                     }
                 }
             }

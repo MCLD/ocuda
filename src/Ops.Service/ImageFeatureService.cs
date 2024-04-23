@@ -17,7 +17,6 @@ namespace Ocuda.Ops.Service
     public class ImageFeatureService : BaseService<ImageFeatureService>, IImageFeatureService
     {
         private const string FeaturesFilePath = "features";
-        private const string ImagesFilePath = "images";
         private readonly IImageFeatureItemRepository _imageFeatureItemRepository;
         private readonly IImageFeatureItemTextRepository _imageFeatureItemTextRepository;
         private readonly IImageFeatureRepository _imageFeatureRepository;
@@ -35,18 +34,12 @@ namespace Ocuda.Ops.Service
             ISiteSettingService siteSettingService)
             : base(logger, httpContextAccessor)
         {
-            _imageFeatureItemRepository = imageFeatureItemRepository
-                ?? throw new ArgumentNullException(nameof(imageFeatureItemRepository));
-            _imageFeatureItemTextRepository = imageFeatureItemTextRepository
-                ?? throw new ArgumentNullException(nameof(imageFeatureItemTextRepository));
-            _imageFeatureRepository = imageFeatureRepository
-                ?? throw new ArgumentNullException(nameof(imageFeatureRepository));
-            _imageFeatureTemplateRepository = imageFeatureTemplateRepository
-                ?? throw new ArgumentNullException(nameof(imageFeatureTemplateRepository));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
-            _siteSettingService = siteSettingService
-                ?? throw new ArgumentNullException(nameof(siteSettingService));
+            _imageFeatureItemRepository = imageFeatureItemRepository;
+            _imageFeatureItemTextRepository = imageFeatureItemTextRepository;
+            _imageFeatureRepository = imageFeatureRepository;
+            _imageFeatureTemplateRepository = imageFeatureTemplateRepository;
+            _languageService = languageService;
+            _siteSettingService = siteSettingService;
         }
 
         public async Task<ImageFeatureTemplate> AddTemplateAsync(int imageFeatureId,
@@ -84,6 +77,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<ImageFeatureItem> CreateItemAsync(ImageFeatureItem imageFeatureItem)
         {
+            ArgumentNullException.ThrowIfNull(imageFeatureItem);
+
             imageFeatureItem.Name = imageFeatureItem.Name?.Trim();
 
             var maxSortOrder = await _imageFeatureItemRepository
@@ -100,6 +95,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<ImageFeature> CreateNoSaveAsync(ImageFeature imageFeature)
         {
+            ArgumentNullException.ThrowIfNull(imageFeature);
+
             imageFeature.Name = imageFeature.Name?.Trim();
 
             await _imageFeatureRepository.AddAsync(imageFeature);
@@ -108,13 +105,8 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteItemAsync(int imageFeatureItemId)
         {
-            var imageFeatureItem = await _imageFeatureItemRepository.FindAsync(imageFeatureItemId);
-
-            if (imageFeatureItem == null)
-            {
-                throw new OcudaException("Image feature item does not exist.");
-            }
-
+            var imageFeatureItem = await _imageFeatureItemRepository.FindAsync(imageFeatureItemId)
+                ?? throw new OcudaException("Image feature item does not exist.");
             var subsequentItems = await _imageFeatureItemRepository.GetImageFeatureSubsequentAsync(
                 imageFeatureItem.ImageFeatureId,
                 imageFeatureItem.Order);
@@ -153,11 +145,8 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteNoSaveAsync(int id)
         {
-            var imageFeature = await _imageFeatureRepository.FindAsync(id);
-            if (imageFeature == null)
-            {
-                throw new OcudaException("Could not find that image feature");
-            }
+            var imageFeature = await _imageFeatureRepository.FindAsync(id)
+                ?? throw new OcudaException("Could not find that image feature");
             var items = await _imageFeatureItemRepository.GetByImageFeatureAsync(id);
 
             IDictionary<string, string> issues = null;
@@ -186,6 +175,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<ImageFeature> EditAsync(ImageFeature imageFeature)
         {
+            ArgumentNullException.ThrowIfNull(imageFeature);
+
             var currentImageFeature = await _imageFeatureRepository.FindAsync(imageFeature.Id);
 
             currentImageFeature.Name = imageFeature.Name?.Trim();
@@ -197,6 +188,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<ImageFeatureItem> EditItemAsync(ImageFeatureItem imageFeatureItem)
         {
+            ArgumentNullException.ThrowIfNull(imageFeatureItem);
+
             var currentItem = await _imageFeatureItemRepository.FindAsync(imageFeatureItem.Id);
 
             currentItem.Name = imageFeatureItem.Name?.Trim();
@@ -267,6 +260,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<ImageFeatureItemText> SetItemTextAsync(ImageFeatureItemText itemText)
         {
+            ArgumentNullException.ThrowIfNull(itemText);
+
             var currentText = await _imageFeatureItemTextRepository
                 .GetByImageFeatureItemAndLanguageAsync(itemText.ImageFeatureItemId,
                     itemText.LanguageId);
@@ -324,13 +319,8 @@ namespace Ocuda.Ops.Service
             }
 
             var itemInPosition = await _imageFeatureItemRepository.GetByImageFeatureAndOrderAsync(
-                item.ImageFeatureId, newSortOrder);
-
-            if (itemInPosition == null)
-            {
-                throw new OcudaException("Item is already in the last position.");
-            }
-
+                item.ImageFeatureId, newSortOrder)
+                ?? throw new OcudaException("Item is already in the last position.");
             itemInPosition.Order = item.Order;
             item.Order = newSortOrder;
 
@@ -360,13 +350,8 @@ namespace Ocuda.Ops.Service
             }
 
             var currentTemplate = await _imageFeatureTemplateRepository
-                .FindAsync(imageFeatureTemplate.Id);
-
-            if (currentTemplate == null)
-            {
-                throw new OcudaException($"Unable to find template ID {imageFeatureTemplate.Id}");
-            }
-
+                .FindAsync(imageFeatureTemplate.Id)
+                ?? throw new OcudaException($"Unable to find template ID {imageFeatureTemplate.Id}");
             currentTemplate.Height = imageFeatureTemplate.Height;
             currentTemplate.ItemsToDisplay = imageFeatureTemplate.ItemsToDisplay;
             currentTemplate.MaximumFileSizeBytes = imageFeatureTemplate.MaximumFileSizeBytes;

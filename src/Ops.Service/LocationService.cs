@@ -90,7 +90,7 @@ namespace Ocuda.Ops.Service
             _siteSettingService = siteSettingService;
         }
 
-        public async Task AddAltTextRangeAsync(List<LocationInteriorImageAltText> imageAltTexts)
+        public async Task AddAltTextRangeAsync(ICollection<LocationInteriorImageAltText> imageAltTexts)
         {
             ArgumentNullException.ThrowIfNull(imageAltTexts);
 
@@ -288,6 +288,9 @@ namespace Ocuda.Ops.Service
             return await _googleClient.GeocodeAsync(address);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
+            "CA1308:Normalize strings to uppercase",
+            Justification = "Normalize AM/PM to lower-case")]
         public async Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId)
         {
             var location = await _locationRepository.FindAsync(locationId);
@@ -533,7 +536,7 @@ namespace Ocuda.Ops.Service
 
             var location = await _locationRepository.GetLocationByStub(locationStub);
 
-            using var memoryStream = new MemoryStream();
+            await using var memoryStream = new MemoryStream();
             await imageFile.CopyToAsync(memoryStream);
             var fileBytes = memoryStream.ToArray();
 
@@ -573,7 +576,7 @@ namespace Ocuda.Ops.Service
 
             if (imageFile != null)
             {
-                using var memoryStream = new MemoryStream();
+                await using var memoryStream = new MemoryStream();
                 await imageFile.CopyToAsync(memoryStream);
                 var fileBytes = memoryStream.ToArray();
 
@@ -605,8 +608,7 @@ namespace Ocuda.Ops.Service
             foreach (var altText in imageAltTexts)
             {
                 altText.AltText = newInteriorImage.AllAltTexts
-                    .Where(_ => _.LanguageId == altText.LanguageId)
-                    .Single()
+                    .SingleOrDefault(_ => _.LanguageId == altText.LanguageId)?
                     .AltText;
             }
 
@@ -663,10 +665,8 @@ namespace Ocuda.Ops.Service
 
         public async Task UploadLocationMapAsync(byte[] imageBytes, string fileName)
         {
-            if (imageBytes == null || fileName == null)
-            {
-                throw new OcudaException("Invalid map image or filename.");
-            }
+            ArgumentNullException.ThrowIfNull(imageBytes);
+            ArgumentNullException.ThrowIfNull(fileName);
 
             string basePath = await _siteSettingService.GetSettingStringAsync(
                 Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
@@ -692,12 +692,12 @@ namespace Ocuda.Ops.Service
                 var assetBase = Path.DirectorySeparatorChar + AssetBasePath;
 
                 var assetPath = Path.Combine(assetBase,
-                ImageFilePath,
-                LocationFilePath,
-                MapFilePath,
-                fileName);
+                    ImageFilePath,
+                    LocationFilePath,
+                    MapFilePath,
+                    fileName);
 
-                var locationCode = fileName.Split('.')[0];
+                var locationCode = Path.GetFileNameWithoutExtension(fileName);
 
                 var location = await _locationRepository.GetLocationByCode(locationCode);
 

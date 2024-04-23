@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using Ocuda.i18n;
 using Ocuda.i18n.Filter;
 using Ocuda.Promenade.Controllers.Filters;
-using Ocuda.Promenade.Models.Keys;
 using Ocuda.Promenade.Service;
 
 namespace Ocuda.Promenade.Controllers.Abstract
@@ -125,7 +124,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
             var isTLS = await _siteSettingService
-                .GetSettingBoolAsync(SiteSetting.Site.IsTLS, forceReload);
+                .GetSettingBoolAsync(Models.Keys.SiteSetting.Site.IsTLS, forceReload);
 
             var actionLink = new UriBuilder(Url.Action(null, null, null, isTLS
                 ? Uri.UriSchemeHttps

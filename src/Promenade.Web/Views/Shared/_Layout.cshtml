@@ -299,14 +299,26 @@
             <div class="col-12 col-md-3 prom-footer-contact text-center">
                 <div class="row flex-md-column mx-auto w-100">
                     <div class="col-12 col-sm-4 col-md-12 py-2 footer-contact">
-                        @Localizer[Promenade.ContactUs]
+                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.ContactLink]?.ToString()))
+                        {
+                            <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.ContactLink]">
+                                @Localizer[Promenade.ContactUs]
+                            </a>
+                        }
+                        else
+                        {
+                            @:&nbsp;
+                        }
                     </div>
                     <div class="col-12 col-sm-4 col-md-12 py-2 footer-contact">
-                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.MainPhoneNumber]?.ToString()))
+                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.Telephone]?.ToString()))
                         {
-                            <a href="tel:+1-@(@Context.Items[Ocuda.Promenade.Controllers.ItemKey.MainPhoneNumber])">
-                                @Context.Items[Ocuda.Promenade.Controllers.ItemKey.MainPhoneNumber]
+                            <a href="tel:+1-@Context.Items[Ocuda.Promenade.Controllers.ItemKey.Telephone]">
+                                @Context.Items[Ocuda.Promenade.Controllers.ItemKey.Telephone]
                             </a>
+                        } else
+                        {
+                            @:&nbsp;
                         }
                     </div>
                     <div class="col-12 col-sm-4 col-md-12 py-2 footer-contact">
