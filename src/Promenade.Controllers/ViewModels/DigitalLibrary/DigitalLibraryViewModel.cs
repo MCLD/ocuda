@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Promenade.Controllers.ViewModels.Emedias
+namespace Ocuda.Promenade.Controllers.ViewModels.DigitalLibrary
 {
-    public class EmediaViewModel
+    public class DigitalLibraryViewModel
     {
         public SocialCard SocialCard { get; set; }
         public ICollection<EmediaGroup> GroupedEmedia { get; set; }

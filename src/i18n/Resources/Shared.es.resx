@@ -345,10 +345,6 @@
     <value>Ver eventos en: {0}</value>
     <comment>Link to view events at a location; {0} is the name of the location</comment>
   </data>
-  <data name="(opens in a new window)" xml:space="preserve">
-    <value>(Se abre en una nueva ventana)</value>
-    <comment>Information added to buttons or links to indicate they open in a new window</comment>
-  </data>
   <data name="{0} (opens in a new window)" xml:space="preserve">
     <value>{0} (se abre en una nueva ventana)</value>
     <comment>Description of a link with information added to indicate the link opens in a new window; {0} is the link description</comment>
@@ -441,77 +437,13 @@
     <value>Ingrese un código postal de 5 dígitos</value>
     <comment>Prompt to enter a five digit ZIP code to find the nearest locations</comment>
   </data>
-  <data name="Requested date" xml:space="preserve">
-    <value>Fecha solicitada</value>
-    <comment>Label prompting a customer to select a date</comment>
-  </data>
-  <data name="Requested date and time" xml:space="preserve">
-    <value>Fecha y hora solicitadas</value>
-    <comment>Label to show a customer what date and time they selected</comment>
-  </data>
-  <data name="Requested time" xml:space="preserve">
-    <value>Tiempo solicitado</value>
-    <comment>Label prompting a customer to select a time</comment>
-  </data>
-  <data name="Back to the site" xml:space="preserve">
-    <value>Volver al sitio</value>
-    <comment>Navigation button: go back to the Web site</comment>
-  </data>
   <data name="Use my location" xml:space="preserve">
     <value>Usa mi ubicación</value>
     <comment>Button: engage a mobile device's GPS to look up the customer's location</comment>
   </data>
-  <data name="Page not found" xml:space="preserve">
-    <value>Página no encontrada</value>
-    <comment>Web error when a page is not found (a 404 error)</comment>
-  </data>
-  <data name="Please enter a telephone number in the format: ###-###-####" xml:space="preserve">
-    <value>Ingrese un número de teléfono en el formato: ### - ### - ####</value>
-    <comment>Error message: telephone number was not entered in the proper format</comment>
-  </data>
-  <data name="Closed today" xml:space="preserve">
-    <value>Hoy está cerrado</value>
-    <comment>Location status message, the location is closed for today</comment>
-  </data>
-  <data name="Find my Library" xml:space="preserve">
-    <value>Encuentra mi biblioteca</value>
-    <comment>Title of the page to locate the nearest library</comment>
-  </data>
-  <data name="Library Information" xml:space="preserve">
-    <value>Información de la biblioteca</value>
-    <comment>Page header for information section of location page</comment>
-  </data>
-  <data name="Nearby Locations" xml:space="preserve">
-    <value>Ubicaciones cercanas</value>
-    <comment>Page header for other locations which are narby</comment>
-  </data>
-  <data name="See a map to this location" xml:space="preserve">
-    <value>Ver un mapa de esta ubicación</value>
-    <comment>Label indicating a link takes the customer to a map of the location</comment>
-  </data>
   <data name="(opens in a new window)" xml:space="preserve">
     <value>(Se abre en una nueva ventana)</value>
     <comment>Information added to buttons or links to indicate they open in a new window</comment>
-  </data>
-  <data name="Request a different time" xml:space="preserve">
-    <value>Solicite una hora diferente</value>
-    <comment>Label encouraging selection of a different time if the selected time is not available</comment>
-  </data>
-  <data name="Schedule your time" xml:space="preserve">
-    <value>Programe su tiempo</value>
-    <comment>Header for customers to schedule a time for their help request</comment>
-  </data>
-  <data name="Your time is scheduled" xml:space="preserve">
-    <value>Su tiempo está programado</value>
-    <comment>Header for success page once a customer's time is scheduled</comment>
-  </data>
-  <data name="Visit home page" xml:space="preserve">
-    <value>Visite la página de inicio</value>
-    <comment>Label describing the home page link</comment>
-  </data>
-  <data name="Enter a 5 digit ZIP code" xml:space="preserve">
-    <value>Ingrese un código postal de 5 dígitos</value>
-    <comment>Prompt to enter a five digit ZIP code to find the nearest locations</comment>
   </data>
   <data name="Location" xml:space="preserve">
     <value>Ubicación</value>
@@ -602,7 +534,7 @@
     <comment>Volunteer form prompt asking about interest.</comment>
   </data>
   <data name="Parent/Guardian Email" xml:space="preserve">
-    <value>Correo Electrónico del Padre/Tutor </value>
+    <value>Correo Electrónico del Padre/Tutor</value>
     <comment>If a teen is volunteering, this prompts for their parent or guardian email address.</comment>
   </data>
   <data name="Parent/Guardian Name" xml:space="preserve">
@@ -648,5 +580,13 @@
   <data name="Sign up for our email newsletter" xml:space="preserve">
     <value />
     <comment>Button for call to action - subscribe to newsletter</comment>
+  </data>
+  <data name="Search the catalog" xml:space="preserve">
+    <value>Buscar en el Catálogo</value>
+    <comment>Placeholder text for the search field</comment>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Buscar</value>
+    <comment>Hover text to display on the search button</comment>
   </data>
 </root>

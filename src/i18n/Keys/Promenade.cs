@@ -108,6 +108,8 @@
         public const string ScheduleRequiredNotes = "Please help us out by telling us a little about your request.";
         public const string ScheduleYourTime = "Schedule your time";
         public const string ScheduleYourTimeIsScheduled = "Your time is scheduled";
+        public const string Search = "Search";
+        public const string SearchTheCatalog = "Search the catalog";
         public const string SeeServicesAtAll = "See services at all of our libraries";
         public const string ServicesAvailable = "Services Available";
         public const string ShowNotesFor = "Show notes for: {0}";

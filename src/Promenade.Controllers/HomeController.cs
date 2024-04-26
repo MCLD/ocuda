@@ -151,7 +151,9 @@ namespace Ocuda.Promenade.Controllers
             {
                 DayOfWeek = _dateTimeProvider.Now.DayOfWeek,
                 CanonicalLink = await GetCanonicalLinkAsync(),
-                Location = await _locationService.GetLocationAsync(locationId.Value, forceReload)
+                Location = await _locationService.GetLocationAsync(locationId.Value, forceReload),
+                SeeServicesAtAllLink = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.Site.ServicesAtAllLink)
             };
 
             if (viewModel.Location == null)

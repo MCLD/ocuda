@@ -133,6 +133,30 @@ namespace Ocuda.Promenade.Models.Defaults
                 Name = "Banner Image Alt",
                 Type = SiteSettingType.StringNullable
             },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Site),
+                Description = "The stub of a link to perform a search in the Polaris ILS",
+                Id = Keys.SiteSetting.Site.CatalogSearchLink,
+                Name = "Catalog search link",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Site),
+                Description = "URL to the footer image at the bottom of the page",
+                Id = Keys.SiteSetting.Site.FooterImage,
+                Name = "Footer Image",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Site),
+                Description = "Alt text when a footer image is displayed",
+                Id = Keys.SiteSetting.Site.FooterImageAlt,
+                Name = "Footer Image Alt",
+                Type = SiteSettingType.StringNullable
+            },
              new SiteSetting
             {
                 Category = nameof(Keys.SiteSetting.Site),
@@ -194,7 +218,15 @@ namespace Ocuda.Promenade.Models.Defaults
                 Name = "Page Title Suffix",
                 Type = SiteSettingType.StringNullable
             },
-
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Site),
+                Description = "A link for 'Services at all locations' on location pages",
+                Id = Keys.SiteSetting.Site.ServicesAtAllLink,
+                Name = "Services at all link",
+                Type = SiteSettingType.StringNullable
+            },
+            
             #endregion Site
 
             #region Social
@@ -227,9 +259,9 @@ namespace Ocuda.Promenade.Models.Defaults
             new SiteSetting
             {
                 Category = nameof(Keys.SiteSetting.Social),
-                Description = "The Twitter @username a Twitter Card should be attributed to",
+                Description = "The Twitter/X @username a Twitter Card should be attributed to",
                 Id = Keys.SiteSetting.Social.TwitterUsername,
-                Name = "Twitter Username",
+                Name = "Twitter/X Username",
                 Type = SiteSettingType.StringNullable
             },
             new SiteSetting
@@ -243,9 +275,9 @@ namespace Ocuda.Promenade.Models.Defaults
             new SiteSetting
             {
                 Category = nameof(Keys.SiteSetting.Social),
-                Description = "The URL to a Twitter profile",
+                Description = "The URL to a Twitter/X profile",
                 Id = Keys.SiteSetting.Social.TwitterUrl,
-                Name = "Twitter URL",
+                Name = "Twitter/X URL",
                 Type = SiteSettingType.StringNullable
             },
             new SiteSetting

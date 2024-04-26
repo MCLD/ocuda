@@ -61,30 +61,28 @@
                         }
                         else
                         {
-                            <p>
-                                @if (!string.IsNullOrEmpty(Model.HoursSegmentText))
+                            @if (!string.IsNullOrEmpty(Model.HoursSegmentText))
+                            {
+                                @Html.Raw(Model.HoursSegmentText)
+                            }
+                            else
+                            {
+                                @if (Model.Location.IsClosed)
                                 {
-                                    @Html.Raw(Model.HoursSegmentText)
+                                    <strong style="font-size: 1.2rem;"
+                                            class="text-danger prom-locaton-isclosed">@Localizer[Promenade.LocationClosed]</strong>
                                 }
                                 else
                                 {
-                                    @if (Model.Location.IsClosed)
+                                    @foreach (var dayGrouping in Model.Location.LocationHours)
                                     {
-                                        <strong style="font-size: 1.2rem;"
-                                                class="text-danger prom-locaton-isclosed">@Localizer[Promenade.LocationClosed]</strong>
-                                    }
-                                    else
-                                    {
-                                        @foreach (var dayGrouping in Model.Location.LocationHours)
-                                        {
-                                            <div>
-                                                <strong>@dayGrouping.Days</strong>
-                                                <span>@dayGrouping.Time</span>
-                                            </div>
-                                        }
+                                        <div class="prom-location-hours">
+                                            <strong>@dayGrouping.Days</strong>
+                                            <span>@dayGrouping.Time</span>
+                                        </div>
                                     }
                                 }
-                            </p>
+                            }
                         }
                         @if (!string.IsNullOrEmpty(Model.ShowMessage))
                         {
@@ -167,7 +165,6 @@
             </div>
         </div>
     </div>
-
     <div class="row g-0 mx-auto mb-4 text-start">
         <div class="row p-0 mt-0 gx-0 gy-3 gx-sm-3 col-lg-10 offset-lg-1">
             <h2 class="mt-0 px-lg-0">@Localizer[Promenade.ServicesAvailable]</h2>
@@ -185,7 +182,7 @@
                            target="@(feature.NewTab == true ? "_blank" : null)"
                            data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
                            data-name="@feature.Name">
-                            <div class="d-flex gap-2 align-items-center ps-2 py-3" style="background: #f3f3f3;">
+                            <div class="d-flex gap-2 align-items-center ps-2 py-3 location-feature-button">
                                 @if (feature.Icon.StartsWith("fa"))
                                 {
                                     <span class="@feature.Icon"></span>
@@ -206,7 +203,7 @@
                     else
                     {
                         <a href="@feature.RedirectLink" target="@(feature.NewTab == true ? "_blank" : null)">
-                            <div class="d-flex gap-2 align-items-center ps-2 py-3" style="background: #f3f3f3;">
+                            <div class="d-flex gap-2 align-items-center ps-2 py-3 location-feature-button">
                                 @if (feature.Icon.StartsWith("fa"))
                                 {
                                     <span class="@feature.Icon"></span>
@@ -226,11 +223,12 @@
                     }
                 </div>
             }
-            <!-- TODO: See Services At All link -->
-            <em><a href="#">@Localizer[Promenade.SeeServicesAtAll]</a></em>
+            @if (!string.IsNullOrEmpty(Model.SeeServicesAtAllLink))
+            {
+                <p class="prom-see-services-at-all"><a href="@Model.SeeServicesAtAllLink">@Localizer[Promenade.SeeServicesAtAll]</a></p>
+            }
         </div>
     </div>
-
     <div class="row g-0 mb-4">
         <div class="d-flex flex-column flex-md-row col-lg-10 offset-lg-1 d-block gap-1 py-1 bg-dark-subtle overflow-hidden">
             <div class="col-12 col-md-4 pt-3" style="background-color: white">
@@ -238,7 +236,7 @@
                 @if (Model.Location.DescriptionSegment?.Text?.Length > 0)
                 {
                     <div class="prom-feature-segment pe-md-2">
-                        @Html.Raw(Model.Location.DescriptionSegment.Text)
+                        <p>@Html.Raw(Model.Location.DescriptionSegment.Text)</p>
                     </div>
                 }
             </div>
@@ -290,7 +288,6 @@
             }
         </div>
     </div>
-
     <div class="row g-0">
         <div class="row g-0 col-lg-10 offset-lg-1 border-4 border-bottom">
             <div class="mx-auto" style="max-width: 740px;">
@@ -325,7 +322,6 @@
             </div>
         </div>
     </div>
-
     @if (!string.IsNullOrEmpty(Model.PostFeatureSegmentText))
     {
         <div class="row prom-feature-segment">
@@ -338,49 +334,6 @@
             </div>
         </div>
     }
-    <!-- TODO: Add this back and populate programmatically when Events platform integration is complete
-    <div class="row g-0 mb-4">
-        <div class="col-lg-10 offset-lg-1 mx-auto border-4 border-bottom">
-            <div class="row">
-                <h2>Featured Events</h2>
-                <div class="col-12 col-sm-4 py-4">
-                    <div class="img-fluid position-relative">
-                        <img class="img-fluid" src="/assets/images/some-event.jpg" />
-                        <div class="d-flex flex-column py-1 px-2 text-center position-absolute top-0 left-0 prom-background-color" style="width: 50px; height: 50px;">
-                            <span class="text-uppercase prom-faq-icons text-white">Jan</span>
-                            <span class="location-feature-link text-white fs-4">12</span>
-                        </div>
-                    </div>
-                    <div class="item-title mt-2">Awesome Event Title</div>
-                    <div>3:00pm, @Model.Location.Name</div>
-                </div>
-                <div class="col-12 col-sm-4 py-4">
-                    <div class="img-fluid position-relative">
-                        <img class="img-fluid" src="/assets/images/some-event.jpg" />
-                        <div class="d-flex flex-column py-1 px-2 text-center position-absolute top-0 left-0 prom-background-color" style="width: 50px; height: 50px;">
-                            <span class="text-uppercase prom-faq-icons text-white">Jan</span>
-                            <span class="location-feature-link text-white fs-4">12</span>
-                        </div>
-                    </div>
-                    <div class="item-title mt-2">Awesome Event Title</div>
-                    <div>3:00pm, @Model.Location.Name</div>
-                </div>
-                <div class="col-12 col-sm-4 py-4">
-                    <div class="img-fluid position-relative">
-                        <img class="img-fluid" src="/assets/images/some-event.jpg" />
-                        <div class="d-flex flex-column py-1 px-2 text-center position-absolute top-0 left-0 prom-background-color" style="width: 50px; height: 50px;">
-                            <span class="text-uppercase prom-faq-icons text-white">Jan</span>
-                            <span class="location-feature-link text-white fs-4">12</span>
-                        </div>
-                    </div>
-                    <div class="item-title mt-2">Awesome Event Title</div>
-                    <div>3:00pm, @Model.Location.Name</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    -->
     @if (Model.NearbyCount > 1)
     {
         <div class="prom-location-nearby">

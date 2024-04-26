@@ -89,13 +89,17 @@ a.rowlink {
         color: inherit;
     }
 
+.navbanner-link-box {
+    background: white;
+}
+
 .navbanner-link-container {
     background: lightgray;
     box-sizing: border-box;
 }
 
-.navbanner-link-box {
-    background: white;
+.navbanner-link-text {
+    font-size: 1.1rem;
 }
 /* -------- */
 

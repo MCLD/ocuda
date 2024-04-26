@@ -101,7 +101,7 @@ namespace Ocuda.Promenade.Controllers.Filters
 
             var footerNavigationId = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.Site.NavigationIdFooter, forceReload);
-            if (leftNavigationId > 0)
+            if (footerNavigationId > 0)
             {
                 context.HttpContext.Items[ItemKey.FooterNavigation]
                     = await _navigationService.GetNavigation(footerNavigationId, forceReload);
@@ -112,6 +112,15 @@ namespace Ocuda.Promenade.Controllers.Filters
 
             context.HttpContext.Items[ItemKey.BannerImageAlt] = await _siteSettingService
                 .GetSettingStringAsync(Models.Keys.SiteSetting.Site.BannerImageAlt, forceReload);
+
+            context.HttpContext.Items[ItemKey.CatalogSearchLink] = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Site.CatalogSearchLink, forceReload);
+
+            context.HttpContext.Items[ItemKey.FooterImage] = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Site.FooterImage, forceReload);
+
+            context.HttpContext.Items[ItemKey.FooterImageAlt] = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Site.FooterImageAlt, forceReload);
 
             context.HttpContext.Items[ItemKey.GoogleAnalyticsTrackingCode]
                 = await _siteSettingService

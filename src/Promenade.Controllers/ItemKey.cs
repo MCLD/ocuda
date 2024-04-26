@@ -4,10 +4,13 @@
     {
         public const string BannerImage = nameof(BannerImage);
         public const string BannerImageAlt = nameof(BannerImageAlt);
+        public const string CatalogSearchLink = nameof(CatalogSearchLink);
         public const string ContactLink = nameof(ContactLink);
         public const string CurrentUiCulture = nameof(CurrentUiCulture);
         public const string ExternalCSS = nameof(ExternalCSS);
         public const string ExternalJS = nameof(ExternalJS);
+        public const string FooterImage = nameof(FooterImage);
+        public const string FooterImageAlt = nameof(FooterImageAlt);
         public const string FooterNavigation = nameof(FooterNavigation);
         public const string ForceReload = nameof(ForceReload);
         public const string GoogleAnalyticsTrackingCode = nameof(GoogleAnalyticsTrackingCode);

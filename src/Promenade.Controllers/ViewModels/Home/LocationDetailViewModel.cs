@@ -28,6 +28,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         public string PreFeatureSegmentHeader { get; set; }
         public string PreFeatureSegmentText { get; set; }
         public Schema.NET.Thing Schema { get; set; }
+        public string SeeServicesAtAllLink { get; set; }
         public IEnumerable<LocationsFeaturesViewModel> ServicesAvailable { get; set; }
         public string ShowMessage { get; set; }
 
