@@ -566,11 +566,11 @@
     <comment>Header for displaying services available at this particular location</comment>
   </data>
   <data name="Contact Us" xml:space="preserve">
-    <value />
+    <value>Contact Us</value>
     <comment>Link to instructions on how to contact the site owner</comment>
   </data>
   <data name="See services at all of our libraries" xml:space="preserve">
-    <value />
+    <value>See services at all of our libraries</value>
     <comment>Textual link on the location page for showing services at all locations</comment>
   </data>
   <data name="Services Available" xml:space="preserve">
@@ -578,7 +578,7 @@
     <comment>Header for displaying services available for a location</comment>
   </data>
   <data name="Sign up for our email newsletter" xml:space="preserve">
-    <value />
+    <value>Sign up for our email newsletter</value>
     <comment>Button for call to action - subscribe to newsletter</comment>
   </data>
   <data name="Search the catalog" xml:space="preserve">
