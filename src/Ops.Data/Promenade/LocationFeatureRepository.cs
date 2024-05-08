@@ -16,6 +16,13 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
+        public async Task<List<LocationFeature>> GeAllLocationFeaturesAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<LocationFeature> GetByIdsAsync(int featureId, int locationId)
         {
             return await DbSet
@@ -24,18 +31,18 @@ namespace Ocuda.Ops.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
+        public async Task<LocationFeature> GetBySegmentIdAsync(int segmentId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .SingleOrDefaultAsync(_ => _.SegmentId == segmentId);
+        }
+
         public async Task<List<LocationFeature>> GetLocationFeaturesByLocationAsync(Location location)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.LocationId == location.Id)
-                .ToListAsync();
-        }
-
-        public async Task<List<LocationFeature>> GeAllLocationFeaturesAsync()
-        {
-            return await DbSet
-                .AsNoTracking()
                 .ToListAsync();
         }
 

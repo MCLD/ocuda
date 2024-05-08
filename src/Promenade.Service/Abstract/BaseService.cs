@@ -127,6 +127,46 @@ namespace Ocuda.Promenade.Service.Abstract
             }.Distinct();
         }
 
+        protected async Task<T> GetFromCacheDatabaseAsync<T>(string cacheKey,
+            int itemId,
+            int cacheForHours,
+            IOcudaCache cache,
+            bool forceReload,
+            Func<int, Task<T>> dbLookupAsync) where T : class
+        {
+            ArgumentNullException.ThrowIfNull(cacheKey);
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(dbLookupAsync);
+
+            if (!cacheKey.Contains("{0}", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new OcudaException("Invalid cache key, must contain {0} for item id.");
+            }
+
+            if (cacheKey.Contains("{1}", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new OcudaException("Invalid cache key, must only contain one replacement token: {0} for item id.");
+            }
+
+            T item = null;
+
+            if (!forceReload)
+            {
+                item = await cache.GetObjectFromCacheAsync<T>(cacheKey);
+            }
+
+            if (item == null)
+            {
+                item = await dbLookupAsync(itemId);
+                if (item != null)
+                {
+                    await cache.SaveToCacheAsync(cacheKey, item, cacheForHours);
+                }
+            }
+
+            return item;
+        }
+
         /// <summary>
         /// <para>Get an item from cache if possible - if not, perform a database lookup.</para>
         /// <para>

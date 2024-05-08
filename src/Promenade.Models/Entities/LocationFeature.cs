@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -23,6 +24,9 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string RedirectUrl { get; set; }
 
+        public int? SegmentId { get; set; }
+
+        [NotMapped]
         public string Text { get; set; }
     }
 }

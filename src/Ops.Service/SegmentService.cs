@@ -32,18 +32,19 @@ namespace Ocuda.Ops.Service
             ISegmentRepository segmentRepository,
             ISegmentTextRepository segmentTextRepository) : base(logger, httpContextAccessor)
         {
-            _emediaGroupRepository = emediaGroupRepository
-                ?? throw new ArgumentNullException(nameof(emediaGroupRepository));
-            _locationRepository = locationRepository
-                ?? throw new ArgumentNullException(nameof(locationRepository));
-            _podcastItemsRepository = podcastItemsRepository
-                ?? throw new ArgumentException(nameof(podcastItemsRepository));
-            _scheduleRequestSubjectRepository = scheduleRequestSubjectRepository
-                ?? throw new ArgumentNullException(nameof(scheduleRequestSubjectRepository));
-            _segmentRepository = segmentRepository
-                ?? throw new ArgumentNullException(nameof(segmentRepository));
-            _segmentTextRepository = segmentTextRepository
-                            ?? throw new ArgumentNullException(nameof(segmentTextRepository));
+            ArgumentNullException.ThrowIfNull(emediaGroupRepository);
+            ArgumentNullException.ThrowIfNull(locationRepository);
+            ArgumentNullException.ThrowIfNull(podcastItemsRepository);
+            ArgumentNullException.ThrowIfNull(scheduleRequestSubjectRepository);
+            ArgumentNullException.ThrowIfNull(segmentRepository);
+            ArgumentNullException.ThrowIfNull(segmentTextRepository);
+
+            _emediaGroupRepository = emediaGroupRepository;
+            _locationRepository = locationRepository;
+            _podcastItemsRepository = podcastItemsRepository;
+            _scheduleRequestSubjectRepository = scheduleRequestSubjectRepository;
+            _segmentRepository = segmentRepository;
+            _segmentTextRepository = segmentTextRepository;
         }
 
         public async Task<Segment> CreateAsync(Segment segment)
@@ -56,6 +57,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<Segment> CreateNoSaveAsync(Segment segment)
         {
+            ArgumentNullException.ThrowIfNull(segment);
+
             segment.Name = segment.Name?.Trim();
 
             await _segmentRepository.AddAsync(segment);
@@ -64,6 +67,8 @@ namespace Ocuda.Ops.Service
 
         public async Task CreateSegmentTextAsync(SegmentText segmentText)
         {
+            ArgumentNullException.ThrowIfNull(segmentText);
+
             segmentText.Text = segmentText.Text?.Trim();
             segmentText.Header = segmentText.Header?.Trim();
 
@@ -71,9 +76,9 @@ namespace Ocuda.Ops.Service
             await _segmentTextRepository.SaveAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int segmentId)
         {
-            var inUseBy = await GetSegmentInUseByAsync(id);
+            var inUseBy = await GetSegmentInUseByAsync(segmentId);
             if (inUseBy.Count > 0)
             {
                 var ocudaException = new OcudaException("Segment is in use by the following");
@@ -82,7 +87,7 @@ namespace Ocuda.Ops.Service
                 throw ocudaException;
             }
 
-            await DeleteNoSaveAsync(id);
+            await DeleteNoSaveAsync(segmentId);
 
             await _segmentRepository.SaveAsync();
         }
@@ -90,7 +95,7 @@ namespace Ocuda.Ops.Service
         public async Task DeleteNoSaveAsync(int id)
         {
             var segment = await _segmentRepository.FindAsync(id);
-            var segmentTexts = await _segmentTextRepository.GetBySegmentIdAsync(segment.Id);
+            var segmentTexts = await _segmentTextRepository.GetBySegmentIdAsync(id);
 
             _segmentTextRepository.RemoveRange(segmentTexts);
             _segmentRepository.Remove(segment);
@@ -102,8 +107,16 @@ namespace Ocuda.Ops.Service
             await _segmentTextRepository.SaveAsync();
         }
 
+        public async Task DeleteWithTextsAlreadyVerifiedAsync(int segmentId)
+        {
+            await DeleteNoSaveAsync(segmentId);
+            await _segmentRepository.SaveAsync();
+        }
+
         public async Task<Segment> EditAsync(Segment segment)
         {
+            ArgumentNullException.ThrowIfNull(segment);
+
             var currentSegment = await _segmentRepository.FindAsync(segment.Id);
 
             currentSegment.Name = segment.Name?.Trim();
@@ -118,6 +131,8 @@ namespace Ocuda.Ops.Service
 
         public async Task EditSegmentTextAsync(SegmentText segmentText)
         {
+            ArgumentNullException.ThrowIfNull(segmentText);
+
             var currentSegmentText = await _segmentTextRepository
                 .GetBySegmentAndLanguageAsync(segmentText.SegmentId, segmentText.LanguageId);
             currentSegmentText.Text = segmentText.Text?.Trim();
@@ -175,6 +190,7 @@ namespace Ocuda.Ops.Service
 
         private async Task<ICollection<string>> GetSegmentInUseByAsync(int id)
         {
+            // LocationFeature is handled in LocationService
             var inUseBy = new List<string>();
 
             var emediaGroup = await _emediaGroupRepository.GetUsingSegmentAsync(id);

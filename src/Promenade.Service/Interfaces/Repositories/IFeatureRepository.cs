@@ -5,6 +5,6 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface IFeatureRepository : IGenericRepository<Feature>
     {
-        Task<Feature> FindAsync(int id);
+        Task<int?> GetIdBySlugAsync(string slug);
     }
 }

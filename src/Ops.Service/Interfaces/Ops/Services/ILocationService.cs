@@ -68,6 +68,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(LocationFilter filter);
 
+        Task<IDictionary<string, string>> GetSlugNameAsync();
+
         Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName, string subDirectory);
 
         Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName);

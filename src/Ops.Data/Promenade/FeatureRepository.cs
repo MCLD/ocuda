@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +21,14 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
+        public async Task<int> CountAsync(FeatureFilter filter)
+        {
+            ArgumentNullException.ThrowIfNull(filter);
+
+            return await ApplyFilters(filter)
+                .CountAsync();
+        }
+
         public async Task<Feature> FindAsync(int id)
         {
             var entity = await DbSet.FindAsync(id);
@@ -37,8 +47,35 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
+        public async Task<ICollection<Feature>> GetByIdsAsync(IEnumerable<int> featureIds)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => featureIds.Contains(_.Id))
+                .ToListAsync();
+        }
+
+        public async Task<Feature> GetBySegmentIdAsync(int segmentId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .SingleOrDefaultAsync(_ => _.NameSegmentId == segmentId
+                    || _.TextSegmentId == segmentId);
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
+            "CA1308:Normalize strings to uppercase",
+            Justification = "Normalizing to lowercase for admin display")]
+        public async Task<Feature> GetFeatureByName(string featureName)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Name.ToLower(CultureInfo.InvariantCulture).Replace(" ", "") == featureName)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<DataWithCount<ICollection<Feature>>> GetPaginatedListAsync(
-            BaseFilter filter)
+                                    BaseFilter filter)
         {
             return new DataWithCount<ICollection<Feature>>
             {
@@ -48,40 +85,6 @@ namespace Ocuda.Ops.Data.Promenade
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
-        }
-
-        public async Task<ICollection<Feature>> PageAsync(FeatureFilter filter)
-        {
-            return await ApplyFilters(filter)
-                .OrderBy(_ => _.Name)
-                .ApplyPagination(filter)
-                .ToListAsync();
-        }
-
-        private IQueryable<Feature> ApplyFilters(FeatureFilter filter)
-        {
-            var items = DbSet.AsNoTracking();
-
-            if (filter.FeatureIds?.Count > 0)
-            {
-                items = items.Where(_ => !filter.FeatureIds.Contains(_.Id));
-            }
-
-            return items;
-        }
-
-        public async Task<int> CountAsync(FeatureFilter filter)
-        {
-            return await ApplyFilters(filter)
-                .CountAsync();
-        }
-
-        public async Task<Feature> GetFeatureByName(string featureName)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.Name.ToLower().Replace(" ", "") == featureName)
-                .FirstOrDefaultAsync();
         }
 
         public async Task<bool> IsDuplicateNameAsync(Feature feature)
@@ -100,12 +103,26 @@ namespace Ocuda.Ops.Data.Promenade
                 .AnyAsync();
         }
 
-        public async Task<ICollection<Feature>> GetByIdsAsync(IEnumerable<int> featureIds)
+        public async Task<ICollection<Feature>> PageAsync(FeatureFilter filter)
         {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => featureIds.Contains(_.Id))
+            ArgumentNullException.ThrowIfNull(filter);
+
+            return await ApplyFilters(filter)
+                .OrderBy(_ => _.Name)
+                .ApplyPagination(filter)
                 .ToListAsync();
+        }
+
+        private IQueryable<Feature> ApplyFilters(FeatureFilter filter)
+        {
+            var items = DbSet.AsNoTracking();
+
+            if (filter.FeatureIds?.Count > 0)
+            {
+                items = items.Where(_ => !filter.FeatureIds.Contains(_.Id));
+            }
+
+            return items;
         }
     }
 }

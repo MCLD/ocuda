@@ -755,7 +755,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             else
             {
                 viewModel.LocationFeature = await _locationFeatureService
-                    .GetByIdsAsync(itemId, location.Id);
+                    .GetByFeatureIdLocationIdAsync(itemId, location.Id);
                 viewModel.Features = await _featureService.GetAllFeaturesAsync();
                 return PartialView("_EditFeaturesPartial", viewModel);
             }
@@ -1032,7 +1032,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 NewInteriorImage = new LocationInteriorImage
                 {
                     SortOrder = interiorImages.Select(_ => _.SortOrder).DefaultIfEmpty(0).Max() + 1,
-                    AllAltTexts= newAltTexts
+                    AllAltTexts = newAltTexts
                 },
                 UpdatedInteriorImage = new LocationInteriorImage
                 {
@@ -1096,7 +1096,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         }
 
                         var locationFeature = await _locationFeatureService
-                            .GetByIdsAsync(volunteerFeature.Id, location.Id);
+                            .GetByFeatureIdLocationIdAsync(volunteerFeature.Id, location.Id);
                         var hasForms = formsViewModel.Any(_ => _.FormMappings.Any() && !_.IsDisabled);
                         var hasLocationFeature = locationFeature != null;
 
@@ -1119,7 +1119,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 viewModel.Groups = await _groupService
                     .GetGroupsByIdsAsync(viewModel.LocationGroups.Select(_ => _.GroupId));
                 viewModel.LocationFeatures = await _locationFeatureService
-                    .GetLocationFeaturesByLocationAsync(location);
+                    .GetLocationFeaturesByLocationAsync(location.Id);
                 viewModel.Features = await _featureService
                     .GetFeaturesByIdsAsync(viewModel.LocationFeatures.Select(_ => _.FeatureId));
 

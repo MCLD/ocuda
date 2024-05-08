@@ -192,7 +192,7 @@ namespace Ocuda.Promenade.Controllers
                 = await _locationService.GetHoursAsync(viewModel.Location.Id, forceReload);
 
             var locationFeatures = await _locationService
-                .GetFullLocationFeaturesAsync(locationId.Value, forceReload);
+                .GetFullLocationFeaturesAsync(locationId.Value, null, forceReload);
 
             viewModel.LocationFeatures = locationFeatures
                 .Select(_ => new LocationsFeaturesViewModel(_));

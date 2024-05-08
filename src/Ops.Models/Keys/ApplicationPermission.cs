@@ -11,6 +11,7 @@
         public static readonly string FormManagement = nameof(FormManagement);
         public static readonly string ImageOptimizer = nameof(ImageOptimizer);
         public static readonly string IntranetFrontPageManagement = nameof(IntranetFrontPageManagement);
+        public static readonly string LocationManagement = nameof(LocationManagement);
         public static readonly string MultiUserAccount = nameof(MultiUserAccount);
         public static readonly string NavigationManagement = nameof(NavigationManagement);
         public static readonly string PodcastShowNotesManagement = nameof(PodcastShowNotesManagement);

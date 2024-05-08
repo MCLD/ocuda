@@ -95,15 +95,8 @@
                         {
                             @if (string.IsNullOrEmpty(feature.RedirectLink))
                             {
-                                <a asp-action="@nameof(HomeController.Feature)"
-                                   asp-controller="@HomeController.Name"
-                                   asp-route-locationSlug="@Model.Location.Stub"
-                                   asp-route-featureSlug="@feature.Stub"
-                                   data-bs-toggle="modal"
-                                   data-bs-target="#featureModal"
-                                   target="@(feature.NewTab == true ? "_blank" : null)"
-                                   data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
-                                   data-name="@feature.Name">
+                                if (string.IsNullOrEmpty(feature.Text))
+                                {
                                     @if (feature.Icon.StartsWith("fa"))
                                     {
                                         <div class="d-flex gap-2 align-items-center mb-1">
@@ -120,11 +113,40 @@
                                             <span>@feature.Name</span>
                                         </div>
                                     }
-                                    @if (feature.NewTab == true)
-                                    {
-                                        <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
-                                    }
-                                </a>
+                                }
+                                else
+                                {
+                                    <a asp-action="@nameof(HomeController.Feature)"
+                                       asp-controller="@HomeController.Name"
+                                       asp-route-locationSlug="@Model.Location.Stub"
+                                       asp-route-featureSlug="@feature.Stub"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#featureModal"
+                                       target="@(feature.NewTab == true ? "_blank" : null)"
+                                       data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
+                                       data-name="@feature.Name">
+                                        @if (feature.Icon.StartsWith("fa"))
+                                        {
+                                            <div class="d-flex gap-2 align-items-center mb-1">
+                                                <span class="@feature.Icon"></span>
+                                                <span> @feature.Name</span>
+                                            </div>
+                                            <span class="@feature.Icon"></span>
+                                            <span> @feature.Name</span>
+                                        }
+                                        else
+                                        {
+                                            <div class="d-flex gap-2 align-items-center mb-1">
+                                                <span>@feature.Icon</span>
+                                                <span>@feature.Name</span>
+                                            </div>
+                                        }
+                                        @if (feature.NewTab == true)
+                                        {
+                                            <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
+                                        }
+                                    </a>
+                                }
                             }
                             else
                             {
@@ -173,15 +195,8 @@
                 <div class="col-12 col-sm-4 location-feature-link">
                     @if (string.IsNullOrEmpty(feature.RedirectLink))
                     {
-                        <a asp-action="@nameof(HomeController.Feature)"
-                           asp-controller="@HomeController.Name"
-                           asp-route-locationSlug="@Model.Location.Stub"
-                           asp-route-featureSlug="@feature.Stub"
-                           data-bs-toggle="modal"
-                           data-bs-target="#featureModal"
-                           target="@(feature.NewTab == true ? "_blank" : null)"
-                           data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
-                           data-name="@feature.Name">
+                        if (string.IsNullOrEmpty(feature.Text))
+                        {
                             <div class="d-flex gap-2 align-items-center ps-2 py-3 location-feature-button">
                                 @if (feature.Icon.StartsWith("fa"))
                                 {
@@ -194,11 +209,36 @@
                                     <span>@feature.Name</span>
                                 }
                             </div>
-                            @if (feature.NewTab == true)
-                            {
-                                <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
-                            }
-                        </a>
+                        }
+                        else
+                        {
+                            <a asp-action="@nameof(HomeController.Feature)"
+                               asp-controller="@HomeController.Name"
+                               asp-route-locationSlug="@Model.Location.Stub"
+                               asp-route-featureSlug="@feature.Stub"
+                               data-bs-toggle="modal"
+                               data-bs-target="#featureModal"
+                               target="@(feature.NewTab == true ? "_blank" : null)"
+                               data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
+                               data-name="@feature.Name">
+                                <div class="d-flex gap-2 align-items-center ps-2 py-3 location-feature-button">
+                                    @if (feature.Icon.StartsWith("fa"))
+                                    {
+                                        <span class="@feature.Icon"></span>
+                                        <span>@feature.Name</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@feature.Icon</span>
+                                        <span>@feature.Name</span>
+                                    }
+                                </div>
+                                @if (feature.NewTab == true)
+                                {
+                                    <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
+                                }
+                            </a>
+                        }
                     }
                     else
                     {
@@ -432,7 +472,7 @@
             modal.find(".modal-title").html(name);
 
             var modalBody = modal.find(".modal-body");
-            modalBody.html("<span class=\"fa-solid fa-spinner fa-2x fa-pulse\"></span>")
+            modalBody.html("<div class=\"text-center\"><span class=\"fa-solid fa-spinner fa-2x fa-pulse\"></span></div>")
 
             $.getJSON(featureUrl,
                 function (response) {

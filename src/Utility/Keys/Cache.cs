@@ -50,6 +50,11 @@
         public static readonly string OpsLeftNav = "leftnav";
 
         /// <summary>
+        /// A dictionary keyed off location slugs with values of the location names
+        /// </summary>
+        public static readonly string OpsLocationList = "locationlist";
+
+        /// <summary>
         /// The return URL once the user is authenticated, replace {0} with the user's identifier.
         /// </summary>
         ///
@@ -157,6 +162,11 @@
         public static readonly string PromExternalResources = "externalresources";
 
         /// <summary>
+        /// Feature slug to ID mapping, {0} is the feature slug
+        /// </summary>
+        public static readonly string PromFeatureSlug = "feat-slug.{0}";
+
+        /// <summary>
         /// Cached image feature, {0} is the image feature id
         /// </summary>
         public static readonly string PromImageFeature = "imagefeature.{0}";
@@ -180,11 +190,6 @@
         /// Location, {0} is the location's id
         /// </summary>
         public static readonly string PromLocation = "loc.{0}";
-
-        /// <summary>
-        /// Location feature, {0} is the location id, {1} is the feature slug
-        /// </summary>
-        public static readonly string PromLocationFeature = "loc-feature.{0}.{1}";
 
         /// <summary>
         /// Location features, {0} is the location's id

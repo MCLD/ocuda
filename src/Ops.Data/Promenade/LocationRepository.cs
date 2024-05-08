@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,8 @@ using Ocuda.Utility.Models;
 namespace Ocuda.Ops.Data.Promenade
 {
     public class LocationRepository
-        : GenericRepository<PromenadeContext, Location>, ILocationRepository
+        : GenericRepository<PromenadeContext, Location>,
+        ILocationRepository
     {
         public LocationRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<LocationRepository> logger) : base(repositoryFacade, logger)
@@ -78,6 +80,8 @@ namespace Ocuda.Ops.Data.Promenade
         public async Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(
             LocationFilter filter)
         {
+            ArgumentNullException.ThrowIfNull(filter);
+
             var query = ApplyFilters(filter);
 
             return new DataWithCount<ICollection<Location>>
@@ -88,6 +92,14 @@ namespace Ocuda.Ops.Data.Promenade
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
+        }
+
+        public async Task<IDictionary<string, string>> GetSlugNameAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => !_.IsDeleted)
+                .ToDictionaryAsync(k => k.Stub, v => v.Name);
         }
 
         public async Task<ICollection<Location>> GetUsingSegmentAsync(int segmentId)

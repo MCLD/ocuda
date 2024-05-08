@@ -26,15 +26,61 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(featureRepository));
         }
 
-        public async Task<DataWithCount<ICollection<Feature>>> GetPaginatedListAsync(
-            BaseFilter filter)
+        public async Task<Feature> AddFeatureAsync(Feature feature)
         {
-            return await _featureRepository.GetPaginatedListAsync(filter);
+            ArgumentNullException.ThrowIfNull(feature);
+
+            feature.Name = feature.Name?.Trim();
+            feature.Stub = feature.Stub?.Trim();
+
+            await ValidateAsync(feature);
+            await _featureRepository.AddAsync(feature);
+            await _featureRepository.SaveAsync();
+
+            return feature;
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var feature = await _featureRepository.FindAsync(id);
+            _featureRepository.Remove(feature);
+            await _featureRepository.SaveAsync();
+        }
+
+        public async Task<Feature> EditAsync(Feature feature)
+        {
+            ArgumentNullException.ThrowIfNull(feature);
+
+            var currentFeature = await _featureRepository.FindAsync(feature.Id);
+            await ValidateAsync(feature);
+            if (currentFeature != null)
+            {
+                currentFeature.BodyText = feature.BodyText?.Trim();
+                currentFeature.Icon = feature.Icon;
+                currentFeature.Name = feature.Name?.Trim();
+                currentFeature.Stub = feature.Stub?.Trim();
+                currentFeature.IsAtThisLocation = feature.IsAtThisLocation;
+                currentFeature.NameSegmentId = feature.NameSegmentId;
+                currentFeature.TextSegmentId = feature.TextSegmentId;
+
+                _featureRepository.Update(feature);
+                await _featureRepository.SaveAsync();
+                return await _featureRepository.FindAsync(currentFeature.Id);
+            }
+            else
+            {
+                throw new OcudaException($"Could not find feature id {feature.Id} to edit.");
+            }
         }
 
         public async Task<List<Feature>> GetAllFeaturesAsync()
         {
             return await _featureRepository.GetAllFeaturesAsync();
+        }
+
+        public async Task<Feature> GetFeatureByIdAsync(int featureId)
+        {
+            return await _featureRepository.FindAsync(featureId);
         }
 
         public async Task<Feature> GetFeatureByNameAsync(string featureName)
@@ -53,51 +99,20 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public async Task<Feature> GetFeatureByIdAsync(int featureId)
+        public async Task<Feature> GetFeatureBySegmentIdAsync(int segmentId)
         {
-            return await _featureRepository.FindAsync(featureId);
+            return await _featureRepository.GetBySegmentIdAsync(segmentId);
         }
 
-        public async Task<Feature> AddFeatureAsync(Feature feature)
+        public async Task<ICollection<Feature>> GetFeaturesByIdsAsync(IEnumerable<int> featureIds)
         {
-            feature.Name = feature.Name?.Trim();
-            feature.BodyText = feature.BodyText?.Trim();
-            feature.Stub = feature.Stub?.Trim();
-
-            await ValidateAsync(feature);
-            await _featureRepository.AddAsync(feature);
-            await _featureRepository.SaveAsync();
-
-            return feature;
+            return await _featureRepository.GetByIdsAsync(featureIds);
         }
 
-        public async Task<Feature> EditAsync(Feature feature)
+        public async Task<DataWithCount<ICollection<Feature>>> GetPaginatedListAsync(
+                                                                            BaseFilter filter)
         {
-            var currentFeature = await _featureRepository.FindAsync(feature.Id);
-            await ValidateAsync(feature);
-            if (currentFeature != null)
-            {
-                currentFeature.BodyText = feature.BodyText?.Trim();
-                currentFeature.Icon = feature.Icon;
-                currentFeature.Name = feature.Name?.Trim();
-                currentFeature.Stub = feature.Stub?.Trim();
-                currentFeature.IsAtThisLocation = feature.IsAtThisLocation;
-
-                _featureRepository.Update(feature);
-                await _featureRepository.SaveAsync();
-                return await _featureRepository.FindAsync(currentFeature.Id);
-            }
-            else
-            {
-                throw new OcudaException($"Could not find feature id {feature.Id} to edit.");
-            }
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            var feature = await _featureRepository.FindAsync(id);
-            _featureRepository.Remove(feature);
-            await _featureRepository.SaveAsync();
+            return await _featureRepository.GetPaginatedListAsync(filter);
         }
 
         public async Task<DataWithCount<ICollection<Feature>>> PageItemsAsync(
@@ -121,11 +136,6 @@ namespace Ocuda.Ops.Service
             {
                 throw new OcudaException($"A feature with stub '{feature.Stub}' already exists.");
             }
-        }
-
-        public async Task<ICollection<Feature>> GetFeaturesByIdsAsync(IEnumerable<int> featureIds)
-        {
-            return await _featureRepository.GetByIdsAsync(featureIds);
         }
     }
 }

@@ -1,20 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
     public class Feature
     {
-        [MaxLength(2000)]
+        [NotMapped]
         public string BodyText { get; set; }
+
+        [NotMapped]
+        public string DisplayName { get; set; }
 
         [MaxLength(48)]
         [Required]
         public string Icon { get; set; }
 
         [MaxLength(5)]
+        [NotMapped]
         public string IconText { get; set; }
 
         [Key]
@@ -34,12 +36,17 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public string Name { get; set; }
 
+        public int NameSegmentId { get; set; }
+
         [NotMapped]
         public bool NeedsPopup { get; set; }
 
         public int? SortOrder { get; set; }
 
+        [Display(Name = "Slug")]
         [MaxLength(80)]
         public string Stub { get; set; }
+
+        public int? TextSegmentId { get; set; }
     }
 }

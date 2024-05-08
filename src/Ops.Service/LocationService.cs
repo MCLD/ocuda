@@ -455,6 +455,11 @@ namespace Ocuda.Ops.Service
             return await _locationRepository.GetPaginatedListAsync(filter);
         }
 
+        public async Task<IDictionary<string, string>> GetSlugNameAsync()
+        {
+            return await _locationRepository.GetSlugNameAsync();
+        }
+
         public async Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName)
         {
             return await SaveImageToServerAsync(imageBytes, fileName, string.Empty);

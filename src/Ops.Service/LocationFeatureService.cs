@@ -24,21 +24,6 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
         }
 
-        public async Task<List<LocationFeature>> GetAllLocationFeaturesAsync()
-        {
-            return await _locationFeatureRepository.GeAllLocationFeaturesAsync();
-        }
-
-        public async Task<List<LocationFeature>> GetLocationFeaturesByLocationAsync(Location location)
-        {
-            return await _locationFeatureRepository.GetLocationFeaturesByLocationId(location.Id);
-        }
-
-        public async Task<LocationFeature> GetByIdsAsync(int featureId, int locationId)
-        {
-            return await _locationFeatureRepository.GetByIdsAsync(featureId, locationId);
-        }
-
         public async Task<LocationFeature> AddLocationFeatureAsync(LocationFeature locationFeature)
         {
             await ValidateAsync(locationFeature);
@@ -46,19 +31,6 @@ namespace Ocuda.Ops.Service
             await _locationFeatureRepository.AddAsync(locationFeature);
             await _locationFeatureRepository.SaveAsync();
             return locationFeature;
-        }
-
-        public async Task<LocationFeature> EditAsync(LocationFeature locationFeature)
-        {
-            var currentLocationFeature = await _locationFeatureRepository
-                .GetByIdsAsync(locationFeature.FeatureId, locationFeature.LocationId);
-            currentLocationFeature.Text = locationFeature.Text;
-            currentLocationFeature.RedirectUrl = locationFeature.RedirectUrl;
-            currentLocationFeature.NewTab = locationFeature.NewTab;
-
-            _locationFeatureRepository.Update(currentLocationFeature);
-            await _locationFeatureRepository.SaveAsync();
-            return currentLocationFeature;
         }
 
         public async Task DeleteAsync(int featureId, int locationId)
@@ -69,11 +41,47 @@ namespace Ocuda.Ops.Service
             await _locationFeatureRepository.SaveAsync();
         }
 
-        private async Task ValidateAsync(LocationFeature locationfeature)
+        public async Task<LocationFeature> EditAsync(LocationFeature locationFeature)
         {
-            if (await _locationFeatureRepository.IsDuplicateAsync(locationfeature))
+            ArgumentNullException.ThrowIfNull(locationFeature);
+
+            var currentLocationFeature = await _locationFeatureRepository
+                .GetByIdsAsync(locationFeature.FeatureId, locationFeature.LocationId);
+            currentLocationFeature.Text = locationFeature.Text?.Trim();
+            currentLocationFeature.RedirectUrl = locationFeature.RedirectUrl?.Trim();
+            currentLocationFeature.NewTab = locationFeature.NewTab;
+            currentLocationFeature.SegmentId = locationFeature.SegmentId;
+
+            _locationFeatureRepository.Update(currentLocationFeature);
+            await _locationFeatureRepository.SaveAsync();
+            return currentLocationFeature;
+        }
+
+        public async Task<List<LocationFeature>> GetAllLocationFeaturesAsync()
+        {
+            return await _locationFeatureRepository.GeAllLocationFeaturesAsync();
+        }
+
+        public async Task<LocationFeature> GetByFeatureIdLocationIdAsync(int featureId, int locationId)
+        {
+            return await _locationFeatureRepository.GetByIdsAsync(featureId, locationId);
+        }
+
+        public async Task<LocationFeature> GetLocationFeatureBySegmentIdAsync(int segmentId)
+        {
+            return await _locationFeatureRepository.GetBySegmentIdAsync(segmentId);
+        }
+
+        public async Task<List<LocationFeature>> GetLocationFeaturesByLocationAsync(int locationId)
+        {
+            return await _locationFeatureRepository.GetLocationFeaturesByLocationId(locationId);
+        }
+
+        private async Task ValidateAsync(LocationFeature locationFeature)
+        {
+            if (await _locationFeatureRepository.IsDuplicateAsync(locationFeature))
             {
-                throw new OcudaException("Location's Feature, already exists.");
+                throw new OcudaException("This location already includes the supplied feature.");
             }
         }
     }

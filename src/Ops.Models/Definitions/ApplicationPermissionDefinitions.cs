@@ -32,6 +32,12 @@ namespace Ocuda.Ops.Models.Definitions
                 Info = "Push section posts to the front page and pin them.",
                 Name = "Intranet Front Page Management"
             },
+            new()
+            {
+                Id = ApplicationPermission.LocationManagement,
+                Info = "Manage information about locations.",
+                Name = "Location Management"
+            },
             new() {
                 Id = ApplicationPermission.NavigationManagement,
                 Info = "Manage the Promenade navigations.",
