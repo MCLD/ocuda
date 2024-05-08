@@ -29,7 +29,7 @@
                         <td>@(feature.IsAtThisLocation ? "At This Location" : "Services")</td>
                         <td class="text-end">
                             <form asp-action="@nameof(LocationsController.AddFeature)"
-                                    method="post">
+                                  method="post">
                                 <input type="hidden" name="slug" value="@Model.Location.Stub" />
                                 <input type="hidden" name="featureId" value="@feature.Id" />
                                 <button class="btn btn-sm btn-outline-success"

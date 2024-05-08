@@ -56,7 +56,9 @@ namespace Ocuda.Ops.Controllers
         public async Task<IActionResult> AddDescription(string slug, int featureId)
         {
             var hasPermission = await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.LocationManagement);
+                ApplicationPermission.LocationManagement)
+                && await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.WebPageContentManagement);
             if (!hasPermission) { return RedirectToUnauthorized(); }
 
             Location location;
@@ -199,7 +201,9 @@ namespace Ocuda.Ops.Controllers
         public async Task<IActionResult> ClearSegment(string slug, int featureId)
         {
             var hasPermission = await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.LocationManagement);
+                ApplicationPermission.LocationManagement)
+                && await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.WebPageContentManagement);
             if (!hasPermission) { return RedirectToUnauthorized(); }
 
             var location = await _locationService.GetLocationByStubAsync(slug);

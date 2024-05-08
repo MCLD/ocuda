@@ -16,7 +16,11 @@
 <div class="row">
     <div class="col">
         <div class="card mb-4">
-            <div class="card-header"><strong>Global Feature Details - @Model.Feature.Name</strong></div>
+            <div class="card-header">
+                <strong>
+                    Global Feature Details - @Model.Feature.Name
+                </strong>
+            </div>
             <div class="card-body">
                 <p>Applies to each location this feature is associated with.</p>
                 <table class="table table-bordered table-striped">
@@ -86,9 +90,10 @@
                 {
                     <span>
                         This feature will show on the <strong>@Model.Location.Name</strong> as an
-                        icon with a name underneath. <strong class="text-danger">It will not be 
-                        clickable unless you add a link and will not show text unless you customize 
-                        it below.</strong>.
+                        icon with a name underneath. <strong class="text-danger">
+                            It will not be clickable unless you add a link and will not show text
+                            unless you customize it below.
+                        </strong>.
                     </span>
                 }
                 else
@@ -121,7 +126,10 @@
 <div class="row">
     <div class="col">
         <div class="card">
-            <div class="card-header"><strong>Location Feature - @Model.Feature.Name</strong> at <strong>@Model.Location.Name</strong></div>
+            <div class="card-header">
+                <strong>Location Feature - @Model.Feature.Name</strong> at
+                <strong>@Model.Location.Name</strong>
+            </div>
             <div class="card-body">
                 @if (string.IsNullOrEmpty(Model.LocationFeature.RedirectUrl)
                 && !Model.LocationFeature.SegmentId.HasValue
@@ -171,13 +179,13 @@
                                                 </button>
                                             </form>
                                             <div>
-                                            <a class="btn btn-sm btn-outline-primary me-4"
-                                               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Detail)"
-                                               asp-area="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Area"
-                                               asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Name"
-                                               asp-route-id="@Model.LocationFeature.SegmentId">
-                                                <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
-                                            </a>
+                                                <a class="btn btn-sm btn-outline-primary me-4"
+                                                   asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Detail)"
+                                                   asp-area="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Area"
+                                                   asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Name"
+                                                   asp-route-id="@Model.LocationFeature.SegmentId">
+                                                    <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                                                </a>
                                             </div>
                                         }
                                         <div class="d-inline-block fa-fw @Model.GetLanguageCssClass(Model.LocationFeatureLanguages)"
@@ -193,8 +201,6 @@
                             </tr>
                         </table>
                     }
-
-
                     else
                     {
                         <table class="table table-bordered table-striped">
@@ -210,9 +216,14 @@
                                                 <form asp-action="@nameof(LocationsController.ClearLink)"
                                                       method="post"
                                                       class="d-inline">
-                                                    <input type="hidden" name="slug" value="@Model.Location.Stub" />
-                                                    <input type="hidden" name="featureId" value="@Model.Feature.Id" />
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <input type="hidden"
+                                                           name="slug"
+                                                           value="@Model.Location.Stub" />
+                                                    <input type="hidden"
+                                                           name="featureId"
+                                                           value="@Model.Feature.Id" />
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-outline-danger">
                                                         <span class="fa-solid fa-circle-minus fa-fw"
                                                               aria-hidden="true"></span>
                                                     </button>
@@ -229,19 +240,9 @@
                                     </div>
                                 </th>
                                 <td>
-                                    @if (string.IsNullOrEmpty(Model.LocationFeature.RedirectUrl))
-                                    {
-                                        <em>
-                                            None provided: when this feature is clicked, the description
-                                            will be displayed.
-                                        </em>
-                                    }
-                                    else
-                                    {
-                                        <a href="@Model.LocationFeature.RedirectUrl" target="_blank">
-                                            @Model.LocationFeature.RedirectUrl
-                                        </a>
-                                    }
+                                    <a href="@Model.LocationFeature.RedirectUrl" target="_blank">
+                                        @Model.LocationFeature.RedirectUrl
+                                    </a>
                                 </td>
                             </tr>
                             @if (!string.IsNullOrEmpty(Model.LocationFeature.RedirectUrl))

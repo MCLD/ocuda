@@ -61,23 +61,26 @@
                 {
                     <li class="list-group-item d-flex">
                         <div class="flex-grow-1 text-start">@feature.Name</div>
-                        <div>
-                            <form asp-action="@nameof(LocationsController.RemoveFeature)"
-                                  class="d-inline">
-                                <input type="hidden" name="slug" value="@Model.Location.Stub" />
-                                <input type="hidden" name="featureId" value="@feature.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <span class="fa-solid fa-circle-minus fa-fw" aria-hidden="true"></span>
-                                </button>
-                            </form>
-                            <a class="btn btn-sm btn-outline-primary"
-                               asp-action="@nameof(LocationsController.LocationFeature)"
-                               asp-route-slug="@Model.Location.Stub"
-                               asp-route-featureId="@feature.Id"
-                               title="Edit location feature">
-                                <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
-                            </a>
-                        </div>
+                        @if (Model.LocationManager)
+                        {
+                            <div>
+                                <form asp-action="@nameof(LocationsController.RemoveFeature)"
+                                      class="d-inline">
+                                    <input type="hidden" name="slug" value="@Model.Location.Stub" />
+                                    <input type="hidden" name="featureId" value="@feature.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <span class="fa-solid fa-circle-minus fa-fw" aria-hidden="true"></span>
+                                    </button>
+                                </form>
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-action="@nameof(LocationsController.LocationFeature)"
+                                   asp-route-slug="@Model.Location.Stub"
+                                   asp-route-featureId="@feature.Id"
+                                   title="Edit location feature">
+                                    <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                                </a>
+                            </div>
+                        }
                     </li>
                 }
             </ul>
@@ -89,27 +92,29 @@
                 {
                     <li class="list-group-item d-flex">
                         <div class="flex-grow-1 text-start">@feature.Name</div>
-                        <div>
-                            <form asp-action="@nameof(LocationsController.RemoveFeature)"
-                                  class="d-inline">
-                                <input type="hidden" name="slug" value="@Model.Location.Stub" />
-                                <input type="hidden" name="featureId" value="@feature.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <span class="fa-solid fa-circle-minus fa-fw" aria-hidden="true"></span>
-                                </button>
-                            </form>
-                            <a class="btn btn-sm btn-outline-primary"
-                               asp-action="@nameof(LocationsController.LocationFeature)"
-                               asp-route-slug="@Model.Location.Stub"
-                               asp-route-featureId="@feature.Id"
-                               title="Edit location feature">
-                                <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
-                            </a>
-                        </div>
+                        @if (Model.LocationManager)
+                        {
+                            <div>
+                                <form asp-action="@nameof(LocationsController.RemoveFeature)"
+                                      class="d-inline">
+                                    <input type="hidden" name="slug" value="@Model.Location.Stub" />
+                                    <input type="hidden" name="featureId" value="@feature.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <span class="fa-solid fa-circle-minus fa-fw" aria-hidden="true"></span>
+                                    </button>
+                                </form>
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-action="@nameof(LocationsController.LocationFeature)"
+                                   asp-route-slug="@Model.Location.Stub"
+                                   asp-route-featureId="@feature.Id"
+                                   title="Edit location feature">
+                                    <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                                </a>
+                            </div>
+                        }
                     </li>
                 }
             </ul>
         </div>
     </div>
 </div>
-
