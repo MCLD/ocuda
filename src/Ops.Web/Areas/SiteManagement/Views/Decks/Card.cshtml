@@ -61,7 +61,13 @@
                     </div>
                     <div class="row mb-2">
                         <div class="col-md-8 offset-md-2">
-                            <div class="alert alert-info">Card images must be @DecksController.CardImageWidth pixels wide and smaller than @(DecksController.MaximumFileSizeBytes / 1024) KB.</div>
+                            <div class="alert alert-info">
+                                Card images must be @DecksController.CardImageWidth pixels wide
+                                @if (DecksController.MaximumFileSizeBytes > 0)
+                                {
+                                    @:and smaller than @(DecksController.MaximumFileSizeBytes / 1024) KB
+                                }
+                            </div>
                         </div>
                     </div>
                     @if (!string.IsNullOrEmpty(Model.CardDetail?.Filename))
