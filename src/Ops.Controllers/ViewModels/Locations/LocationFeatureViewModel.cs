@@ -14,6 +14,8 @@ namespace Ocuda.Ops.Controllers.ViewModels.Locations
         }
 
         public IDictionary<int, string> AllLanguages { get; }
+        public bool CanEditSegments { get; set; }
+        public bool CanManageLocations { get; set; }
         public Feature Feature { get; set; }
         public ICollection<string> FeatureNameLanguages { get; }
         public string FeatureText { get; set; }
@@ -24,10 +26,6 @@ namespace Ocuda.Ops.Controllers.ViewModels.Locations
         public LocationFeature LocationFeature { get; set; }
 
         public ICollection<string> LocationFeatureLanguages { get; }
-
-        public bool LocationManager { get; set; }
-
-        public bool SegmentEditor { get; set; }
 
         public static string GetLanguageTitle(ICollection<string> languages)
         {

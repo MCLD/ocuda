@@ -133,7 +133,7 @@
             <div class="card-body">
                 @if (string.IsNullOrEmpty(Model.LocationFeature.RedirectUrl)
                 && !Model.LocationFeature.SegmentId.HasValue
-                && Model.LocationManager)
+                && Model.CanManageLocations)
                 {
                     <p>Customize this feature for this location:</p>
                     <div class="d-flex justify-content-around">
@@ -145,7 +145,7 @@
                                 Add Link
                             </a>
                         </div>
-                        @if (Model.SegmentEditor)
+                        @if (Model.CanEditSegments)
                         {
                             <div>
                                 <a asp-action="@nameof(LocationsController.AddDescription)"
@@ -167,7 +167,7 @@
                                         <div class="flex-grow-1 text-start">
                                             Custom description for this location
                                         </div>
-                                        @if (Model.LocationManager && Model.SegmentEditor)
+                                        @if (Model.CanManageLocations && Model.CanEditSegments)
                                         {
                                             <form asp-action="@nameof(LocationsController.ClearSegment)"
                                                   method="post">
@@ -210,7 +210,7 @@
                                         <div class="flex-grow-1 text-left">
                                             Link
                                         </div>
-                                        @if (Model.LocationManager)
+                                        @if (Model.CanManageLocations)
                                         {
                                             <div>
                                                 <form asp-action="@nameof(LocationsController.ClearLink)"

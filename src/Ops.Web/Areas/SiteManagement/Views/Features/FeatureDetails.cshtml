@@ -1,129 +1,171 @@
-﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Feature.FeatureViewModel
+﻿@using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Feature
+@model FeatureViewModel
 
-@section styles {
-    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
-}
-
-<div class="feature-save-container">
-    <div class="feature-save-message"></div>
+<div class="d-flex mb-2">
+    <h1 class="flex-grow-1 text-start">
+        Feature
+        <small class="text-muted">@Model.Feature.Name</small>
+    </h1>
+    <div>
+        <a class="btn btn-outline-dark"
+           asp-action="@nameof(FeaturesController.Index)">Back</a>
+    </div>
 </div>
 
 <div class="row">
-    <div class="col-12">
-        <h1>@(Model.Feature.IsNewFeature ? "Add Feature" : "Edit Feature")</h1>
-    </div>
-</div>
-
-<form method="post"
-      asp-controller="@FeaturesController.Name"
-      asp-action="@Model.Action"
-      role="form"
-      id="featureform"
-      display="inline">
-    <input asp-for="Feature.Id" id="feature-id" type="hidden" />
-    <input asp-for="Feature.NeedsPopup" type="hidden" />
-    <input asp-for="Feature.Name"
-           formgroup
-           autocomplete="off" />
-    <input asp-for="Feature.Icon"
-           class="form-control icon-picker"
-           type="text"
-           formgroup
-           autocomplete="off" />
-    <select formgroup asp-for="Feature.IsAtThisLocation">
-        <option value="false">Services Available</option>
-        <option value="true">At This Location</option>
-    </select>
-    <div class="row">
-        <div class="accordion offset-md-3 col-md-9" id="popup-accordion">
-            <div class="accordion-item">
-                <div class="accordion-header" id="accordion-header">
-                    <button class="accordion-button collapsed"
-                            style="text-decoration: none;"
-                            id="popup-button"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapseDiv"
-                            aria-expanded="true"
-                            aria-controls="collapseDiv">
-                        Display this feature in a pop-up
-                    </button>
-                </div>
-                <div id="collapseDiv"
-                     class="accordion-collapse collapse@(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "" : " show")"
-                     aria-labelledby="headingOne"
-                     data-parent="#popup-accordion">
-                    <div class="accordion-body">
-                        <input asp-for="Feature.Stub"
-                               formgroup
-                               autocomplete="off"
-                               info-tooltip="The stub is the nickname/URL for the feature."
-                               on-blur-js="FormatStub" />
-                        <div class="mb-3 row">
-                            <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-end"></label>
-                            <div class="mb-3-inner col-md-9">
-                                <textarea asp-for="Feature.BodyText" markdown-editor></textarea>
-                                <span asp-validation-for="Feature.BodyText" class="validation-message text-danger"></span>
-                            </div>
+    <div class="col">
+        <form method="post" asp-action="@nameof(FeaturesController.EditFeature)">
+            <input asp-for="Feature.Id" type="hidden" />
+            <input asp-for="Feature.Name" type="hidden" />
+            <input asp-for="Feature.Stub" type="hidden" />
+            <input asp-for="Feature.NameSegmentId" type="hidden" />
+            <input asp-for="Feature.TextSegmentId" type="hidden" />
+            <div class="mb-3">
+                <label asp-for="Feature.Name" class="form-label"></label>
+                <div class="d-flex flex-nowrap">
+                    <div class="flex-grow-1"><input type="text" class="form-control" disabled value="@Model.Feature.Name" /></div>
+                    @if (Model.CanManageFeatures && Model.CanEditSegments)
+                    {
+                        <div class="form-text">
+                            <a class="btn btn-sm btn-outline-primary ms-2"
+                               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Detail)"
+                               asp-area="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Area"
+                               asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Name"
+                               asp-route-id="@Model.Feature.NameSegmentId">
+                                <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                            </a>
                         </div>
+                    }
+                    <div class="d-inline-block form-text ms-2 fa-fw @Model.GetLanguageCssClass(Model.FeatureNameLanguages)"
+                         style="font-size: 1.5rem;"
+                         title="@FeatureViewModel.GetLanguageTitle(Model.FeatureNameLanguages)">
+                        <span class="fa-solid fa-language"></span>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="row mt-3">
-        <div class="offset-md-3 col-md-9">
             <div class="mb-3">
-                <a class="btn btn-secondary"
-                   id="return-home"
-                   asp-action="@nameof(FeaturesController.Index)">Return to Features</a>
-                @if (Model.Feature.IsNewFeature)
-                {
-                    <text>
-                        <button type="submit"
-                                id="submit"
-                                value="Submit"
-                                class="btn btn-success"
-                                button-spinner>
-                            <span class="buttonText">Add Feature</span>
-                        </button>
-                    </text>
-                }
-                else
-                {
-                    <text>
-                        <button type="submit"
-                                id="submit"
-                                value="Submit"
-                                class="btn btn-success"
-                                button-spinner>
-                            <span class="buttonText">Update Feature</span>
-                        </button>
-                    </text>
-                }
+                <label asp-for="Feature.Stub" class="form-label"></label>
+                <div class="d-flex">
+                    <div class="flex-grow-1"><input type="text" disabled class="form-control" value="@Model.Feature.Stub" /></div>
+                    @if (Model.CanUpdateSlug)
+                    {
+                        <div class="form-text">
+                            <a class="btn btn-sm btn-outline-primary ms-2"
+                               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Detail)"
+                               asp-area="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Area"
+                               asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Name"
+                               asp-route-id="@Model.Feature.NameSegmentId">
+                                <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Feature.SortOrder" class="form-label"></label>
+                <input type="text" class="form-control" asp-for="Feature.SortOrder" />
+                <div class="form-text">Supply a number to sort items at the front of the list, left blank it will sort in alphabetical order.</div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Feature.Icon" class="form-label"></label>
+                <input type="text" class="form-control" asp-for="Feature.Icon" />
+                <div class="form-text">Full FontAwesome tag (e.g. <code>fa-solid fa-biohazard</code>), include <code>fa-fw</code></div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Feature.IsAtThisLocation" class="form-label"></label>
+                <select class="form-control" asp-for="Feature.IsAtThisLocation">
+                    <option value="false">Services Available</option>
+                    <option value="true">At This Location</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex pb-2">
+                    <label asp-for="Feature.BodyText" class="form-label flex-grow-1"></label>
+                    @if (Model.CanManageFeatures)
+                    {
+                        @if (Model.Feature.TextSegmentId.HasValue)
+                        {
+                            <button class="btn btn-sm btn-outline-danger form-text"
+                                    data-bs-target="#deleteTextModal"
+                                    data-bs-toggle="modal"
+                                    type="button">
+                                <span class="fa-solid fa-circle-minus fa-fw" aria-hidden="true"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            <a asp-action="@nameof(FeaturesController.AddDescription)"
+                               asp-route-slug="@Model.Feature.Stub"
+                               class="btn btn-outline-success btn-sm form-text"><span class="fa-solid fa-circle-plus"></span></a>
+                        }
+                    }
+                    @if (Model.CanManageFeatures && Model.CanEditSegments && Model.Feature.TextSegmentId.HasValue)
+                    {
+                        <div class="form-text ms-2">
+                            <a class="btn btn-sm btn-outline-primary"
+                               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Detail)"
+                               asp-area="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Area"
+                               asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Name"
+                               asp-route-id="@Model.Feature.TextSegmentId">
+                                <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                            </a>
+                        </div>
+                    }
+                    <div class="d-inline-block ms-2 form-text fa-fw @Model.GetLanguageCssClass(Model.FeatureTextLanguages)"
+                         style="font-size: 1.5rem;"
+                         title="@FeatureViewModel.GetLanguageTitle(Model.FeatureTextLanguages)">
+                        <span class="fa-solid fa-language"></span>
+                    </div>
+                </div>
+                <div>
+                    <div style="border: var(--bs-border-width) solid var(--bs-border-color); background-color: var(--bs-secondary-bg); border-radius: 0.5rem;" class="p-2">
+                        @if (string.IsNullOrWhiteSpace(Model.Feature.BodyText))
+                        {
+                            <em>None provided.</em>
+                        }
+                        else
+                        {
+                            @Html.Raw(Model.Feature.BodyText)
+                        }
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-success">Save</button>
+        </form>
+    </div>
+</div>
+
+<form asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.FeaturesController.DeleteText)"
+      method="post">
+    <input type="hidden" name="slug" value="@Model.Feature.Stub" />
+    <div aria-hidden="true"
+         aria-labelledby="deleteTextLabel"
+         class="modal fade"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false"
+         id="deleteTextModal"
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteTextLabel">Delete text</h1>
+                    <button aria-label="Close"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            type="button"></button>
+                </div>
+                <div class="modal-body">
+                    Delete the text description?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal"
+                            type="button">
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
+                </div>
             </div>
         </div>
     </div>
 </form>
-
-@section scripts{
-    <script src="~/js/md.min.js" asp-append-version="true"></script>
-    <script>
-        $("#featureform").submit(function (event) {
-            if (!$("#collapseDiv").hasClass("show")) {
-                $("#Feature_NeedsPopup").val("False");
-                $("#Feature_Stub").val("");
-                $("#wmd-input").val("");
-            }
-        });
-        function FormatStub(object) {
-            updateStub($(object), $(object).val());
-        }
-
-        $(document).ready(function () {
-            var editor = new Markdown.Editor($("#Feature_BodyText"), { allowUploads: false });
-            editor.run();
-            $('[data-bs-toggle="tooltip"]').tooltip();
-        });
-    </script>
-}

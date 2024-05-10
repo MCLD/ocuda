@@ -16,6 +16,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<List<LocationFeature>> GetLocationFeaturesByLocationId(int locationId);
 
+        Task<IEnumerable<int>> GetLocationsByFeatureIdAsync(int featureId);
+
         Task<bool> IsDuplicateAsync(LocationFeature locationfeature);
     }
 }

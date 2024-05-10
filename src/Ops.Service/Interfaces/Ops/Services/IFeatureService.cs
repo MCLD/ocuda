@@ -18,14 +18,16 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<Feature> GetFeatureByIdAsync(int featureId);
 
-        Task<Feature> GetFeatureByNameAsync(string featureName);
-
         Task<Feature> GetFeatureBySegmentIdAsync(int segmentId);
+
+        Task<Feature> GetFeatureBySlugAsync(string slug);
 
         Task<ICollection<Feature>> GetFeaturesByIdsAsync(IEnumerable<int> featureIds);
 
         Task<DataWithCount<ICollection<Feature>>> GetPaginatedListAsync(BaseFilter filter);
 
         Task<DataWithCount<ICollection<Feature>>> PageItemsAsync(FeatureFilter filter);
+
+        Task UpdateFeatureNameAsync(int featureId, string newName);
     }
 }

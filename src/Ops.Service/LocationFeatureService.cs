@@ -77,6 +77,11 @@ namespace Ocuda.Ops.Service
             return await _locationFeatureRepository.GetLocationFeaturesByLocationId(locationId);
         }
 
+        public async Task<IEnumerable<int>> GetLocationsByFeatureIdAsync(int featureId)
+        {
+            return await _locationFeatureRepository.GetLocationsByFeatureIdAsync(featureId);
+        }
+
         private async Task ValidateAsync(LocationFeature locationFeature)
         {
             if (await _locationFeatureRepository.IsDuplicateAsync(locationFeature))

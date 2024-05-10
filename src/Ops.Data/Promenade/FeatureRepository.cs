@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -63,25 +62,24 @@ namespace Ocuda.Ops.Data.Promenade
                     || _.TextSegmentId == segmentId);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
-            "CA1308:Normalize strings to uppercase",
-            Justification = "Normalizing to lowercase for admin display")]
-        public async Task<Feature> GetFeatureByName(string featureName)
+        public async Task<Feature> GetBySlugAsync(string slug)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Name.ToLower(CultureInfo.InvariantCulture).Replace(" ", "") == featureName)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync(_ => _.Stub == slug);
         }
 
         public async Task<DataWithCount<ICollection<Feature>>> GetPaginatedListAsync(
-                                    BaseFilter filter)
+            BaseFilter filter)
         {
             return new DataWithCount<ICollection<Feature>>
             {
                 Count = await DbSet.AsNoTracking().CountAsync(),
                 Data = await DbSet.AsNoTracking()
-                    .OrderBy(_ => _.Name)
+                    .OrderByDescending(_ => _.IsAtThisLocation)
+                    .ThenByDescending(_ => _.SortOrder.HasValue)
+                    .ThenBy(_ => _.SortOrder)
+                    .ThenBy(_ => _.Name)
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
@@ -111,6 +109,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .OrderBy(_ => _.Name)
                 .ApplyPagination(filter)
                 .ToListAsync();
+        }
+
+        public async Task UpdateName(int featureId, string newName)
+        {
+            var feature = await DbSet.SingleOrDefaultAsync(_ => _.Id == featureId);
+            feature.Name = newName;
+            Update(feature);
+            await SaveAsync();
         }
 
         private IQueryable<Feature> ApplyFilters(FeatureFilter filter)

@@ -54,6 +54,15 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<int>> GetLocationsByFeatureIdAsync(int featureId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.FeatureId == featureId)
+                .Select(_ => _.LocationId)
+                .ToListAsync();
+        }
+
         public async Task<bool> IsDuplicateAsync(LocationFeature locationfeature)
         {
             return await DbSet

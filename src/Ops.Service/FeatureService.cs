@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -16,14 +17,22 @@ namespace Ocuda.Ops.Service
     public class FeatureService : BaseService<FeatureService>, IFeatureService
     {
         private readonly IFeatureRepository _featureRepository;
+        private readonly ILocationFeatureService _locationFeatureService;
+        private readonly ILocationService _locationService;
 
         public FeatureService(ILogger<FeatureService> logger,
             IHttpContextAccessor httpContextAccessor,
-            IFeatureRepository featureRepository)
-            : base(logger, httpContextAccessor)
+            IFeatureRepository featureRepository,
+            ILocationService locationService,
+            ILocationFeatureService locationFeatureService) : base(logger, httpContextAccessor)
         {
-            _featureRepository = featureRepository
-                ?? throw new ArgumentNullException(nameof(featureRepository));
+            ArgumentNullException.ThrowIfNull(featureRepository);
+            ArgumentNullException.ThrowIfNull(locationFeatureService);
+            ArgumentNullException.ThrowIfNull(locationService);
+
+            _featureRepository = featureRepository;
+            _locationFeatureService = locationFeatureService;
+            _locationService = locationService;
         }
 
         public async Task<Feature> AddFeatureAsync(Feature feature)
@@ -42,6 +51,17 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAsync(int id)
         {
+            var locationIds = await _locationFeatureService.GetLocationsByFeatureIdAsync(id);
+
+            if (locationIds?.Any() == true)
+            {
+                var locations = await _locationService.GetAllLocationsIdNameAsync();
+
+                var subset = locations.Where(_ => locationIds.Contains(_.Key)).Select(_ => _.Value);
+
+                throw new OcudaException($"That feature is in use at the folowing locations: {string.Join(", ", subset)}");
+            }
+
             var feature = await _featureRepository.FindAsync(id);
             _featureRepository.Remove(feature);
             await _featureRepository.SaveAsync();
@@ -52,13 +72,12 @@ namespace Ocuda.Ops.Service
             ArgumentNullException.ThrowIfNull(feature);
 
             var currentFeature = await _featureRepository.FindAsync(feature.Id);
-            await ValidateAsync(feature);
             if (currentFeature != null)
             {
                 currentFeature.BodyText = feature.BodyText?.Trim();
                 currentFeature.Icon = feature.Icon;
                 currentFeature.Name = feature.Name?.Trim();
-                currentFeature.Stub = feature.Stub?.Trim();
+                currentFeature.Stub = feature.Stub?.Trim() ?? currentFeature.Stub;
                 currentFeature.IsAtThisLocation = feature.IsAtThisLocation;
                 currentFeature.NameSegmentId = feature.NameSegmentId;
                 currentFeature.TextSegmentId = feature.TextSegmentId;
@@ -83,25 +102,14 @@ namespace Ocuda.Ops.Service
             return await _featureRepository.FindAsync(featureId);
         }
 
-        public async Task<Feature> GetFeatureByNameAsync(string featureName)
-        {
-            try
-            {
-                return await _featureRepository.GetFeatureByName(featureName);
-            }
-            catch (OcudaException ex)
-            {
-                _logger.LogError(ex,
-                    "Problem finding feature {FeatureName}: {Message}",
-                    featureName,
-                    ex.Message);
-                throw new OcudaException($"Could not find feature: {featureName}");
-            }
-        }
-
         public async Task<Feature> GetFeatureBySegmentIdAsync(int segmentId)
         {
             return await _featureRepository.GetBySegmentIdAsync(segmentId);
+        }
+
+        public async Task<Feature> GetFeatureBySlugAsync(string slug)
+        {
+            return await _featureRepository.GetBySlugAsync(slug);
         }
 
         public async Task<ICollection<Feature>> GetFeaturesByIdsAsync(IEnumerable<int> featureIds)
@@ -110,7 +118,7 @@ namespace Ocuda.Ops.Service
         }
 
         public async Task<DataWithCount<ICollection<Feature>>> GetPaginatedListAsync(
-                                                                            BaseFilter filter)
+            BaseFilter filter)
         {
             return await _featureRepository.GetPaginatedListAsync(filter);
         }
@@ -123,6 +131,14 @@ namespace Ocuda.Ops.Service
                 Data = await _featureRepository.PageAsync(filter),
                 Count = await _featureRepository.CountAsync(filter)
             };
+        }
+
+        public async Task UpdateFeatureNameAsync(int featureId, string newName)
+        {
+            if (!string.IsNullOrEmpty(newName))
+            {
+                await _featureRepository.UpdateName(featureId, newName.Trim());
+            }
         }
 
         private async Task ValidateAsync(Feature feature)

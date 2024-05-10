@@ -1071,7 +1071,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 };
 
                 var volunteerFeature = await _featureService
-                    .GetFeatureByNameAsync("Volunteer");
+                    .GetFeatureBySlugAsync("volunteer");
                 if (volunteerFeature != null)
                 {
                     var forms = await _volunteerFormService.GetVolunteerFormsAsync();

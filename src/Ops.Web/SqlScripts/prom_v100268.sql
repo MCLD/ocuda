@@ -81,3 +81,12 @@ BEGIN
 END
 CLOSE location_feature_cursor;
 DEALLOCATE location_feature_cursor;
+
+-- ensure features have slugs/stubs
+UPDATE [Features]
+SET [Stub] = LTRIM(RTRIM(REPLACE([Name], ' ', '-')))
+WHERE [Stub] IS NULL;
+
+-- ensure slugs/stubs are all lowercase
+UPDATE [Features]
+SET [Stub] = LOWER([Stub]);

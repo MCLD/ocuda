@@ -6,6 +6,7 @@ namespace Ocuda.Promenade.Models.Entities
     public class Feature
     {
         [NotMapped]
+        [Display(Name = "Text")]
         public string BodyText { get; set; }
 
         [NotMapped]
@@ -27,10 +28,8 @@ namespace Ocuda.Promenade.Models.Entities
         public string ImagePath { get; set; }
 
         [Required]
+        [Display(Name = "Section")]
         public bool IsAtThisLocation { get; set; }
-
-        [NotMapped]
-        public bool IsNewFeature { get; set; }
 
         [MaxLength(255)]
         [Required]
@@ -38,9 +37,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         public int NameSegmentId { get; set; }
 
-        [NotMapped]
-        public bool NeedsPopup { get; set; }
-
+        [Display(Name = "Sort order")]
         public int? SortOrder { get; set; }
 
         [Display(Name = "Slug")]

@@ -310,7 +310,6 @@ namespace Ocuda.Ops.Controllers
 
             if (locationFeature == null)
             {
-                // is this add?
                 return NotFound();
             }
 
@@ -319,9 +318,9 @@ namespace Ocuda.Ops.Controllers
                 Feature = feature,
                 Location = location,
                 LocationFeature = locationFeature,
-                LocationManager = await HasAppPermissionAsync(_permissionGroupService,
+                CanManageLocations = await HasAppPermissionAsync(_permissionGroupService,
                     ApplicationPermission.LocationManagement),
-                SegmentEditor = await HasAppPermissionAsync(_permissionGroupService,
+                CanEditSegments = await HasAppPermissionAsync(_permissionGroupService,
                     ApplicationPermission.WebPageContentManagement)
             };
 

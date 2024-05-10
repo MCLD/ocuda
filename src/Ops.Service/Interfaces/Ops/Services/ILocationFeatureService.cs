@@ -19,5 +19,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<LocationFeature> GetLocationFeatureBySegmentIdAsync(int segmentId);
 
         Task<List<LocationFeature>> GetLocationFeaturesByLocationAsync(int locationId);
+
+        Task<IEnumerable<int>> GetLocationsByFeatureIdAsync(int featureId);
     }
 }

@@ -301,127 +301,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 await EstablishBacklinkAsync(segment.Id, viewModel);
             }
-            //if (pageLayoutId.HasValue)
-            //{
-            //    viewModel.BackLink = Url.Action(nameof(PagesController.LayoutDetail),
-            //        PagesController.Name,
-            //        new
-            //        {
-            //            id = pageLayoutId.Value
-            //        });
-            //    viewModel.Relationship
-            //        = $"This segment is used page layout ID: {pageLayoutId.Value}";
-            //}
-            //else
-            //{
-            //    var emediaGroup = await _emediaService.GetGroupUsingSegmentAsync(segment.Id);
-
-            //    if (emediaGroup != null)
-            //    {
-            //        viewModel.BackLink = Url.Action(nameof(EmediaController.GroupDetails),
-            //            EmediaController.Name,
-            //            new
-            //            {
-            //                id = emediaGroup.Id
-            //            });
-            //        viewModel.Relationship
-            //            = $"This segment is used by emedia group: {emediaGroup.Name}";
-            //    }
-
-            //    var feature = await _featureService.GetFeatureBySegmentIdAsync(segment.Id);
-            //    if (feature != null)
-            //    {
-            //        throw new NotImplementedException();
-            //    }
-
-            //    var locations = await _locationService.GetLocationsBySegment(segment.Id);
-
-            //    if (locations?.Count == 1)
-            //    {
-            //        viewModel.BackLink = Url.Action(nameof(Controllers.LocationsController.Details),
-            //            Controllers.LocationsController.Name,
-            //            new
-            //            {
-            //                area = "",
-            //                slug = locations.First().Stub
-            //            });
-            //        viewModel.Relationship
-            //            = $"This segment is used for location: {locations.First().Name}";
-            //    }
-            //    if (locations?.Count > 1)
-            //    {
-            //        viewModel.Relationship = string.Format(CultureInfo.InvariantCulture,
-            //            "This segment is used for multiple locations: {0}",
-            //            string.Join(", ", locations.Select(_ => _.Name)));
-            //    }
-
-            //    var locationFeature = await _locationFeatureService.GetLocationFeatureBySegmentIdAsync(segment.Id);
-            //    if (locationFeature != null)
-            //    {
-            //        var location = await _locationService.GetLocationByIdAsync(locationFeature.LocationId);
-            //        viewModel.BackLink = Url.Action(nameof(Controllers.LocationsController.LocationFeature),
-            //            new
-            //            {
-            //                area = "",
-            //                slug = location.Stub,
-            //                featureId = locationFeature.FeatureId
-            //            });
-            //        viewModel.Relationship = "This segment is used to customize a location feature description.";
-            //    }
-
-            //    var episode = await _podcastService.GetEpisodeBySegmentIdAsync(segment.Id);
-
-            //    if (episode != null)
-            //    {
-            //        viewModel.BackLink = Url.Action(nameof(PodcastsController.EditEpisode),
-            //            PodcastsController.Name,
-            //            new
-            //            {
-            //                episodeId = episode.Id
-            //            });
-            //        viewModel.Relationship
-            //            = $"This segment is used for podcast '{episode.Podcast.Title}' episode #{episode.Episode.Value}";
-            //        string published = episode.PublishDate.HasValue
-            //            ? $"published {episode.PublishDate.Value.ToLongDateString()}"
-            //            : "not yet published";
-            //        viewModel.AutomatedHeaderMarkup
-            //            = $"<strong>Show notes for {episode.Title}</strong><br>{episode.Podcast.Title}. <em>Episode {episode.Episode}, {published}.</em>";
-            //    }
-            //    viewModel.IsShowNotes = episode != null;
-
-            //    var forms = await _formService.GetFormBySegmentIdAsync(segment.Id);
-            //    if (forms?.Count == 1)
-            //    {
-            //        viewModel.BackLink = Url.Action(nameof(VolunteerController.Form),
-            //            VolunteerController.Name,
-            //            new
-            //            {
-            //                id = forms.First().Id
-            //            });
-            //    }
-
-            //    var products = await _productService.GetBySegmentIdAsync(segment.Id);
-
-            //    if (products?.Count == 1)
-            //    {
-            //        viewModel.BackLink = Url.Action(nameof(ProductsController.Details),
-            //            ProductsController.Name,
-            //            new
-            //            {
-            //                productSlug = products.First().Slug
-            //            });
-            //        viewModel.Relationship
-            //            = $"This segment is used for product: {products.First().Name}";
-            //        viewModel.AutomatedHeaderMarkup
-            //            = $"<strong>{products.First().Name}</strong>";
-            //    }
-            //    else if (products?.Count > 1)
-            //    {
-            //        viewModel.Relationship = string.Format(CultureInfo.InvariantCulture,
-            //            "This segment is used for multiple products: {0}",
-            //            string.Join(", ", products.Select(_ => _.Name)));
-            //    }
-            //}
 
             return View(viewModel);
         }
@@ -465,6 +344,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     await _segmentService.EditSegmentTextAsync(segmentText);
 
                     ShowAlertSuccess("Updated segment text!");
+                }
+
+                // if this was an update to the name of a feature then update the name item as well
+                var defaultLanguage = await _languageService.GetDefaultLanguageId();
+                if (language.Id == defaultLanguage)
+                {
+                    var feature = await _featureService.GetFeatureBySegmentIdAsync(segment.Id);
+                    if (feature?.NameSegmentId == segment.Id)
+                    {
+                        await _featureService.UpdateFeatureNameAsync(feature.Id, segmentText.Text);
+                    }
                 }
             }
 
@@ -601,7 +491,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var feature = await _featureService.GetFeatureBySegmentIdAsync(segmentId);
             if (feature != null)
             {
-                throw new NotImplementedException();
+                viewModel.BackLink = Url.Action(nameof(FeaturesController.Feature),
+                    FeaturesController.Name,
+                    new
+                    {
+                        area = FeaturesController.Area,
+                        slug = feature.Stub
+                    });
+                viewModel.Relationship = $"This segment is used for feature: {feature.Name}";
             }
 
             var locations = await _locationService.GetLocationsBySegment(segmentId);
