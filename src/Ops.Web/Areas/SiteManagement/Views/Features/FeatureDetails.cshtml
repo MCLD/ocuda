@@ -51,10 +51,8 @@
                     {
                         <div class="form-text">
                             <a class="btn btn-sm btn-outline-primary ms-2"
-                               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Detail)"
-                               asp-area="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Area"
-                               asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Name"
-                               asp-route-id="@Model.Feature.NameSegmentId">
+                               asp-action="@nameof(FeaturesController.UpdateSlug)"
+                               asp-route-slug="@Model.Feature.Stub">
                                 <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                             </a>
                         </div>

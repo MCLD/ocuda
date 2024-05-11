@@ -335,5 +335,46 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             return View(viewModel);
         }
+
+        [HttpGet("[action]/{slug}")]
+        [RestoreModelState]
+        public async Task<IActionResult> UpdateSlug(string slug)
+        {
+            if (!IsSiteManager()) { return RedirectToUnauthorized(); }
+
+            var feature = await _featureService.GetFeatureBySlugAsync(slug);
+            if (feature == null) { return NotFound(); }
+
+            return View(new SlugViewModel { PriorSlug = slug, Slug = slug });
+        }
+
+        [HttpPost("[action]/{slug}")]
+        [SaveModelState]
+        public async Task<IActionResult> UpdateSlug(string slug, SlugViewModel viewModel)
+        {
+            if (!IsSiteManager()) { return RedirectToUnauthorized(); }
+
+            if (viewModel == null) { return NotFound(); }
+
+            if (string.IsNullOrEmpty(viewModel.Slug)) { return NotFound(); }
+
+            var feature = await _featureService.GetFeatureBySlugAsync(viewModel.PriorSlug);
+            if (feature == null) { return NotFound(); }
+
+            var slugLookup = await _featureService.GetFeatureBySlugAsync(viewModel.Slug?.Trim());
+            if (slugLookup != null)
+            {
+                ModelState.AddModelError("Slug", "That Slug is already in use.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                feature.Stub = viewModel.Slug;
+                await _featureService.EditAsync(feature);
+                return RedirectToAction(nameof(Feature), new { slug = viewModel.Slug });
+            }
+
+            return RedirectToAction(nameof(UpdateSlug), new { slug = viewModel.PriorSlug });
+        }
     }
 }
