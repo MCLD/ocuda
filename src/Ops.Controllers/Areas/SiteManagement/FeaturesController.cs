@@ -350,7 +350,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost("[action]/{slug}")]
         [SaveModelState]
-        public async Task<IActionResult> UpdateSlug(string slug, SlugViewModel viewModel)
+        public async Task<IActionResult> UpdateSlug(SlugViewModel viewModel)
         {
             if (!IsSiteManager()) { return RedirectToUnauthorized(); }
 
