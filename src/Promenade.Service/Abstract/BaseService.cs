@@ -174,8 +174,8 @@ namespace Ocuda.Promenade.Service.Abstract
             }
 
             string populatedCacheKey = string.Format(CultureInfo.InvariantCulture,
-                    cacheKey,
-                    itemId);
+                cacheKey,
+                itemId);
 
             T item = null;
 

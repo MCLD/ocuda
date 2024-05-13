@@ -369,7 +369,14 @@ namespace Ocuda.Promenade.Service
                     // get feature name
                     var nameSegmentText = await _segmentService
                         .GetSegmentTextBySegmentIdAsync(feature.Feature.NameSegmentId, forceReload);
-                    feature.Feature.DisplayName = nameSegmentText.Text;
+                    if (nameSegmentText == null)
+                    {
+                        _logger.LogError("Unable to find name segment id {NameSegmentId} for feature id {FeatureId} at location {LocationId}",
+                            feature.Feature.NameSegmentId,
+                            feature.FeatureId,
+                            locationId);
+                    }
+                    feature.Feature.DisplayName = nameSegmentText?.Text;
 
                     // feature.SegmentId is for this location, feature.Feature.SegmentId is global
                     int? textSegmentId = feature.SegmentId ?? feature.Feature.TextSegmentId;
@@ -377,7 +384,14 @@ namespace Ocuda.Promenade.Service
                     {
                         var segmentText = await _segmentService
                             .GetSegmentTextBySegmentIdAsync(textSegmentId.Value, forceReload);
-                        feature.Text = segmentText.Text;
+                        if(segmentText == null)
+                        {
+                            _logger.LogError("Unable to find text segmetn id {TextSegmentId} for feature id {FeatureId} at location {LocationId}",
+                                textSegmentId.Value,
+                                feature.FeatureId,
+                                locationId);
+                        }
+                        feature.Text = segmentText?.Text;
                     }
                 }
             }
