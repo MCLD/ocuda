@@ -127,6 +127,31 @@ namespace Ocuda.Promenade.Service.Abstract
             }.Distinct();
         }
 
+        /// <summary>
+        /// <para>Get an item from cache if possible - if not, perform a database lookup.</para>
+        /// <para>
+        /// This method attempts to fetch an item from a cacheKey and itemId. If that fails, it
+        /// uses the dbLookupAsync method to look the value up and sotres it in the cache.
+        /// </para>
+        /// <para>
+        /// If the forceReload parameter is true it will not try to get the value from the
+        /// cache at all.
+        /// </para>
+        /// </summary>
+        /// <typeparam name="T">The object type we are attempting to fetch/look up</typeparam>
+        /// <param name="cacheKey">
+        ///     The cacheKey with two tokens, {0} for item id and {1} for language id
+        /// </param>
+        /// <param name="itemId">The id of the item we are looking for.</param>
+        /// <param name="cacheForHours">Number of hours to cache items</param>
+        /// <param name="cache">A distributed cache provider that implements IOcudaCache</param>
+        /// <param name="forceReload">Whether we should skip checking cache altogether</param>
+        /// <param name="dbLookupAsync">
+        ///     A method for performing the database lookup, only takes one parameter: item id
+        /// <returns>The object if it can be found in cache or the database</returns>
+        /// <exception cref="OcudaException">
+        ///     Thrown if the cacheKey is not valid (not enough or too many replacement tokens)
+        /// </exception>
         protected async Task<T> GetFromCacheDatabaseAsync<T>(string cacheKey,
             int itemId,
             int cacheForHours,
@@ -148,11 +173,15 @@ namespace Ocuda.Promenade.Service.Abstract
                 throw new OcudaException("Invalid cache key, must only contain one replacement token: {0} for item id.");
             }
 
+            string populatedCacheKey = string.Format(CultureInfo.InvariantCulture,
+                    cacheKey,
+                    itemId);
+
             T item = null;
 
             if (!forceReload)
             {
-                item = await cache.GetObjectFromCacheAsync<T>(cacheKey);
+                item = await cache.GetObjectFromCacheAsync<T>(populatedCacheKey);
             }
 
             if (item == null)
@@ -160,7 +189,7 @@ namespace Ocuda.Promenade.Service.Abstract
                 item = await dbLookupAsync(itemId);
                 if (item != null)
                 {
-                    await cache.SaveToCacheAsync(cacheKey, item, cacheForHours);
+                    await cache.SaveToCacheAsync(populatedCacheKey, item, cacheForHours);
                 }
             }
 
@@ -227,8 +256,8 @@ namespace Ocuda.Promenade.Service.Abstract
             {
                 string populatedCacheKey = string.Format(CultureInfo.InvariantCulture,
                     cacheKey,
-                languageId,
-                itemId);
+                    languageId,
+                    itemId);
 
                 if (cacheForHours > 0 && !forceReload)
                 {

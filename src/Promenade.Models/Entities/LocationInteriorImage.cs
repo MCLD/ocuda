@@ -10,7 +10,7 @@ namespace Ocuda.Promenade.Models.Entities
         public List<LocationInteriorImageAltText> AllAltTexts { get; set; }
 
         [NotMapped]
-        public LocationInteriorImageAltText AltText { get; set; }
+        public string AltText { get; set; }
 
         [Key]
         public int Id { get; set; }

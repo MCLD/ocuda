@@ -403,66 +403,50 @@ namespace Ocuda.Promenade.Service
                 Utility.Keys.Cache.PromLocation,
                 id);
 
-            Location location = null;
-
-            if (!forceReload)
-            {
-                location = await _cache.GetObjectFromCacheAsync<Location>(cacheKey);
-            }
+            Location location = await GetFromCacheDatabaseAsync(
+                Utility.Keys.Cache.PromLocation,
+                id,
+                CacheLocationHours,
+                _cache,
+                forceReload,
+                _locationRepository.FindAsync);
 
             if (location == null)
             {
-                location = await _locationRepository.FindAsync(id);
-
-                if (location == null)
-                {
-                    return null;
-                }
-
-                // cache location info but segment and status info caches individually below
-                await _cache.SaveToCacheAsync(cacheKey, location, CacheLocationHours);
+                return null;
             }
 
-            string interiorImagesCacheKey = string.Format(CultureInfo.InvariantCulture,
+            location.InteriorImages = await GetFromCacheDatabaseAsync(
                 Utility.Keys.Cache.PromLocationInteriorImages,
-                id);
+                location.Id,
+                CacheLocationHours,
+                _cache,
+                forceReload,
+                _locationInteriorImageRepository.GetLocationInteriorImagesAsync);
 
-            ICollection<LocationInteriorImage> interiorImages = forceReload
-                ? null
-                : await _cache
-                    .GetObjectFromCacheAsync<List<LocationInteriorImage>>(interiorImagesCacheKey);
+            var fixedSortOrder = 0;
 
-            if (interiorImages == null)
+            if (location.InteriorImages?.Count > 0)
             {
-                interiorImages = await _locationInteriorImageRepository
-                    .GetLocationInteriorImagesAsync(id);
+                var currentDefaultLanguageId = await GetCurrentDefaultLanguageIdAsync(_contextAccessor,
+                    _languageService);
 
-                await _cache.SaveToCacheAsync(interiorImagesCacheKey, interiorImages, CacheLocationHours);
-            }
-
-            var currentDefaultLanguageId = await GetCurrentDefaultLanguageIdAsync(_contextAccessor,
-                _languageService);
-
-            foreach (var image in interiorImages)
-            {
-                var imageAltTextCacheKey = string.Format(CultureInfo.InvariantCulture,
-                    Utility.Keys.Cache.PromLocationImageAltText,
-                    id,
-                    currentDefaultLanguageId.First());
-
-                image.AltText = forceReload ? null : await _cache.
-                    GetObjectFromCacheAsync<LocationInteriorImageAltText>(imageAltTextCacheKey);
-
-                if (image.AltText == null)
+                foreach (var interiorImage in location.InteriorImages.OrderBy(_ => _.SortOrder))
                 {
-                    image.AltText = await _imageAltTextRepository
-                        .GetByImageIdAsync(image.Id, currentDefaultLanguageId.First());
+                    interiorImage.SortOrder = fixedSortOrder++;
 
-                    await _cache.SaveToCacheAsync(imageAltTextCacheKey, image.AltText, CacheLocationHours);
+                    var altText = await GetFromCacheDatabaseAsync(
+                        Utility.Keys.Cache.PromLocationImageAltText,
+                        interiorImage.Id,
+                        currentDefaultLanguageId,
+                        CacheLocationHours,
+                        _cache,
+                        forceReload,
+                        _imageAltTextRepository.GetByImageIdAsync);
+
+                    interiorImage.AltText = altText?.AltText;
                 }
             }
-
-            location.InteriorImages = interiorImages;
 
             location.DescriptionSegment = await _segmentService
                 .GetSegmentTextBySegmentIdAsync(location.DescriptionSegmentId,

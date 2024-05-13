@@ -289,15 +289,6 @@
                                         aria-label="@interiorImage.AltText"></button>
 
                             }
-                            @foreach (var interiorImage in Model.Location.InteriorImages)
-                            {
-                                <button type="button"
-                                        data-bs-target="#interiorPhotoCarousel"
-                                        data-bs-slide-to="@interiorImage.SortOrder"
-                                        class="@Model.ActiveIfFirstInteriorImage(interiorImage.SortOrder)"
-                                        aria-current="true"
-                                        aria-label="@interiorImage.AltText"></button>
-                            }
                         </div>
                         <div class="carousel-inner">
                             @foreach (var interiorImage in Model.Location.InteriorImages)
