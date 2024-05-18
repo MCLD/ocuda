@@ -19,6 +19,7 @@ using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Extensions;
+using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers
@@ -924,7 +925,7 @@ namespace Ocuda.Ops.Controllers
             {
                 var (extension, imageBytes) = _imageService.ConvertFromBase64(imageBase64);
                 // TODO: fix this using slugify the way the other image processes work?
-                var filename = $"{location.Name.ToLowerInvariant().Replace(' ', '-')}-map{extension}";
+                var filename = $"{location.Name.ToLowerInvariant().Replace(' ', '-').Replace(".", "")}-map{extension}";
 
                 try
                 {

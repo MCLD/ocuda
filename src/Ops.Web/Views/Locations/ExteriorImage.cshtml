@@ -74,14 +74,14 @@
     <script>
         $(function () {
             const upModal = new bootstrap.Modal('#uploadModal', null);
-            $('#uploadForm').on('submit', function (ee) {
+            $('#uploadForm').on('submit', function () {
                 $('button[type=\'submit\']').each(function () {
                     $(this).prop('disabled', true);
                 });
                 upModal.show()
             });
             if (slugify) {
-                $('#Filename').val(slugify($('#LocationName').val().toLowerCase()));
+                $('#Filename').val(slugify($('#LocationName').val().replace(".", "").toLowerCase()));
             }
             $('input[type=\'file\']').each(function () {
                 $(this).on('change', function () {
