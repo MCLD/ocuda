@@ -17,6 +17,21 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
+        public async Task FixInteriorImageSortOrder(int locationId)
+        {
+            var interiorImages = DbSet.Where(_ => _.LocationId == locationId).ToList();
+
+            int counter = 0;
+            foreach (var interiorImage in interiorImages
+                .OrderBy(_ => _.SortOrder)
+                .ThenBy(_ => _.ImagePath))
+            {
+                interiorImage.SortOrder = counter++;
+            }
+            UpdateRange(interiorImages);
+            await SaveAsync();
+        }
+
         public async Task<LocationInteriorImage> GetInteriorImageByIdAsync(int imageId)
         {
             return await DbSet
@@ -32,6 +47,15 @@ namespace Ocuda.Ops.Data.Promenade
                 .Where(_ => _.LocationId == locationId)
                 .OrderBy(_ => _.SortOrder)
                 .ToListAsync();
+        }
+
+        public async Task<int> GetNextSortOrderAsync(int locationId)
+        {
+            var top = await DbSet
+                .AsNoTracking()
+                .Where(_ => _.LocationId == locationId)
+                .MaxAsync(_ => _.SortOrder as int?) ?? -1;
+            return top + 1;
         }
     }
 }

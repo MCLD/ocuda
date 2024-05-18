@@ -400,42 +400,41 @@
         }
     }
     @RenderSection("Scripts", required: false)
+    @if (!string.IsNullOrEmpty(catalogSearchLink))
+    {
+        <script language="javascript">
+            String.prototype.trim = function () {
+                return this.replace(/^\s*|\s*$/g, "");
+            };
+            function ProcessInput(e) {
+                if (window.event)
+                    // IE
+                    keyNum = e.keyCode;
+                else if (e.which)
+                    // Netscape/Firefox/Opera
+                    keyNum = e.which;
+                if (keyNum == 13) {
+                    e.returnValue = false;
+                    e.cancelBubble = true;
+                    DoKeywordSearch();
+                    return false;
+                }
+                return true;
+            }
+            function DoKeywordSearch() {
+                if (document.getElementById("textboxTerm").value.trim() != "")
+                    window.location =
+                        "@catalogSearchLink" +
+                        escape(document.getElementById("textboxTerm").value);
+                else document.getElementById("textboxTerm").focus();
+            }
+
+            document.querySelectorAll('.middle-nav-dropdown').forEach(nav => {
+                nav.addEventListener('click', e => e.preventDefault());
+            });
+
+            document.getElementById("textboxTerm").focus();
+        </script>
+    }
 </body>
 </html>
-
-@if (!string.IsNullOrEmpty(catalogSearchLink))
-{
-    <script language="javascript">
-        String.prototype.trim = function () {
-            return this.replace(/^\s*|\s*$/g, "");
-        };
-        function ProcessInput(e) {
-            if (window.event)
-                // IE
-                keyNum = e.keyCode;
-            else if (e.which)
-                // Netscape/Firefox/Opera
-                keyNum = e.which;
-            if (keyNum == 13) {
-                e.returnValue = false;
-                e.cancelBubble = true;
-                DoKeywordSearch();
-                return false;
-            }
-            return true;
-        }
-        function DoKeywordSearch() {
-            if (document.getElementById("textboxTerm").value.trim() != "")
-                window.location =
-                    "@catalogSearchLink" +
-                    escape(document.getElementById("textboxTerm").value);
-            else document.getElementById("textboxTerm").focus();
-        }
-
-        document.querySelectorAll('.middle-nav-dropdown').forEach(nav => {
-            nav.addEventListener('click', e => e.preventDefault());
-        });
-
-        document.getElementById("textboxTerm").focus();
-    </script>
-}

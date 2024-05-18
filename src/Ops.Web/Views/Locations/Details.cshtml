@@ -29,7 +29,7 @@
         <div class="card mb-2">
             <div class="card-header">Description</div>
             <div class="card-body">
-                <p class="card-text">@(Model.Location.DescriptionSegment?.Text ?? "No description available.")</p>
+                <p class="card-text">@(Html.Raw(Model.Location.DescriptionSegment?.Text ?? "No description available."))</p>
             </div>
             <div class="card-footer d-flex">
                 <div class="d-inline-block fa-fw @Model.LanguageCssClass flex-grow-1 text-start"
@@ -51,6 +51,85 @@
                     </div>
                 }
             </div>
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-header">Map</div>
+            <div class="card-body">
+                <a asp-action="@nameof(LocationsController.MapImage)"
+                   asp-route-slug="@Model.Location.Stub">
+                    <img class="img-fluid"
+                         src="@Url.Action(nameof(LocationsController.MapImage), new { slug = Model.Location.Stub })?@DetailsViewModel.Now()">
+                </a>
+            </div>
+            @if (Model.LocationManager)
+            {
+                <div class="card-footer d-flex justify-content-end">
+                    <div>
+                        <a class="btn btn-sm btn-outline-primary"
+                           asp-action="@nameof(LocationsController.UpdateMapImage)"
+                           asp-route-slug="@Model.Location.Stub">
+                            <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-header">Exterior photo</div>
+            <div class="card-body">
+                <a asp-action="@nameof(LocationsController.ExteriorImage)"
+                   asp-route-slug="@Model.Location.Stub">
+                    <img class="img-fluid"
+                         src="@Url.Action(nameof(LocationsController.ExteriorImage), new { slug = Model.Location.Stub })?@DetailsViewModel.Now()">
+                </a>
+            </div>
+            @if (Model.LocationManager)
+            {
+                <div class="card-footer d-flex justify-content-end">
+                    <div>
+                        <a class="btn btn-sm btn-outline-primary"
+                           asp-action="@nameof(LocationsController.UpdateExteriorImage)"
+                           asp-route-slug="@Model.Location.Stub">
+                            <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-header">Interior photos</div>
+            <div class="card-body">
+                @if (Model.Location.InteriorImages?.Count > 0)
+                {
+                    @foreach (var interiorImage in Model.Location.InteriorImages)
+                    {
+                        <a asp-action="@nameof(LocationsController.InteriorImage)"
+                           asp-route-id="@interiorImage.Id">
+                            <img class="img-thumbnail" style="max-width: 200px; max-height: 200px;"
+                                 src="@Url.Action(nameof(LocationsController.InteriorImage), new { id = interiorImage.Id })?@DetailsViewModel.Now()">
+                        </a>
+                    }
+                }
+                else
+                {
+                    <em>No interior photos.</em>
+                }
+            </div>
+            @if (Model.LocationManager)
+            {
+                <div class="card-footer d-flex justify-content-end">
+                    <div>
+                        <a class="btn btn-sm btn-outline-primary"
+                           asp-action="@nameof(LocationsController.UpdateInteriorImages)"
+                           asp-route-slug="@Model.Location.Stub">
+                            <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                </div>
+            }
         </div>
     </div>
     <div class="col">

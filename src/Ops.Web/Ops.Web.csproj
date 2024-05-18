@@ -6,7 +6,7 @@
     <CodeAnalysisRuleSet>../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
     <Company>Maricopa County Library District</Company>
     <Copyright>Copyright 2018 Maricopa County Library District</Copyright>
-    <FileVersion>1.0.0.272</FileVersion>
+    <FileVersion>1.0.0.273</FileVersion>
     <LangVersion>Latest</LangVersion>
     <PackageLicenseUrl>https://github.com/MCLD/ocuda/blob/develop/LICENSE</PackageLicenseUrl>
     <Product>Ocuda</Product>
@@ -38,6 +38,7 @@
 
   <ItemGroup>
     <Content Remove="Areas\SiteManagement\Views\Features\UpdateSlug.cshtml" />
+    <Content Remove="Views\Locations\ExteriorImage.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -96,6 +97,7 @@
 
   <ItemGroup>
     <None Include="Areas\SiteManagement\Views\Features\UpdateSlug.cshtml" />
+    <None Include="Views\Locations\ExteriorImage.cshtml" />
   </ItemGroup>
 
 </Project>

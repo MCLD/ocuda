@@ -1,0 +1,93 @@
+﻿@using Ocuda.Ops.Controllers.ViewModels.Locations
+@model InteriorImagesViewModel
+
+<div class="d-flex mb-2">
+    <h1 class="flex-grow-1 text-start">
+        Interior Photos
+        <small class="text-muted">@Model.LocationName</small>
+    </h1>
+    <div>
+        <a asp-action="@nameof(LocationsController.AddInteriorImage)"
+           asp-route-slug="@Model.Slug"
+           class="btn btn-outline-success me-1">Add Image</a>
+        <a class="btn btn-outline-secondary"
+           asp-action="@nameof(LocationsController.Details)"
+           asp-route-slug="@Model.Slug">Back</a>
+    </div>
+</div>
+<div class="row">
+    @foreach (var interiorImage in Model.InteriorImages)
+    {
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img class="card-img-top" src="@Url.Action(nameof(LocationsController.InteriorImage), new { id = interiorImage.Id })?@InteriorImagesViewModel.Now()">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Sort order</strong>: @interiorImage.SortOrder</li>
+                    @foreach (var altText in interiorImage.AllAltTexts)
+                    {
+                        <li class="list-group-item"><strong>@altText.Language.Description</strong>: @altText.AltText</li>
+                    }
+                </ul>
+                <div action="card-footer">
+                    <div class="d-flex justify-content-between p-2">
+                        <div>
+                            @if (interiorImage.SortOrder == Model.InteriorImages.Min(_ => _.SortOrder))
+                            {
+                                <button disabled="disabled" class="btn btn-sm btn-outline-secondary me-2">
+                                    <span class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></span>
+                                </button>
+                            }
+                            else
+                            {
+                                <form asp-action="@nameof(LocationsController.ChangeInternalImageSortOrder)"
+                                      asp-route-slug="@Model.Slug"
+                                      class="d-inline">
+                                    <input type="hidden" name="interiorImageId" value="@interiorImage.Id" />
+                                    <input type="hidden" name="increment" value="-1" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary me-2">
+                                        <span class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></span>
+                                    </button>
+                                </form>
+                            }
+                            @if (interiorImage.SortOrder == Model.InteriorImages.Max(_ => _.SortOrder))
+                            {
+                                <button disabled="disabled" class="btn btn-sm btn-outline-secondary">
+                                    <span class="fa-solid fa-angle-right fa-fw" aria-hidden="true"></span>
+                                </button>
+                            }
+                            else
+                            {
+                                <form asp-action="@nameof(LocationsController.ChangeInternalImageSortOrder)"
+                                      asp-route-slug="@Model.Slug"
+                                      class="d-inline">
+                                    <input type="hidden" name="interiorImageId" value="@interiorImage.Id" />
+                                    <input type="hidden" name="increment" value="1" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        <span class="fa-solid fa-angle-right fa-fw" aria-hidden="true"></span>
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                        <div>&nbsp;</div>
+                        <div>
+                            <form asp-action="@nameof(LocationsController.RemoveInteriorImage)"
+                                  asp-route-slug="@Model.Slug"
+                                  class="d-inline">
+                                <input type="hidden" name="interiorImageId" value="@interiorImage.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger me-2">
+                                    <span class="fa-solid fa-circle-minus fa-fw" aria-hidden="true"></span>
+                                </button>
+                            </form>
+                            <a class="btn btn-sm btn-outline-primary"
+                               asp-action="@nameof(LocationsController.UpdateInteriorImage)"
+                               asp-route-interiorImageId="@interiorImage.Id"
+                               asp-route-slug="@Model.Slug">
+                                <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Controllers.ViewModels.Locations
@@ -12,7 +13,9 @@ namespace Ocuda.Ops.Controllers.ViewModels.Locations
         }
 
         public IDictionary<int, string> AllLanguages { get; }
+
         public IEnumerable<Feature> AtThisLocation { get; set; }
+
         public ICollection<string> DescriptionLanguages { get; }
 
         public string LanguageCssClass
@@ -36,8 +39,16 @@ namespace Ocuda.Ops.Controllers.ViewModels.Locations
         }
 
         public Location Location { get; set; }
+
         public bool LocationManager { get; set; }
+
         public bool SegmentEditor { get; set; }
+
         public IEnumerable<Feature> ServicesAvailable { get; set; }
+
+        public static string Now()
+        {
+            return DateTime.Now.ToString("s");
+        }
     }
 }

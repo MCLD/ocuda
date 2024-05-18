@@ -384,9 +384,9 @@ namespace Ocuda.Promenade.Service
                     {
                         var segmentText = await _segmentService
                             .GetSegmentTextBySegmentIdAsync(textSegmentId.Value, forceReload);
-                        if(segmentText == null)
+                        if (segmentText == null)
                         {
-                            _logger.LogError("Unable to find text segmetn id {TextSegmentId} for feature id {FeatureId} at location {LocationId}",
+                            _logger.LogInformation("Unable to find text segment id {TextSegmentId} for feature id {FeatureId} at location {LocationId}",
                                 textSegmentId.Value,
                                 feature.FeatureId,
                                 locationId);
