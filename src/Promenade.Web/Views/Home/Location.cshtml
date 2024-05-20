@@ -317,21 +317,23 @@
         <div class="row g-0 col-lg-10 offset-lg-1 border-4 border-bottom">
             <div class="mx-auto" style="max-width: 740px;">
                 <div class="row">
-                    @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]?.ToString()))
+                    @if(!string.IsNullOrEmpty(Model.SocialLink) && 
+                        !string.IsNullOrEmpty(Model.SocialName) &&
+                        !string.IsNullOrEmpty(Model.SocialIcon))
                     {
                         <div class="col-12 col-sm-6 mb-4 location-feature-link">
-                            <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]"
-                            @Model.Location.Facebook
+                            <a href="@Model.SocialLink"
                                target="_blank"
                                class="text-reset">
                                 <div class="d-flex gap-4 align-items-center prom-box-border p-3 h-100">
-                                    <span class="fa-brands fa-facebook display-4 prom-text-color"></span>
+                                    <span class="@Model.SocialIcon display-4 prom-text-color"></span>
                                     <span class="location-feature-link prom-faq-icons">
-                                        @Localizer[Promenade.ConnectSocialOn, nameof(Model.Location.Facebook)]!
+                                        @Localizer[Promenade.ConnectSocialOn, Model.SocialName]!
                                     </span>
                                 </div>
                             </a>
                         </div>
+
                     }
                     <div class="col-12 col-sm-6 mb-4 location-feature-link">
                         <a href="@Model.Location.SubscriptionLink">

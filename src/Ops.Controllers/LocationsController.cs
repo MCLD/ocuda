@@ -12,14 +12,12 @@ using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Controllers.ServiceFacades;
 using Ocuda.Ops.Controllers.ViewModels.Locations;
 using Ocuda.Ops.Models.Keys;
-using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Extensions;
-using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers
@@ -910,6 +908,9 @@ namespace Ocuda.Ops.Controllers
         }
 
         [HttpPost("[action]/{slug}")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
+            "CA1308:Normalize strings to uppercase",
+            Justification = "Normalizing filename to lowercase")]
         public async Task<IActionResult> UpdateMapImage([FromBody] string imageBase64, string slug)
         {
             if (string.IsNullOrEmpty(slug)) { return NotFound(); }
@@ -925,7 +926,11 @@ namespace Ocuda.Ops.Controllers
             {
                 var (extension, imageBytes) = _imageService.ConvertFromBase64(imageBase64);
                 // TODO: fix this using slugify the way the other image processes work?
-                var filename = $"{location.Name.ToLowerInvariant().Replace(' ', '-').Replace(".", "")}-map{extension}";
+                var fixedBase = location.Name
+                    .ToLowerInvariant()
+                    .Replace(" ", "-", StringComparison.InvariantCultureIgnoreCase)
+                    .Replace(".", "", StringComparison.InvariantCultureIgnoreCase);
+                var filename = $"{fixedBase}-map{extension}";
 
                 try
                 {

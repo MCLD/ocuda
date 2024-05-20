@@ -32,6 +32,10 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         public IEnumerable<LocationsFeaturesViewModel> ServicesAvailable { get; set; }
         public string ShowMessage { get; set; }
 
+        public string SocialIcon { get; set; }
+        public string SocialLink { get; set; }
+        public string SocialName { get; set; }
+
         public string ActiveIfFirstInteriorImage(int itemSortOrder) =>
             Location?.InteriorImages?.Min(_ => _.SortOrder) == itemSortOrder
                 ? "active"

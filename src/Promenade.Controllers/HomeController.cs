@@ -155,6 +155,12 @@ namespace Ocuda.Promenade.Controllers
             }
 
             var location = await _locationService.GetLocationAsync(locationId.Value, forceReload);
+
+            if (Location == null)
+            {
+                return NotFound();
+            }
+
             var builder = BaseUriBuilder;
             builder.Path = _pathResolverService.GetPublicContentLink(UriPaths.Images,
                 UriPaths.Locations,
@@ -188,13 +194,17 @@ namespace Ocuda.Promenade.Controllers
                 DayOfWeek = _dateTimeProvider.Now.DayOfWeek,
                 CanonicalLink = await GetCanonicalLinkAsync(),
                 Location = location,
+                SocialLink = location.Facebook ?? await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.Social.FacebookUrl, forceReload),
                 SeeServicesAtAllLink = await _siteSettingService
                     .GetSettingStringAsync(Models.Keys.SiteSetting.Site.ServicesAtAllLink)
             };
 
-            if (viewModel.Location == null)
+            // TODO: fix so that social link is selectable
+            if (!string.IsNullOrEmpty(viewModel.SocialLink))
             {
-                return NotFound();
+                viewModel.SocialIcon = "fa-brands fa-facebook";
+                viewModel.SocialName = nameof(location.Facebook);
             }
 
             if (viewModel.Location.HoursSegmentText != null)
