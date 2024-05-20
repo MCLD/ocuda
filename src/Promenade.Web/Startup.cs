@@ -143,7 +143,7 @@ namespace Ocuda.Promenade.Web
 
             app.UseSession();
 
-            app.UseHealthChecks("/health");
+            app.UseHealthChecks("/healthcheck");
             app.UseMvc();
         }
 

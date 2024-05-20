@@ -104,7 +104,7 @@ namespace Ocuda.Ops.Web
             app.UseEndpoints(_ =>
             {
                 _.MapControllers();
-                _.MapHealthChecks("/health");
+                _.MapHealthChecks("/healthcheck");
             });
         }
 
