@@ -17,7 +17,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.17")
+                .HasAnnotation("ProductVersion", "7.0.18")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -430,8 +430,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
 
                     b.Property<string>("Details")
                         .HasMaxLength(1000)
@@ -481,18 +481,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BodyText")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
                     b.Property<string>("Icon")
                         .IsRequired()
                         .HasMaxLength(48)
                         .HasColumnType("nvarchar(48)");
-
-                    b.Property<string>("IconText")
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
 
                     b.Property<string>("ImagePath")
                         .HasMaxLength(255)
@@ -506,12 +498,18 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<int>("NameSegmentId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("SortOrder")
                         .HasColumnType("int");
 
                     b.Property<string>("Stub")
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
+
+                    b.Property<int?>("TextSegmentId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -869,8 +867,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Text")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("SegmentId")
+                        .HasColumnType("int");
 
                     b.HasKey("FeatureId", "LocationId");
 
@@ -1045,6 +1043,97 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.ToTable("LocationProductMaps");
                 });
 
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.NavBanner", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NavBanners");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.NavBannerImage", b =>
+                {
+                    b.Property<int>("NavBannerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Filename")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ImageAltText")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("NavBannerId", "LanguageId");
+
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("NavBannerImages");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.NavBannerLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("NavBannerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NavBannerId");
+
+                    b.ToTable("NavBannerLinks");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.NavBannerLinkText", b =>
+                {
+                    b.Property<int>("NavBannerLinkId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.HasKey("NavBannerLinkId", "LanguageId");
+
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("NavBannerLinkTexts");
+                });
+
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Navigation", b =>
                 {
                     b.Property<int>("Id")
@@ -1207,6 +1296,9 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<int?>("DeckId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("NavBannerId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
@@ -1229,6 +1321,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.HasIndex("CarouselId");
 
                     b.HasIndex("DeckId");
+
+                    b.HasIndex("NavBannerId");
 
                     b.HasIndex("PageFeatureId");
 
@@ -2413,6 +2507,55 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.NavBannerImage", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.NavBanner", "NavBanner")
+                        .WithMany()
+                        .HasForeignKey("NavBannerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Language");
+
+                    b.Navigation("NavBanner");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.NavBannerLink", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.NavBanner", "NavBanner")
+                        .WithMany()
+                        .HasForeignKey("NavBannerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("NavBanner");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.NavBannerLinkText", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.NavBannerLink", "NavBannerLink")
+                        .WithMany()
+                        .HasForeignKey("NavBannerLinkId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Language");
+
+                    b.Navigation("NavBannerLink");
+                });
+
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Navigation", b =>
                 {
                     b.HasOne("Ocuda.Promenade.Models.Entities.Navigation", null)
@@ -2514,6 +2657,11 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("DeckId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Ocuda.Promenade.Models.Entities.NavBanner", "NavBanner")
+                        .WithMany()
+                        .HasForeignKey("NavBannerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Ocuda.Promenade.Models.Entities.ImageFeature", "PageFeature")
                         .WithMany()
                         .HasForeignKey("PageFeatureId")
@@ -2540,6 +2688,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Navigation("Carousel");
 
                     b.Navigation("Deck");
+
+                    b.Navigation("NavBanner");
 
                     b.Navigation("PageFeature");
 

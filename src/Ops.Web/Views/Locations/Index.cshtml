@@ -1,0 +1,48 @@
+﻿@using Ocuda.Ops.Controllers.ViewModels.Locations
+@model IndexViewModel
+
+<div class="d-flex justify-content-between mb-2">
+    <h1>
+        Locations
+    </h1>
+    <div>
+        <a class="btn btn-outline-dark"
+           asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)"
+           asp-area=""
+           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name">
+            Home
+        </a>
+    </div>
+</div>
+
+@if (Model.Locations?.Any() != true)
+{
+    <div class="row">
+        <div class="col">
+            <div class="alert alert-warning">No locations found.</div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var location in Model.Locations)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <a asp-action="@nameof(Ocuda.Ops.Controllers.LocationsController.Details)"
+                           asp-route-slug="@location.Stub">@location.Name</a>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            @location.Address<br/>
+                            @location.City, @location.State @location.Zip
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+<nav paginate="@Model"></nav>

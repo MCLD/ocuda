@@ -58,7 +58,34 @@
 
 @foreach (var item in Model.PageLayout.Items)
 {
-    if (item.BannerFeatureId.HasValue)
+    if (item.NavBannerId.HasValue && item.NavBanner != null)
+    {
+        <div class="row">
+            <div class="mb-4">
+                <div class="row g-0">
+                    <div class="col-12 col-lg-7">
+                        <img class="img-fluid" 
+                                src="@item.NavBanner.NavBannerImage.ImageLinkPath" 
+                                alt="@item.NavBanner.NavBannerImage.ImageAltText" />
+                    </div>
+                    <div class="col-12 col-lg-5 p-2 gap-2 fs-5 text-bold navbanner-link-container">
+                        <div class="navbanner-link-grid-container gap-2 h-100">
+                            @foreach (var link in item.NavBanner.NavBannerLinks)
+                            {
+                                <a class="navbanner-link-href h-100" href="@link.Link">
+                                    <div class="d-flex align-items-center justify-content-center py-4 py-lg-1 gap-2 h-100 navbanner-link-box">
+                                        <span class="@link.Icon mb-1 navbanner-link-icon"></span>
+                                        <span class="text-bold navbanner-link-text">@link.LocalizedText</span>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (item.BannerFeatureId.HasValue)
     {
         <div class="row">
             <div class="col-12">
@@ -89,7 +116,7 @@
             @foreach (var card in item.CardDetails)
             {
                 <div class="col-12 col-sm-6 col-md-4 mb-3">
-                    <div class="card">
+                    <div class="card h-100">
                         @if (!string.IsNullOrEmpty(card.Filename))
                         {
                             @if (!string.IsNullOrEmpty(card.Link))
@@ -139,7 +166,7 @@
                 <div class="card">
                     @if (!string.IsNullOrEmpty(item.Carousel.CarouselText?.Title))
                     {
-                        <div class="card-header">@item.Carousel.CarouselText.Title</div>
+                        <div class="card-header h3">@item.Carousel.CarouselText.Title</div>
                     }
                     <div class="card-body">
                         <div class="prom-carousel">
@@ -155,8 +182,8 @@
                                     {
                                         <text>data-button-@button.Order='{"Sort":"@button.Order","Button":"@button.LabelText.Text","Link":"@button.Url"}' </text>
                                     }>
-                                                                                        <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p>
-                                                                                    </a>
+                                                    <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p>
+                                                </a>
                                 </div>
                             }
                         </div>
@@ -189,23 +216,23 @@
     }
     else if (item.PageFeatureId.HasValue)
     {
-        <div class="row">
-            <div class="col-12">
-                <div style="max-width: 740px" class="mx-auto d-block mb-3">
-                    <div class="row">
+        <div class="row mb-3">
+            <div class="col-12 mb-2">
+                <div style="max-width: 740px; background-color: lightgray" class="mx-auto d-block p-2">
+                    <div class="row g-2">
                         @{
                             int count = 0;
                         }
                         @foreach (var featureItem in item.PageFeature.Items)
                         {
-                            <div class="col-xs-12 col-sm-6 col-lg-3 mb-2">
+                            <div class="col-xs-12 col-sm-6 col-md-3">
                                 @if (!string.IsNullOrEmpty(featureItem.ImageFeatureItemText.FileContent))
                                 {
                                     <a href="@featureItem.ImageFeatureItemText.Link" class="d-block prom-tile">
                                         <svg viewBox="0 0 200 200" class="d-block mx-auto">
                                             @Html.Raw(featureItem.ImageFeatureItemText.FileContent)
                                         </svg>
-                                        <p class="px-2">@featureItem.ImageFeatureItemText.AltText</p>
+                                        <p class="px-2 mb-0">@featureItem.ImageFeatureItemText.AltText</p>
                                     </a>
                                 }
                                 else
@@ -246,9 +273,8 @@
         <div class="row">
             <div class="col-12">
                 <div id="carouselControls"
-                     class="carousel slide mx-auto d-block mb-4"
+                     class="carousel slide mx-auto d-block mb-4 col-lg-10 offset-lg-1"
                      data-bs-ride="carousel"
-                     style="max-width: 740px"
                      aria-hidden="true">
                     <div class="carousel-inner">
                         @foreach (var webslideItem in item.Webslide.Items)

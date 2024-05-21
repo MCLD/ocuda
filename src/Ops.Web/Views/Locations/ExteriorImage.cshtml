@@ -1,0 +1,95 @@
+﻿@using Ocuda.Ops.Controllers.ViewModels.Locations
+@model ExteriorImageViewModel
+
+<div class="d-flex mb-2">
+    <h1 class="flex-grow-1 text-start">
+        Exterior Photo
+        <small class="text-muted">@Model.LocationName</small>
+    </h1>
+    <div>
+        <a class="btn btn-outline-success"
+           asp-action="@nameof(LocationsController.Details)"
+           asp-route-slug="@Model.Slug">Back</a>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-8 offset-2">
+        <div>
+            <p>
+                Use this form to upload a new exterior picture for
+                <strong>@Model.LocationName</strong>. The uploaded file should be a JPEG or PNG 
+                image of dimensions
+                <strong>@Model.CropWidth pixels wide by @Model.CropHeight pixels high</strong>.
+            </p>
+            <form id="uploadForm"
+                  asp-action="@nameof(LocationsController.UpdateExteriorImage)"
+                  asp-route-slug="@Model.Slug"
+                  enctype="multipart/form-data">
+                <input type="hidden" asp-for="Filename" />
+                <input type="hidden" asp-for="LocationName" value="@Model.LocationName" />
+                <div class="input-group">
+                    <input asp-for="Image"
+                           class="form-control"
+                           type="file">
+                    <button type="submit" 
+                        disabled="disabled"
+                        class="btn btn-outline-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="row mb-4">
+    <h3 class="text-center">Current Exterior Image</h3>
+    <div class="col-8 offset-2">
+        <a asp-action="@nameof(LocationsController.ExteriorImage)"
+           asp-route-slug="@Model.Slug">
+            <img class="img-fluid"
+                 src="@Url.Action(nameof(LocationsController.ExteriorImage), new { slug = Model.Slug })?@ExteriorImageViewModel.Now()">
+        </a>
+    </div>
+</div>
+
+<div class="modal fade"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     id="uploadModal"
+     tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="uploadingModal">Uploading and optimizing...</h1>
+            </div>
+            <div class="modal-body">
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                         style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(function () {
+            const upModal = new bootstrap.Modal('#uploadModal', null);
+            $('#uploadForm').on('submit', function () {
+                $('button[type=\'submit\']').each(function () {
+                    $(this).prop('disabled', true);
+                });
+                upModal.show()
+            });
+            if (slugify) {
+                $('#Filename').val(slugify($('#LocationName').val().replace(".", "").toLowerCase()));
+            }
+            $('input[type=\'file\']').each(function () {
+                $(this).on('change', function () {
+                    $('button[type=\'submit\']').each(function () {
+                        $(this).prop('disabled', false);
+                    });
+                });
+            });
+        });
+    </script>
+}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CommonMark;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Controllers.ViewModels.Shared;
@@ -100,7 +101,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
             var viewModel = new PageViewModel
             {
-                Content = CommonMark.CommonMarkConverter.Convert(page.Content),
+                Content = CommonMarkConverter.Convert(page.Content),
                 CanonicalUrl = await GetCanonicalLinkAsync()
             };
 
@@ -153,7 +154,8 @@ namespace Ocuda.Promenade.Controllers.Abstract
                         .GetByIdAsync(item.CarouselId.Value, forceReload);
                     if (!string.IsNullOrEmpty(item.Carousel?.CarouselText?.Footer))
                     {
-                        item.Carousel.CarouselText.Footer = CommonMark.CommonMarkConverter.Convert(item.Carousel.CarouselText.Footer);
+                        item.Carousel.CarouselText.Footer
+                            = CommonMarkConverter.Convert(item.Carousel.CarouselText.Footer);
                     }
                 }
                 else if (item.DeckId.HasValue)
@@ -162,12 +164,17 @@ namespace Ocuda.Promenade.Controllers.Abstract
                         .GetByIdAsync(item.DeckId.Value, forceReload);
                     foreach (var cardDetail in item.CardDetails)
                     {
-                        cardDetail.Text = CommonMark.CommonMarkConverter.Convert(cardDetail.Text);
+                        cardDetail.Text = CommonMarkConverter.Convert(cardDetail.Text);
                         if (!string.IsNullOrEmpty(cardDetail.Footer))
                         {
-                            cardDetail.Footer = CommonMark.CommonMarkConverter.Convert(cardDetail.Footer);
+                            cardDetail.Footer = CommonMarkConverter.Convert(cardDetail.Footer);
                         }
                     }
+                }
+                else if (item.NavBannerId.HasValue)
+                {
+                    item.NavBanner = await PageContext.NavBannerService
+                        .GetByIdAsync(item.NavBannerId.Value, forceReload);
                 }
                 else if (item.PageFeatureId.HasValue)
                 {

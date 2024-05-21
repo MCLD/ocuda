@@ -1,0 +1,38 @@
+﻿@using Ocuda.Ops.Controllers.ViewModels.Locations
+@model LinkViewModel
+
+<div class="d-flex mb-2">
+    <h1 class="flex-grow-1 text-start">
+        Location Feature
+        <small class="text-muted">@Model.Location.Name / @Model.Feature.Name</small>
+    </h1>
+    <div>
+        <a class="btn btn-outline-dark"
+           asp-action="@nameof(LocationsController.LocationFeature)"
+           asp-route-featureId="@Model.Feature.Id"
+           asp-route-slug="@Model.Location.Stub">Back</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <form method="post">
+            <input type="hidden" asp-for="FeatureId" value="@Model.Feature.Id" />
+            <input type="hidden" asp-for="LocationStub" value="@Model.Location.Stub" />
+            <div class="mb-3">
+                <label for="link" class="form-label">Link</label>
+                <input type="text" asp-for="Link" class="form-control" aria-describedby="linkHelp">
+                <div id="linkHelp" class="form-text">
+                    The link for the button: releative if on this site
+                    (<code>/path/</code>), absolute if not (<code>https://...</code>).
+                </div>
+            </div>
+            <div class="mb-3">
+                <select class="form-select" asp-for="NewTab" aria-label="Default select example">
+                    <option value="true">Open in a new tab/window</option>
+                    <option value="false">Open in the same tab/window</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>

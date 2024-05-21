@@ -11,7 +11,6 @@ using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Podcasts;
-using Ocuda.Promenade.Models.Keys;
 using Ocuda.Promenade.Service;
 using Ocuda.Promenade.Service.Filters;
 using Ocuda.Utility.Models;
@@ -196,7 +195,7 @@ namespace Ocuda.Promenade.Controllers
             };
 
             var scheme = (await _siteSettingService
-                .GetSettingBoolAsync(SiteSetting.Site.IsTLS)) ? "https" : "http";
+                .GetSettingBoolAsync(Models.Keys.SiteSetting.Site.IsTLS)) ? "https" : "http";
             viewModel.RSSUrl = Url.Action(nameof(RSS), Name, new { stub = podcast.Stub }, scheme);
 
             foreach (var item in viewModel.PodcastItems)
@@ -241,7 +240,7 @@ namespace Ocuda.Promenade.Controllers
             XNamespace itunesNS = "http://www.itunes.com/dtds/podcast-1.0.dtd";
 
             var scheme = (await _siteSettingService
-                .GetSettingBoolAsync(SiteSetting.Site.IsTLS)) ? "https" : "http";
+                .GetSettingBoolAsync(Models.Keys.SiteSetting.Site.IsTLS)) ? "https" : "http";
 
             var podcastUri = new Uri(
                 Url.Action(nameof(Podcast), Name, new { stub = podcast.Stub }, scheme),
@@ -468,19 +467,19 @@ namespace Ocuda.Promenade.Controllers
 
             var settings = new XmlWriterSettings
             {
+                Async = true,
                 Encoding = Encoding.UTF8,
                 NewLineHandling = NewLineHandling.Entitize,
                 NewLineOnAttributes = true,
                 Indent = true
             };
 
-            using var stream = new MemoryStream();
-            using (var xmlWriter = XmlWriter.Create(stream, settings))
-            {
-                var rssFormatter = new Rss20FeedFormatter(feed, false);
-                rssFormatter.WriteTo(xmlWriter);
-                xmlWriter.Flush();
-            }
+            await using var stream = new MemoryStream();
+            await using var xmlWriter = XmlWriter.Create(stream, settings);
+
+            var rssFormatter = new Rss20FeedFormatter(feed, false);
+            rssFormatter.WriteTo(xmlWriter);
+            await xmlWriter.FlushAsync();
 
             Response.Headers.Add("Last-Modified",
                 new DateTime(lastModified)

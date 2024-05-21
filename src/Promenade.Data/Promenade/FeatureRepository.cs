@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
@@ -15,14 +16,13 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<Feature> FindAsync(int id)
+        public async Task<int?> GetIdBySlugAsync(string slug)
         {
-            var entity = await DbSet.FindAsync(id);
-            if (entity != null)
-            {
-                _context.Entry(entity).State = EntityState.Detached;
-            }
-            return entity;
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Stub == slug)
+                .Select(_ => _.Id)
+                .SingleOrDefaultAsync();
         }
     }
 }

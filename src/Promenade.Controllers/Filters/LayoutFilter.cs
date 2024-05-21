@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Ocuda.Promenade.Models.Keys;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Models;
 using Ocuda.Utility.Services.Interfaces;
@@ -71,10 +70,10 @@ namespace Ocuda.Promenade.Controllers.Filters
                 .Select(_ => _.Url).ToList();
 
             context.HttpContext.Items[ItemKey.PageTitleSuffix] = await _siteSettingService
-                .GetSettingStringAsync(SiteSetting.Site.PageTitleSuffix, forceReload);
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Site.PageTitleSuffix, forceReload);
 
             var topNavigationId = await _siteSettingService
-                .GetSettingIntAsync(SiteSetting.Site.NavigationIdTop, forceReload);
+                .GetSettingIntAsync(Models.Keys.SiteSetting.Site.NavigationIdTop, forceReload);
 
             if (topNavigationId > 0)
             {
@@ -83,7 +82,7 @@ namespace Ocuda.Promenade.Controllers.Filters
             }
 
             var middleNavigationId = await _siteSettingService
-                .GetSettingIntAsync(SiteSetting.Site.NavigationIdMiddle, forceReload);
+                .GetSettingIntAsync(Models.Keys.SiteSetting.Site.NavigationIdMiddle, forceReload);
 
             if (middleNavigationId > 0)
             {
@@ -92,7 +91,7 @@ namespace Ocuda.Promenade.Controllers.Filters
             }
 
             var leftNavigationId = await _siteSettingService
-                .GetSettingIntAsync(SiteSetting.Site.NavigationIdLeft, forceReload);
+                .GetSettingIntAsync(Models.Keys.SiteSetting.Site.NavigationIdLeft, forceReload);
 
             if (leftNavigationId > 0)
             {
@@ -101,37 +100,53 @@ namespace Ocuda.Promenade.Controllers.Filters
             }
 
             var footerNavigationId = await _siteSettingService
-                .GetSettingIntAsync(SiteSetting.Site.NavigationIdFooter, forceReload);
-            if (leftNavigationId > 0)
+                .GetSettingIntAsync(Models.Keys.SiteSetting.Site.NavigationIdFooter, forceReload);
+            if (footerNavigationId > 0)
             {
                 context.HttpContext.Items[ItemKey.FooterNavigation]
                     = await _navigationService.GetNavigation(footerNavigationId, forceReload);
             }
 
             context.HttpContext.Items[ItemKey.BannerImage] = await _siteSettingService
-                .GetSettingStringAsync(SiteSetting.Site.BannerImage, forceReload);
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Site.BannerImage, forceReload);
 
             context.HttpContext.Items[ItemKey.BannerImageAlt] = await _siteSettingService
-                .GetSettingStringAsync(SiteSetting.Site.BannerImageAlt, forceReload);
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Site.BannerImageAlt, forceReload);
+
+            context.HttpContext.Items[ItemKey.CatalogSearchLink] = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Site.CatalogSearchLink, forceReload);
+
+            context.HttpContext.Items[ItemKey.FooterImage] = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Site.FooterImage, forceReload);
+
+            context.HttpContext.Items[ItemKey.FooterImageAlt] = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Site.FooterImageAlt, forceReload);
 
             context.HttpContext.Items[ItemKey.GoogleAnalyticsTrackingCode]
                 = await _siteSettingService
-                    .GetSettingStringAsync(SiteSetting.Site.GoogleTrackingCode, forceReload);
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.Site.GoogleTrackingCode,
+                        forceReload);
 
             context.HttpContext.Items[ItemKey.SocialFacebookUrl] = await _siteSettingService
-                .GetSettingStringAsync(SiteSetting.Social.FacebookUrl, forceReload);
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Social.FacebookUrl, forceReload);
 
             context.HttpContext.Items[ItemKey.SocialInstagramUrl] = await _siteSettingService
-                .GetSettingStringAsync(SiteSetting.Social.InstagramUrl, forceReload);
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Social.InstagramUrl, forceReload);
 
             context.HttpContext.Items[ItemKey.SocialTikTokUrl] = await _siteSettingService
-                .GetSettingStringAsync(SiteSetting.Social.TikTokUrl, forceReload);
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Social.TikTokUrl, forceReload);
 
             context.HttpContext.Items[ItemKey.SocialTwitterUrl] = await _siteSettingService
-                .GetSettingStringAsync(SiteSetting.Social.TwitterUrl, forceReload);
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Social.TwitterUrl, forceReload);
 
             context.HttpContext.Items[ItemKey.SocialYoutubeUrl] = await _siteSettingService
-                .GetSettingStringAsync(SiteSetting.Social.YoutubeUrl, forceReload);
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Social.YoutubeUrl, forceReload);
+
+            context.HttpContext.Items[ItemKey.Telephone] = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Contact.Telephone, forceReload);
+
+            context.HttpContext.Items[ItemKey.ContactLink] = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Contact.Link, forceReload);
 
             await next();
         }

@@ -10,7 +10,12 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface ILocationService
     {
-        Task AddAltTextRangeAsync(List<LocationInteriorImageAltText> imageAltTexts);
+        int ExteriorImageHeight { get; }
+        int ExteriorImageWidth { get; }
+        int InteriorImageHeight { get; }
+        int InteriorImageWidth { get; }
+
+        Task AddAltTextRangeAsync(ICollection<LocationInteriorImageAltText> imageAltTexts);
 
         Task AddImageAltTextAsync(LocationInteriorImageAltText imageAltText);
 
@@ -19,8 +24,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<Location> AddLocationAsync(Location location);
 
         Task AddLocationMappingAsync(int productId, string importLocation, int locationId);
-
-        Task<string> AssetPathToFullPath(string imagePath);
 
         Task DeleteAsync(int id);
 
@@ -44,11 +47,15 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<(double? Latitude, double? Longitude)> GetCoordinatesAsync(string address);
 
+        Task<string> GetExteriorImageFilePathAsync(string filename);
+
         Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId);
 
         Task<LocationInteriorImageAltText> GetImageAltTextAsync(int imageId, int languageId);
 
         Task<LocationInteriorImage> GetInteriorImageByIdAsync(int imageId);
+
+        Task<string> GetInteriorImageFilePathAsync(string filename);
 
         Task<Location> GetLocationByCodeAsync(string locationCode);
 
@@ -66,20 +73,42 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<ICollection<LocationSummary>> GetLocationSummariesAsync(string address);
 
+        Task<string> GetMapImageFilePathAsync(string filename);
+
         Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(LocationFilter filter);
 
-        Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName, string subDirectory);
+        Task<IDictionary<string, string>> GetSlugNameAsync();
 
-        Task<string> SaveImageToServerAsync(byte[] imageBytes, string fileName);
+        //Task<string> SaveImageToServerAsync(byte[] imageBytes,
+        //    string requestedFilename,
+        //    bool overwrite,
+        //    string subDirectory);
+
+        //Task<string> SaveImageToServerAsync(byte[] imageBytes,
+        //    string requestedFilename,
+        //    bool overwrite);
 
         Task UndeleteAsync(int id);
 
-        Task UpdateExteriorImage(IFormFile imageFile, string locationStub);
+        Task UpdateExteriorImageAsync(IFormFile imageFile, string filename, string locationStub);
 
-        Task UpdateInteriorImageAsync(LocationInteriorImage newInteriorImage, IFormFile imageFile);
+        Task UpdateImageAltTextAsync(int imageId, int languageId, string altText);
 
-        Task UpdateLocationMapPathAsync(string locationCode, string mapImagePath);
+        Task UpdateInteriorImageAsync(LocationInteriorImage newInteriorImage,
+            string filename,
+            IFormFile imageFile);
+
+        Task UpdateInteriorImageSortAsync(string slug, int interiorImageId, int increment);
 
         Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId);
+
+        Task UpdateMapImageAsync(byte[] fileBytes, string filename, string locationStub);
+
+        public Task UploadAddInteriorImageAsync(int locationId,
+            string filename,
+            IFormFile imageFile,
+            IDictionary<int, string> altTexts);
+
+        Task UploadLocationMapAsync(byte[] imageBytes, string fileName);
     }
 }

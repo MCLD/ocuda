@@ -52,6 +52,7 @@
                     <option value="carousel">Carousel</option>
                     <option value="deck">Deck</option>
                     <option value="feature">Feature</option>
+                    <option value="navBanner">NavBanner</option>
                     <option value="segment">Segment</option>
                     <option value="webslide">Webslide</option>
                 </select>
@@ -68,6 +69,9 @@
         </div>
         <div id="addFeatureFields" class="d-none">
             <input id="addFeatureName" asp-for="PageFeature.Name" formgroup disabled />
+        </div>
+        <div id="addNavBannerFields" class="d-none">
+            <input id="addNavBannerName" asp-for="NavBanner.Name" formgroup disabled />
         </div>
         <div id="addSegmentFields" class="d-none">
             <input id="addSegmentName" asp-for="Segment.Name" formgroup disabled />
@@ -126,6 +130,19 @@
          name="Feature"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editFeatureName" asp-for="PageFeature.Name" formgroup />
+    </div>
+</form>
+
+<form id="editNavBannerForm" role="form">
+    <input id="editNavBannerLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="editNavBanner" asp-for="PageItem.Id" type="hidden" />
+
+    <div modal
+         id="editNavBannerModal"
+         isLarge="true"
+         name="NavBanner"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editNavBannerName" asp-for="NavBanner.Name" formgroup />
     </div>
 </form>
 
@@ -264,6 +281,12 @@
                                 <td class="align-middle">Carousel</td>
                                 <td class="align-middle">@item.Carousel.Items.Count</td>
                             }
+                            else if (item.NavBannerId.HasValue)
+                            {
+                                <td class="align-middle">@item.NavBanner.Name</td>
+                                <td class="align-middle">NavBanner</td>
+                                <td></td>
+                            }
                             else if (item.PageFeatureId.HasValue)
                             {
                                 <td class="align-middle">@item.PageFeature.Name</td>
@@ -377,6 +400,26 @@
                                         <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                     </a>
                                 }
+                                else if (item.NavBannerId.HasValue)
+                                {
+                                    <button type="button"
+                                            class="btn btn-outline-primary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editNavBannerModal"
+                                            data-id="@item.Id"
+                                            data-name="@item.NavBanner.Name"
+                                            title="Edit NavBanner">
+                                        <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
+                                    </button>
+                                    <a asp-controller="@NavBannerController.Name"
+                                       asp-action="@(nameof(NavBannerController.Detail))"
+                                       asp-route-id="@item.NavBannerId.Value"
+                                       asp-route-pageLayoutId=@Model.PageLayoutId
+                                       class="btn btn-outline-primary"
+                                       title="Edit feature content">
+                                        <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                                    </a>
+                                }
                                 else if (item.SegmentId.HasValue)
                                 {
                                     <button type="button"
@@ -421,11 +464,12 @@
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                                 data-id="@item.Id"
-                                data-name="@(item.BannerFeature?.Name ?? item.Carousel?.Name ?? item.Deck?.Name ?? item.PageFeature?.Name ?? item.Segment?.Name ?? item.Webslide?.Name)"
+                                data-name="@(item.BannerFeature?.Name ?? item.Carousel?.Name ?? item.Deck?.Name ?? item.NavBanner?.Name ?? item.PageFeature?.Name ?? item.Segment?.Name ?? item.Webslide?.Name)"
                                 data-banner="@item.BannerFeatureId"
                                 data-carousel="@item.CarouselId"
                                 data-deck="@item.DeckId"
                                 data-feature="@item.PageFeatureId"
+                                data-navbanner="@item.NavBannerId"
                                 data-segment="@item.SegmentId"
                                 data-webslide="@item.WebslideId"
                                 title="Delete layout item">
@@ -447,6 +491,7 @@
             $("#addCarouselFields").addClass("d-none").find("input").attr("disabled", "disabled");
             $("#addDeckFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
             $("#addFeatureFields").addClass("d-none").find("input, select").removeAttr("disabled");
+            $("#addNavBannerFields").addClass("d-none").find("input, select").removeAttr("disabled");
             $("#addSegmentFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
             $("#addWebslideFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
             let itemTitleCase = itemType.charAt(0).toUpperCase() + itemType.slice(1);
@@ -489,6 +534,7 @@
             let carousel = button.data("carousel");
             let deck = button.data("deck");
             let feature = button.data("feature");
+            let navbanner = button.data("navbanner");
             let segment = button.data("segment");
             let webslide = button.data("webslide");
             let modal = $(this);
@@ -506,6 +552,9 @@
             }
             else if (feature) {
                 type = "feature";
+            }
+            else if (navbanner) {
+                type = "navbanner"
             }
             else if (segment) {
                 type = "segment";
@@ -575,6 +624,17 @@
         });
 
         $("#editFeatureForm").submit(editItem);
+
+        $("#editNavBannerModal").on("show.bs.modal", function (e) {
+            let button = $(e.relatedTarget);
+            let id = button.data("id");
+            let name = button.data("name");
+
+            $("#editNavBanner").val(id);
+            $("#editNavBannerName").val(name);
+        });
+
+        $("#editNavBannerForm").submit(editItem);
 
         $("#editSegmentModal").on("show.bs.modal", function (e) {
             let button = $(e.relatedTarget);

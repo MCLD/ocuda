@@ -1,0 +1,258 @@
+﻿@using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.NavBannerViewModels
+@model DetailViewModel
+
+<div class="row mb-2 g-3">
+    <div class="col-sm-8">
+        <h1>
+            NavBanner
+            <small class="text-muted">@Model.Name</small>
+        </h1>
+    </div>
+    <div class="col-sm-4">
+        @if (Model.PageLayoutId.HasValue)
+        {
+            <a asp-controller="@PagesController.Name"
+                asp-action="@nameof(PagesController.LayoutDetail)"
+                asp-route-id="@Model.PageLayoutId.Value"
+                class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
+        }
+    </div>
+    <form class="d-flex flex-column gap-2" enctype="multipart/form-data" asp-action="@nameof(NavBannerController.Detail)" method="post" role="form">
+        <input type="hidden" asp-for="PageLayoutId" />
+        <input type="hidden" asp-for="NavBannerId" />
+        <input type="hidden" asp-for="Language.Id" />
+        @if (Model.LanguageList?.Count() > 1)
+        {
+            <div class="mb-3 row">
+                <div class="col-md-9">
+                    <label asp-for="Language" class="col-form-label me-3"></label>
+            @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
+            {
+                <a href="@Url.Action(nameof(NavBannerController.Detail), new { id = Model.NavBannerId, language = item.Value })"
+                    class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">@item.Text</a>
+            }
+                </div>
+            </div>
+            <div class="row d-none oc-save-warning">
+                <div class="offset-md-2 col-md-8">
+                    <div class="alert alert-warning">
+                        <span class="fa-solid fa-circle-arrow-up"></span> You have unsaved changes, they will be lost if you change languages.
+                    </div>
+                </div>
+            </div>
+        }
+        <div id="bannerPreview" class="card @(Model.NavBannerImage?.Filename == null ? "d-none" : null)">
+            <div class="card-header">Preview</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="mb-4">
+                        <div class="row g-0">
+                            <div class="col-12 col-md-7">
+                                <img id="imagePreview"
+                                        class="img-fluid"
+                                        src="@Model.NavBannerLinkPath" />
+                            </div>
+                            <div class="col-12 col-md-5 p-2 gap-2 fs-5 text-bold navbanner-link-container">
+                                <div class="navbanner-link-grid-container gap-2 h-100">
+                                    <a class="navbanner-link-href h-100" href="@Model.TopLeft.Link" data-preview="TopLeft">
+                                        <div class="d-flex align-items-center justify-content-center py-4 py-md-1 gap-2 h-100 navbanner-link-box">
+                                            <span class="@Model.TopLeft.Icon mb-1 navbanner-link-icon"></span>
+                                            <span class="text-bold navbanner-link-text">@Model.TopLeft.NavBannerLinkText.Text</span>
+                                        </div>
+                                    </a>
+                                    <a class="navbanner-link-href h-100" href="@Model.TopRight.Link" data-preview="TopRight">
+                                        <div class="d-flex align-items-center justify-content-center py-4 py-md-1 gap-2 h-100 navbanner-link-box">
+                                            <span class="@Model.TopRight.Icon mb-1 navbanner-link-icon"></span>
+                                            <span class="text-bold navbanner-link-text">@Model.TopRight.NavBannerLinkText.Text</span>
+                                        </div>
+                                    </a>
+                                    <a class="navbanner-link-href h-100" href="@Model.BottomLeft.Link" data-preview="BottomLeft">
+                                        <div class="d-flex align-items-center justify-content-center py-4 py-md-1 gap-2 h-100 navbanner-link-box">
+                                            <span class="@Model.BottomLeft.Icon mb-1 navbanner-link-icon"></span>
+                                            <span class="text-bold navbanner-link-text">@Model.BottomLeft.NavBannerLinkText.Text</span>
+                                        </div>
+                                    </a>    
+                                    <a class="navbanner-link-href h-100" href="@Model.BottomRight.Link" data-preview="BottomRight">
+                                        <div class="d-flex align-items-center justify-content-center py-4 py-md-1 gap-2 h-100 navbanner-link-box">
+                                            <span class="@Model.BottomRight.Icon mb-1 navbanner-link-icon"></span>
+                                            <span class="text-bold navbanner-link-text">@Model.BottomRight.NavBannerLinkText.Text</span>
+                                        </div>
+                                    </a>                                      
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="mt-3">Image</h2>
+        <label asp-for="@Model.Image"></label>
+        <input type="file" class="form-control navbanner-image-input" asp-for="@Model.Image" />
+
+        <label asp-for="@Model.NavBannerImage.ImageAltText"></label>
+        <input type="text" class="form-control alt-text-field" asp-for="@Model.NavBannerImage.ImageAltText" />
+
+        <h2 class="mt-3">
+            Navigation
+            <small class="text-muted">Changes reflected above when you tab or click out of a field</small>
+        </h2>
+        <table class="table table-bordered" style="border: 2px solid black;">
+            <tr> 
+                <td data-quadrant="TopLeft">
+                    <h3>Top left</h3>
+                    <div class="mb-1">
+                        <label asp-for="@Model.TopLeft.Icon" class="form-label"></label>
+                        <input class="navbanner-link-icon-input form-control" asp-for="@Model.TopLeft.Icon" type="text" />
+                        <div class="form-text">Full FontAwesome tag (e.g. <code>fa-solid fa-biohazard</code>)</div>
+                    </div>
+                    <div class="mb-1">
+                        <label asp-for="@Model.TopLeft.NavBannerLinkText.Text" class="form-label"></label>
+                        <input class="navbanner-link-text-input form-control" asp-for="@Model.TopLeft.NavBannerLinkText.Text" type="text" />
+                    </div>
+                    <div class="mb-1">
+                        <label asp-for="@Model.TopLeft.Link" class="form-label"></label>
+                        <input class="navbanner-link-href-input form-control" asp-for="@Model.TopLeft.Link" type="text" />
+                        <div class="form-text">External links fully qualified (e.g. <code>https://...</code>), local links relative (e.g. <code>/about/administration/</code>)</div>
+                        <input type="hidden" asp-for="@Model.TopLeft.Order" value="0" />
+                    </div>
+                </td>
+                <td data-quadrant="TopRight">
+                    <h3>Top right</h3>
+                    <div class="mb-1">
+                        <label asp-for="@Model.TopRight.Icon" class="form-label"></label>
+                        <input class="navbanner-link-icon-input form-control" asp-for="@Model.TopRight.Icon" type="text" />
+                        <div class="form-text">Full FontAwesome tag (e.g. <code>fa-solid fa-biohazard</code>)</div>
+                    </div>
+                    <div class="mb-1">
+                        <label asp-for="@Model.TopRight.NavBannerLinkText.Text" class="form-label"></label>
+                        <input class="navbanner-link-text-input form-control" asp-for="@Model.TopRight.NavBannerLinkText.Text" type="text" />
+                    </div>
+                    <div class="mb-1">
+                        <label asp-for="@Model.TopRight.Link" class="form-label"></label>
+                        <input class="navbanner-link-href-input form-control" asp-for="@Model.TopRight.Link" type="text" />
+                        <div class="form-text">External links fully qualified (e.g. <code>https://...</code>), local links relative (e.g. <code>/about/administration/</code>)</div>
+                        <input type="hidden" asp-for="@Model.TopRight.Order" value="1" />
+                    </div>
+                </td>
+            </tr>
+            <tr> 
+                <td data-quadrant="BottomLeft">
+                    <h3>Bottom left</h3>
+                    <div class="mb-1">
+                        <label asp-for="@Model.BottomLeft.Icon" class="form-label"></label>
+                        <input class="navbanner-link-icon-input form-control" asp-for="@Model.BottomLeft.Icon" type="text" />
+                        <div class="form-text">Full FontAwesome tag (e.g. <code>fa-solid fa-biohazard</code>)</div>
+                    </div>
+                    <div class="mb-1">
+                        <label asp-for="@Model.BottomLeft.NavBannerLinkText.Text" class="form-label"></label>
+                        <input class="navbanner-link-text-input form-control" asp-for="@Model.BottomLeft.NavBannerLinkText.Text" type="text" />
+                    </div>
+                    <div class="mb-1">
+                        <label asp-for="@Model.BottomLeft.Link" class="form-label"></label>
+                        <input class="navbanner-link-href-input form-control" asp-for="@Model.BottomLeft.Link" type="text" />
+                        <div class="form-text">External links fully qualified (e.g. <code>https://...</code>), local links relative (e.g. <code>/about/administration/</code>)</div>
+                        <input type="hidden" asp-for="@Model.BottomLeft.Order" value="2" />
+                    </div>
+                </td>
+                <td data-quadrant="BottomRight">
+                    <h4>Bottom right</h4>
+                    <div class="mb-1">
+                        <label asp-for="@Model.BottomRight.Icon" class="form-label"></label>
+                        <input class="navbanner-link-icon-input form-control" asp-for="@Model.BottomRight.Icon" type="text" />
+                        <div class="form-text">Full FontAwesome tag (e.g. <code>fa-solid fa-biohazard</code>)</div>
+                    </div>
+                    <div class="mb-1">
+                        <label asp-for="@Model.BottomRight.NavBannerLinkText.Text" class="form-label"></label>
+                        <input class="navbanner-link-text-input form-control" asp-for="@Model.BottomRight.NavBannerLinkText.Text" type="text" />
+                    </div>
+                    <div class="mb-1">
+                        <label asp-for="@Model.BottomRight.Link" class="form-label"></label>
+                        <input class="navbanner-link-href-input form-control" asp-for="@Model.BottomRight.Link" type="text" />
+                        <div class="form-text">External links fully qualified (e.g. <code>https://...</code>), local links relative (e.g. <code>/about/administration/</code>)</div>
+                        <input type="hidden" asp-for="@Model.BottomRight.Order" value="3"  />
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div class="row d-none oc-save-warning">
+            <div class="col-md-8 offset-md-2">
+                <div class="alert alert-warning">
+                    <span class="fa-solid fa-circle-arrow-up"></span> You have unsaved changes, they will be lost if you change languages.
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <button class="btn btn-success" type="submit">Save Changes</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section scripts
+{
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
+
+    <script type="text/javascript">
+        function showSaveChanges() {
+            $(".oc-save-warning").removeClass("d-none");
+        }
+
+        $(".alt-text-field").keydown(function (event) {
+            $(".oc-save-warning").removeClass("d-none");
+        });
+
+        document.querySelector('#Image').addEventListener('change', updateBannerImage);
+
+        document.querySelectorAll('.navbanner-link-icon-input').forEach(_ => {
+            _.addEventListener('keydown', showSaveChanges);
+            _.addEventListener('change', updateLinkIcons);
+        });
+        document.querySelectorAll('.navbanner-link-text-input').forEach(_ => {
+            _.addEventListener('keydown', showSaveChanges);
+            _.addEventListener('change', updateLinkTexts);
+        });
+        document.querySelectorAll('.navbanner-link-href-input').forEach(_ => {
+                _.addEventListener('keydown', showSaveChanges);
+                _.addEventListener('change', updateLinkHrefs)
+        });
+
+        function updateBannerImage() {
+            showSaveChanges();
+            document.querySelector('#bannerPreview').classList.remove('d-none');
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                    document.querySelector('#imagePreview').src = e.target.result;
+            };
+
+            reader.readAsDataURL(document.querySelector('.navbanner-image-input').files[0]);
+        }
+
+        function updateLinkIcons() {
+            $('td[data-quadrant]').each(function() {
+                let currentItem = $(this).data('quadrant');
+                let iconValue = $(this).find('input.navbanner-link-icon-input').val();
+                $(`a[data-preview='${currentItem}'] span.navbanner-link-icon`).attr('class', `${iconValue} mb-1 navbanner-link-icon`);
+            });
+        }
+
+        function updateLinkTexts() {
+            $('td[data-quadrant]').each(function() {
+                let currentItem = $(this).data('quadrant');
+                let textValue = $(this).find('input.navbanner-link-text-input').val();
+                $(`a[data-preview='${currentItem}'] span.navbanner-link-text`).text(textValue);
+            });
+        }
+
+        function updateLinkHrefs() {
+            $('td[data-quadrant]').each(function() {
+                let currentItem = $(this).data('quadrant');
+                let hrefValue = $(this).find('input.navbanner-link-href-input').val();
+                $(`a[data-preview='${currentItem}']`).attr('href', hrefValue);
+            });
+        }
+    </script>
+}

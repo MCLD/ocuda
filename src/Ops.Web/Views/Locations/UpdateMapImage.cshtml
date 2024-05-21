@@ -1,33 +1,29 @@
-﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location.LocationMapViewModel
+﻿@using Ocuda.Ops.Controllers.ViewModels.Locations
+@model UpdateMapImageViewModel
+
+<div class="d-flex mb-2">
+    <h1 class="flex-grow-1 text-start">
+        Map Image
+        <small class="text-muted">@Model.Location.Name</small>
+    </h1>
+    <div>
+        <a class="btn btn-outline-success"
+           asp-action="@nameof(LocationsController.Details)"
+           asp-route-slug="@Model.Location.Stub">Back</a>
+    </div>
+</div>
 
 <div class="row">
-    <div class="col-sm-10">
-        <h1>
-            Map Image Generator
-        </h1>
-        <h1>
-            <small class="text-muted">
-                @Model.Location.Name
-            </small>
-        </h1>
-    </div>
-    <div class="col-sm-2">
-        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Images))"
-           asp-route-locationStub="@Model.Location.Stub">Back</a>
+    <div class="col-sm-6">
+        <div class="alert alert-success d-none" id="status-message"></div>
+        <div class="alert alert-warning d-none" id="status-error"></div>
     </div>
 </div>
+
 <div class="row">
-    <div class="col-sm-6">
-        <div class="alert alert-success" id="status-message" style="display: none;"></div>
-        <div class="alert alert-warning" id="status-error" style="display: none;"></div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-sm-6">
-        <div class="d-flex mb-3">
-            <label class="col-4" for="zoom-level">
+    <div class="col-sm-6 offset-3">
+        <div class="row mb-3">
+            <label class="col-sm-4" for="zoom-level">
                 Zoom Level
                 <span class="fa-regular fa-circle-question"
                       title="Google Maps zoom levels range from 0 to 18. For most locations, a zoom level between 12 - 14 is most practical."
@@ -35,10 +31,12 @@
                       data-placement="top">
                 </span>
             </label>
-            <input class="form-control" id="zoom-level" name="zoom-level" type="number" value="13" min="0" max="18" />
+            <div class="col-sm-8">
+                <input class="form-control" id="zoom-level" name="zoom-level" type="number" value="13" min="0" max="18" />
+            </div>
         </div>
-        <div class="d-flex mb-3">
-            <label class="col-4" for="scale">
+        <div class="row mb-3">
+            <label class="col-sm-4" for="scale">
                 Scale
                 <span class="fa-regular fa-circle-question"
                       title="Scale value can be 1 or 2. For high dpi displays, use scale 2 to prevent image from being distorted."
@@ -46,57 +44,80 @@
                       data-placement="top">
                 </span>
             </label>
-            <input class="form-control" id="scale" name="scale" type="number" value="2" min="1" max="2" />
+            <div class="col-sm-8">
+                <input class="form-control" id="scale" name="scale" type="number" value="2" min="1" max="2" disabled="disabled" />
+            </div>
         </div>
-        <div class="d-flex mb-3">
-            <label class="col-4" for="image-width">Image Width</label>
-            <input class="form-control" id="image-width" name="image-width" type="number" step="10" value="500" />
+        <div class="row mb-3">
+            <label class="col-sm-4" for="image-width">Image Width</label>
+            <div class="col-sm-8">
+                <input class="form-control" id="image-width" name="image-width" type="number" step="10" value="500" disabled="disabled" />
+            </div>
         </div>
-        <div class="d-flex mb-3">
-            <label class="col-4" for="image-height">Image Height</label>
-            <input class="form-control" id="image-height" name="image-height" type="number" step="10" value="250" />
+        <div class="row mb-3">
+            <label class="col-sm-4" for="image-height">Image Height</label>
+            <div class="col-sm-8">
+                <input class="form-control" id="image-height" name="image-height" type="number" step="10" value="250" disabled="disabled" />
+            </div>
         </div>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-sm-6" id="image-preview-container"></div>
+    <div class="col-sm-6 offset-3" id="image-preview-container"></div>
 </div>
 
 <div class="row">
-    <div class="col-sm-6 d-flex gap-3">
-        <div>
-            <button class="btn btn-primary w-100" id="preview-image">Preview</button>
-        </div>
-        <div class="flex-grow-1">
-            <button class="btn btn-success w-100" id="save-image" disabled>Optimize and Save</button>
-        </div>
+    <div class="col-sm-6 offset-3 d-flex justify-content-end">
+        <button class="btn btn-outline-primary me-2" id="preview-image">Preview</button>
+        <button class="btn btn-outline-success" id="save-image" disabled>Optimize and Save</button>
     </div>
 
+</div>
+
+<div class="modal fade"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     id="uploadModal"
+     tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="uploadingModal">Uploading and optimizing...</h1>
+            </div>
+            <div class="modal-body">
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                         style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts
-    {
+{
     <script>
         $(function () {
             $('[data-bs-toggle="tooltip"]').tooltip()
-        })
+        });
 
         document.querySelector('#preview-image').addEventListener('click', showPreview);
         document.querySelector('#save-image').addEventListener('click', saveImage);
         document.addEventListener('keydown', e => {
-            if (e.key === 'Enter')
-            {
+            if (e.key === 'Enter') {
                 showPreview();
             }
         })
+
+        const upModal = new bootstrap.Modal('#uploadModal', null);
 
         const locationAddress = "@Model.Location.Address";
         const apiKey = "@Model.MapApiKey";
         const fileName = "@Model.Location.Stub";
 
-        const optimizePath = "@Url.Action(nameof(ImageOptimizerController.OptimizeFromBase64), ImageOptimizerController.Name)";
-        const savePath = "@Url.Action(nameof(LocationsController.UpdateMapImage), LocationsController.Name, new { locationCode = Model.Location.Code})";
+        const optimizePath = "@Url.Action(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.ImageOptimizerController.OptimizeFromBase64), Ocuda.Ops.Controllers.Areas.SiteManagement.ImageOptimizerController.Name)";
+        const savePath = "@Url.Action(nameof(LocationsController.UpdateMapImage), LocationsController.Name, new { slug = Model.Location.Stub })";
 
         const zoomEl = document.querySelector('#zoom-level');
         const scaleEl = document.querySelector('#scale');
@@ -195,7 +216,7 @@
         }
 
         async function saveImage() {
-            showStatus("Optimizing image...");
+            upModal.show();
             try {
                 const saveResponse = await fetch(savePath, {
                     headers: {
@@ -213,6 +234,7 @@
                 showError(`Error optimizing image. ${e.value}`);
                 return;
             }
+            upModal.hide();
         }
     </script>
 }

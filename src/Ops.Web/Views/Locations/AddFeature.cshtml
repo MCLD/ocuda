@@ -1,0 +1,54 @@
+﻿@using Ocuda.Ops.Controllers.ViewModels.Locations
+@model AddFeatureViewModel
+
+<div class="d-flex mb-2">
+    <h1 class="flex-grow-1 text-start">
+        Add Location Feature
+        <small class="text-muted">@Model.Location.Name</small>
+    </h1>
+    <div>
+        <a class="btn btn-outline-dark"
+           asp-action="@nameof(LocationsController.Details)"
+           asp-route-slug="@Model.Location.Stub">Back</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <table class="table table-bordered table-striped table-hover">
+            <tr>
+                <th>Feature</th>
+                <th>Type</th>
+                <th class="text-end">Action</th>
+            </tr>
+            @if (Model.AvailableFeatures?.Count > 1)
+            {
+                @foreach (var feature in Model.AvailableFeatures.OrderByDescending(_ => _.IsAtThisLocation).ThenBy(_ => _.Name))
+                {
+                    <tr>
+                        <td>@feature.Name</td>
+                        <td>@(feature.IsAtThisLocation ? "At This Location" : "Services")</td>
+                        <td class="text-end">
+                            <form asp-action="@nameof(LocationsController.AddFeature)"
+                                  method="post">
+                                <input type="hidden" name="slug" value="@Model.Location.Stub" />
+                                <input type="hidden" name="featureId" value="@feature.Id" />
+                                <button class="btn btn-sm btn-outline-success"
+                                        type="submit">
+                                    <span class="fa-solid fa-circle-plus fa-fw" aria-hidden="true"></span>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3">
+                        <em>All available features are already configured for this location.</em>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

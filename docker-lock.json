@@ -4,24 +4,24 @@
 			{
 				"name": "mcr.microsoft.com/dotnet/sdk",
 				"tag": "7.0",
-				"digest": "3ee57ab678f7ecc254dc674d7889fc764698e3b51381c4dd3d1d414ecf0295fb"
+				"digest": "64db914029faa026ff41d9284fa3badf039f94292ff1e5ba91e4b4b76e090968"
 			},
 			{
 				"name": "mcr.microsoft.com/dotnet/aspnet",
 				"tag": "7.0",
-				"digest": "21f1da4b95d84ad3313920e1deb3d45e416a870b937e9a885cb8eb7ca7bf8ff0"
+				"digest": "f507a8758c00c294a826906d32289227a60f931d0af183af51adc9d3e08363b3"
 			}
 		],
 		"Dockerfile_promenade": [
 			{
 				"name": "mcr.microsoft.com/dotnet/sdk",
 				"tag": "7.0",
-				"digest": "3ee57ab678f7ecc254dc674d7889fc764698e3b51381c4dd3d1d414ecf0295fb"
+				"digest": "64db914029faa026ff41d9284fa3badf039f94292ff1e5ba91e4b4b76e090968"
 			},
 			{
 				"name": "mcr.microsoft.com/dotnet/aspnet",
 				"tag": "7.0",
-				"digest": "21f1da4b95d84ad3313920e1deb3d45e416a870b937e9a885cb8eb7ca7bf8ff0"
+				"digest": "f507a8758c00c294a826906d32289227a60f931d0af183af51adc9d3e08363b3"
 			}
 		]
 	}

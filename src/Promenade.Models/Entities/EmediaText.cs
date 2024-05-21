@@ -16,7 +16,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         public Language Language { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(512)]
         [Required]
         public string Description { get; set; }
 

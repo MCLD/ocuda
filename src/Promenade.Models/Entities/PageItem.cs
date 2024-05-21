@@ -27,6 +27,9 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int Id { get; set; }
 
+        public NavBanner NavBanner { get; set; }
+        public int? NavBannerId { get; set; }
+
         public int Order { get; set; }
         public ImageFeature PageFeature { get; set; }
 

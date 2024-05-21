@@ -2,25 +2,30 @@
 {
     public static class ItemKey
     {
-        public const string BannerImage = "BannerImage";
-        public const string BannerImageAlt = "BannerImageAlt";
-        public const string CurrentUiCulture = "CurrentCulture";
-        public const string ExternalCSS = "ExternalCSS";
-        public const string ExternalJS = "ExternalJS";
-        public const string FooterNavigation = "FooterNavigation";
-        public const string ForceReload = "ForceReload";
-        public const string GoogleAnalyticsTrackingCode = "GoogleAnalyticsTrackingCode";
-        public const string HrefLang = "HrefLang";
-        public const string L10n = "L10n";
-        public const string LeftNavigation = "LeftNavigation";
-        public const string MiddleNavigation = "MiddleNavigation";
-        public const string PageTitleSuffix = "PageTitle";
-        public const string PublicContentPath = "PublicContentPath";
-        public const string SocialFacebookUrl = "SocialFacebookUrl";
-        public const string SocialInstagramUrl = "SocialInstagramUrl";
-        public const string SocialTikTokUrl = "SocialTikTokUrl";
-        public const string SocialTwitterUrl = "SocialTwitterUrl";
-        public const string SocialYoutubeUrl = "SocialYoutubeUrl";
-        public const string TopNavigation = "TopNavigation";
+        public const string BannerImage = nameof(BannerImage);
+        public const string BannerImageAlt = nameof(BannerImageAlt);
+        public const string CatalogSearchLink = nameof(CatalogSearchLink);
+        public const string ContactLink = nameof(ContactLink);
+        public const string CurrentUiCulture = nameof(CurrentUiCulture);
+        public const string ExternalCSS = nameof(ExternalCSS);
+        public const string ExternalJS = nameof(ExternalJS);
+        public const string FooterImage = nameof(FooterImage);
+        public const string FooterImageAlt = nameof(FooterImageAlt);
+        public const string FooterNavigation = nameof(FooterNavigation);
+        public const string ForceReload = nameof(ForceReload);
+        public const string GoogleAnalyticsTrackingCode = nameof(GoogleAnalyticsTrackingCode);
+        public const string HrefLang = nameof(HrefLang);
+        public const string L10n = nameof(L10n);
+        public const string LeftNavigation = nameof(LeftNavigation);
+        public const string MiddleNavigation = nameof(MiddleNavigation);
+        public const string PageTitleSuffix = nameof(PageTitleSuffix);
+        public const string PublicContentPath = nameof(PublicContentPath);
+        public const string SocialFacebookUrl = nameof(SocialFacebookUrl);
+        public const string SocialInstagramUrl = nameof(SocialInstagramUrl);
+        public const string SocialTikTokUrl = nameof(SocialTikTokUrl);
+        public const string SocialTwitterUrl = nameof(SocialTwitterUrl);
+        public const string SocialYoutubeUrl = nameof(SocialYoutubeUrl);
+        public const string Telephone = nameof(Telephone);
+        public const string TopNavigation = nameof(TopNavigation);
     }
 }

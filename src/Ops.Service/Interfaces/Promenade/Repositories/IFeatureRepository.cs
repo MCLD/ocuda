@@ -16,7 +16,9 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<ICollection<Feature>> GetByIdsAsync(IEnumerable<int> featureIds);
 
-        Task<Feature> GetFeatureByName(string featureName);
+        Task<Feature> GetBySegmentIdAsync(int segmentId);
+
+        Task<Feature> GetBySlugAsync(string slug);
 
         Task<DataWithCount<ICollection<Feature>>> GetPaginatedListAsync(BaseFilter filter);
 
@@ -25,5 +27,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<bool> IsDuplicateStubAsync(Feature feature);
 
         Task<ICollection<Feature>> PageAsync(FeatureFilter filter);
+
+        Task UpdateName(int featureId, string newName);
     }
 }

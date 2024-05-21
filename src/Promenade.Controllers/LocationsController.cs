@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Locations;
 using Ocuda.Promenade.Service;
+using Ocuda.Utility;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Controllers
 {
@@ -13,12 +15,16 @@ namespace Ocuda.Promenade.Controllers
     {
         private readonly string _apiKey;
         private readonly LocationService _locationService;
+        private readonly IPathResolverService _pathResolverService;
 
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
+            IPathResolverService pathResolverService,
             LocationService locationService) : base(context)
         {
+            ArgumentNullException.ThrowIfNull(pathResolverService);
             ArgumentNullException.ThrowIfNull(locationService);
 
+            _pathResolverService = pathResolverService;
             _locationService = locationService;
 
             _apiKey = _config[Utility.Keys.Configuration.OcudaGoogleAPI];
@@ -87,10 +93,26 @@ namespace Ocuda.Promenade.Controllers
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
+            var locations = await _locationService
+                    .GetLocationsStatusAsync(latitude, longitude, forceReload);
+
+            var builder = BaseUriBuilder;
+            foreach (var location in locations)
+            {
+                builder.Path = _pathResolverService.GetPublicContentLink(UriPaths.Images,
+                    UriPaths.Locations,
+                    location.ImagePath);
+                location.ImagePath = builder.Uri.LocalPath;
+                builder.Path = _pathResolverService.GetPublicContentLink(UriPaths.Images,
+                    UriPaths.Locations,
+                    UriPaths.Maps,
+                    location.MapImagePath);
+                location.MapImagePath = builder.Uri.LocalPath;
+            }
+
             return new LocationViewModel
             {
-                Locations = await _locationService
-                    .GetLocationsStatusAsync(latitude, longitude, forceReload),
+                Locations = locations,
                 CanSearchAddress = !string.IsNullOrWhiteSpace(_apiKey),
                 Latitude = latitude,
                 Longitude = longitude

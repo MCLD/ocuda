@@ -16,12 +16,26 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
+        public async Task<List<LocationFeature>> GeAllLocationFeaturesAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<LocationFeature> GetByIdsAsync(int featureId, int locationId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.FeatureId == featureId && _.LocationId == locationId)
                 .SingleOrDefaultAsync();
+        }
+
+        public async Task<LocationFeature> GetBySegmentIdAsync(int segmentId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .SingleOrDefaultAsync(_ => _.SegmentId == segmentId);
         }
 
         public async Task<List<LocationFeature>> GetLocationFeaturesByLocationAsync(Location location)
@@ -32,18 +46,20 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<List<LocationFeature>> GeAllLocationFeaturesAsync()
-        {
-            return await DbSet
-                .AsNoTracking()
-                .ToListAsync();
-        }
-
         public async Task<List<LocationFeature>> GetLocationFeaturesByLocationId(int locationId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.LocationId == locationId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<int>> GetLocationsByFeatureIdAsync(int featureId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.FeatureId == featureId)
+                .Select(_ => _.LocationId)
                 .ToListAsync();
         }
 

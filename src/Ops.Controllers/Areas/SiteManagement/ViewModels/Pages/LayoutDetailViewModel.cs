@@ -12,6 +12,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
         public int LanguageId { get; set; }
         public SelectList LanguageList { get; set; }
         public ImageFeature PageFeature { get; set; }
+        public NavBanner NavBanner { get; set; }
         public PageItem PageItem { get; set; }
         public PageLayout PageLayout { get; set; }
         public int PageLayoutId { get; set; }

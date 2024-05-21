@@ -10,7 +10,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
             int pageLayoutId,
             ImageFeatureTemplate imageFeatureTemplate);
 
-        Task ClearTemplateForImageFeatureAsync(int imageFeatureId);
+        Task ClearTemplateForImageFeatureAsync(int imageFeatureTemplateId);
 
         Task<ImageFeatureItem> CreateItemAsync(ImageFeatureItem imageFeatureItem);
 

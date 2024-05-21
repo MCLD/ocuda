@@ -23,6 +23,7 @@
 <form id="addForm" role="form">
     <div modal id="addModal" isLarge="true" name="Carousel" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addTitle" asp-for="Carousel.CarouselText.Title" formgroup />
+        <input id="addTitle" asp-for="Carousel.CarouselText.Footer" formgroup />
     </div>
 </form>
 
@@ -56,7 +57,7 @@
                                 </a>
                             </td>
                             <td class="align-middle">@carousel.Items.Count</td>
-                            <td align="align-middle">
+                            <td class="align-middle">
                                 <button type="button"
                                         class="btn btn-outline-danger"
                                         data-bs-toggle="modal"

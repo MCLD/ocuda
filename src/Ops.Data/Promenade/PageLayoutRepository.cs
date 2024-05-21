@@ -62,6 +62,8 @@ namespace Ocuda.Ops.Data.Promenade
                     .ThenInclude(_ => _.Carousel)
                         .ThenInclude(_ => _.Items)
                 .Include(_ => _.Items)
+                    .ThenInclude(_ => _.NavBanner)
+                .Include(_ => _.Items)
                     .ThenInclude(_ => _.PageFeature)
                         .ThenInclude(_ => _.Items)
                 .Include(_ => _.Items)

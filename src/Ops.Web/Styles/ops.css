@@ -77,6 +77,32 @@ a.rowlink {
     color: green;
 }
 
+/* NavBanner Preview */
+.navbanner-link-grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+    .navbanner-link-grid-container a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+.navbanner-link-box {
+    background: white;
+}
+
+.navbanner-link-container {
+    background: lightgray;
+    box-sizing: border-box;
+}
+
+.navbanner-link-text {
+    font-size: 1.1rem;
+}
+/* -------- */
+
 .navcolumn {
     height: 100%;
     width: 0;

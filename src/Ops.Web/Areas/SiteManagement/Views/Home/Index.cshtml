@@ -1,5 +1,6 @@
-﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Home.IndexViewModel
-@using Ocuda.Ops.Controllers.Areas.SiteManagement
+﻿@using Ocuda.Ops.Controllers.Areas.SiteManagement
+@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Home.IndexViewModel
+
 
 <h1>Web Site management</h1>
 
@@ -78,7 +79,7 @@
         </div>
     }
 
-    @if (Model.IsSiteManager)
+    @if (Model.IsSiteManager || Model.HasFeatureManagement)
     {
         <div class="col-12 col-md-4 my-2">
             <div class="card">
@@ -86,24 +87,31 @@
                     @LocationsController.Name
                 </div>
                 <div class="card-body">
-                    <a asp-area="@LocationsController.Area"
-                       asp-controller="@LocationsController.Name"
-                       asp-action="@nameof(LocationsController.Index)"
-                       class="btn btn-outline-primary mt-1">@LocationsController.Name</a>
-                    <a asp-area="@GroupsController.Area"
-                       asp-controller="@GroupsController.Name"
-                       asp-action="@nameof(GroupsController.Index)"
-                       class="btn btn-outline-primary mt-1 ">@GroupsController.Name</a>
-
-                    <a asp-area="@FeaturesController.Area"
-                       asp-controller="@FeaturesController.Name"
-                       asp-action="@nameof(FeaturesController.Index)"
-                       class="btn btn-outline-primary mt-1">@FeaturesController.Name</a>
-
-                    <a asp-area="@VolunteerController.Area"
-                       asp-controller="@VolunteerController.Name"
-                       asp-action="@nameof(VolunteerController.Index)"
-                       class="btn btn-outline-primary mt-1">@VolunteerController.Name</a>
+                    @if (Model.IsSiteManager)
+                    {
+                        <a asp-area="@LocationsController.Area"
+                           asp-controller="@LocationsController.Name"
+                           asp-action="@nameof(LocationsController.Index)"
+                           class="btn btn-outline-primary mt-1">@LocationsController.Name</a>
+                        <a asp-area="@GroupsController.Area"
+                           asp-controller="@GroupsController.Name"
+                           asp-action="@nameof(GroupsController.Index)"
+                           class="btn btn-outline-primary mt-1 ">@GroupsController.Name</a>
+                    }
+                    @if (Model.IsSiteManager || Model.HasFeatureManagement)
+                    {
+                        <a asp-area="@FeaturesController.Area"
+                           asp-controller="@FeaturesController.Name"
+                           asp-action="@nameof(FeaturesController.Index)"
+                           class="btn btn-outline-primary mt-1">@FeaturesController.Name</a>
+                    }
+                    @if (Model.IsSiteManager)
+                    {
+                        <a asp-area="@VolunteerController.Area"
+                           asp-controller="@VolunteerController.Name"
+                           asp-action="@nameof(VolunteerController.Index)"
+                           class="btn btn-outline-primary mt-1">@VolunteerController.Name</a>
+                    }
                 </div>
             </div>
         </div>

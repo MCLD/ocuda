@@ -32,6 +32,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly IDeckService _deckService;
         private readonly IImageFeatureService _imageFeatureService;
         private readonly ILanguageService _languageService;
+        private readonly INavBannerService _navBannerService;
         private readonly IPageService _pageService;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly ISegmentService _segmentService;
@@ -41,27 +42,33 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ICarouselService carouselService,
             IDeckService deckService,
             ILanguageService languageService,
+            INavBannerService navBannerService,
             IPageService pageService,
             IPermissionGroupService permissionGroupService,
             ISegmentService segmentService,
             ISocialCardService socialCardService,
             IImageFeatureService imageFeatureService) : base(context)
         {
-            _carouselService = carouselService
-                ?? throw new ArgumentNullException(nameof(carouselService));
-            _deckService = deckService
-                ?? throw new ArgumentNullException(nameof(deckService));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
-            _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
-            _segmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
-            _socialCardService = socialCardService
-                ?? throw new ArgumentNullException(nameof(socialCardService));
-            _imageFeatureService = imageFeatureService
-                ?? throw new ArgumentNullException(nameof(imageFeatureService));
+            ArgumentNullException.ThrowIfNull(carouselService);
+            ArgumentNullException.ThrowIfNull(deckService);
+            ArgumentNullException.ThrowIfNull(imageFeatureService);
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(navBannerService);
+            ArgumentNullException.ThrowIfNull(pageService);
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+            ArgumentNullException.ThrowIfNull(segmentService);
+            ArgumentNullException.ThrowIfNull(socialCardService);
+
+
+            _carouselService = carouselService;
+            _deckService = deckService;
+            _imageFeatureService = imageFeatureService;
+            _languageService = languageService;
+            _navBannerService = navBannerService;
+            _pageService = pageService;
+            _permissionGroupService = permissionGroupService;
+            _segmentService = segmentService;
+            _socialCardService = socialCardService;
         }
 
         public static string Area
@@ -359,6 +366,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     && model.Carousel == null
                     && model.Deck == null
                     && model.PageFeature == null
+                    && model.NavBanner == null
                     && model.Segment == null
                     && model.Webslide == null)
                 {
@@ -380,6 +388,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         else if (!string.IsNullOrEmpty(model.Deck?.Name))
                         {
                             model.PageItem.Deck = model.Deck;
+                        }
+                        else if (!string.IsNullOrEmpty(model.NavBanner?.Name))
+                        {
+                            model.PageItem.NavBanner = model.NavBanner;
                         }
                         else if (!string.IsNullOrEmpty(model.PageFeature?.Name))
                         {
@@ -441,6 +453,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             url = Url.Action(nameof(DecksController.Detail),
                                 DecksController.Name,
                                 new { deckId = pageItem.Deck.Id });
+                        }
+                        else if (pageItem.NavBanner != null)
+                        {
+                            url = Url.Action(nameof(NavBannerController.Detail),
+                                NavBannerController.Name,
+                                new { id = pageItem.NavBanner.Id });
                         }
                         else if (pageItem.PageFeature != null)
                         {
@@ -886,6 +904,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     ModelState.AddModelError("PageItem", "No deck submitted");
                 }
+                else if (pageItem.NavBannerId.HasValue && model.NavBanner == null)
+                {
+                    ModelState.AddModelError("PageItem", "No navbanner submitted");
+                }
                 else if (pageItem.PageFeatureId.HasValue && model.PageFeature == null)
                 {
                     ModelState.AddModelError("PageItem", "No feature submitted");
@@ -912,6 +934,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         {
                             model.Deck.Id = pageItem.DeckId.Value;
                             await _deckService.EditAsync(model.Deck);
+                        }
+                        else if (pageItem.NavBannerId.HasValue)
+                        {
+                            model.NavBanner.Id = pageItem.NavBannerId.Value;
+                            await _navBannerService.EditAsync(model.NavBanner);
                         }
                         else if (pageItem.PageFeatureId.HasValue)
                         {

@@ -9,16 +9,15 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         public LocationsFeaturesViewModel(LocationFeature locationsFeatures)
         {
             BodyText = CommonMarkConverter.Convert(locationsFeatures?.Feature?.BodyText);
-            Icon = string.IsNullOrEmpty(locationsFeatures?.Feature?.IconText)
-                ? locationsFeatures?.Feature?.Icon
-                : $"{locationsFeatures?.Feature?.Icon} prom-location-icon-text";
+            Icon = locationsFeatures?.Feature?.Icon;
+            IconText = locationsFeatures?.Feature?.IconText;
             ImagePath = locationsFeatures?.Feature?.ImagePath;
+            IsAtThisLocation = locationsFeatures.Feature?.IsAtThisLocation ?? false;
             Name = locationsFeatures?.Feature?.Name;
-            RedirectLink = locationsFeatures?.RedirectUrl;
             NewTab = locationsFeatures?.NewTab;
+            RedirectLink = locationsFeatures?.RedirectUrl;
             Stub = locationsFeatures?.Feature?.Stub;
             Text = CommonMarkConverter.Convert(locationsFeatures?.Text);
-            IconText = locationsFeatures?.Feature?.IconText;
         }
 
         [Required]
@@ -32,6 +31,8 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
 
         [MaxLength(255)]
         public string ImagePath { get; set; }
+
+        public bool IsAtThisLocation { get; set; }
 
         [MaxLength(255)]
         [Required]

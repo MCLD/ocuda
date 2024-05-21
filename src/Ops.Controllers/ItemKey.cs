@@ -2,10 +2,11 @@
 {
     public static class ItemKey
     {
-        public static readonly string ExternalCSS = "ExternalCSS";
-        public static readonly string ExternalJS = "ExternalJS";
-        public static readonly string NavColumn = "NavColumn";
-        public static readonly string Nickname = "Nickname";
-        public static readonly string Sections = "Sections";
+        public static readonly string ExternalCSS = nameof(ExternalCSS);
+        public static readonly string ExternalJS = nameof(ExternalJS);
+        public static readonly string Locations = nameof(Locations);
+        public static readonly string NavColumn = nameof(NavColumn);
+        public static readonly string Nickname = nameof(Nickname);
+        public static readonly string Sections = nameof(Sections);
     }
 }

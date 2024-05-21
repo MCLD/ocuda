@@ -345,10 +345,6 @@
     <value>View events at: {0}</value>
     <comment>Link to view events at a location; {0} is the name of the location</comment>
   </data>
-  <data name="(opens in a new window)" xml:space="preserve">
-    <value>(opens in a new window)</value>
-    <comment>Information added to buttons or links to indicate they open in a new window</comment>
-  </data>
   <data name="{0} (opens in a new window)" xml:space="preserve">
     <value>{0} (opens in a new window)</value>
     <comment>Description of a link with information added to indicate the link opens in a new window; {0} is the link description</comment>
@@ -441,107 +437,43 @@
     <value>Enter a 5 digit ZIP code</value>
     <comment>Prompt to enter a five digit ZIP code to find the nearest locations</comment>
   </data>
-  <data name="Requested date">
-    <value>Requested date</value>
-    <comment>Label prompting a customer to select a date</comment>
-  </data>
-  <data name="Requested date and time">
-    <value>Requested date and time</value>
-    <comment>Label to show a customer what date and time they selected</comment>
-  </data>
-  <data name="Requested time">
-    <value>Requested time</value>
-    <comment>Label prompting a customer to select a time</comment>
-  </data>
-  <data name="Back to the site">
-    <value>Back to the site</value>
-    <comment>Navigation button: go back to the Web site</comment>
-  </data>
-  <data name="Use my location">
+  <data name="Use my location" xml:space="preserve">
     <value>Use my location</value>
     <comment>Button: engage a mobile device's GPS to look up the customer's location</comment>
   </data>
-  <data name="Page not found">
-    <value>Page not found</value>
-    <comment>Web error when a page is not found (a 404 error)</comment>
-  </data>
-  <data name="Please enter a telephone number in the format: ###-###-####">
-    <value>Please enter a telephone number in the format: ###-###-####</value>
-    <comment>Error message: telephone number was not entered in the proper format</comment>
-  </data>
-  <data name="Closed today">
-    <value>Closed today</value>
-    <comment>Location status message, the location is closed for today</comment>
-  </data>
-  <data name="Find my Library">
-    <value>Find my Library</value>
-    <comment>Title of the page to locate the nearest library</comment>
-  </data>
-  <data name="Library Information">
-    <value>Library Information</value>
-    <comment>Page header for information section of location page</comment>
-  </data>
-  <data name="Nearby Locations">
-    <value>Nearby Locations</value>
-    <comment>Page header for other locations which are narby</comment>
-  </data>
-  <data name="See a map to this location">
-    <value>See a map to this location (opens in a new window)</value>
-    <comment>Label indicating a link takes the customer to a map of the location</comment>
-  </data>
-  <data name="(opens in a new window)">
+  <data name="(opens in a new window)" xml:space="preserve">
     <value>(opens in a new window)</value>
     <comment>Information added to buttons or links to indicate they open in a new window</comment>
   </data>
-  <data name="Request a different time">
-    <value>Request a different time</value>
-    <comment>Label encouraging selection of a different time if the selected time is not available</comment>
-  </data>
-  <data name="Schedule your time">
-    <value>Schedule your time</value>
-    <comment>Header for customers to schedule a time for their help request</comment>
-  </data>
-  <data name="Your time is scheduled">
-    <value>Your time is scheduled</value>
-    <comment>Header for success page once a customer's time is scheduled</comment>
-  </data>
-  <data name="Visit home page">
-    <value>Visit home page</value>
-    <comment>Label describing the home page link</comment>
-  </data>
-  <data name="Enter a 5 digit ZIP code">
-    <value>Enter a 5 digit ZIP code</value>
-    <comment>Prompt to enter a five digit ZIP code to find the nearest locations</comment>
-  </data>
-  <data name="Location">
+  <data name="Location" xml:space="preserve">
     <value>Location</value>
     <comment>Column header for a location</comment>
   </data>
-  <data name="Hours">
+  <data name="Hours" xml:space="preserve">
     <value>Hours</value>
     <comment>Column header describing when the location is open</comment>
   </data>
-  <data name="Status">
+  <data name="Status" xml:space="preserve">
     <value>Status</value>
     <comment>Column header with product inventory status</comment>
   </data>
-  <data name="Last Update">
+  <data name="Last Update" xml:space="preserve">
     <value>Last Update</value>
     <comment>Column header describing when data was last updated</comment>
   </data>
-  <data name="Has {0}">
+  <data name="Has {0}" xml:space="preserve">
     <value>Has {0}</value>
     <comment>Text indicating that a location has an item. {0} will be replaced with the name of the item</comment>
   </data>
-  <data name="Does not have {0}">
+  <data name="Does not have {0}" xml:space="preserve">
     <value>Does not have {0}</value>
     <comment>Text indicating that a location does not have an item. {0} will be replaced with the name of the item</comment>
   </data>
-  <data name="Show notes for: {0}">
+  <data name="Show notes for: {0}" xml:space="preserve">
     <value>Show notes for: {0}</value>
     <comment>Header for a podcast's show notes; {0} is the episode title</comment>
   </data>
-  <data name="View show notes">
+  <data name="View show notes" xml:space="preserve">
     <value>View show notes</value>
     <comment>Label that links to a podcast's show notes</comment>
   </data>
@@ -628,5 +560,33 @@
   <data name="Thank you for your interest! Someone will be in touch with you very soon." xml:space="preserve">
     <value>Thank you for your interest! Someone will be in touch with you very soon.</value>
     <comment>Default follow-up shown to customer after submitting volunteer form.</comment>
+  </data>
+  <data name="At This Location" xml:space="preserve">
+    <value>At This Location</value>
+    <comment>Header for displaying services available at this particular location</comment>
+  </data>
+  <data name="Contact Us" xml:space="preserve">
+    <value>Contact Us</value>
+    <comment>Link to instructions on how to contact the site owner</comment>
+  </data>
+  <data name="See services at all of our libraries" xml:space="preserve">
+    <value>See services at all of our libraries</value>
+    <comment>Textual link on the location page for showing services at all locations</comment>
+  </data>
+  <data name="Services Available" xml:space="preserve">
+    <value>Services Available</value>
+    <comment>Header for displaying services available for a location</comment>
+  </data>
+  <data name="Sign up for our email newsletter" xml:space="preserve">
+    <value>Sign up for our email newsletter</value>
+    <comment>Button for call to action - subscribe to newsletter</comment>
+  </data>
+  <data name="Search the catalog" xml:space="preserve">
+    <value>Search the catalog</value>
+    <comment>Placeholder text for the search field</comment>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+    <comment>Hover text to display on the search button</comment>
   </data>
 </root>

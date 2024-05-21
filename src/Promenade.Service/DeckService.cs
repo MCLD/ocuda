@@ -17,16 +17,14 @@ namespace Ocuda.Promenade.Service
     public class DeckService : BaseService<DeckService>
     {
         private const string CardsFilePath = "cards";
-        private const string ImagesFilePath = "images";
 
+        private readonly IOcudaCache _cache;
         private readonly ICardDetailRepository _cardDetailRepository;
         private readonly ICardRepository _cardRepository;
         private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IOcudaCache _cache;
-        private readonly IPageLayoutRepository _pageLayoutRepository;
-        private readonly IPathResolverService _pathResolver;
         private readonly LanguageService _languageService;
+        private readonly IPathResolverService _pathResolver;
 
         public DeckService(ILogger<DeckService> logger,
             IDateTimeProvider dateTimeProvider,
@@ -35,24 +33,23 @@ namespace Ocuda.Promenade.Service
             IConfiguration config,
             IHttpContextAccessor httpContextAccessor,
             IOcudaCache cache,
-            IPageLayoutRepository pageLayoutRepository,
             IPathResolverService pathResolver,
             LanguageService languageService) : base(logger, dateTimeProvider)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _cardDetailRepository = cardDetailRepository
-                ?? throw new ArgumentNullException(nameof(cardDetailRepository));
-            _cardRepository = cardRepository
-                ?? throw new ArgumentNullException(nameof(cardRepository));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-            _httpContextAccessor = httpContextAccessor
-                ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
-            _pageLayoutRepository = pageLayoutRepository
-                ?? throw new ArgumentNullException(nameof(pageLayoutRepository));
-            _pathResolver = pathResolver
-                ?? throw new ArgumentNullException(nameof(pathResolver));
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(cardDetailRepository);
+            ArgumentNullException.ThrowIfNull(cardRepository);
+            ArgumentNullException.ThrowIfNull(config);
+            ArgumentNullException.ThrowIfNull(httpContextAccessor);
+            ArgumentNullException.ThrowIfNull(pathResolver);
+
+            _cache = cache;
+            _cardDetailRepository = cardDetailRepository;
+            _cardRepository = cardRepository;
+            _config = config;
+            _httpContextAccessor = httpContextAccessor;
+            _languageService = languageService;
+            _pathResolver = pathResolver;
         }
 
         public async Task<IEnumerable<CardDetail>> GetByIdAsync(int deckId, bool forceReload)
@@ -127,7 +124,7 @@ namespace Ocuda.Promenade.Service
                 if (detail != null)
                 {
                     var languageName = await _languageService
-                        .GetNameAsync(detail.LanguageId, forceReload);
+                        .GetLanguageNameAsync(detail.LanguageId, forceReload);
 
                     if (!string.IsNullOrEmpty(detail.Filename))
                     {

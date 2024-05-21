@@ -4,155 +4,351 @@
     <link rel="canonical" href="@Model.CanonicalLink" />
 }
 
+@if (!string.IsNullOrEmpty(Model.PreFeatureSegmentText))
+{
+    <div class="row prom-feature-segment">
+        <div class="col-12">
+            @if (!string.IsNullOrEmpty(Model.PreFeatureSegmentHeader))
+            {
+                <h2>@Model.PreFeatureSegmentHeader</h2>
+            }
+            @Html.Raw(Model.PreFeatureSegmentText)
+        </div>
+    </div>
+}
+
 <div class="prom-location">
     <div class="row">
-        <div class="col-12 col-md-5 order-md-2">
-            <img src="@Model.Location.ImagePath"
-                 class="img-fluid pb-2" />
-        </div>
-        <div class="col-12 col-md-7 order-md-1">
-            <h1>@Model.Location.Name</h1>
-            <a aria-label="@Localizer[Promenade.NewWindowItem, @Localizer[Promenade.LocationSeeAMap]]"
-               href="@Model.Location.MapLink"
-               class="btn btn-outline-secondary float-end ms-2 prom-locations-maplink d-print-none"
-               target="_blank">
-                <span class="fa-solid fa-map-location-dot"></span> Map
-            </a>
-            @if (Model.Location.CurrentStatus != null)
-            {
-                <div class="todays-status">
-                    @if (Model.Location.CurrentStatus?.IsCurrentlyOpen == true
-                   && !string.IsNullOrEmpty(Model.Location.CurrentStatus.TodaysHours))
-                    {
-                        @Localizer[Promenade.TodaysHours, @Model.Location.CurrentStatus.TodaysHours]
-                    }
-                    else
-                    {
-                        @Model.Location.CurrentStatus.StatusMessage
-                    }
+        <div class="col-12">
+            <div class="d-flex flex-column flex-md-row col-lg-10 offset-lg-1 mx-auto d-block gap-1 px-0 pb-1 pt-sm-1 mb-4 bg-dark-subtle">
+                <div class="col-12 col-md-4 bg-white">
+                    <img src="@Model.Location.ImagePath"
+                         class="img-cover" />
                 </div>
-            }
-            <div class="visually-hidden">@Localizer[Promenade.LocationOurAddress]</div>
-            <address>
-                @Model.Location.Address
-                <br />
-                @Model.Location.City,
-                @Model.Location.State
-                @Model.Location.Zip
-                <br />
-                <a aria-label="@Localizer[Promenade.LocationCallUsAt, Model.Location.Phone]"
-                   href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
-            </address>
-            <div class="visually-hidden">@Localizer[Promenade.LocationCurrentHours]</div>
-            @if (Model.Location.IsAlwaysOpen)
-            {
-                <p>@Localizer[Promenade.LocationOpen]</p>
-            }
-            else
-            {
-                <p>
-                    @if (!string.IsNullOrEmpty(Model.HoursSegmentText))
-                    {
-                        @Html.Raw(Model.HoursSegmentText)
-                    }
-                    else
-                    {
-                        @if (Model.Location.IsClosed)
+                <div class="col-12 col-md-8 d-flex flex-column flex-sm-row gap-1">
+                    <div class="col-12 col-sm-6 bg-white px-0 py-4 px-sm-4">
+                        <h2>@Model.Location.Name</h2>
+
+                        @if (Model.Location.CurrentStatus != null)
                         {
-                            <strong style="font-size: 1.2rem;"
-                                    class="text-danger prom-locaton-isclosed">@Localizer[Promenade.LocationClosed]</strong>
+                            <div class="todays-status">
+                                @if (Model.Location.CurrentStatus?.IsCurrentlyOpen == true
+                               && !string.IsNullOrEmpty(Model.Location.CurrentStatus.TodaysHours))
+                                {
+                                    @Localizer[Promenade.TodaysHours, @Model.Location.CurrentStatus.TodaysHours]
+                                }
+                                else
+                                {
+                                    @Model.Location.CurrentStatus.StatusMessage
+                                }
+                            </div>
+                        }
+                        <div class="visually-hidden">@Localizer[Promenade.LocationOurAddress]</div>
+                        <address>
+                            @Model.Location.Address
+                            <br />
+                            @Model.Location.City,
+                            @Model.Location.State
+                            @Model.Location.Zip
+                            <br />
+                            <a aria-label="@Localizer[Promenade.LocationCallUsAt, Model.Location.Phone]"
+                               href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
+                        </address>
+                        <div class="visually-hidden">@Localizer[Promenade.LocationCurrentHours]</div>
+                        @if (Model.Location.IsAlwaysOpen)
+                        {
+                            <p>@Localizer[Promenade.LocationOpen]</p>
                         }
                         else
                         {
-                            @foreach (var dayGrouping in Model.Location.LocationHours)
+                            @if (!string.IsNullOrEmpty(Model.HoursSegmentText))
                             {
-                                <div>
-                                    <strong>@dayGrouping.Days</strong>
-                                    <span>@dayGrouping.Time</span>
-                                </div>
+                                @Html.Raw(Model.HoursSegmentText)
+                            }
+                            else
+                            {
+                                @if (Model.Location.IsClosed)
+                                {
+                                    <strong style="font-size: 1.2rem;"
+                                            class="text-danger prom-locaton-isclosed">@Localizer[Promenade.LocationClosed]</strong>
+                                }
+                                else
+                                {
+                                    @foreach (var dayGrouping in Model.Location.LocationHours)
+                                    {
+                                        <div class="prom-location-hours">
+                                            <strong>@dayGrouping.Days</strong>
+                                            <span>@dayGrouping.Time</span>
+                                        </div>
+                                    }
+                                }
                             }
                         }
-                    }
-                </p>
-            }
-            @if (!string.IsNullOrEmpty(Model.ShowMessage))
+                        @if (!string.IsNullOrEmpty(Model.ShowMessage))
+                        {
+                            <div class="alert alert-info prom-alert"><p>@Html.Raw(Model.ShowMessage)</p></div>
+                        }
+                    </div>
+                    <div class="col-12 col-sm-6 bg-white px-0 py-4 px-sm-4 location-feature-link">
+                        <h2>@Localizer[Promenade.AtThisLocation]</h2>
+                        @foreach (var feature in Model.AtThisLocation)
+                        {
+                            @if (string.IsNullOrEmpty(feature.RedirectLink))
+                            {
+                                if (string.IsNullOrEmpty(feature.Text))
+                                {
+                                    @if (feature.Icon.StartsWith("fa"))
+                                    {
+                                        <div class="d-flex gap-2 align-items-center mb-1">
+                                            <span class="@feature.Icon"></span>
+                                            <span> @feature.Name</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex gap-2 align-items-center mb-1">
+                                            <span>@feature.Icon</span>
+                                            <span>@feature.Name</span>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <a asp-action="@nameof(HomeController.Feature)"
+                                       asp-controller="@HomeController.Name"
+                                       asp-route-locationSlug="@Model.Location.Stub"
+                                       asp-route-featureSlug="@feature.Stub"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#featureModal"
+                                       target="@(feature.NewTab == true ? "_blank" : null)"
+                                       data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
+                                       data-name="@feature.Name">
+                                        @if (feature.Icon.StartsWith("fa"))
+                                        {
+                                            <div class="d-flex gap-2 align-items-center mb-1">
+                                                <span class="@feature.Icon"></span>
+                                                <span> @feature.Name</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="d-flex gap-2 align-items-center mb-1">
+                                                <span>@feature.Icon</span>
+                                                <span>@feature.Name</span>
+                                            </div>
+                                        }
+                                        @if (feature.NewTab == true)
+                                        {
+                                            <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
+                                        }
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <a href="@feature.RedirectLink" target="@(feature.NewTab == true ? "_blank" : null)">
+                                    @if (feature.Icon.StartsWith("fa"))
+                                    {
+                                        <div class="d-flex gap-2 align-items-center mb-1">
+                                            <span class="@feature.Icon"></span>
+                                            <span> @feature.Name</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex gap-2 align-items-center mb-1">
+                                            <span>@feature.Icon</span>
+                                            <span>@feature.Name</span>
+                                        </div>
+                                    }
+                                    @if (feature.NewTab.HasValue && feature.NewTab.Value == true)
+                                    {
+                                        <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
+                                    }
+                                </a>
+                            }
+
+                        }
+                        <a aria-label="@Localizer[Promenade.NewWindowItem, @Localizer[Promenade.LocationSeeAMap]]"
+                           href="@Model.Location.MapLink"
+                           class="btn btn-outline-secondary float-end ms-2 mt-3 prom-locations-maplink d-print-none"
+                           target="_blank">
+                            <span class="fa-solid fa-map-location-dot"></span> Map
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="row g-0 mx-auto mb-4 text-start">
+        <div class="row p-0 mt-0 gx-0 gy-3 gx-sm-3 col-lg-10 offset-lg-1">
+            <h2 class="mt-0 px-lg-0">@Localizer[Promenade.ServicesAvailable]</h2>
+            @foreach (var feature in Model.ServicesAvailable)
             {
-                <div class="alert alert-info prom-alert"><p>@Html.Raw(Model.ShowMessage)</p></div>
+                <div class="col-12 col-sm-4 location-feature-link">
+                    @if (string.IsNullOrEmpty(feature.RedirectLink))
+                    {
+                        if (string.IsNullOrEmpty(feature.Text))
+                        {
+                            <div class="d-flex gap-2 align-items-center ps-2 py-3 location-feature-button">
+                                @if (feature.Icon.StartsWith("fa"))
+                                {
+                                    <span class="@feature.Icon"></span>
+                                    <span>@feature.Name</span>
+                                }
+                                else
+                                {
+                                    <span>@feature.Icon</span>
+                                    <span>@feature.Name</span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <a asp-action="@nameof(HomeController.Feature)"
+                               asp-controller="@HomeController.Name"
+                               asp-route-locationSlug="@Model.Location.Stub"
+                               asp-route-featureSlug="@feature.Stub"
+                               data-bs-toggle="modal"
+                               data-bs-target="#featureModal"
+                               target="@(feature.NewTab == true ? "_blank" : null)"
+                               data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
+                               data-name="@feature.Name">
+                                <div class="d-flex gap-2 align-items-center ps-2 py-3 location-feature-button">
+                                    @if (feature.Icon.StartsWith("fa"))
+                                    {
+                                        <span class="@feature.Icon"></span>
+                                        <span>@feature.Name</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@feature.Icon</span>
+                                        <span>@feature.Name</span>
+                                    }
+                                </div>
+                                @if (feature.NewTab == true)
+                                {
+                                    <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
+                                }
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <a href="@feature.RedirectLink" target="@(feature.NewTab == true ? "_blank" : null)">
+                            <div class="d-flex gap-2 align-items-center ps-2 py-3 location-feature-button">
+                                @if (feature.Icon.StartsWith("fa"))
+                                {
+                                    <span class="@feature.Icon"></span>
+                                    <span>@feature.Name</span>
+                                }
+                                else
+                                {
+                                    <span>@feature.Icon</span>
+                                    <span>@feature.Name</span>
+                                }
+                            </div>
+                            @if (feature.NewTab.HasValue && feature.NewTab.Value == true)
+                            {
+                                <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
+                            }
+                        </a>
+                    }
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(Model.SeeServicesAtAllLink))
+            {
+                <p class="prom-see-services-at-all"><a href="@Model.SeeServicesAtAllLink">@Localizer[Promenade.SeeServicesAtAll]</a></p>
             }
         </div>
     </div>
-
-    @if (!string.IsNullOrEmpty(Model.PreFeatureSegmentText))
-    {
-        <div class="row prom-feature-segment">
-            <div class="col-12">
-                @if (!string.IsNullOrEmpty(Model.PreFeatureSegmentHeader))
+    <div class="row g-0 mb-4">
+        <div class="d-flex flex-column flex-md-row col-lg-10 offset-lg-1 d-block gap-1 py-1 bg-dark-subtle overflow-hidden">
+            <div class="col-12 col-md-4 pt-3" style="background-color: white">
+                <h2>@Localizer[Promenade.LocationInformationHeader]</h2>
+                @if (Model.Location.DescriptionSegment?.Text?.Length > 0)
                 {
-                    <h2>@Model.PreFeatureSegmentHeader</h2>
+                    <div class="prom-feature-segment pe-md-2">
+                        <p>@Html.Raw(Model.Location.DescriptionSegment.Text)</p>
+                    </div>
                 }
-                @Html.Raw(Model.PreFeatureSegmentText)
             </div>
+            @if (Model.Location.InteriorImages.Count > 0)
+            {
+                <div class="col-12 col-md-8" style="background-color: white;">
+                    <div id="interiorPhotoCarousel" class="carousel slide">
+                        <div class="carousel-indicators">
+                            @foreach (var interiorImage in Model.Location.InteriorImages)
+                            {
+                                <button type="button"
+                                        data-bs-target="#interiorPhotoCarousel"
+                                        data-bs-slide-to="@interiorImage.SortOrder"
+                                        class="@Model.ActiveIfFirstInteriorImage(interiorImage.SortOrder)"
+                                        aria-current="true"
+                                        aria-label="@interiorImage.AltText"></button>
+
+                            }
+                        </div>
+                        <div class="carousel-inner">
+                            @foreach (var interiorImage in Model.Location.InteriorImages)
+                            {
+                                <div class="carousel-item @Model.ActiveIfFirstInteriorImage(interiorImage.SortOrder)">
+                                    <img src="@interiorImage.ImagePath"
+                                         class="d-block w-100"
+                                         alt="@interiorImage.AltText">
+                                </div>
+                            }
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#interiorPhotoCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#interiorPhotoCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+            }
         </div>
-    }
-
-    <h2>@Localizer[Promenade.LocationInformationHeader]</h2>
-
-    @if (Model.Location.DescriptionSegment?.Text?.Length > 0)
-    {
-        <div class="row prom-feature-segment">
-            <div class="col-12">
-                @Html.Raw(Model.Location.DescriptionSegment.Text)
-            </div>
-        </div>
-    }
-
-    <div class="row prom-features">
-        @foreach (var feature in Model.LocationFeatures)
-        {
-            <div class="col-4 col-md-3 col-lg-2 my-2">
-                @if (string.IsNullOrEmpty(feature.RedirectLink))
-                {
-                    <a asp-action="@nameof(HomeController.Feature)"
-                       asp-controller="@HomeController.Name"
-                       asp-route-locationSlug="@Model.Location.Stub"
-                       asp-route-featureSlug="@feature.Stub"
-                       data-bs-toggle="modal"
-                       data-bs-target="#featureModal"
-                       target="@(feature.NewTab == true ? "_blank" : null)"
-                       data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
-                       data-name="@feature.Name">
-                        <span class="fa-stack fa-2x d-block mx-auto">
-                            <span class="fa-solid fa-square fa-stack-2x"></span>
-                            <span class="@feature.Icon"
-                            @(string.IsNullOrEmpty(feature.IconText) ? "" : "aria-hidden='true'")>
-                                @Html.Raw(feature.IconText)
-                            </span>
-                        </span>
-                        @feature.Name
-                        @if (feature.NewTab == true)
-                        {
-                            <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
-                        }
-                    </a>
-                }
-                else
-                {
-                    <a href="@feature.RedirectLink" target="@(feature.NewTab == true ? "_blank" : null)">
-                        <span class="fa-stack fa-2x d-block mx-auto">
-                            <span class="fa-solid fa-square fa-stack-2x"></span>
-                            <span class="@feature.Icon"></span>
-                        </span>
-                        @feature.Name
-                        @if (feature.NewTab.HasValue && feature.NewTab.Value == true)
-                        {
-                            <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
-                        }
-                    </a>
-                }
-            </div>
-        }
     </div>
+    <div class="row g-0">
+        <div class="row g-0 col-lg-10 offset-lg-1 border-4 border-bottom">
+            <div class="mx-auto" style="max-width: 740px;">
+                <div class="row">
+                    @if(!string.IsNullOrEmpty(Model.SocialLink) && 
+                        !string.IsNullOrEmpty(Model.SocialName) &&
+                        !string.IsNullOrEmpty(Model.SocialIcon))
+                    {
+                        <div class="col-12 col-sm-6 mb-4 location-feature-link">
+                            <a href="@Model.SocialLink"
+                               target="_blank"
+                               class="text-reset">
+                                <div class="d-flex gap-4 align-items-center prom-box-border p-3 h-100">
+                                    <span class="@Model.SocialIcon display-4 prom-text-color"></span>
+                                    <span class="location-feature-link prom-faq-icons">
+                                        @Localizer[Promenade.ConnectSocialOn, Model.SocialName]!
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
 
+                    }
+                    <div class="col-12 col-sm-6 mb-4 location-feature-link">
+                        <a href="@Model.Location.SubscriptionLink">
+                            <div class="d-flex gap-4 align-items-center prom-box-border p-3 h-100">
+                                <span class="fa-solid fa-envelope-open-text display-4 prom-text-color"></span>
+                                <span class="location-feature-link prom-faq-icons">
+                                    @Localizer[Promenade.SignUpForEmailNewsletter]!
+                                </span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     @if (!string.IsNullOrEmpty(Model.PostFeatureSegmentText))
     {
         <div class="row prom-feature-segment">
@@ -165,7 +361,6 @@
             </div>
         </div>
     }
-
     @if (Model.NearbyCount > 1)
     {
         <div class="prom-location-nearby">
@@ -235,12 +430,10 @@
                                     @if (Model.NearbyCount == Model.NearbyEventsCount)
                                     {
                                         @Localizer[Promenade.LocationUpdatesFromAllCount, Model.NearbyEventsCount]
-                                        ;
                                     }
                                     else
                                     {
                                         @Localizer[Promenade.LocationUpdatesFromCount, Model.NearbyEventsCount]
-                                        ;
                                     }
                                     <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
                                 </a>
@@ -266,7 +459,7 @@
             modal.find(".modal-title").html(name);
 
             var modalBody = modal.find(".modal-body");
-            modalBody.html("<span class=\"fa-solid fa-spinner fa-2x fa-pulse\"></span>")
+            modalBody.html("<div class=\"text-center\"><span class=\"fa-solid fa-spinner fa-2x fa-pulse\"></span></div>")
 
             $.getJSON(featureUrl,
                 function (response) {
@@ -278,7 +471,7 @@
         });
     </script>
 
-    @if(Model.Schema != null)
+    @if (Model.Schema != null)
     {
         <script type="application/ld+json">
             @Html.Raw(Model.Schema.ToHtmlEscapedString())

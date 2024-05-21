@@ -22,6 +22,12 @@ namespace Ocuda.Ops.Models.Definitions
                 Info = "Manage the Promenade Emedia page.",
                 Name = "Emedia Management"
             },
+            new()
+            {
+                Id = ApplicationPermission.FeatureManagement,
+                Info = "Manage features which can be applied to locations",
+                Name="Feature Management"
+            },
             new() {
                 Id = ApplicationPermission.ImageOptimizer,
                 Info = "Ability to directly access the image optimizer.",
@@ -31,6 +37,12 @@ namespace Ocuda.Ops.Models.Definitions
                 Id = ApplicationPermission.IntranetFrontPageManagement,
                 Info = "Push section posts to the front page and pin them.",
                 Name = "Intranet Front Page Management"
+            },
+            new()
+            {
+                Id = ApplicationPermission.LocationManagement,
+                Info = "Manage information about locations.",
+                Name = "Location Management"
             },
             new() {
                 Id = ApplicationPermission.NavigationManagement,

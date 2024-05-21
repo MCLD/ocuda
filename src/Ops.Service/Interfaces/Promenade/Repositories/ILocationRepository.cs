@@ -22,6 +22,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(LocationFilter filter);
 
+        Task<IDictionary<string, string>> GetSlugNameAsync();
+
         Task<ICollection<Location>> GetUsingSegmentAsync(int segmentId);
 
         Task<bool> IsDuplicateNameAsync(Location location);

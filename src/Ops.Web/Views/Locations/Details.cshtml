@@ -1,0 +1,199 @@
+﻿@using Ocuda.Ops.Controllers.ViewModels.Locations
+@model DetailsViewModel
+
+<div class="d-flex mb-2">
+    <h1 class="flex-grow-1 text-start">
+        Location
+        <small class="text-muted">@Model.Location.Name</small>
+    </h1>
+    @if (Model.LocationManager)
+    {
+        <div>
+            <a class="btn btn-outline-success"
+               asp-action="@nameof(LocationsController.AddFeature)"
+               asp-route-slug="@Model.Location.Stub">Add Feature to Location</a>
+        </div>
+    }
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-2">
+            <div class="card-header">Address</div>
+            <div class="card-body">
+                @Model.Location.Address<br />
+                @Model.Location.City, @Model.Location.State @Model.Location.Zip<br />
+                @Model.Location.Phone
+            </div>
+        </div>
+        <div class="card mb-2">
+            <div class="card-header">Description</div>
+            <div class="card-body">
+                <p class="card-text">@(Html.Raw(Model.Location.DescriptionSegment?.Text ?? "No description available."))</p>
+            </div>
+            <div class="card-footer d-flex">
+                <div class="d-inline-block fa-fw @Model.LanguageCssClass flex-grow-1 text-start"
+                     style="font-size: 1.5rem;"
+                     title="@Model.LanguageTitle">
+                    <span class="fa-solid fa-language"></span>
+                </div>
+                @if (Model.LocationManager && Model.SegmentEditor)
+                {
+                    <div>
+                        <a class="btn btn-sm btn-outline-primary"
+                           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Detail)"
+                           asp-area="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Area"
+                           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Name"
+                           asp-route-id="@Model.Location.DescriptionSegmentId"
+                           title="Edit description">
+                            <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-header">Map</div>
+            <div class="card-body">
+                <a asp-action="@nameof(LocationsController.MapImage)"
+                   asp-route-slug="@Model.Location.Stub">
+                    <img class="img-fluid"
+                         src="@Url.Action(nameof(LocationsController.MapImage), new { slug = Model.Location.Stub })?@DetailsViewModel.Now()">
+                </a>
+            </div>
+            @if (Model.LocationManager)
+            {
+                <div class="card-footer d-flex justify-content-end">
+                    <div>
+                        <a class="btn btn-sm btn-outline-primary"
+                           asp-action="@nameof(LocationsController.UpdateMapImage)"
+                           asp-route-slug="@Model.Location.Stub">
+                            <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-header">Exterior photo</div>
+            <div class="card-body">
+                <a asp-action="@nameof(LocationsController.ExteriorImage)"
+                   asp-route-slug="@Model.Location.Stub">
+                    <img class="img-fluid"
+                         src="@Url.Action(nameof(LocationsController.ExteriorImage), new { slug = Model.Location.Stub })?@DetailsViewModel.Now()">
+                </a>
+            </div>
+            @if (Model.LocationManager)
+            {
+                <div class="card-footer d-flex justify-content-end">
+                    <div>
+                        <a class="btn btn-sm btn-outline-primary"
+                           asp-action="@nameof(LocationsController.UpdateExteriorImage)"
+                           asp-route-slug="@Model.Location.Stub">
+                            <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-header">Interior photos</div>
+            <div class="card-body">
+                @if (Model.Location.InteriorImages?.Count > 0)
+                {
+                    @foreach (var interiorImage in Model.Location.InteriorImages)
+                    {
+                        <a asp-action="@nameof(LocationsController.InteriorImage)"
+                           asp-route-id="@interiorImage.Id">
+                            <img class="img-thumbnail" style="max-width: 200px; max-height: 200px;"
+                                 src="@Url.Action(nameof(LocationsController.InteriorImage), new { id = interiorImage.Id })?@DetailsViewModel.Now()">
+                        </a>
+                    }
+                }
+                else
+                {
+                    <em>No interior photos.</em>
+                }
+            </div>
+            @if (Model.LocationManager)
+            {
+                <div class="card-footer d-flex justify-content-end">
+                    <div>
+                        <a class="btn btn-sm btn-outline-primary"
+                           asp-action="@nameof(LocationsController.UpdateInteriorImages)"
+                           asp-route-slug="@Model.Location.Stub">
+                            <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col">
+        <div class="card mb-2">
+            <div class="card-header">At this location</div>
+            <ul class="list-group list-group-flush">
+                @foreach (var feature in Model.AtThisLocation)
+                {
+                    <li class="list-group-item d-flex">
+                        <div class="flex-grow-1 text-start">@feature.Name</div>
+                        @if (Model.LocationManager)
+                        {
+                            <div>
+                                <form asp-action="@nameof(LocationsController.RemoveFeature)"
+                                      class="d-inline">
+                                    <input type="hidden" name="slug" value="@Model.Location.Stub" />
+                                    <input type="hidden" name="featureId" value="@feature.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <span class="fa-solid fa-circle-minus fa-fw" aria-hidden="true"></span>
+                                    </button>
+                                </form>
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-action="@nameof(LocationsController.LocationFeature)"
+                                   asp-route-slug="@Model.Location.Stub"
+                                   asp-route-featureId="@feature.Id"
+                                   title="Edit location feature">
+                                    <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                                </a>
+                            </div>
+                        }
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="card mb-2">
+            <div class="card-header">Services available</div>
+            <ul class="list-group list-group-flush">
+                @foreach (var feature in Model.ServicesAvailable)
+                {
+                    <li class="list-group-item d-flex">
+                        <div class="flex-grow-1 text-start">@feature.Name</div>
+                        @if (Model.LocationManager)
+                        {
+                            <div>
+                                <form asp-action="@nameof(LocationsController.RemoveFeature)"
+                                      class="d-inline">
+                                    <input type="hidden" name="slug" value="@Model.Location.Stub" />
+                                    <input type="hidden" name="featureId" value="@feature.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <span class="fa-solid fa-circle-minus fa-fw" aria-hidden="true"></span>
+                                    </button>
+                                </form>
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-action="@nameof(LocationsController.LocationFeature)"
+                                   asp-route-slug="@Model.Location.Stub"
+                                   asp-route-featureId="@feature.Id"
+                                   title="Edit location feature">
+                                    <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                                </a>
+                            </div>
+                        }
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

@@ -1,151 +1,188 @@
 ﻿using System;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Feature;
 using Ocuda.Ops.Controllers.Filters;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Email;
 using Ocuda.Utility.Exceptions;
-using Ocuda.Utility.Keys;
-using Ocuda.Utility.Models;
+using Ocuda.Utility.Extensions;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
     [Area("SiteManagement")]
-    [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
     public class FeaturesController : BaseController<FeaturesController>
     {
         private readonly IFeatureService _featureService;
-
-        public static string Name { get { return "Features"; } }
-        public static string Area { get { return "SiteManagement"; } }
+        private readonly ILanguageService _languageService;
+        private readonly IPermissionGroupService _permissionGroupService;
+        private readonly ISegmentService _segmentService;
 
         public FeaturesController(ServiceFacades.Controller<FeaturesController> context,
-            IFeatureService featureService) : base(context)
+            IFeatureService featureService,
+            ILanguageService languageService,
+            IPermissionGroupService permissionGroupService,
+            ISegmentService segmentService) : base(context)
         {
-            _featureService = featureService
-                ?? throw new ArgumentNullException(nameof(featureService));
+            ArgumentNullException.ThrowIfNull(featureService);
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+            ArgumentNullException.ThrowIfNull(segmentService);
+
+            _featureService = featureService;
+            _languageService = languageService;
+            _permissionGroupService = permissionGroupService;
+            _segmentService = segmentService;
         }
 
-        [Route("")]
-        [Route("[action]")]
-        public async Task<IActionResult> Index(int page = 1)
+        public static string Area
+        { get { return "SiteManagement"; } }
+
+        public static string Name
+        { get { return "Features"; } }
+
+        [HttpGet("[action]/{slug}")]
+        public async Task<IActionResult> AddDescription(string slug)
         {
-            var itemsPerPage = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
+            var hasPermission = await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.FeatureManagement)
+                && await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.WebPageContentManagement);
+            if (!hasPermission) { return RedirectToUnauthorized(); }
 
-            var filter = new BaseFilter(page, itemsPerPage);
+            var feature = await _featureService.GetFeatureBySlugAsync(slug);
+            if (feature == null) { return NotFound(); }
 
-            var featureList = await _featureService.GetPaginatedListAsync(filter);
-
-            var paginateModel = new PaginateModel
+            if (feature.TextSegmentId.HasValue)
             {
-                ItemCount = featureList.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
-
-            if (paginateModel.PastMaxPage)
-            {
-                return RedirectToRoute(
+                return RedirectToAction(nameof(SegmentsController.Detail),
+                    SegmentsController.Name,
                     new
                     {
-                        page = paginateModel.LastPage ?? 1
+                        area = Areas.SiteManagement.SegmentsController.Area,
+                        id = feature.TextSegmentId.Value
                     });
             }
 
-            var viewModel = new FeatureViewModel
+            var segment = await _segmentService.CreateAsync(new Segment
             {
-                AllFeatures = featureList.Data,
-                PaginateModel = paginateModel
-            };
-
-            return View(viewModel);
-        }
-
-        [Route("CreateFeature")]
-        [RestoreModelState]
-        public IActionResult CreateFeature()
-        {
-            return View("FeatureDetails", new FeatureViewModel
-            {
-                Feature = new Feature
-                {
-                    IsNewFeature = true
-                },
-                Action = nameof(FeaturesController.CreateFeature)
+                IsActive = true,
+                Name = $"Feature {feature.Name} description text"
             });
-        }
 
-        [Route("{featureName}")]
-        [RestoreModelState]
-        public async Task<IActionResult> Feature(string featureName)
-        {
-            var feature = await _featureService.GetFeatureByNameAsync(featureName);
-            if (feature != null)
+            if (segment == null)
             {
-                feature.IsNewFeature = false;
-                feature.NeedsPopup = !string.IsNullOrEmpty(feature.Stub);
-                return View("FeatureDetails", new FeatureViewModel
+                _logger.LogError("Unable to create segment for feature {FeatureName}",
+                    feature.Name);
+                ShowAlertDanger("Unable to create segment. Please contact an administrator.");
+                return RedirectToAction(nameof(Details), new { slug });
+            }
+
+            feature.TextSegmentId = segment.Id;
+            await _featureService.EditAsync(feature);
+
+            return RedirectToAction(nameof(SegmentsController.Detail),
+                SegmentsController.Name,
+                new
                 {
-                    Feature = feature,
-                    Action = nameof(FeaturesController.EditFeature)
+                    area = Areas.SiteManagement.SegmentsController.Area,
+                    id = segment.Id
                 });
-            }
-            else
-            {
-                ShowAlertDanger("Feature does not exist.");
-                return RedirectToAction(nameof(Index));
-            }
         }
 
-        [HttpPost]
-        [Route("[action]")]
-        [SaveModelState]
-        public async Task<IActionResult> CreateFeature(Feature feature)
+        [HttpGet("[action]")]
+        [RestoreModelState]
+        public async Task<IActionResult> CreateFeature()
         {
-            if (feature.NeedsPopup && string.IsNullOrEmpty(feature.Stub))
+            var hasPermission = await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.FeatureManagement);
+            if (!hasPermission) { return RedirectToUnauthorized(); }
+
+            return View();
+        }
+
+        [HttpPost("[action]")]
+        [SaveModelState]
+        public async Task<IActionResult> CreateFeature(CreateFeatureViewModel viewModel)
+        {
+            var hasPermission = await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.FeatureManagement);
+            if (!hasPermission) { return RedirectToUnauthorized(); }
+
+            if (viewModel == null) { return NotFound(); }
+
+            var slugLookup = await _featureService.GetFeatureBySlugAsync(viewModel.Slug?.Trim());
+            if (slugLookup != null)
             {
-                ModelState.AddModelError("Feature.Stub", "A 'Stub' is required for a popup.");
-                ShowAlertDanger("A 'Stub' is required for a popup.");
-                feature.IsNewFeature = true;
-                return RedirectToAction(nameof(CreateFeature));
+                ModelState.AddModelError("Slug", "That Slug is already in use.");
             }
+
             if (ModelState.IsValid)
             {
-                try
+                var defaultLanguageId = await _languageService.GetDefaultLanguageId();
+                var segment = await _segmentService.CreateAsync(new Segment
                 {
-                    await _featureService.AddFeatureAsync(feature);
-                    ShowAlertSuccess($"Added Feature: {feature.Name}");
-                    feature.IsNewFeature = true;
-                    return RedirectToAction(nameof(Feature), new { featureName = feature.Name.ToLower().Replace(" ", "") });
-                }
-                catch (OcudaException ex)
+                    IsActive = true,
+                    Name = $"Feature {viewModel.Name?.Trim()}",
+                });
+
+                await _segmentService.CreateSegmentTextAsync(new SegmentText
                 {
-                    ShowAlertDanger($"Unable to Create Feature: {ex.Message}");
-                    _logger.LogError(ex, "Problem creating feature: {Message}", ex.Message);
-                    feature.IsNewFeature = true;
-                    return RedirectToAction(nameof(Feature));
-                }
+                    LanguageId = defaultLanguageId,
+                    SegmentId = segment.Id,
+                    Text = viewModel.Name.Trim()
+                });
+
+                var feature = new Feature
+                {
+                    Name = viewModel.Name?.Trim(),
+                    Icon = viewModel.Icon,
+                    NameSegmentId = segment.Id,
+                    Stub = viewModel.Slug
+                };
+
+                await _featureService.AddFeatureAsync(feature);
+
+                return RedirectToAction(nameof(Feature), new { viewModel.Slug });
             }
             else
             {
-                ShowAlertDanger($"Invalid paramaters");
-                feature.IsNewFeature = true;
+                var issues = new StringBuilder("Issues creating ").Append(viewModel.Name).Append(":<ul>");
+                foreach (var model in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    issues.Append("<li>")
+                        .Append(model.ErrorMessage)
+                        .Append("</li>");
+                }
+                issues.Append("</ul>");
+                ShowAlertDanger(issues.ToString());
                 return RedirectToAction(nameof(CreateFeature));
             }
         }
 
-        [HttpPost]
-        [Route("[action]")]
-        [SaveModelState]
-        public async Task<IActionResult> DeleteFeature(Feature feature)
+        [HttpPost("[action]")]
+        public async Task<IActionResult> DeleteFeature(string slug)
         {
+            var hasPermission = await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.FeatureManagement);
+            if (!hasPermission) { return RedirectToUnauthorized(); }
+
+            var feature = await _featureService.GetFeatureBySlugAsync(slug);
+            if (feature == null)
+            {
+                return NotFound();
+            }
+
             try
             {
                 await _featureService.DeleteAsync(feature.Id);
@@ -160,44 +197,184 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
+        public async Task<IActionResult> DeleteText(string slug)
+        {
+            var hasPermission = await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.FeatureManagement);
+            if (!hasPermission) { return RedirectToUnauthorized(); }
+
+            var feature = await _featureService.GetFeatureBySlugAsync(slug);
+            if (feature == null) { return NotFound(); }
+
+            if (feature.TextSegmentId.HasValue)
+            {
+                await _segmentService
+                    .DeleteWithTextsAlreadyVerifiedAsync(feature.TextSegmentId.Value);
+                ShowAlertSuccess("Text deleted.");
+            }
+            else
+            {
+                ShowAlertSuccess("Unable to delete text.");
+            }
+
+            feature.TextSegmentId = null;
+            await _featureService.EditAsync(feature);
+
+            return RedirectToAction(nameof(FeaturesController.Feature), new
+            {
+                slug = feature.Stub
+            });
+        }
+
+        [HttpPost("[action]")]
         [SaveModelState]
         public async Task<IActionResult> EditFeature(Feature feature)
         {
-            if (feature.NeedsPopup && string.IsNullOrEmpty(feature.Stub))
-            {
-                ModelState.AddModelError("Feature.Stub", "Stub is required for a popup.");
-                ShowAlertDanger("Stub is required for a popup.");
-                feature.IsNewFeature = false;
-                return View("FeatureDetails", new FeatureViewModel
-                {
-                    Feature = feature,
-                    Action = nameof(FeaturesController.EditFeature)
-                });
-            }
+            var hasPermission = await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.FeatureManagement);
+            if (!hasPermission) { return RedirectToUnauthorized(); }
+
+            if (feature == null) { return NotFound(); }
+
             if (ModelState.IsValid)
             {
                 try
                 {
                     await _featureService.EditAsync(feature);
                     ShowAlertSuccess($"Updated Feature: {feature.Name}");
-                    return RedirectToAction(nameof(Feature), new { featureName = feature.Name.ToLower().Replace(" ", "") });
+                    return RedirectToAction(nameof(Feature), new { slug = feature.Stub });
                 }
                 catch (OcudaException ex)
                 {
                     ShowAlertDanger($"Unable to Update Feature: {feature.Name}");
                     _logger.LogError(ex, "Problem updating feature: {Message}", ex.Message);
-                    feature.IsNewFeature = false;
-                    return RedirectToAction(nameof(Feature), new { featureName = feature.Name.ToLower().Replace(" ", "") });
+                    return RedirectToAction(nameof(Feature), new { slug = feature.Stub });
                 }
             }
             else
             {
-                ShowAlertDanger($"Invalid Parameters: {feature.Name}");
-                feature.IsNewFeature = false;
-                return RedirectToAction(nameof(Feature), new { featureName = feature.Name.ToLower().Replace(" ", "") });
+                var issues = new StringBuilder("Issues saving ").Append(feature.Name).Append(":<ul>");
+                foreach (var model in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    issues.Append("<li>")
+                        .Append(model.ErrorMessage)
+                        .Append("</li>");
+                }
+                issues.Append("</ul>");
+                ShowAlertDanger(issues.ToString());
+                return RedirectToAction(nameof(Feature), new { slug = feature.Stub });
             }
+        }
+
+        [HttpGet("{slug}")]
+        [RestoreModelState]
+        public async Task<IActionResult> Feature(string slug)
+        {
+            var feature = await _featureService.GetFeatureBySlugAsync(slug);
+            if (feature == null) { return NotFound(); }
+
+            var viewModel = new FeatureViewModel
+            {
+                CanEditSegments = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.WebPageContentManagement),
+                CanManageFeatures = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.FeatureManagement),
+                CanUpdateSlug = IsSiteManager(),
+                Feature = feature
+            };
+
+            viewModel.AllLanguages.AddRange(await _languageService.GetActiveNamesAsync());
+
+            var defaultLanguageId = await _languageService.GetDefaultLanguageId();
+
+            var nameSegment = await _segmentService
+                .GetBySegmentAndLanguageAsync(feature.NameSegmentId, defaultLanguageId);
+            feature.DisplayName = nameSegment.Text;
+            viewModel.FeatureNameLanguages.AddRange(await _segmentService
+                .GetSegmentLanguagesByIdAsync(feature.NameSegmentId));
+
+            if (feature.TextSegmentId.HasValue)
+            {
+                var featureText = await _segmentService
+                    .GetBySegmentAndLanguageAsync(feature.TextSegmentId.Value, defaultLanguageId);
+                feature.BodyText = CommonMark.CommonMarkConverter.Convert(featureText?.Text);
+                viewModel.FeatureTextLanguages.AddRange(await _segmentService
+                    .GetSegmentLanguagesByIdAsync(feature.TextSegmentId.Value));
+            }
+
+            return View("FeatureDetails", viewModel);
+        }
+
+        [HttpGet("")]
+        public async Task<IActionResult> Index(int page)
+        {
+            var itemsPerPage = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
+
+            var filter = new BaseFilter(page == 0 ? 1 : page, itemsPerPage);
+
+            var featureList = await _featureService.GetPaginatedListAsync(filter);
+
+            var viewModel = new FeatureViewModel
+            {
+                ItemCount = featureList.Count,
+                CurrentPage = filter.Page,
+                ItemsPerPage = filter.Take.Value
+            };
+
+            if (viewModel.PastMaxPage)
+            {
+                return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
+            }
+
+            viewModel.CanManageFeatures = await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.FeatureManagement);
+
+            viewModel.AllFeatures.AddRange(featureList.Data);
+
+            return View(viewModel);
+        }
+
+        [HttpGet("[action]/{slug}")]
+        [RestoreModelState]
+        public async Task<IActionResult> UpdateSlug(string slug)
+        {
+            if (!IsSiteManager()) { return RedirectToUnauthorized(); }
+
+            var feature = await _featureService.GetFeatureBySlugAsync(slug);
+            if (feature == null) { return NotFound(); }
+
+            return View(new SlugViewModel { PriorSlug = slug, Slug = slug });
+        }
+
+        [HttpPost("[action]/{slug}")]
+        [SaveModelState]
+        public async Task<IActionResult> UpdateSlug(SlugViewModel viewModel)
+        {
+            if (!IsSiteManager()) { return RedirectToUnauthorized(); }
+
+            if (viewModel == null) { return NotFound(); }
+
+            if (string.IsNullOrEmpty(viewModel.Slug)) { return NotFound(); }
+
+            var feature = await _featureService.GetFeatureBySlugAsync(viewModel.PriorSlug);
+            if (feature == null) { return NotFound(); }
+
+            var slugLookup = await _featureService.GetFeatureBySlugAsync(viewModel.Slug?.Trim());
+            if (slugLookup != null)
+            {
+                ModelState.AddModelError("Slug", "That Slug is already in use.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                feature.Stub = viewModel.Slug;
+                await _featureService.EditAsync(feature);
+                return RedirectToAction(nameof(Feature), new { slug = viewModel.Slug });
+            }
+
+            return RedirectToAction(nameof(UpdateSlug), new { slug = viewModel.PriorSlug });
         }
     }
 }

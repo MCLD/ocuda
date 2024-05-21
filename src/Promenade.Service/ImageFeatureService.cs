@@ -18,7 +18,6 @@ namespace Ocuda.Promenade.Service
     public class ImageFeatureService : BaseService<ImageFeatureService>
     {
         private const string FeaturesFilePath = "features";
-        private const string ImagesFilePath = "images";
         private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -118,7 +117,7 @@ namespace Ocuda.Promenade.Service
                 var invalidItems = new List<ImageFeatureItem>();
 
                 string languageName = await _languageService
-                    .GetNameAsync(currentLanguageId ?? defaultLanguageId, forceReload);
+                    .GetLanguageNameAsync(currentLanguageId ?? defaultLanguageId, forceReload);
 
                 foreach (var item in imageFeature.Items)
                 {

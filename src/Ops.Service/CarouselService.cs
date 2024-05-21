@@ -223,7 +223,7 @@ namespace Ocuda.Ops.Service
             carouselText.LanguageId = await _languageRepository.GetDefaultLanguageId();
             carouselText.Carousel = carousel;
             carouselText.Title = carouselText.Title?.Trim();
-            carouselText.Footer =carouselText.Footer?.Trim();
+            carouselText.Footer = carouselText.Footer?.Trim();
 
             await _carouselRepository.AddAsync(carousel);
             await _carouselTextRepository.AddAsync(carouselText);

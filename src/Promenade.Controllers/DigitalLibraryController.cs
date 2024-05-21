@@ -2,19 +2,19 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Promenade.Controllers.Abstract;
-using Ocuda.Promenade.Controllers.ViewModels.Emedias;
+using Ocuda.Promenade.Controllers.ViewModels.DigitalLibrary;
 using Ocuda.Promenade.Service;
 
 namespace Ocuda.Promenade.Controllers
 {
-    [Route("[Controller]")]
-    [Route("{culture:cultureConstraint?}/[Controller]")]
-    public class EmediaController : BaseController<EmediaController>
+    [Route("digital-library")]
+    [Route("{culture:cultureConstraint?}/digital-library")]
+    public class DigitalLibraryController : BaseController<DigitalLibraryController>
     {
         private readonly EmediaService _emediaService;
         private readonly SocialCardService _socialCardService;
 
-        public EmediaController(ServiceFacades.Controller<EmediaController> context,
+        public DigitalLibraryController(ServiceFacades.Controller<DigitalLibraryController> context,
             EmediaService emediaService,
             SocialCardService socialCardService) : base(context)
         {
@@ -63,7 +63,7 @@ namespace Ocuda.Promenade.Controllers
                 card = await _socialCardService.GetByIdAsync(emediaSocial, forceReload);
             }
 
-            var emediaViewModel = new EmediaViewModel
+            var emediaViewModel = new DigitalLibraryViewModel
             {
                 GroupedEmedia = groupedEmedia,
                 SocialCard = card

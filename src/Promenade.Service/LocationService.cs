@@ -31,25 +31,31 @@ namespace Ocuda.Promenade.Service
 
         private readonly IOcudaCache _cache;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IFeatureRepository _featureRepository;
         private readonly IGoogleClient _googleClient;
         private readonly IGroupRepository _groupRepository;
+        private readonly IImageAltTextRepository _imageAltTextRepository;
         private readonly LanguageService _languageService;
         private readonly IStringLocalizer<i18n.Resources.Shared> _localizer;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
         private readonly ILocationGroupRepository _locationGroupRepository;
         private readonly ILocationHoursOverrideRepository _locationHoursOverrideRepository;
         private readonly ILocationHoursRepository _locationHoursRepository;
+        private readonly ILocationInteriorImageRepository _locationInteriorImageRepository;
         private readonly ILocationRepository _locationRepository;
         private readonly SegmentService _segmentService;
 
         public LocationService(IDateTimeProvider dateTimeProvider,
+            IFeatureRepository featureRepository,
             IGoogleClient googleClient,
             IGroupRepository groupRepository,
             IHttpContextAccessor contextAccessor,
+            IImageAltTextRepository imageAltTextRepository,
             ILocationFeatureRepository locationFeatureRepository,
             ILocationGroupRepository locationGroupRepository,
             ILocationHoursOverrideRepository locationHoursOverrideRepository,
             ILocationHoursRepository locationHoursRepository,
+            ILocationInteriorImageRepository locationInteriorImageRepository,
             ILocationRepository locationRepository,
             ILogger<LocationService> logger,
             IOcudaCache cache,
@@ -60,27 +66,33 @@ namespace Ocuda.Promenade.Service
         {
             ArgumentNullException.ThrowIfNull(cache);
             ArgumentNullException.ThrowIfNull(contextAccessor);
+            ArgumentNullException.ThrowIfNull(featureRepository);
             ArgumentNullException.ThrowIfNull(googleClient);
             ArgumentNullException.ThrowIfNull(groupRepository);
+            ArgumentNullException.ThrowIfNull(imageAltTextRepository);
             ArgumentNullException.ThrowIfNull(languageService);
             ArgumentNullException.ThrowIfNull(localizer);
             ArgumentNullException.ThrowIfNull(locationFeatureRepository);
             ArgumentNullException.ThrowIfNull(locationGroupRepository);
             ArgumentNullException.ThrowIfNull(locationHoursOverrideRepository);
             ArgumentNullException.ThrowIfNull(locationHoursRepository);
+            ArgumentNullException.ThrowIfNull(locationInteriorImageRepository);
             ArgumentNullException.ThrowIfNull(locationRepository);
             ArgumentNullException.ThrowIfNull(segmentService);
 
             _cache = cache;
             _contextAccessor = contextAccessor;
+            _featureRepository = featureRepository;
             _googleClient = googleClient;
             _groupRepository = groupRepository;
+            _imageAltTextRepository = imageAltTextRepository;
             _languageService = languageService;
             _localizer = localizer;
             _locationFeatureRepository = locationFeatureRepository;
             _locationGroupRepository = locationGroupRepository;
             _locationHoursOverrideRepository = locationHoursOverrideRepository;
             _locationHoursRepository = locationHoursRepository;
+            _locationInteriorImageRepository = locationInteriorImageRepository;
             _locationRepository = locationRepository;
             _segmentService = segmentService;
         }
@@ -334,32 +346,55 @@ namespace Ocuda.Promenade.Service
         }
 
         public async Task<ICollection<LocationFeature>> GetFullLocationFeaturesAsync(int locationId,
+            int? featureId,
             bool forceReload)
         {
-            string cacheKey = string.Format(CultureInfo.InvariantCulture,
+            ICollection<LocationFeature> features = await GetFromCacheDatabaseAsync(
                 Utility.Keys.Cache.PromLocationFeatures,
-                locationId);
+                locationId,
+                CacheLocationFeatureHours,
+                _cache,
+                forceReload,
+                _locationFeatureRepository.GetFullLocationFeaturesAsync);
 
-            ICollection<LocationFeature> features = null;
-
-            if (!forceReload)
+            if (featureId.HasValue)
             {
-                features = await _cache.GetObjectFromCacheAsync<ICollection<LocationFeature>>(cacheKey);
+                features = features.Where(_ => _.FeatureId == featureId.Value).ToList();
             }
 
             if (features != null)
             {
-                return features;
+                foreach (var feature in features)
+                {
+                    // get feature name
+                    var nameSegmentText = await _segmentService
+                        .GetSegmentTextBySegmentIdAsync(feature.Feature.NameSegmentId, forceReload);
+                    if (nameSegmentText == null)
+                    {
+                        _logger.LogError("Unable to find name segment id {NameSegmentId} for feature id {FeatureId} at location {LocationId}",
+                            feature.Feature.NameSegmentId,
+                            feature.FeatureId,
+                            locationId);
+                    }
+                    feature.Feature.DisplayName = nameSegmentText?.Text;
+
+                    // feature.SegmentId is for this location, feature.Feature.SegmentId is global
+                    int? textSegmentId = feature.SegmentId ?? feature.Feature.TextSegmentId;
+                    if (textSegmentId.HasValue)
+                    {
+                        var segmentText = await _segmentService
+                            .GetSegmentTextBySegmentIdAsync(textSegmentId.Value, forceReload);
+                        if (segmentText == null)
+                        {
+                            _logger.LogInformation("Unable to find text segment id {TextSegmentId} for feature id {FeatureId} at location {LocationId}",
+                                textSegmentId.Value,
+                                feature.FeatureId,
+                                locationId);
+                        }
+                        feature.Text = segmentText?.Text;
+                    }
+                }
             }
-
-            features = await _locationFeatureRepository.GetFullLocationFeaturesAsync(locationId);
-
-            if (features == null)
-            {
-                return null;
-            }
-
-            await _cache.SaveToCacheAsync(cacheKey, features, CacheLocationFeatureHours);
 
             return features;
         }
@@ -382,24 +417,49 @@ namespace Ocuda.Promenade.Service
                 Utility.Keys.Cache.PromLocation,
                 id);
 
-            Location location = null;
-
-            if (!forceReload)
-            {
-                location = await _cache.GetObjectFromCacheAsync<Location>(cacheKey);
-            }
+            Location location = await GetFromCacheDatabaseAsync(
+                Utility.Keys.Cache.PromLocation,
+                id,
+                CacheLocationHours,
+                _cache,
+                forceReload,
+                _locationRepository.FindAsync);
 
             if (location == null)
             {
-                location = await _locationRepository.FindAsync(id);
+                return null;
+            }
 
-                if (location == null)
+            location.InteriorImages = await GetFromCacheDatabaseAsync(
+                Utility.Keys.Cache.PromLocationInteriorImages,
+                location.Id,
+                CacheLocationHours,
+                _cache,
+                forceReload,
+                _locationInteriorImageRepository.GetLocationInteriorImagesAsync);
+
+            var fixedSortOrder = 0;
+
+            if (location.InteriorImages?.Count > 0)
+            {
+                var currentDefaultLanguageId = await GetCurrentDefaultLanguageIdAsync(_contextAccessor,
+                    _languageService);
+
+                foreach (var interiorImage in location.InteriorImages.OrderBy(_ => _.SortOrder))
                 {
-                    return null;
-                }
+                    interiorImage.SortOrder = fixedSortOrder++;
 
-                // cache location info but segment and status info caches individually below
-                await _cache.SaveToCacheAsync(cacheKey, location, CacheLocationHours);
+                    var altText = await GetFromCacheDatabaseAsync(
+                        Utility.Keys.Cache.PromLocationImageAltText,
+                        interiorImage.Id,
+                        currentDefaultLanguageId,
+                        CacheLocationHours,
+                        _cache,
+                        forceReload,
+                        _imageAltTextRepository.GetByImageIdAsync);
+
+                    interiorImage.AltText = altText?.AltText;
+                }
             }
 
             location.DescriptionSegment = await _segmentService
@@ -436,31 +496,32 @@ namespace Ocuda.Promenade.Service
             bool forceReload)
         {
             string cacheKey = string.Format(CultureInfo.InvariantCulture,
-                Utility.Keys.Cache.PromLocationFeature,
-                locationId,
+                Utility.Keys.Cache.PromFeatureSlug,
                 featureSlug);
 
-            LocationFeature locationFeature = null;
+            int? featureId = null;
 
             if (!forceReload)
             {
-                locationFeature = await _cache.GetObjectFromCacheAsync<LocationFeature>(cacheKey);
+                featureId = await _cache.GetIntFromCacheAsync(cacheKey);
             }
 
-            if (locationFeature != null)
+            if (!featureId.HasValue)
             {
-                return locationFeature;
+                featureId = await _featureRepository.GetIdBySlugAsync(featureSlug);
+
+                if (!featureId.HasValue)
+                {
+                    return null;
+                }
+
+                await _cache.SaveToCacheAsync(cacheKey, featureId.Value, CacheLocationFeatureHours);
             }
 
-            locationFeature = await _locationFeatureRepository
-                .GetFullLocationFeatureAsync(locationId, featureSlug);
+            var features = await GetFullLocationFeaturesAsync(locationId, featureId, forceReload);
 
-            if (locationFeature != null)
-            {
-                await _cache.SaveToCacheAsync(cacheKey, locationFeature, CacheLocationFeatureHours);
-            }
-
-            return locationFeature;
+            return features.SingleOrDefault(_ => _.FeatureId == featureId.Value
+                && _.LocationId == locationId);
         }
 
         public async Task<int?> GetLocationIdAsync(string slug, bool forceReload)
@@ -589,102 +650,101 @@ namespace Ocuda.Promenade.Service
                 : locations.OrderBy(_ => _.Name).ToList();
         }
 
-        public async Task<ICollection<LocationHoursResult>> GetWeeklyHoursAsync(int locationId,
-            bool forceReload)
-        {
-            var results = new List<LocationHoursResult>();
+        //public async Task<ICollection<LocationHoursResult>> GetWeeklyHoursAsync(int locationId,
+        //    bool forceReload)
+        //{
+        //    var results = new List<LocationHoursResult>();
 
-            var location = await GetLocationAsync(locationId, forceReload);
+        //    var location = await GetLocationAsync(locationId, forceReload);
 
-            if (location.IsAlwaysOpen)
-            {
-                for (int day = 0; day < DaysInWeek; day++)
-                {
-                    results.Add(new LocationHoursResult
-                    {
-                        Open = true,
-                        DayOfWeek = (DayOfWeek)day,
-                        IsCurrentlyOpen = true
-                    });
-                }
-            }
-            else if (location.IsClosed)
-            {
-                for (int day = 0; day < DaysInWeek; day++)
-                {
-                    results.Add(new LocationHoursResult
-                    {
-                        Open = false,
-                        DayOfWeek = (DayOfWeek)day,
-                        IsCurrentlyOpen = false
-                    });
-                }
-            }
-            else
-            {
-                // Add override days
-                var now = DateTime.Now;
-                var firstDayOfWeek = now.AddDays(-(int)now.DayOfWeek);
-                var lastDayOfWeek = firstDayOfWeek.AddDays(DaysInWeek - 1);
+        //    if (location.IsAlwaysOpen)
+        //    {
+        //        for (int day = 0; day < DaysInWeek; day++)
+        //        {
+        //            results.Add(new LocationHoursResult
+        //            {
+        //                Open = true,
+        //                DayOfWeek = (DayOfWeek)day,
+        //                IsCurrentlyOpen = true
+        //            });
+        //        }
+        //    }
+        //    else if (location.IsClosed)
+        //    {
+        //        for (int day = 0; day < DaysInWeek; day++)
+        //        {
+        //            results.Add(new LocationHoursResult
+        //            {
+        //                Open = false,
+        //                DayOfWeek = (DayOfWeek)day,
+        //                IsCurrentlyOpen = false
+        //            });
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // Add override days
+        //        var now = DateTime.Now;
+        //        var firstDayOfWeek = now.AddDays(-(int)now.DayOfWeek);
+        //        var lastDayOfWeek = firstDayOfWeek.AddDays(DaysInWeek - 1);
 
-                var overrides = await _locationHoursOverrideRepository.GetBetweenDatesAsync(
-                    locationId, firstDayOfWeek, lastDayOfWeek);
+        //        var overrides = await _locationHoursOverrideRepository.GetBetweenDatesAsync(
+        //            locationId, firstDayOfWeek, lastDayOfWeek);
 
-                foreach (var dayOverride in overrides)
-                {
-                    results.Add(new LocationHoursResult
-                    {
-                        OpenTime = dayOverride.OpenTime,
-                        CloseTime = dayOverride.CloseTime,
-                        Open = dayOverride.Open,
-                        DayOfWeek = dayOverride.Date.DayOfWeek,
-                        IsOverride = true
-                    });
-                }
+        //        foreach (var dayOverride in overrides)
+        //        {
+        //            results.Add(new LocationHoursResult
+        //            {
+        //                OpenTime = dayOverride.OpenTime,
+        //                CloseTime = dayOverride.CloseTime,
+        //                Open = dayOverride.Open,
+        //                DayOfWeek = dayOverride.Date.DayOfWeek,
+        //                IsOverride = true
+        //            });
+        //        }
 
-                // Fill in non-override days
-                if (results.Count < DaysInWeek)
-                {
-                    var weeklyHours
-                        = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
+        //        // Fill in non-override days
+        //        if (results.Count < DaysInWeek)
+        //        {
+        //            var weeklyHours
+        //                = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
 
-                    var remainingDays = weeklyHours
-                        .Where(_ => !results.Select(r => r.DayOfWeek).Contains(_.DayOfWeek));
+        //            var remainingDays = weeklyHours
+        //                .Where(_ => !results.Select(r => r.DayOfWeek).Contains(_.DayOfWeek));
 
-                    foreach (var day in remainingDays)
-                    {
-                        results.Add(new LocationHoursResult
-                        {
-                            OpenTime = day.OpenTime,
-                            CloseTime = day.CloseTime,
-                            Open = day.Open,
-                            DayOfWeek = day.DayOfWeek
-                        });
-                    }
-                }
+        //            foreach (var day in remainingDays)
+        //            {
+        //                results.Add(new LocationHoursResult
+        //                {
+        //                    OpenTime = day.OpenTime,
+        //                    CloseTime = day.CloseTime,
+        //                    Open = day.Open,
+        //                    DayOfWeek = day.DayOfWeek
+        //                });
+        //            }
+        //        }
 
-                // Set currently open
-                foreach (var dayResult in results)
-                {
-                    if (dayResult.Open && dayResult.OpenTime <= now && dayResult.CloseTime >= now)
-                    {
-                        dayResult.IsCurrentlyOpen = true;
-                    }
-                }
+        //        // Set currently open
+        //        foreach (var dayResult in results)
+        //        {
+        //            if (dayResult.Open && dayResult.OpenTime <= now && dayResult.CloseTime >= now)
+        //            {
+        //                dayResult.IsCurrentlyOpen = true;
+        //            }
+        //        }
 
-                results = results.OrderBy(_ => _.DayOfWeek).ToList();
-            }
+        //        results = results.OrderBy(_ => _.DayOfWeek).ToList();
+        //    }
 
-            return results;
-        }
+        //    return results;
+        //}
 
         public async Task<string> GetZipCodeAsync(double latitude, double longitude)
         {
             return await _googleClient.GetZipCodeAsync(latitude, longitude);
         }
 
-        private static string FormatOpeningHours(DateTime openTime,
-            DateTime closeTime)
+        private static string FormatOpeningHours(DateTime openTime, DateTime closeTime)
         {
             var format = new StringBuilder("{0:%h");
             if (openTime.Minute != 0)
@@ -701,7 +761,6 @@ namespace Ocuda.Promenade.Service
                 format.ToString(),
                 openTime,
                 closeTime);
-
         }
 
         private static string GetFormattedDayGroupings(List<DayOfWeek> days)
@@ -719,17 +778,13 @@ namespace Ocuda.Promenade.Service
 
                 if (days.Count == 2)
                 {
-
                     return dayFormatter.GetAbbreviatedDayName(firstDay)
                         + " & " + dayFormatter.GetAbbreviatedDayName(lastDay);
-
                 }
                 else if (days.Count == lastDay - firstDay + 1)
                 {
-
                     return dayFormatter.GetAbbreviatedDayName(firstDay) +
                         $" {ndash} {dayFormatter.GetAbbreviatedDayName(lastDay)}";
-
                 }
                 else
                 {

@@ -1,0 +1,101 @@
+﻿@using Ocuda.Ops.Controllers.ViewModels.Locations
+@model InteriorImageViewModel
+
+<div class="d-flex mb-2">
+    <h1 class="flex-grow-1 text-start">
+        Add Interior Photo
+        <small class="text-muted">@Model.LocationName</small>
+    </h1>
+    <div>
+        <a class="btn btn-outline-success"
+           asp-action="@nameof(LocationsController.UpdateInteriorImages)"
+           asp-route-slug="@Model.Slug">Back</a>
+    </div>
+</div>
+<form id="uploadForm"
+      asp-action="@nameof(LocationsController.AddInteriorImage)"
+      asp-route-slug="@Model.Slug"
+      enctype="multipart/form-data">
+    <div class="row mb-4">
+        <div class="col-8 offset-2">
+            <h4>New Photo</h4>
+            <p>
+                Use this form to upload a new interior picture for
+                <strong>@Model.LocationName</strong>. The uploaded file should be a JPEG or PNG
+                image of dimensions
+                <strong>@Model.CropWidth pixels wide by @Model.CropHeight pixels high</strong>.
+            </p>
+            <input type="hidden" asp-for="Filename" />
+            <input type="hidden" asp-for="LocationName" value="@Model.LocationName" />
+            <div class="input-group">
+                <input asp-for="Image"
+                       class="form-control"
+                       type="file">
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-8 offset-2">
+            <h4>Alt Text</h4>
+            <p>Alt Text for each language is required.</p>
+            @foreach (var languageId in Model.Languages.Keys)
+            {
+                <div class="input-group mb-2">
+                    <label class="input-group-text">@Model.Languages[languageId]</label>
+                    <input type="hidden" name="AltTexts[@languageId].Key" value="@languageId" />
+                    <input type="text" name="AltTexts[@languageId]" value="@Model.AltTexts[languageId]" class="form-control" />
+                </div>
+            }
+            <div class="text-end">
+                <button type="submit"
+                        class="btn btn-outline-primary">
+                    Add New Image
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="modal fade"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     id="uploadModal"
+     tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="uploadingModal">Uploading and optimizing...</h1>
+            </div>
+            <div class="modal-body">
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                         style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(function () {
+            const upModal = new bootstrap.Modal('#uploadModal', null);
+            $('#uploadForm').on('submit', function () {
+                $('button[type=\'submit\']').each(function () {
+                    $(this).prop('disabled', true);
+                });
+                upModal.show()
+            });
+            if (slugify) {
+                $('#Filename').val(slugify($('#LocationName').val().replace(".", "").toLowerCase()));
+            }
+            $('input[type=\'file\']').each(function () {
+                $(this).on('change', function () {
+                    $('button[type=\'submit\']').each(function () {
+                        $(this).prop('disabled', false);
+                    });
+                });
+            });
+        });
+    </script>
+}

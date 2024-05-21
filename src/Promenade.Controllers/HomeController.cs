@@ -9,8 +9,10 @@ using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Home;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
+using Ocuda.Utility;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Controllers
 {
@@ -21,9 +23,11 @@ namespace Ocuda.Promenade.Controllers
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly LocationService _locationService;
         private readonly PageService _pageService;
+        private readonly IPathResolverService _pathResolverService;
         private readonly VolunteerFormService _volunteerFormService;
 
         public HomeController(IDateTimeProvider dateTimeProvider,
+           IPathResolverService pathResolverService,
            LocationService locationService,
            PageService pageService,
            ServiceFacades.Controller<HomeController> context,
@@ -34,11 +38,13 @@ namespace Ocuda.Promenade.Controllers
             ArgumentNullException.ThrowIfNull(dateTimeProvider);
             ArgumentNullException.ThrowIfNull(locationService);
             ArgumentNullException.ThrowIfNull(pageService);
+            ArgumentNullException.ThrowIfNull(pathResolverService);
             ArgumentNullException.ThrowIfNull(volunteerFormService);
 
             _dateTimeProvider = dateTimeProvider;
             _locationService = locationService;
             _pageService = pageService;
+            _pathResolverService = pathResolverService;
             _volunteerFormService = volunteerFormService;
         }
 
@@ -72,6 +78,7 @@ namespace Ocuda.Promenade.Controllers
             {
                 var location = await _locationService
                     .GetLocationAsync(locationFeature.LocationId, forceReload);
+
                 PageTitle = _localizer[i18n.Keys.Promenade.LocationFeatureAt,
                     locationFeature.Feature.Name,
                     location.Name];
@@ -147,16 +154,57 @@ namespace Ocuda.Promenade.Controllers
                 return NotFound();
             }
 
+            var location = await _locationService.GetLocationAsync(locationId.Value, forceReload);
+
+            if (Location == null)
+            {
+                return NotFound();
+            }
+
+            var builder = BaseUriBuilder;
+            builder.Path = _pathResolverService.GetPublicContentLink(UriPaths.Images,
+                UriPaths.Locations,
+                location.ImagePath);
+            location.ImagePath = builder.Uri.LocalPath;
+            builder.Path = _pathResolverService.GetPublicContentLink(UriPaths.Images,
+                UriPaths.Locations,
+                UriPaths.Maps,
+                location.MapImagePath);
+            location.MapImagePath = builder.Uri.LocalPath;
+
+            if (location.InteriorImages?.Count > 0)
+            {
+                foreach (var interiorImage in location.InteriorImages)
+                {
+                    builder.Path = _pathResolverService.GetPublicContentLink(UriPaths.Images,
+                        UriPaths.Locations,
+                        UriPaths.Interior,
+                        interiorImage.ImagePath);
+                    interiorImage.ImagePath = builder.Uri.LocalPath;
+                    builder.Path = _pathResolverService.GetPublicContentLink(UriPaths.Images,
+                        UriPaths.Locations,
+                        UriPaths.Maps,
+                        location.MapImagePath);
+                    location.MapImagePath = builder.Uri.LocalPath;
+                }
+            }
+
             var viewModel = new LocationDetailViewModel
             {
                 DayOfWeek = _dateTimeProvider.Now.DayOfWeek,
                 CanonicalLink = await GetCanonicalLinkAsync(),
-                Location = await _locationService.GetLocationAsync(locationId.Value, forceReload)
+                Location = location,
+                SocialLink = location.Facebook ?? await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.Social.FacebookUrl, forceReload),
+                SeeServicesAtAllLink = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.Site.ServicesAtAllLink)
             };
 
-            if (viewModel.Location == null)
+            // TODO: fix so that social link is selectable
+            if (!string.IsNullOrEmpty(viewModel.SocialLink))
             {
-                return NotFound();
+                viewModel.SocialIcon = "fa-brands fa-facebook";
+                viewModel.SocialName = nameof(location.Facebook);
             }
 
             if (viewModel.Location.HoursSegmentText != null)
@@ -190,10 +238,13 @@ namespace Ocuda.Promenade.Controllers
                 = await _locationService.GetHoursAsync(viewModel.Location.Id, forceReload);
 
             var locationFeatures = await _locationService
-                .GetFullLocationFeaturesAsync(locationId.Value, forceReload);
+                .GetFullLocationFeaturesAsync(locationId.Value, null, forceReload);
 
             viewModel.LocationFeatures = locationFeatures
                 .Select(_ => new LocationsFeaturesViewModel(_));
+
+            viewModel.AtThisLocation = viewModel.LocationFeatures.Where(_ => _.IsAtThisLocation);
+            viewModel.ServicesAvailable = viewModel.LocationFeatures.Where(_ => !_.IsAtThisLocation);
 
             if (viewModel.Location.DisplayGroupId.HasValue)
             {

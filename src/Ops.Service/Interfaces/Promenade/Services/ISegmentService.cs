@@ -14,11 +14,25 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task CreateSegmentTextAsync(SegmentText segmentText);
 
-        Task DeleteAsync(int id);
+        /// <summary>
+        /// Delete a Segment and any related SegmentTexts after validating that they are not in use by:
+        /// - Emedia Groups
+        /// - Locations
+        /// - Schedule Request Subjects
+        /// - Podcast episode notes
+        /// </summary>
+        /// <param name="segmentId">Segment id</param>
+        Task DeleteAsync(int segmentId);
 
         Task DeleteNoSaveAsync(int id);
 
         Task DeleteSegmentTextAsync(SegmentText segmentText);
+
+        /// <summary>
+        /// Delete a Segment and any related SegmentTexts with NO in-use validation. Either verify
+        /// that the segment is no longer needed prior to calling or use DeleteAsync().
+        /// <param name="segmentId">Segment id</param>
+        Task DeleteWithTextsAlreadyVerifiedAsync(int segmentId);
 
         Task<Segment> EditAsync(Segment segment);
 
@@ -40,6 +54,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task<ICollection<string>> GetSegmentLanguagesByIdAsync(int id);
 
-        Task UpdateWrapAsync(int segmentId, int? SegmentWrapId);
+        Task UpdateWrapAsync(int segmentId, int? segmentWrapId);
     }
 }

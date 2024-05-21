@@ -1,0 +1,261 @@
+﻿@using Ocuda.Ops.Controllers.ViewModels.Locations
+@model LocationFeatureViewModel
+
+<div class="d-flex mb-2">
+    <h1 class="flex-grow-1 text-start">
+        Location Feature
+        <small class="text-muted">@Model.Location.Name / @Model.Feature.Name</small>
+    </h1>
+    <div>
+        <a class="btn btn-outline-dark"
+           asp-action="@nameof(LocationsController.Details)"
+           asp-route-slug="@Model.Location.Stub">Back</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card mb-4">
+            <div class="card-header">
+                <strong>
+                    Global Feature Details - @Model.Feature.Name
+                </strong>
+            </div>
+            <div class="card-body">
+                <p>Applies to each location this feature is associated with.</p>
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <th>Display name</th>
+                        <td>
+                            <div class="d-flex">
+                                <div class="flex-grow-1 text-left">@Model.Feature.DisplayName</div>
+                                <div class="d-inline-block fa-fw @Model.GetLanguageCssClass(Model.FeatureNameLanguages) text-end"
+                                     style="font-size: 1.5rem;"
+                                     title="@LocationFeatureViewModel.GetLanguageTitle(Model.FeatureNameLanguages)">
+                                    <span class="fa-solid fa-language"></span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Icon</th>
+                        <td><span class="@Model.Feature.Icon"></span></td>
+                    </tr>
+                    <tr>
+                        <th>Section</th>
+                        <td>@(Model.Feature.IsAtThisLocation ? "At This Location" : "Services Available")</td>
+                    </tr>
+                    <tr>
+                        <th>Slug</th>
+                        <td><code>@Model.Feature.Stub</code></td>
+                    </tr>
+                </table>
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <th>
+                            <div class="d-flex">
+                                <div class="flex-grow-1 text-left">Default description</div>
+                                <div class="d-inline-block fa-fw @Model.GetLanguageCssClass(Model.FeatureTextLanguages) text-end"
+                                     style="font-size: 1.5rem;"
+                                     title="@LocationFeatureViewModel.GetLanguageTitle(Model.FeatureTextLanguages)">
+                                    <span class="fa-solid fa-language"></span>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            @if (string.IsNullOrWhiteSpace(Model.Feature.BodyText))
+                            {
+                                <em>None provided.</em>
+                            }
+                            else
+                            {
+                                @Html.Raw(Model.Feature.BodyText)
+                            }
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="alert alert-info">
+            @if (string.IsNullOrEmpty(Model.LocationFeature.RedirectUrl)
+            && !Model.LocationFeature.SegmentId.HasValue)
+            {
+                if (string.IsNullOrWhiteSpace(Model.Feature.BodyText))
+                {
+                    <span>
+                        This feature will show on the <strong>@Model.Location.Name</strong> as an
+                        icon with a name underneath. <strong class="text-danger">
+                            It will not be clickable unless you add a link and will not show text
+                            unless you customize it below.
+                        </strong>.
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        This feature will show on the <strong>@Model.Location.Name</strong> page as
+                        an icon that, when clicked, will display the
+                        <strong>default description</strong> above.
+                    </span>
+                }
+            }
+            else if (string.IsNullOrEmpty(Model.LocationFeature.RedirectUrl))
+            {
+                <span>
+                    This feature will show on the <strong>@Model.Location.Name</strong> page as
+                    an icon that, when clicked, will display the
+                    <strong>custom description</strong> below.
+                </span>
+            }
+            else
+            {
+                <span>
+                    This feature will show on the <strong>@Model.Location.Name</strong> page as
+                    an icon that, when clicked, will redirect to the <strong>Link</strong> below.
+                </span>
+            }
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                <strong>Location Feature - @Model.Feature.Name</strong> at
+                <strong>@Model.Location.Name</strong>
+            </div>
+            <div class="card-body">
+                @if (string.IsNullOrEmpty(Model.LocationFeature.RedirectUrl)
+                && !Model.LocationFeature.SegmentId.HasValue
+                && Model.CanManageLocations)
+                {
+                    <p>Customize this feature for this location:</p>
+                    <div class="d-flex justify-content-around">
+                        <div>
+                            <a asp-action="@nameof(LocationsController.UpdateLink)"
+                               asp-route-slug="@Model.Location.Stub"
+                               asp-route-featureId="@Model.Feature.Id"
+                               class="btn btn-outline-primary">
+                                Add Link
+                            </a>
+                        </div>
+                        @if (Model.CanEditSegments)
+                        {
+                            <div>
+                                <a asp-action="@nameof(LocationsController.AddDescription)"
+                                   asp-route-slug="@Model.Location.Stub"
+                                   asp-route-featureId="@Model.Feature.Id"
+                                   class="btn btn-outline-primary">Customize Description</a>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(Model.LocationFeature.RedirectUrl))
+                    {
+                        <table class="table table-bordered table-striped">
+                            <tr>
+                                <th>
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1 text-start">
+                                            Custom description for this location
+                                        </div>
+                                        @if (Model.CanManageLocations && Model.CanEditSegments)
+                                        {
+                                            <form asp-action="@nameof(LocationsController.ClearSegment)"
+                                                  method="post">
+                                                <input type="hidden" name="slug" value="@Model.Location.Stub" />
+                                                <input type="hidden" name="featureId" value="@Model.Feature.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger me-2">
+                                                    <span class="fa-solid fa-circle-minus fa-fw"
+                                                          aria-hidden="true"></span>
+                                                </button>
+                                            </form>
+                                            <div>
+                                                <a class="btn btn-sm btn-outline-primary me-4"
+                                                   asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Detail)"
+                                                   asp-area="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Area"
+                                                   asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Name"
+                                                   asp-route-id="@Model.LocationFeature.SegmentId">
+                                                    <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                                                </a>
+                                            </div>
+                                        }
+                                        <div class="d-inline-block fa-fw @Model.GetLanguageCssClass(Model.LocationFeatureLanguages)"
+                                             style="font-size: 1.5rem;"
+                                             title="@LocationFeatureViewModel.GetLanguageTitle(Model.LocationFeatureLanguages)">
+                                            <span class="fa-solid fa-language"></span>
+                                        </div>
+                                    </div>
+                                </th>
+                            </tr>
+                            <tr>
+                                <td>@Html.Raw(Model.LocationFeature.Text)</td>
+                            </tr>
+                        </table>
+                    }
+                    else
+                    {
+                        <table class="table table-bordered table-striped">
+                            <tr>
+                                <th>
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1 text-left">
+                                            Link
+                                        </div>
+                                        @if (Model.CanManageLocations)
+                                        {
+                                            <div>
+                                                <form asp-action="@nameof(LocationsController.ClearLink)"
+                                                      method="post"
+                                                      class="d-inline">
+                                                    <input type="hidden"
+                                                           name="slug"
+                                                           value="@Model.Location.Stub" />
+                                                    <input type="hidden"
+                                                           name="featureId"
+                                                           value="@Model.Feature.Id" />
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-outline-danger">
+                                                        <span class="fa-solid fa-circle-minus fa-fw"
+                                                              aria-hidden="true"></span>
+                                                    </button>
+                                                </form>
+                                                <a asp-action="@nameof(LocationsController.UpdateLink)"
+                                                   asp-route-slug="@Model.Location.Stub"
+                                                   asp-route-featureId="@Model.Feature.Id"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <span class="fa-regular fa-file-lines fa-fw"
+                                                          aria-hidden="true"></span>
+                                                </a>
+                                            </div>
+                                        }
+                                    </div>
+                                </th>
+                                <td>
+                                    <a href="@Model.LocationFeature.RedirectUrl" target="_blank">
+                                        @Model.LocationFeature.RedirectUrl
+                                    </a>
+                                </td>
+                            </tr>
+                            @if (!string.IsNullOrEmpty(Model.LocationFeature.RedirectUrl))
+                            {
+                                <tr>
+                                    <th>Status</th>
+                                    <td>@(Model.LocationFeature.NewTab ? "Opens in a new tab" : "Opens in the same tab")</td>
+                                </tr>
+                            }
+                        </table>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

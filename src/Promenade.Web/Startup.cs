@@ -143,7 +143,7 @@ namespace Ocuda.Promenade.Web
 
             app.UseSession();
 
-            app.UseHealthChecks("/health");
+            app.UseHealthChecks("/healthcheck");
             app.UseMvc();
         }
 
@@ -443,6 +443,18 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.LocationInteriorImageRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IImageAltTextRepository,
                 Data.Promenade.ImageAltTextRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.INavBannerRepository,
+                Data.Promenade.NavBannerRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.INavBannerImageRepository,
+                Data.Promenade.NavBannerImageRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.INavBannerLinkRepository,
+                Data.Promenade.NavBannerLinkRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.INavBannerLinkTextRepository,
+                Data.Promenade.NavBannerLinkTextRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ILocationInteriorImageRepository,
+                Data.Promenade.LocationInteriorImageRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IImageAltTextRepository,
+                Data.Promenade.ImageAltTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.INavigationRepository,
                 Data.Promenade.NavigationRepository>();
             services.AddScoped<Service.Interfaces.Repositories.INavigationTextRepository,
@@ -517,6 +529,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<ImageFeatureService>();
             services.AddScoped<LanguageService>();
             services.AddScoped<LocationService>();
+            services.AddScoped<NavBannerService>();
             services.AddScoped<NavigationService>();
             services.AddScoped<ImageFeatureService>();
             services.AddScoped<PageService>();

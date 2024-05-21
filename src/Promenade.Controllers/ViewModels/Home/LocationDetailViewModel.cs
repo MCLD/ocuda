@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Controllers.ViewModels.Home
@@ -11,6 +12,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
             NearbyLocationGroups = new List<LocationGroup>();
         }
 
+        public IEnumerable<LocationsFeaturesViewModel> AtThisLocation { get; set; }
         public string CanonicalLink { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
         public string DescriptionSegmentText { get; set; }
@@ -26,6 +28,17 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         public string PreFeatureSegmentHeader { get; set; }
         public string PreFeatureSegmentText { get; set; }
         public Schema.NET.Thing Schema { get; set; }
+        public string SeeServicesAtAllLink { get; set; }
+        public IEnumerable<LocationsFeaturesViewModel> ServicesAvailable { get; set; }
         public string ShowMessage { get; set; }
+
+        public string SocialIcon { get; set; }
+        public string SocialLink { get; set; }
+        public string SocialName { get; set; }
+
+        public string ActiveIfFirstInteriorImage(int itemSortOrder) =>
+            Location?.InteriorImages?.Min(_ => _.SortOrder) == itemSortOrder
+                ? "active"
+                : null;
     }
 }

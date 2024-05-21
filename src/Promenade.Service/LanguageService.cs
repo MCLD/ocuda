@@ -92,7 +92,7 @@ namespace Ocuda.Promenade.Service
             return languageId;
         }
 
-        public async Task<string> GetNameAsync(int id, bool forceReload)
+        public async Task<string> GetLanguageNameAsync(int id, bool forceReload)
         {
             var cacheKey = string.Format(CultureInfo.InvariantCulture,
                 Utility.Keys.Cache.PromLanguageName,

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,14 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
+        public async Task<int> CountAsync(FeatureFilter filter)
+        {
+            ArgumentNullException.ThrowIfNull(filter);
+
+            return await ApplyFilters(filter)
+                .CountAsync();
+        }
+
         public async Task<Feature> FindAsync(int id)
         {
             var entity = await DbSet.FindAsync(id);
@@ -37,6 +46,29 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
+        public async Task<ICollection<Feature>> GetByIdsAsync(IEnumerable<int> featureIds)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => featureIds.Contains(_.Id))
+                .ToListAsync();
+        }
+
+        public async Task<Feature> GetBySegmentIdAsync(int segmentId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .SingleOrDefaultAsync(_ => _.NameSegmentId == segmentId
+                    || _.TextSegmentId == segmentId);
+        }
+
+        public async Task<Feature> GetBySlugAsync(string slug)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .SingleOrDefaultAsync(_ => _.Stub == slug);
+        }
+
         public async Task<DataWithCount<ICollection<Feature>>> GetPaginatedListAsync(
             BaseFilter filter)
         {
@@ -44,44 +76,13 @@ namespace Ocuda.Ops.Data.Promenade
             {
                 Count = await DbSet.AsNoTracking().CountAsync(),
                 Data = await DbSet.AsNoTracking()
-                    .OrderBy(_ => _.Name)
+                    .OrderByDescending(_ => _.IsAtThisLocation)
+                    .ThenByDescending(_ => _.SortOrder.HasValue)
+                    .ThenBy(_ => _.SortOrder)
+                    .ThenBy(_ => _.Name)
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
-        }
-
-        public async Task<ICollection<Feature>> PageAsync(FeatureFilter filter)
-        {
-            return await ApplyFilters(filter)
-                .OrderBy(_ => _.Name)
-                .ApplyPagination(filter)
-                .ToListAsync();
-        }
-
-        private IQueryable<Feature> ApplyFilters(FeatureFilter filter)
-        {
-            var items = DbSet.AsNoTracking();
-
-            if (filter.FeatureIds?.Count > 0)
-            {
-                items = items.Where(_ => !filter.FeatureIds.Contains(_.Id));
-            }
-
-            return items;
-        }
-
-        public async Task<int> CountAsync(FeatureFilter filter)
-        {
-            return await ApplyFilters(filter)
-                .CountAsync();
-        }
-
-        public async Task<Feature> GetFeatureByName(string featureName)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.Name.ToLower().Replace(" ", "") == featureName)
-                .FirstOrDefaultAsync();
         }
 
         public async Task<bool> IsDuplicateNameAsync(Feature feature)
@@ -100,12 +101,34 @@ namespace Ocuda.Ops.Data.Promenade
                 .AnyAsync();
         }
 
-        public async Task<ICollection<Feature>> GetByIdsAsync(IEnumerable<int> featureIds)
+        public async Task<ICollection<Feature>> PageAsync(FeatureFilter filter)
         {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => featureIds.Contains(_.Id))
+            ArgumentNullException.ThrowIfNull(filter);
+
+            return await ApplyFilters(filter)
+                .OrderBy(_ => _.Name)
+                .ApplyPagination(filter)
                 .ToListAsync();
+        }
+
+        public async Task UpdateName(int featureId, string newName)
+        {
+            var feature = await DbSet.SingleOrDefaultAsync(_ => _.Id == featureId);
+            feature.Name = newName;
+            Update(feature);
+            await SaveAsync();
+        }
+
+        private IQueryable<Feature> ApplyFilters(FeatureFilter filter)
+        {
+            var items = DbSet.AsNoTracking();
+
+            if (filter.FeatureIds?.Count > 0)
+            {
+                items = items.Where(_ => !filter.FeatureIds.Contains(_.Id));
+            }
+
+            return items;
         }
     }
 }
