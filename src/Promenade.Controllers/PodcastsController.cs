@@ -467,6 +467,7 @@ namespace Ocuda.Promenade.Controllers
 
             var settings = new XmlWriterSettings
             {
+                Async = true,
                 Encoding = Encoding.UTF8,
                 NewLineHandling = NewLineHandling.Entitize,
                 NewLineOnAttributes = true,
@@ -474,12 +475,11 @@ namespace Ocuda.Promenade.Controllers
             };
 
             await using var stream = new MemoryStream();
-            await using (var xmlWriter = XmlWriter.Create(stream, settings))
-            {
-                var rssFormatter = new Rss20FeedFormatter(feed, false);
-                rssFormatter.WriteTo(xmlWriter);
-                xmlWriter.Flush();
-            }
+            await using var xmlWriter = XmlWriter.Create(stream, settings);
+
+            var rssFormatter = new Rss20FeedFormatter(feed, false);
+            rssFormatter.WriteTo(xmlWriter);
+            await xmlWriter.FlushAsync();
 
             Response.Headers.Add("Last-Modified",
                 new DateTime(lastModified)
