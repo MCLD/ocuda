@@ -316,15 +316,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 if (viewModel.Publish)
                 {
-                    if (!viewModel.PublishAtDate.HasValue && !viewModel.PublishAtTime.HasValue)
-                    {
-                        viewModel.Post.PublishedAt = DateTime.Now;
-                    }
-                    else
-                    {
-                        viewModel.Post.PublishedAt = viewModel.PublishAtDate.Value
-                            .CombineWithTime(viewModel.PublishAtTime.Value);
-                    }
+                    var date = viewModel.PublishAtDate ?? DateTime.Now;
+                    var time = viewModel.PublishAtTime ?? DateTime.Now;
+                    viewModel.Post.PublishedAt = date.CombineWithTime(time);
                 }
 
                 if (viewModel.PinUntilDate.HasValue && viewModel.PinUntilTime.HasValue)
@@ -387,6 +381,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpPost("[action]")]
         public async Task<IActionResult> DeleteFileFromLibrary(FileLibraryViewModel viewModel)
         {
+            ArgumentNullException.ThrowIfNull(viewModel);
             var section = await GetSectionAsManagerAsync(viewModel.SectionSlug);
             if (section == null)
             {
@@ -588,6 +583,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [SaveModelState]
         public async Task<IActionResult> EditPost(PostViewModel viewModel)
         {
+            ArgumentNullException.ThrowIfNull(viewModel);
             var section = await GetSectionAsManagerAsync(viewModel.Post.SectionId);
             if (section == null)
             {
@@ -598,15 +594,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 if (viewModel.Publish)
                 {
-                    if (!viewModel.PublishAtDate.HasValue && !viewModel.PublishAtTime.HasValue)
-                    {
-                        viewModel.Post.PublishedAt = DateTime.Now;
-                    }
-                    else
-                    {
-                        viewModel.Post.PublishedAt = viewModel.PublishAtDate.Value
-                            .CombineWithTime(viewModel.PublishAtTime.Value);
-                    }
+                    var date = viewModel.PublishAtDate ?? DateTime.Now;
+                    var time = viewModel.PublishAtTime ?? DateTime.Now;
+                    viewModel.Post.PublishedAt = date.CombineWithTime(time);
                 }
 
                 if (viewModel.PinUntilDate.HasValue && viewModel.PinUntilTime.HasValue)
@@ -1000,6 +990,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpPost("[action]")]
         public async Task<IActionResult> ReplaceFile(FileLibraryViewModel viewModel)
         {
+            ArgumentNullException.ThrowIfNull(viewModel);
             var section = await GetSectionAsManagerAsync(viewModel.SectionSlug);
             if (section == null)
             {
