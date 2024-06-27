@@ -270,7 +270,7 @@ namespace Ocuda.Promenade.Service.Abstract
 
                     if (item != null)
                     {
-                        await cache.SaveToCacheAsync(cacheKey, item, cacheForHours);
+                        await cache.SaveToCacheAsync(populatedCacheKey, item, cacheForHours);
                     }
                 }
 
