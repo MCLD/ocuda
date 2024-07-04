@@ -169,16 +169,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         // filename is different but there is an old image, delete it
                         if (!replaceImage && !string.IsNullOrEmpty(currentFilename))
                         {
-                            var cardsUsingImage = await _deckService
-                                .CardsUsingImageAsync(currentCard.Filename);
-
-                            if (cardsUsingImage == 1)
-                            {
-                                _logger.LogInformation("Removing card image file {Filename} as it is no longer used.",
-                                    currentFilename);
-                                await _deckService.RemoveCardImageAsync(currentCard.CardId,
-                                    currentCard.LanguageId);
-                            }
+                            await _deckService.RemoveCardImageAsync(currentCard.CardId,
+                                currentCard.LanguageId);
                         }
 
                         // get an approved filename with path
@@ -262,12 +254,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             if (deckId == 0 && pageLayoutId == 0)
             {
+                _logger.LogInformation("Card {Card} (last in deck and layout) removed", cardId);
                 return RedirectToAction(nameof(PagesController.Index), PagesController.Name);
             }
             else if (deckId == 0)
             {
+                _logger.LogInformation("Card {Card} (last in deck) removed", cardId);
                 return RedirectToAction(
-                nameof(PagesController.LayoutDetail),
+                    nameof(PagesController.LayoutDetail),
                     PagesController.Name,
                     new
                     {
@@ -276,6 +270,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
+                _logger.LogInformation("Card {Card} from deck {Deck} in layout {Layout} removed",
+                    cardId,
+                    deckId,
+                    pageLayoutId);
                 return RedirectToAction(nameof(Detail), new { deckId });
             }
         }

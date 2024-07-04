@@ -386,6 +386,8 @@ namespace Ocuda.Ops.Service
                         try
                         {
                             File.Delete(Path.Combine(path, itemText.Filename));
+                            _logger.LogInformation("Image feature file {Filename} deleted",
+                                itemText.Filename);
                         }
                         catch (IOException ioex)
                         {

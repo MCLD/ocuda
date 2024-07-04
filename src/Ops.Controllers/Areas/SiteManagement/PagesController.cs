@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,7 +59,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ArgumentNullException.ThrowIfNull(permissionGroupService);
             ArgumentNullException.ThrowIfNull(segmentService);
             ArgumentNullException.ThrowIfNull(socialCardService);
-
 
             _carouselService = carouselService;
             _deckService = deckService;
@@ -155,11 +155,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             try
             {
+                var priorLayout = await _pageService.GetLayoutByIdAsync(cloneLayoutId);
                 var layout = await _pageService
                     .CloneLayoutAsync(clonePageHeaderId, cloneLayoutId, clonedName);
 
+                var pageHeader = await _pageService.GetHeaderByIdAsync(clonePageHeaderId);
+
                 if (layout != null)
                 {
+                    _logger.LogInformation("Page {Page} layout {Layout} cloned into {Name}",
+                        pageHeader.PageName,
+                        priorLayout.Name,
+                        layout.Name);
+
                     ShowAlertSuccess("Layout successfully cloned!");
                     return RedirectToAction(nameof(LayoutDetail), new { id = layout.Id });
                 }
@@ -260,6 +268,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         response.Url = Url.Action(nameof(Detail), new { id = header.Id });
                     }
 
+                    _logger.LogInformation("Page {Name} (slug {Slug}) of type {Type} created",
+                        header.PageName,
+                        header.Stub,
+                        header.Type);
+
                     ShowAlertSuccess($"Created page: {header.PageName}");
                 }
                 catch (OcudaException ex)
@@ -313,6 +326,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             Success = true,
                             Url = Url.Action(nameof(LayoutDetail), new { id = layout.Id })
                         };
+
+                        var pageHeader = await _pageService.GetHeaderByIdAsync(layout.PageHeaderId);
+
+                        _logger.LogInformation("Page layout {Name} for page {PageHeader} with start time {StartTime} created",
+                            layout.Name,
+                            pageHeader.PageName,
+                            layout.StartDate?.ToString(CultureInfo.CurrentCulture)
+                                ?? "unspecified");
 
                         ShowAlertSuccess($"Created layout: {layout.Name}");
                     }
@@ -519,6 +540,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             Url = url
                         };
 
+                        _logger.LogInformation("Page item {Item} for layout {Name} created",
+                            pageItem.Id,
+                            layout.Name);
+
                         ShowAlertSuccess("Created item for layout");
                     }
                     catch (OcudaException ex)
@@ -563,8 +588,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ArgumentNullException.ThrowIfNull(model);
             try
             {
+                var pageHeader = await _pageService.GetHeaderByIdAsync(model.PageHeader.Id);
+
                 await _pageService.DeleteHeaderAsync(model.PageHeader.Id);
-                ShowAlertSuccess($"Deleted page: {model.PageHeader.PageName}");
+                ShowAlertSuccess($"Deleted page: {pageHeader.PageName}");
+                _logger.LogInformation("Page {Page} deleted", pageHeader.PageName);
             }
             catch (Exception ex)
             {
@@ -594,8 +622,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             try
             {
+                var pageHeader = await _pageService
+                    .GetHeaderByIdAsync(pageLayout.PageHeaderId);
+
                 await _pageService.DeleteLayoutAsync(model.PageLayout.Id);
-                ShowAlertSuccess($"Deleted layout: {model.PageLayout.Name}");
+                ShowAlertSuccess($"Deleted layout: {pageLayout.Name}");
+                _logger.LogInformation("Page {Page} layout {Layout} deleted",
+                    pageHeader.PageName,
+                    pageLayout.Name);
             }
             catch (Exception ex)
             {
@@ -624,7 +658,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
 
+            var pageHeader = await _pageService.GetHeaderByIdAsync(page.PageHeaderId);
+
             ShowAlertSuccess($"Deleted page {language.Description} content!");
+            _logger.LogInformation("Page {Page} {Description} content deleted",
+                pageHeader.PageName,
+                language.Description);
 
             return RedirectToAction(nameof(Detail),
                 new
@@ -647,10 +686,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToUnauthorized();
             }
 
+            var pageHeader = await _pageService.GetHeaderByIdAsync(layout.PageHeaderId);
+
             try
             {
                 await _pageService.DeleteItemAsync(model.PageItem.Id);
                 ShowAlertSuccess("Deleted layout item");
+                _logger.LogInformation("Page {Page} layout {Layout} item {Item} deleted",
+                    pageHeader.PageName,
+                    layout.Name,
+                    model.PageItem.Id);
             }
             catch (Exception ex)
             {
@@ -748,17 +793,25 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var currentPage = await _pageService.GetByHeaderAndLanguageAsync(
                     model.HeaderId, language.Id);
 
+                var pageHeader = await _pageService.GetHeaderByIdAsync(page.PageHeaderId);
+
                 if (currentPage == null)
                 {
                     await _pageService.CreateAsync(page);
 
                     ShowAlertSuccess("Added page content!");
+                    _logger.LogInformation("Page {Page} language {Language} content added",
+                        pageHeader.PageName,
+                        language.Id);
                 }
                 else
                 {
                     await _pageService.EditAsync(page);
 
                     ShowAlertSuccess("Updated page content!");
+                    _logger.LogInformation("Page {Page} language {Language} content updated",
+                        pageHeader.PageName,
+                        language.Id);
                 }
             }
 
@@ -785,6 +838,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     var header = await _pageService.EditHeaderAsync(model.PageHeader);
                     response = new JsonResponse { Success = true };
                     ShowAlertSuccess($"Updated page: {header.PageName}");
+                    _logger.LogInformation("Page {Page} header updated", header.PageName);
                 }
                 catch (OcudaException ex)
                 {
@@ -842,7 +896,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             Success = true
                         };
 
+                        var pageHeader = await _pageService.GetHeaderByIdAsync(layout.PageHeaderId);
+
                         ShowAlertSuccess($"Updated layout: {layout.Name}");
+                        _logger.LogInformation("Page {Page} layout {Name} updated",
+                            pageHeader.PageName,
+                            layout.Name);
                     }
                     catch (OcudaException ex)
                     {
@@ -971,7 +1030,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             })
                         };
 
+                        var pageHeader = await _pageService.GetHeaderByIdAsync(layout.PageHeaderId);
+
                         ShowAlertSuccess("Updated layout item");
+                        _logger.LogInformation("Page {Page} layout {Name} item {Item} updated",
+                            pageHeader.PageName,
+                            layout.Name,
+                            pageItem.Id);
                     }
                     catch (OcudaException ex)
                     {
@@ -1160,6 +1225,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 await _pageService.SetLayoutTextAsync(model.PageLayoutText);
                 ShowAlertSuccess("Updated layout text.");
+                var pageHeader = await _pageService.GetHeaderByIdAsync(pageLayout.PageHeaderId);
+                _logger.LogInformation("Page {Page} layout {Name} text updated",
+                    pageHeader.PageName,
+                    pageLayout.Name);
             }
 
             var language = await _languageService.GetActiveByIdAsync(
@@ -1262,6 +1331,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .RemoveFromPermissionGroupAsync<PermissionGroupPageContent>(headerId,
                     permissionGroupId);
                 AlertInfo = "Content permission removed.";
+                var pageHeader = await _pageService.GetHeaderByIdAsync(headerId);
+                _logger.LogInformation("Page {Page} had permission group {PermissionGroup} removed",
+                    pageHeader.PageName,
+                    permissionGroupId);
             }
             catch (Exception ex)
             {

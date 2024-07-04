@@ -310,8 +310,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 if (!string.IsNullOrEmpty(deleteImageFilePath)
                     && System.IO.File.Exists(deleteImageFilePath))
                 {
-                    _logger.LogInformation("Deleting now-unused image: {Path}",
-                        deleteImageFilePath);
+                    _logger.LogInformation("Deleting now-unused NavBanner image: {Path}",
+                        navBannerImage.Filename);
                     System.IO.File.Delete(deleteImageFilePath);
                 }
             }
