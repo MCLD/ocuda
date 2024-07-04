@@ -365,10 +365,26 @@ namespace Ocuda.Ops.Service
                     }
                     else
                     {
+                        // check if this card is in use elsewhere
+                        var imageUseCount = await _cardDetailRepository
+                            .CardsUsingImageAsync(card.Filename);
+
                         var baseImagePath = await GetFullImageDirectoryPath(_siteSettingService,
                             languageName,
                             CardsFilePath);
-                        File.Delete(Path.Combine(baseImagePath, card.Filename));
+
+                        if (imageUseCount == 1)
+                        {
+                            File.Delete(Path.Combine(baseImagePath, card.Filename));
+                            _logger.LogInformation("Card image {Filename} deleted, only used in 1 card.",
+                                card.Filename);
+                        }
+                        else
+                        {
+                            _logger.LogInformation("Card image {Filename} not deleted, used in {UseCount} cards",
+                                card.Filename,
+                                imageUseCount);
+                        }
                     }
                 }
             }

@@ -253,7 +253,10 @@ namespace Ocuda.Ops.Web
 
                 // minifying Bootstrap seems to upset this tool, bring it in pre-minified
                 _.AddJavaScriptBundle("/js/bootstrap.min.js",
-                    new NUglify.JavaScript.CodeSettings { MinifyCode = false },
+                    new WebOptimizer.Processors.JsSettings
+                    {
+                        CodeSettings = new NUglify.JavaScript.CodeSettings { MinifyCode = false }
+                    },
                     "js/bootstrap.min.js").UseContentRoot();
 
                 _.AddJavaScriptBundle("/js/md.min.js",

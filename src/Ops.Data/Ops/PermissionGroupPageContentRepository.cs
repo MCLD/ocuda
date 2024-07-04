@@ -69,11 +69,8 @@ namespace Ocuda.Ops.Data.Ops
         public async Task RemoveSaveAsync(int pageHeaderId, int permissionGroupId)
         {
             var item = await DbSet.SingleOrDefaultAsync(_ => _.PageHeaderId == pageHeaderId
-                && _.PermissionGroupId == permissionGroupId);
-            if (item == null)
-            {
-                throw new OcudaException($"Unable to find permission for page id {pageHeaderId} and permission group {permissionGroupId}");
-            }
+                && _.PermissionGroupId == permissionGroupId)
+                ?? throw new OcudaException($"Unable to find permission for page id {pageHeaderId} and permission group {permissionGroupId}");
             DbSet.Remove(item);
             await SaveAsync();
         }

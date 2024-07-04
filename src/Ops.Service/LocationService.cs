@@ -119,6 +119,8 @@ namespace Ocuda.Ops.Service
 
         public async Task AddInteriorImageAsync(LocationInteriorImage locationInteriorImage)
         {
+            ArgumentNullException.ThrowIfNull(locationInteriorImage);
+
             await _locationInteriorImageRepository.AddAsync(locationInteriorImage);
             await _locationInteriorImageRepository.SaveAsync();
 
@@ -219,7 +221,7 @@ namespace Ocuda.Ops.Service
             await _imageAltTextRepository.SaveAsync();
 
             File.Delete(imagePath);
-
+            _logger.LogInformation("Interior image {Filename} deleted", image.ImagePath);
             await FixInteriorImageSortOrder(locationId);
         }
 
@@ -548,6 +550,7 @@ namespace Ocuda.Ops.Service
                     UriPaths.Locations,
                     oldImageName);
                 File.Delete(oldFilePath);
+                _logger.LogInformation("Exterior image {Filename} deleted", oldImageName);
             }
         }
 
@@ -606,6 +609,7 @@ namespace Ocuda.Ops.Service
                     UriPaths.Interior,
                     oldImageName);
                 File.Delete(oldFilePath);
+                _logger.LogInformation("Old interior image {Filename} deleted", oldImageName);
             }
         }
 
@@ -691,6 +695,7 @@ namespace Ocuda.Ops.Service
                     UriPaths.Maps,
                     oldImageName);
                 File.Delete(oldFilePath);
+                _logger.LogInformation("Map image {Filename} deleted", oldImageName);
             }
         }
 
@@ -800,6 +805,8 @@ namespace Ocuda.Ops.Service
                 {
                     var oldFilePath = Path.Combine(filePath, oldFileName);
                     File.Delete(oldFilePath);
+                    _logger.LogInformation("Deleted map image {Path}",
+                        oldFilePath);
                 }
             }
             catch (OcudaException oex)
@@ -820,7 +827,7 @@ namespace Ocuda.Ops.Service
             else
             {
                 var firstDay = days[0];
-                var lastDay = days.Last();
+                var lastDay = days[^1];
 
                 if (days.Count == lastDay - firstDay + 1)
                 {

@@ -216,6 +216,9 @@ namespace Ocuda.Ops.Service
             if (System.IO.File.Exists(fullPath))
             {
                 System.IO.File.Delete(fullPath);
+                _logger.LogInformation("Deleted profile image {Path} for user {User}",
+                    fullPath,
+                    user.Username);
             }
 
             user.PictureFilename = null;
@@ -311,6 +314,9 @@ namespace Ocuda.Ops.Service
             if (System.IO.File.Exists(fullPath))
             {
                 System.IO.File.Delete(fullPath);
+                _logger.LogInformation("Deleted profile image {Path} for user {User}",
+                    fullPath,
+                    user.Username);
             }
 
             await System.IO.File.WriteAllBytesAsync(fullPath, profilePicture);
