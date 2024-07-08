@@ -225,6 +225,19 @@
                                             <span class="fa-solid fa-copy fa-fw" aria-hidden="true"></span>
                                         </button>
                                     }
+                                    @if (!string.IsNullOrEmpty(Model.PreviewLink))
+                                    {
+                                        <form action="@Model.PreviewLink"
+                                              class="d-inline"
+                                              method="post"
+                                              role="form"
+                                              target="_blank">
+                                            <input type="hidden" name="PreviewId" value="@layout.PreviewId" />
+                                            <button class="btn btn-outline-info" title="Preview">
+                                                <span class="fa-solid fa-magnifying-glass fa-fw"></span>
+                                            </button>
+                                        </form>
+                                    }
                                     <button type="button"
                                             class="btn btn-outline-danger"
                                             data-bs-toggle="modal"

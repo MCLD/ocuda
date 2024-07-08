@@ -23,7 +23,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
         public PageLayout PageLayout { get; set; }
         public ICollection<PageLayout> PageLayouts { get; set; }
         public PaginateModel PaginateModel { get; set; }
-
+        public string PreviewLink { get; set; }
         public DateTime? StartDate { get; set; }
 
         public DateTime? StartTime { get; set; }
