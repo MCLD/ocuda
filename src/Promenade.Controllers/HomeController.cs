@@ -139,7 +139,7 @@ namespace Ocuda.Promenade.Controllers
         [HttpGet("")]
         public async Task<IActionResult> Index()
         {
-            return await ReturnPageAsync(nameof(Index));
+            return await Page(nameof(Index));
         }
 
         [HttpGet("{locationSlug:locationSlugConstraint}")]
@@ -275,6 +275,12 @@ namespace Ocuda.Promenade.Controllers
             viewModel.Schema = await GetSchemaAsync(viewModel.Location);
 
             return View(nameof(Location), viewModel);
+        }
+
+        [HttpPost("")]
+        public async Task<IActionResult> Preview()
+        {
+            return await PagePreview(nameof(Index));
         }
 
         private async Task<LocationFeature> GetFeatureDetailsAsync(string locationSlug,

@@ -1131,7 +1131,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         nameof(ImageFeatureTemplate.Name)),
                 IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
                 IsWebContentManager = await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.WebPageContentManagement),
+                    ApplicationPermission.WebPageContentManagement),
                 PageHeaders = headerList.Data,
                 PageType = filter.PageType.Value,
                 PaginateModel = paginateModel,
@@ -1175,33 +1175,18 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
             }
 
-            string previewLink = null;
-
             var pageHeader = await _pageService.GetHeaderByIdAsync(pageLayout.PageHeaderId);
-            var baseUrl = await _siteSettingService
-                .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl);
-
-            if (pageHeader != null && !string.IsNullOrEmpty(baseUrl))
-            {
-                var previewLinkBuilder = new StringBuilder(baseUrl);
-                if (pageHeader.Type != PageType.Home)
-                {
-                    previewLinkBuilder.Append(pageHeader.Type.ToString().ToLowerInvariant())
-                        .Append('/')
-                        .Append(pageHeader.Stub)
-                        .Append('/');
-                }
-                previewLink = previewLinkBuilder.ToString();
-            }
 
             var viewModel = new LayoutDetailViewModel
             {
+                LanguageId = selectedLanguage.Id,
+                LanguageList = new SelectList(languages,
+                    nameof(Language.Name),
+                    nameof(Language.Description),
+                    selectedLanguage.Name),
                 PageLayout = pageLayout,
                 PageLayoutId = pageLayout.Id,
-                LanguageId = selectedLanguage.Id,
-                LanguageList = new SelectList(languages, nameof(Language.Name),
-                    nameof(Language.Description), selectedLanguage.Name),
-                PreviewLink = previewLink
+                PreviewLink = await GetPreviewLink(pageHeader)
             };
 
             return View(viewModel);
@@ -1269,6 +1254,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value
             };
+
             if (paginateModel.PastMaxPage)
             {
                 return RedirectToRoute(
@@ -1280,12 +1266,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var viewModel = new LayoutsViewModel
             {
-                PageLayouts = layoutList.Data,
-                PaginateModel = paginateModel,
                 HeaderId = header.Id,
                 HeaderName = header.PageName,
                 HeaderStub = header.Stub,
-                HeaderType = header.Type
+                HeaderType = header.Type,
+                PageLayouts = layoutList.Data,
+                PaginateModel = paginateModel,
+                PreviewLink = await GetPreviewLink(header)
             };
 
             return View(viewModel);
@@ -1359,6 +1346,31 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             return Json(response);
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
+            "CA1308:Normalize strings to uppercase",
+            Justification = "Normalize to lowercase as part of a link")]
+        private async Task<string> GetPreviewLink(PageHeader pageHeader)
+        {
+            var previewLink = new StringBuilder();
+
+            var baseUrl = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl);
+
+            if (pageHeader != null && !string.IsNullOrEmpty(baseUrl))
+            {
+                previewLink.Append(baseUrl);
+                if (pageHeader.Type != PageType.Home)
+                {
+                    previewLink.Append(pageHeader.Type.ToString().ToLowerInvariant())
+                        .Append('/')
+                        .Append(pageHeader.Stub)
+                        .Append('/');
+                }
+            }
+
+            return previewLink.ToString();
         }
 
         private async Task<bool> HasPagePermissionsAsync(int pageHeaderId)

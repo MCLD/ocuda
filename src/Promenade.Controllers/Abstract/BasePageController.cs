@@ -73,6 +73,12 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
             if (pageHeader == null)
             {
+                if (!string.IsNullOrEmpty(previewId))
+                {
+                    _logger.LogError("Preview requested for {Slug} but that page was not found (preview id {PreviewId})",
+                        stub,
+                        previewId);
+                }
                 return NotFound();
             }
 
