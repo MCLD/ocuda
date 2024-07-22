@@ -69,7 +69,7 @@ namespace Ocuda.Promenade.Controllers
                 SocialCard = card
             };
 
-            PageTitle = "eMedia";
+            PageTitle = "Digital Library";
 
             return View(emediaViewModel);
         }
