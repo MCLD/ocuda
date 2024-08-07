@@ -202,13 +202,28 @@ namespace Ocuda.Ops.Service
                                 if (int.TryParse(userId, out int numericUserId))
                                 {
                                     var user = await _userService.GetByIdAsync(numericUserId);
-                                    if (!string.IsNullOrEmpty(user.Email)
-                                        && !details.Cc.ContainsKey(user.Email))
+                                    if (user == null)
                                     {
-                                        _logger.LogInformation("Incident email: {Name} <{Email}> receives all incidents",
-                                            user.Name ?? user.Email,
-                                            user.Email);
-                                        details.Cc.Add(user.Email, user.Name ?? user.Email);
+                                        _logger.LogError("Incidents copied to {UserId} per setting {SiteSetting} but that user can't be found.",
+                                            numericUserId,
+                                            Ops.Models.Keys.SiteSetting.Incident.NotifyUserIds);
+                                    }
+                                    else
+                                    {
+                                        if (!string.IsNullOrEmpty(user?.Email)
+                                            && !details.Cc.ContainsKey(user.Email))
+                                        {
+                                            _logger.LogInformation("Incident email: {Name} <{Email}> receives all incidents",
+                                                user.Name ?? user.Email,
+                                                user.Email);
+                                            details.Cc.Add(user.Email, user.Name ?? user.Email);
+                                        }
+                                        else
+                                        {
+                                            _logger.LogError("Incidents copied to {UserId} per setting {SiteSetting} but that user has no email address.",
+                                                numericUserId,
+                                                Ops.Models.Keys.SiteSetting.Incident.NotifyUserIds);
+                                        }
                                     }
                                 }
                                 else
