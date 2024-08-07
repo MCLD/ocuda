@@ -111,6 +111,10 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             {
                 ModelState.AddModelError(nameof(viewModel.IncidentDate), "Please choose a date in the last 2 weeks");
             }
+            else if (viewModel.IncidentDate > _dateTimeProvider.Now)
+            {
+                ModelState.AddModelError(nameof(viewModel.IncidentDate), "Please choose a date not in the future.");
+            }
             else if (viewModel.IncidentDate.HasValue && viewModel.IncidentTime.HasValue)
             {
                 viewModel.Incident.IncidentAt = viewModel.IncidentDate.Value
