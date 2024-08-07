@@ -44,6 +44,9 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(screenlyService));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1031:Do not catch general exception types",
+            Justification = "Don't take down the job system on an uncaught exception")]
         public async Task UpdateDigitalDisplaysAsync()
         {
             var display = await GetPendingDisplayAsync();
@@ -55,7 +58,7 @@ namespace Ocuda.Ops.Service
 
             try
             {
-                if (display != null)
+                if (display?.RemoteAddress != null)
                 {
                     await _digitalDisplayService.SetDisplayStatusAsync(display.Id,
                         "Connecting to update slides...");

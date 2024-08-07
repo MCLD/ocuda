@@ -10,6 +10,7 @@ using MimeKit;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Utility.Exceptions;
+using Serilog.Context;
 using SixLabors.ImageSharp;
 
 namespace Ocuda.Ops.Service
@@ -200,45 +201,85 @@ namespace Ocuda.Ops.Service
             {
                 throw new OcudaConfigurationException($"Unable to optimize image, missing configuration: {nameof(Utility.Keys.Configuration.OpsImageOptimizerUsername)}");
             }
-
-            if (Format == Format.Auto)
+            using (LogContext.PushProperty("ImageUriOrPath", imageUri?.AbsoluteUri ?? imagePath))
             {
-                Format = Format.Jpeg;
-                var optimizedJpeg = imageUri != null
-                    ? await _client.OptimizeAsync(imageUri)
-                    : await _client.OptimizeAsync(imagePath);
+                if (Format == Format.Auto)
+                {
+                    OptimizedImageResult optimizedJpeg = null;
+                    Format = Format.Jpeg;
+                    try
+                    {
+                        optimizedJpeg = imageUri != null
+                            ? await _client.OptimizeAsync(imageUri)
+                            : await _client.OptimizeAsync(imagePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex,
+                            "An error occurred optimizing {Format} {ImageUriOrPath} image: {ErrorMessage}",
+                            Format,
+                            imageUri?.AbsoluteUri ?? imagePath,
+                            ex.Message);
+                        throw;
+                    }
 
-                Format = Format.Png;
-                var optimizedPng = imageUri != null
-                    ? await _client.OptimizeAsync(imageUri)
-                    : await _client.OptimizeAsync(imagePath);
+                    OptimizedImageResult optimizedPng = null;
+                    Format = Format.Png;
+                    try
+                    {
+                        optimizedPng = imageUri != null
+                            ? await _client.OptimizeAsync(imageUri)
+                            : await _client.OptimizeAsync(imagePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex,
+                            "An error occurred optimizing {Format} {ImageUriOrPath} image: {ErrorMessage}",
+                            Format,
+                            imageUri?.AbsoluteUri ?? imagePath,
+                            ex.Message);
+                        throw;
+                    }
+                    _logger.LogInformation("Optimized {ImageInfo}, from {OriginalSize:n0} to JPEG size {JpegSize:n0} in {ElapsedJpeg:n2}s, PNG size {PngSize:n0} in {ElapsedPng:n2}s",
+                        imageUri != null ? imageUri.AbsoluteUri : imagePath,
+                        optimizedJpeg.OriginalSize,
+                        optimizedJpeg.File.Length,
+                        optimizedJpeg.ElapsedSeconds,
+                        optimizedPng.File.Length,
+                        optimizedPng.ElapsedSeconds);
 
-                _logger.LogInformation("Optimized {ImageInfo}, from {OriginalSize:n0} to JPEG size {JpegSize:n0} in {ElapsedJpeg:n2}s, PNG size {PngSize:n0} in {ElapsedPng:n2}s",
-                    imageUri != null ? imageUri.AbsoluteUri : imagePath,
-                    optimizedJpeg.OriginalSize,
-                    optimizedJpeg.File.Length,
-                    optimizedJpeg.ElapsedSeconds,
-                    optimizedPng.File.Length,
-                    optimizedPng.ElapsedSeconds);
+                    Format = Format.Auto;
+                    return optimizedJpeg.File.Length > optimizedPng.File.Length
+                        ? optimizedPng
+                        : optimizedJpeg;
+                }
+                else
+                {
+                    OptimizedImageResult optimized = null;
+                    try
+                    {
+                        optimized = imageUri != null
+                            ? await _client.OptimizeAsync(imageUri)
+                            : await _client.OptimizeAsync(imagePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex,
+                            "An error occurred optimizing {Format} {ImageUriOrPath} image: {ErrorMessage}",
+                            Format,
+                            imageUri?.AbsoluteUri ?? imagePath,
+                            ex.Message);
+                        throw;
+                    }
 
-                Format = Format.Auto;
-                return optimizedJpeg.File.Length > optimizedPng.File.Length
-                    ? optimizedPng
-                    : optimizedJpeg;
-            }
-            else
-            {
-                var optimized = imageUri != null
-                    ? await _client.OptimizeAsync(imageUri)
-                    : await _client.OptimizeAsync(imagePath);
+                    _logger.LogInformation("Optimized {ImageInfo}, from {OriginalSize:n0} to {NewSize:n0} in {ElapsedSeconds:n2}s",
+                        imageUri != null ? imageUri.AbsoluteUri : imagePath,
+                        optimized.OriginalSize,
+                        optimized.File.Length,
+                        optimized.ElapsedSeconds);
 
-                _logger.LogInformation("Optimized {ImageInfo}, from {OriginalSize:n0} to {NewSize:n0} in {ElapsedSeconds:n2}s",
-                    imageUri != null ? imageUri.AbsoluteUri : imagePath,
-                    optimized.OriginalSize,
-                    optimized.File.Length,
-                    optimized.ElapsedSeconds);
-
-                return optimized;
+                    return optimized;
+                }
             }
         }
     }
