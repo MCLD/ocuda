@@ -11,7 +11,7 @@
     <Product>Ocuda</Product>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/MCLD/ocuda/</RepositoryUrl>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <UserSecretsId>eb6c2377-84db-46df-9f5d-fde6a5ab4b8f</UserSecretsId>
     <Version>1.1.1</Version>
   </PropertyGroup>
@@ -25,8 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.20" />
-    <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.8" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
   </ItemGroup>
 
   <ItemGroup>
