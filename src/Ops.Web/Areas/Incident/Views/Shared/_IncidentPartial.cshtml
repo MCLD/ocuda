@@ -1,32 +1,38 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.IncidentViewModelBase
 
-<div class="row mb-2">
-    <div class="col-sm-6">
-        <h1>
-            @Model.Heading
-            @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
-            {
-                <small class="text-muted">@Model.SecondaryHeading</small>
-            }
-        </h1>
-    </div>
-    <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
-           asp-area=""
-           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
-           asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)">Back</a>
-        <a class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+<div class="d-flex justify-content-between">
+    <h1>
+        @Model.Heading
+        @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
+        {
+            <small class="text-muted">@Model.SecondaryHeading</small>
+        }
+    </h1>
+    <div class="pt-2">
+        @if (!string.IsNullOrEmpty(Model.IncidentDocumentLink))
+        {
+            <a class="btn btn-outline-primary me-2"
+               href="@Model.IncidentDocumentLink">View Example</a>
+        }
+        @if (Model.CanConfigureIncidents)
+        {
+            <a class="btn btn-outline-primary"
+               asp-action="@nameof(HomeController.Configuration)"
+               asp-controller="@HomeController.Name">
+                Configuration
+            </a>
+        }
+        <a class="btn btn-outline-success me-2"
            asp-action="@nameof(HomeController.Add)"
            asp-controller="@HomeController.Name"
            asp-route-page="@(Model.Page > 1 ? Model.Page : null)">
             <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
             Add Report
         </a>
-        <a class="btn btn-outline-primary mt-2 mb-1 me-2 float-end"
-           asp-action="@nameof(HomeController.Configuration)"
-           asp-controller="@HomeController.Name">
-            Configuration
-        </a>
+        <a class="btn btn-outline-dark"
+           asp-area=""
+           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)">Back</a>
     </div>
 </div>
 
@@ -46,19 +52,19 @@
             {
                 <li class="nav-item">
                     <a asp-action="@nameof(HomeController.All)"
-                   asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
-                   asp-controller="@HomeController.Name"
-                   class="nav-link"
-                   auto-active>
+                       asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
+                       asp-controller="@HomeController.Name"
+                       class="nav-link"
+                       auto-active>
                         @nameof(HomeController.All)
                     </a>
                 </li>
                 <li class="nav-item">
                     <a asp-action="@nameof(HistoricalController.Index)"
-                   asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
-                   asp-controller="@HistoricalController.Name"
-                   class="nav-link"
-                   auto-active>
+                       asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
+                       asp-controller="@HistoricalController.Name"
+                       class="nav-link"
+                       auto-active>
                         Historical
                     </a>
                 </li>
