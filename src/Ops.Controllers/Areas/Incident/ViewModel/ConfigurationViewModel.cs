@@ -11,7 +11,6 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
         }
 
         public bool CanConfigureEmails { get; set; }
-        public bool CanConfigureIncidents { get; set; }
         public int EmailTemplateId { get; set; }
         public ICollection<Models.Entities.IncidentType> IncidentTypes { get; set; }
 

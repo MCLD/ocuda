@@ -18,8 +18,8 @@
         @if (Model.CanConfigureIncidents)
         {
             <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
-                data-bs-toggle="modal"
-                data-bs-target="#addTypeModal">
+                    data-bs-toggle="modal"
+                    data-bs-target="#addTypeModal">
                 <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Add Incident Type
             </button>
@@ -58,11 +58,11 @@
                             if (incidentType.IsActive)
                             {
                                 <form asp-action="@nameof(HomeController.DeactivateType)"
-                      method="post" role="form" class="d-inline-block">
+                                      method="post" role="form" class="d-inline-block">
                                     <input type="hidden" name="typeId" value="@incidentType.Id" />
                                     <button class="btn btn-outline-danger btn-sm"
-                            title="Deactivate"
-                            type="submit">
+                                            title="Deactivate"
+                                            type="submit">
                                         <span class="fa-regular fa-circle-xmark"></span>
                                     </button>
                                 </form>
@@ -70,20 +70,20 @@
                             else
                             {
                                 <form asp-action="@nameof(HomeController.ActivateType)"
-                      method="post" role="form" class="d-inline-block">
+                                      method="post" role="form" class="d-inline-block">
                                     <input type="hidden" name="typeId" value="@incidentType.Id" />
                                     <button class="btn btn-outline-success btn-sm"
-                            title="Activate"
-                            type="submit">
+                                            title="Activate"
+                                            type="submit">
                                         <span class="fa-regular fa-circle-check"></span>
                                     </button>
                                 </form>
                             }
                             <button class="btn btn-sm btn-outline-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target="#updateTypeModal"
-                        data-id="@incidentType.Id"
-                        data-description="@incidentType.Description">
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#updateTypeModal"
+                                    data-id="@incidentType.Id"
+                                    data-description="@incidentType.Description">
                                 <span class="fa-solid fa-pencil"></span>
                             </button>
                         }
@@ -160,22 +160,22 @@ else
 {
     <form asp-action="@nameof(HomeController.AddType)" method="post" role="form">
         <div modal
-         isLarge="true"
-         id="addTypeModal"
-         name="Incident Type"
-         type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
-         data-bs-backdrop="static">
+             isLarge="true"
+             id="addTypeModal"
+             name="Incident Type"
+             type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
+             data-bs-backdrop="static">
             <div class="mb-3">
                 <label for="incidentTypeDescription">Incident Type Description</label>
                 <input type="text"
-                   class="form-control"
-                   name="incidentTypeDescription"
-                   required
-                   data-val="true"
-                   data-val-required="You must enter an incident type description." />
+                       class="form-control"
+                       name="incidentTypeDescription"
+                       required
+                       data-val="true"
+                       data-val-required="You must enter an incident type description." />
                 <span class="validation-message text-danger field-validation-valid"
-                  data-valmsg-for="incidentTypeDescription"
-                  data-valmsg-replace="true"></span>
+                      data-valmsg-for="incidentTypeDescription"
+                      data-valmsg-replace="true"></span>
             </div>
         </div>
     </form>
@@ -183,36 +183,36 @@ else
     <form asp-action="@nameof(HomeController.UpdateType)" method="post" role="form">
         <input type="hidden" name="incidentTypeId" id="updateIncidentTypeId" />
         <div modal
-         isLarge="true"
-         id="updateTypeModal"
-         name="Incident Type"
-         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit"
-         data-bs-backdrop="static">
+             isLarge="true"
+             id="updateTypeModal"
+             name="Incident Type"
+             type="Ocuda.Utility.TagHelpers.ModalTypes.Edit"
+             data-bs-backdrop="static">
             <div class="mb-3">
                 <label for="incidentTypeDescription">Incident Type Description</label>
                 <input type="text"
-                   class="form-control"
-                   id="updateIncidentTypeDescription"
-                   name="incidentTypeDescription"
-                   required
-                   data-val="true"
-                   data-val-required="You must enter an incident type description." />
+                       class="form-control"
+                       id="updateIncidentTypeDescription"
+                       name="incidentTypeDescription"
+                       required
+                       data-val="true"
+                       data-val-required="You must enter an incident type description." />
                 <span class="validation-message text-danger field-validation-valid"
-                  data-valmsg-for="incidentTypeDescription"
-                  data-valmsg-replace="true"></span>
+                      data-valmsg-for="incidentTypeDescription"
+                      data-valmsg-replace="true"></span>
             </div>
         </div>
     </form>
 }
 
 @section scripts {
-<script>
-     $('#updateTypeModal').on('show.bs.modal', function (event) {
-         let caller = $(event.relatedTarget);
-         $('#updateIncidentTypeId').val(caller.data('id'));
-         $('#updateIncidentTypeDescription').val(caller.data('description'));
-         console.info(caller.data('id'));
-         console.info(caller.data('description'));
-    })
-</script>
+    <script>
+        $('#updateTypeModal').on('show.bs.modal', function (event) {
+            let caller = $(event.relatedTarget);
+            $('#updateIncidentTypeId').val(caller.data('id'));
+            $('#updateIncidentTypeDescription').val(caller.data('description'));
+            console.info(caller.data('id'));
+            console.info(caller.data('description'));
+        })
+    </script>
 }

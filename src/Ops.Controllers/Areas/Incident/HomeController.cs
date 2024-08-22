@@ -84,6 +84,8 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
 
             var viewModel = new AddViewModel
             {
+                IncidentDocumentLink = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.Incident.Documentation),
                 Incident = new Models.Entities.Incident
                 {
                     LocationId = associatedLocation ?? default
@@ -285,6 +287,8 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 CanConfigureIncidents = IsSiteManager(),
                 EmailTemplateId = await _siteSettingService
                     .GetSettingIntAsync(Models.Keys.SiteSetting.Incident.EmailTemplateId),
+                IncidentDocumentLink = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.Incident.Documentation),
                 IncidentTypes = incidentTypes.Data,
                 ItemCount = incidentTypes.Count,
                 ItemsPerPage = filter.Take.Value,
@@ -341,6 +345,8 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 CanAdd = hasPermission,
                 CanHide = IsSiteManager(),
                 Incident = incident,
+                IncidentDocumentLink = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.Incident.Documentation),
                 IncidentTypes = await _incidentService.GetActiveIncidentTypesAsync(),
                 SecondaryHeading = $"#{incident.Id}"
             };
@@ -511,13 +517,16 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             return new IndexViewModel
             {
                 AllLocationNames = await _locationService.GetAllNamesIncludingDeletedAsync(),
+                CanConfigureIncidents = IsSiteManager(),
                 CanViewAll = await CanViewAllAsync(),
                 CurrentPage = currentPage,
+                IncidentDocumentLink = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.Incident.Documentation),
                 Incidents = incidents.Data,
                 IncidentTypes = allIncidentTypes,
                 ItemCount = incidents.Count,
                 ItemsPerPage = filter.Take.Value,
-                SearchText = filter.SearchText,
+                SearchText = filter.SearchText
             };
         }
     }

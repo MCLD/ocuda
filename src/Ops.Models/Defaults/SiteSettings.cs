@@ -184,6 +184,15 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
+                Id = Keys.SiteSetting.Incident.Documentation,
+                Name = "Link to incident documentation",
+                Description = "A link to documentation about incidents",
+                Category = "Incident",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
                 Id = Keys.SiteSetting.Incident.LawEnforcementAddresses,
                 Name = "Law Enforcement addresses",
                 Description = "Comma-separated email addresses to email incident reports when law enforcement is contacted",
@@ -220,8 +229,8 @@ namespace Ocuda.Ops.Models.Defaults
                 Name = "Link to scheduling documentation",
                 Description = "A link to documentation about scheduling",
                 Category = "Scheduling",
-                 Value = "",
-                 Type = SiteSettingType.StringNullable
+                Value = "",
+                Type = SiteSettingType.StringNullable
             },
 
             #endregion Scheduling
