@@ -471,7 +471,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         private async Task EstablishBacklinkAsync(int segmentId,
-                                            DetailViewModel viewModel)
+            DetailViewModel viewModel)
         {
             var emediaGroup = await _emediaService.GetGroupUsingSegmentAsync(segmentId);
 
@@ -570,6 +570,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     {
                         id = forms.First().Id
                     });
+                viewModel.Relationship
+                    = $"This segment is used for form type: {forms.First().VolunteerFormType}";
+                viewModel.TemplateFields.Add(Template.LocationName);
                 return;
             }
 

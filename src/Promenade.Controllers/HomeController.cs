@@ -12,7 +12,9 @@ using Ocuda.Promenade.Service;
 using Ocuda.Utility;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Keys;
 using Ocuda.Utility.Services.Interfaces;
+using Stubble.Core.Builders;
 
 namespace Ocuda.Promenade.Controllers
 {
@@ -608,6 +610,8 @@ namespace Ocuda.Promenade.Controllers
                 throw new OcudaException();
             }
 
+            var location = await _locationService.GetLocationAsync(locationId.Value, forceReload);
+
             var adultLocationMapping = await _volunteerFormService
                 .FindLocationFormAsync(VolunteerFormType.Adult, locationId.Value, forceReload)
                 ?? throw new OcudaException(i18n.Keys.Promenade.ErrorVolunteerNotAcceptingAdult);
@@ -626,8 +630,15 @@ namespace Ocuda.Promenade.Controllers
             {
                 viewModel.SegmentHeader
                     = adultLocationMapping.Form.HeaderSegment.Header;
-                viewModel.SegmentText
-                    = FormatForDisplay(adultLocationMapping.Form.HeaderSegment);
+
+                var stubble = new StubbleBuilder().Build();
+
+                viewModel.SegmentText = await stubble.RenderAsync(
+                    FormatForDisplay(adultLocationMapping.Form.HeaderSegment),
+                    new Dictionary<string, string>
+                    {
+                        { Template.LocationName.Key, location.Name}
+                    });
             }
 
             return viewModel;
@@ -645,6 +656,8 @@ namespace Ocuda.Promenade.Controllers
             {
                 throw new OcudaException();
             }
+
+            var location = await _locationService.GetLocationAsync(locationId.Value, forceReload);
 
             var teenLocationMapping = await _volunteerFormService
                 .FindLocationFormAsync(VolunteerFormType.Teen, locationId.Value, forceReload)
@@ -664,8 +677,15 @@ namespace Ocuda.Promenade.Controllers
             {
                 viewModel.SegmentHeader
                     = teenLocationMapping.Form.HeaderSegment.Header;
-                viewModel.SegmentText
-                    = FormatForDisplay(teenLocationMapping.Form.HeaderSegment);
+
+                var stubble = new StubbleBuilder().Build();
+
+                viewModel.SegmentText = await stubble.RenderAsync(
+                    FormatForDisplay(teenLocationMapping.Form.HeaderSegment),
+                    new Dictionary<string, string>
+                    {
+                        { Template.LocationName.Key, location.Name}
+                    });
             }
 
             return viewModel;
