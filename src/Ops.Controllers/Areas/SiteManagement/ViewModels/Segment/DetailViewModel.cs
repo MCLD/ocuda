@@ -1,12 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment
 {
     public class DetailViewModel
     {
+        public DetailViewModel()
+        {
+            TemplateFields = new List<KeyWithDescription>();
+        }
+
         [DisplayName("Displayed header")]
         public string AutomatedHeaderMarkup { get; set; }
 
@@ -38,5 +45,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment
 
         [DisplayName("Language")]
         public Language SelectedLanguage { get; set; }
+
+        [DisplayName("Available tags")]
+        public ICollection<KeyWithDescription> TemplateFields { get; }
     }
 }
