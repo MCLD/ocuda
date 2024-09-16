@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Ocuda.i18n.Filter
@@ -17,16 +18,27 @@ namespace Ocuda.i18n.Filter
         private const string CultureRouteKey = "culture";
 
         private readonly IOptions<RequestLocalizationOptions> _l10nOptions;
+        private readonly ILogger<RequestLocalizationOptions> _logger;
 
-        public LocalizationFilterAttribute(IOptions<RequestLocalizationOptions> l10nOptions)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1019:Define accessors for attribute arguments",
+            Justification = "Arguments are for internal use only.")]
+        public LocalizationFilterAttribute(ILogger<RequestLocalizationOptions> logger,
+            IOptions<RequestLocalizationOptions> l10nOptions)
         {
-            _l10nOptions = l10nOptions
-                ?? throw new ArgumentNullException(nameof(l10nOptions));
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(l10nOptions);
+
+            _logger = logger;
+            _l10nOptions = l10nOptions;
         }
 
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context,
             ResourceExecutionDelegate next)
         {
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(next);
+
             if (_l10nOptions.Value?.SupportedCultures.Count > 1)
             {
                 string requestedCulture = context.RouteData.Values.ContainsKey(CultureRouteKey)
@@ -115,7 +127,20 @@ namespace Ocuda.i18n.Filter
 
                 var cultureList = new Dictionary<string, string>();
 
-                var builtPath = new Uri(uriBuilder.Uri, Culture.DefaultName + uriPath);
+                Uri builtPath;
+                try
+                {
+                    builtPath = new Uri(uriBuilder.Uri, Culture.DefaultName + uriPath);
+                }
+                catch (UriFormatException ufex)
+                {
+                    _logger.LogCritical("Error composing URI from {URI} and {Path}: {ErrorMessage}",
+                        uriBuilder.Uri,
+                        Culture.DefaultName + uriPath,
+                        ufex.Message);
+                    throw;
+                }
+
                 var cultureHrefLang = new Dictionary<string, string>
                 {
                     { "x-default", builtPath.AbsoluteUri }

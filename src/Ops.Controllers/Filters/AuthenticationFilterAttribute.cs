@@ -181,7 +181,16 @@ namespace Ocuda.Ops.Controllers.Filters
                         }
 
                         // perform ldap update of user object
-                        user = LdapService.LookupByUsername(user);
+                        var lookupUser = LdapService.LookupByUsername(user);
+                        if (lookupUser != null)
+                        {
+                            user = lookupUser;
+                        }
+                        else
+                        {
+                            Logger.LogWarning("Unable to find username {Username} in LDAP",
+                                user.Username);
+                        }
 
                         // if the user is new, add them to the database
                         if (newUser)
@@ -197,7 +206,8 @@ namespace Ocuda.Ops.Controllers.Filters
                             }
                             else
                             {
-                                Logger.LogInformation("New user {Username} detected, inserting into database", user.Username);
+                                Logger.LogInformation("New user {Username} detected, inserting into database",
+                                    user.Username);
                                 user = await UserManagementService.AddUser(user);
                             }
                         }
@@ -211,9 +221,9 @@ namespace Ocuda.Ops.Controllers.Filters
                         // start creating the user's claims with their username
                         var claims = new HashSet<Claim>
                         {
-                            new Claim(ClaimType.Username, username),
-                            new Claim(ClaimType.UserId, userId),
-                            new Claim(ClaimType.AuthenticatedAt, now
+                            new(ClaimType.Username, username),
+                            new(ClaimType.UserId, userId),
+                            new(ClaimType.AuthenticatedAt, now
                                 .ToString("O", CultureInfo.InvariantCulture))
                         };
 
@@ -265,10 +275,7 @@ namespace Ocuda.Ops.Controllers.Filters
                                 foreach (var claim in claimGroups
                                     .Where(_ => _.GroupName == groupName))
                                 {
-                                    if (!claimantOf.ContainsKey(claim.ClaimType))
-                                    {
-                                        claimantOf.Add(claim.ClaimType, groupName);
-                                    }
+                                    claimantOf.TryAdd(claim.ClaimType, groupName);
                                 }
 
                                 var permissionList = permissionGroups
