@@ -3,9 +3,9 @@ using Ocuda.Ops.Models.Abstract;
 
 namespace Ocuda.Ops.Models.Entities
 {
-    public class PermissionGroupPageContent : PermissionGroupMappingBase
+    public class PermissionGroupIncidentLocation : PermissionGroupMappingBase
     {
         [Required]
-        public int PageHeaderId { get; set; }
+        public int LocationId { get; set; }
     }
 }

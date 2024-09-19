@@ -48,7 +48,19 @@
                     @nameof(HomeController.Mine)
                 </a>
             </li>
-            @if (Model.CanViewAll == true)
+            @if(Model.CanViewLocation)
+            {
+                <li class="nav-item">
+                    <a asp-action="@nameof(HomeController.Locations)"
+                       asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
+                       asp-controller="@HomeController.Name"
+                       class="nav-link"
+                       auto-active>
+                        My Location(s)
+                    </a>
+                </li>
+            }
+            @if (Model.CanViewAll)
             {
                 <li class="nav-item">
                     <a asp-action="@nameof(HomeController.All)"

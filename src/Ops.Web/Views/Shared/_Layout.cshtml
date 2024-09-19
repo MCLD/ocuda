@@ -287,6 +287,7 @@
                 }
             </div>
         }
+        @RenderSection("Header", required: false)
         @if (TempData[Ocuda.Ops.Controllers.TempDataKey.AlertDanger] != null)
         {
             <div class="row">
@@ -321,7 +322,6 @@
         }
         @RenderBody()
     </div>
-
     <script src="~/js/main.min.js" asp-append-version="true"></script>
     <script src="~/js/bootstrap.min.js" asp-append-version="true"></script>
     @if (Context.Items.ContainsKey(ItemKey.ExternalJS))

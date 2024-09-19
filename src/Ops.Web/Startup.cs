@@ -388,6 +388,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.LinkRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupApplicationRepository,
                 Data.Ops.PermissionGroupApplicationRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupIncidentLocationRepository,
+                Data.Ops.PermissionGroupIncidentLocationRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupPageContentRepository,
                 Data.Ops.PermissionGroupPageContentRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupPodcastItemRepository,

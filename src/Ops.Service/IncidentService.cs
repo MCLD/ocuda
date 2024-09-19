@@ -72,10 +72,10 @@ namespace Ocuda.Ops.Service
             ICollection<IncidentParticipant> participants,
             Uri baseUri)
         {
-            if (incident == null) { throw new ArgumentNullException(nameof(incident)); }
-            if (staffs == null) { throw new ArgumentNullException(nameof(staffs)); }
-            if (participants == null) { throw new ArgumentNullException(nameof(participants)); }
-            if (baseUri == null) { throw new ArgumentNullException(nameof(baseUri)); }
+            ArgumentNullException.ThrowIfNull(baseUri);
+            ArgumentNullException.ThrowIfNull(incident);
+            ArgumentNullException.ThrowIfNull(participants);
+            ArgumentNullException.ThrowIfNull(staffs);
 
             var now = _dateTimeProvider.Now;
             var currentUserId = GetCurrentUserId();

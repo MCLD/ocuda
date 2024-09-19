@@ -35,6 +35,11 @@
         public static readonly string OpsGroup = "auth.{0}.group{1}";
 
         /// <summary>
+        /// Cached list of location ids the current user can see incident reports for
+        /// </summary>
+        public static readonly string OpsIncidentLocationAuthorizations = "incidentloc.{0}";
+
+        /// <summary>
         /// Instance that runs jobs and how often it runs them
         /// </summary>
         public static readonly string OpsJobRunner = "jobrunner";
