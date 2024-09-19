@@ -689,7 +689,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
 
             var authorizedLocations = new List<int>();
             var locations = await _locationService.GetAllLocationsAsync();
-            var permissionGroups = new List<PermissionGroupIncidentLocation>();
+
             foreach (var location in locations)
             {
                 var locationGroups = await _permissionGroupService
