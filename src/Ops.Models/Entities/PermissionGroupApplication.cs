@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Ocuda.Ops.Models.Abstract;
 
 namespace Ocuda.Ops.Models.Entities
 {
-    public class PermissionGroupApplication
+    public class PermissionGroupApplication : PermissionGroupMappingBase
     {
         [Required]
         [MaxLength(255)]
         public string ApplicationPermission { get; set; }
 
-        [Required]
-        public int PermissionGroupId { get; set; }
         public PermissionGroup PermissionGroup { get; set; }
     }
 }

@@ -27,7 +27,7 @@
     </div>
 </div>
 
-@if (Model.IncidentTypes?.Count > 0)
+@if (Model.IncidentTypes?.Any() == true)
 {
     <table class="table table-sm table-bordered table-hover table-striped">
         <thead>
@@ -155,6 +155,37 @@ else
         }
     </table>
 </form>
+
+@if (Model.Locations?.Any() == true)
+{
+    <div class="row">
+        <div class="col col-md-6 offset-md-3">
+            <table class="table table-sm table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Location</th>
+                        <th>Groups</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var location in Model.Locations.OrderBy(_ => _.Name))
+                    {
+                        <tr class="align-middle">
+                            <td>@location.Name</td>
+                            <td>@Model.LocationPermissions[location.Id]</td>
+                            <td>
+                                <a asp-action="@nameof(HomeController.Permissions)"
+                                   asp-route-locationId="@location.Id"
+                                   class="btn btn-sm btn-outline-primary"><span class="fa-solid fa-pencil"></span></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
 
 @if (Model.CanConfigureIncidents)
 {

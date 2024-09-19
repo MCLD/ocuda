@@ -1,0 +1,90 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.PermissionsViewModel
+
+@section Header {
+    <div class="row mb-2">
+        <div class="col-sm-7">
+            <h1>
+                Incident Location Assignment
+                <small>@Model.LocationName</small>
+            </h1>
+        </div>
+        <div class="col-sm-5">
+            <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
+               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Configuration)"
+               asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
+               asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name">Back</a>
+        </div>
+    </div>
+}
+<div class="row">
+    <div class="col">
+        <p>
+            Assigning a permission here will enable users with that permission to see all incident
+            reports related to <strong>@Model.LocationName</strong>.
+        </p>
+    </div>
+</div>
+<div class="row">
+    <div class="col col-sm-6">
+        <div class="card">
+            <div class="card-header">
+                <strong>Available Groups</strong>
+            </div>
+            <ul class="list-group list-group-flush">
+                @if (Model.AvailableGroups?.Count > 0)
+                {
+                    foreach (var availableGroup in Model.AvailableGroups)
+                    {
+                        <form asp-action="@(nameof(HomeController.AddPermissionGroup))"
+                              asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
+                              asp-controller="@HomeController.Name"
+                              asp-route-locationId="@Model.LocationId"
+                              asp-route-permissionGroupId="@availableGroup.Key">
+                        <li class="list-group-item d-flex">
+                            <span class="flex-grow-1 mt-1">@availableGroup.Value</span>
+                            <button class="btn btn-outline-success">
+                                <span class="fa-solid fa-circle-plus fa-fw"></span>
+                            </button>
+                        </li>
+                        </form>
+                    }
+                }
+                else
+                {
+                    <li class="list-group-item">No groups available.</li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="col col-sm-6">
+        <div class="card">
+            <div class="card-header">
+                <strong>Assigned Groups</strong>
+            </div>
+            <ul class="list-group list-group-flush">
+                @if (Model.AssignedGroups?.Count > 0)
+                {
+                    foreach (var availableGroup in Model.AssignedGroups)
+                    {
+                        <form asp-action="@(nameof(HomeController.RemovePermissionGroup))"
+                              asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
+                              asp-controller="@HomeController.Name"
+                              asp-route-locationId="@Model.LocationId"
+                              asp-route-permissionGroupId="@availableGroup.Key">
+                        <li class="list-group-item d-flex">
+                            <span class="flex-grow-1 mt-1">@availableGroup.Value</span>
+                            <button class="btn btn-outline-danger">
+                                <span class="fa-solid fa-circle-minus"></span>
+                            </button>
+                        </li>
+                        </form>
+                    }
+                }
+                else
+                {
+                    <li class="list-group-item">No groups assigned.</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

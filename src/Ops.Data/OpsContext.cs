@@ -46,6 +46,7 @@ namespace Ocuda.Ops.Data
         public DbSet<LinkLibrary> LinkLibraries { get; set; }
         public DbSet<Link> Links { get; set; }
         public DbSet<PermissionGroupApplication> PermissionGroupApplication { get; set; }
+        public DbSet<PermissionGroupIncidentLocation> PermissionGroupIncidentLocations { get; set; }
         public DbSet<PermissionGroupPageContent> PermissionGroupPageContents { get; set; }
         public DbSet<PermissionGroupPodcastItem> PermissionGroupPodcastItems { get; set; }
         public DbSet<PermissionGroupProductManager> PermissionGroupProductManager { get; set; }
@@ -76,10 +77,7 @@ namespace Ocuda.Ops.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            if (modelBuilder == null)
-            {
-                throw new ArgumentNullException(nameof(modelBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
 
@@ -101,6 +99,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.IncidentId, _.RelatedIncidentId });
             modelBuilder.Entity<PermissionGroupApplication>()
                 .HasKey(_ => new { _.PermissionGroupId, _.ApplicationPermission });
+            modelBuilder.Entity<PermissionGroupIncidentLocation>()
+                .HasKey(_ => new { _.PermissionGroupId, _.LocationId });
             modelBuilder.Entity<PermissionGroupPageContent>()
                 .HasKey(_ => new { _.PermissionGroupId, _.PageHeaderId });
             modelBuilder.Entity<PermissionGroupPodcastItem>()

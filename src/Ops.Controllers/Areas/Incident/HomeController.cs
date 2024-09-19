@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
@@ -19,6 +20,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Controllers.Areas.Incident
 {
@@ -26,7 +28,9 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
     [Route("[area]")]
     public class HomeController : BaseController<HomeController>
     {
+        private const int CacheLocationPermissionsMinutes = 5;
         private const string PageTitle = "Incident Reports";
+        private readonly IOcudaCache _cache;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IIncidentService _incidentService;
         private readonly ILocationService _locationService;
@@ -37,18 +41,23 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             IDateTimeProvider dateTimeProvider,
             IIncidentService incidentService,
             ILocationService locationService,
+            IOcudaCache cache,
             IPermissionGroupService permissionGroupService,
             IUserService userService) : base(context)
         {
-            _dateTimeProvider = dateTimeProvider
-                ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-            _incidentService = incidentService
-                ?? throw new ArgumentNullException(nameof(incidentService));
-            _locationService = locationService
-                ?? throw new ArgumentNullException(nameof(locationService));
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(dateTimeProvider);
+            ArgumentNullException.ThrowIfNull(incidentService);
+            ArgumentNullException.ThrowIfNull(locationService);
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+            ArgumentNullException.ThrowIfNull(userService);
+
+            _cache = cache;
+            _dateTimeProvider = dateTimeProvider;
+            _incidentService = incidentService;
+            _locationService = locationService;
+            _permissionGroupService = permissionGroupService;
+            _userService = userService;
 
             SetPageTitle(PageTitle);
         }
@@ -191,6 +200,27 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             return RedirectToAction(nameof(Details), new { id = incidentId });
         }
 
+        [HttpPost("[action]/{locationId:int}/{permissionGroupId:int}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> AddPermissionGroup(int locationId, int permissionGroupId)
+        {
+            try
+            {
+                await _permissionGroupService
+                    .AddToPermissionGroupAsync<PermissionGroupIncidentLocation>(locationId,
+                        permissionGroupId);
+                var permissionInfo = await _permissionGroupService.GetGroupsAsync([permissionGroupId]);
+                var location = await _locationService.GetLocationByIdAsync(locationId);
+                AlertInfo = $"Group <strong>{permissionInfo.FirstOrDefault()?.PermissionGroupName}</strong> added to view incidents at <strong>{location.Name}</strong>. This will take effect after {CacheLocationPermissionsMinutes} minutes.";
+            }
+            catch (OcudaException oex)
+            {
+                AlertDanger = $"Problem adding permission: {oex.Message}";
+            }
+
+            return RedirectToAction(nameof(Permissions), new { locationId });
+        }
+
         [HttpPost("[action]")]
         public async Task<IActionResult> AddRelationship(int incidentId, int relatedIncidentId)
         {
@@ -233,7 +263,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
         }
 
         [HttpGet("[action]")]
-        [HttpGet("[action]/{page}")]
+        [HttpGet("[action]/{page:int}")]
         public async Task<IActionResult> All(int page, string searchText)
         {
             var hasPermission = await CanViewAllAsync();
@@ -262,14 +292,16 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
 
             foreach (var incident in viewModel.Incidents)
             {
-                incident.CreatedByUser = await _userService.GetByIdIncludeDeletedAsync(incident.CreatedBy);
+                incident.CreatedByUser
+                    = await _userService.GetByIdIncludeDeletedAsync(incident.CreatedBy);
             }
 
             return View("Index", viewModel);
         }
 
         [HttpGet("[action]")]
-        [HttpGet("[action]/{page}")]
+        [HttpGet("[action]/{page:int}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Configuration(int page)
         {
             int currentPage = page != 0 ? page : 1;
@@ -294,7 +326,15 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 ItemsPerPage = filter.Take.Value,
                 LawEnforcementAddresses = await _siteSettingService
                     .GetSettingStringAsync(Models.Keys.SiteSetting.Incident.LawEnforcementAddresses),
+                Locations = await _locationService.GetAllLocationsAsync()
             };
+
+            foreach (var location in viewModel.Locations)
+            {
+                var locationPermissions = await _permissionGroupService
+                    .GetPermissionsAsync<PermissionGroupIncidentLocation>(location.Id);
+                viewModel.LocationPermissions.Add(location.Id, locationPermissions.Count);
+            }
 
             if (viewModel.PastMaxPage)
             {
@@ -316,7 +356,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             return RedirectToAction(nameof(Configuration));
         }
 
-        [HttpGet("[action]/{id}")]
+        [HttpGet("[action]/{id:int}")]
         public async Task<IActionResult> Details(int id)
         {
             var incident = await _incidentService.GetAsync(id);
@@ -367,8 +407,45 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             return RedirectToAction(nameof(Details), new { id = incidentId });
         }
 
+        [HttpGet("[action]")]
+        [HttpGet("[action]/{page:int}")]
+        public async Task<IActionResult> Locations(int page, string searchText)
+        {
+            var authorizedLocations = await GetLocationAuthorizationsAsync();
+
+            if (!authorizedLocations.Any())
+            {
+                return RedirectToUnauthorized();
+            }
+
+            int currentPage = page != 0 ? page : 1;
+
+            var filter = new IncidentFilter(currentPage)
+            {
+                LocationIds = authorizedLocations,
+                SearchText = searchText
+            };
+
+            var viewModel = await GetIncidentsAsync(filter, currentPage);
+
+            if (viewModel.PastMaxPage)
+            {
+                return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
+            }
+
+            viewModel.SecondaryHeading = "My Location(s)";
+
+            foreach (var incident in viewModel.Incidents)
+            {
+                incident.CreatedByUser
+                    = await _userService.GetByIdIncludeDeletedAsync(incident.CreatedBy);
+            }
+
+            return View("Index", viewModel);
+        }
+
         [HttpGet("")]
-        [HttpGet("[action]/{page}")]
+        [HttpGet("[action]/{page:int}")]
         public async Task<IActionResult> Mine(int page, string searchText)
         {
             int currentPage = page != 0 ? page : 1;
@@ -391,6 +468,64 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             SetPageTitle($"{PageTitle}: {nameof(Mine)}");
 
             return View("Index", viewModel);
+        }
+
+        [HttpGet("[action]/{locationId:int}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> Permissions(int locationId)
+        {
+            var location = await _locationService.GetLocationByIdAsync(locationId);
+            if (location == null)
+            {
+                return NotFound();
+            }
+
+            var permissionGroups = await _permissionGroupService.GetAllAsync();
+            var locationPermissions = await _permissionGroupService
+                .GetPermissionsAsync<PermissionGroupIncidentLocation>(locationId);
+
+            var viewModel = new PermissionsViewModel
+            {
+                LocationId = locationId,
+                LocationName = location.Name
+            };
+
+            foreach (var permissionGroup in permissionGroups)
+            {
+                if (locationPermissions.Any(_ => _.PermissionGroupId == permissionGroup.Id))
+                {
+                    viewModel.AssignedGroups.Add(permissionGroup.Id,
+                        permissionGroup.PermissionGroupName);
+                }
+                else
+                {
+                    viewModel.AvailableGroups.Add(permissionGroup.Id,
+                        permissionGroup.PermissionGroupName);
+                }
+            }
+
+            return View(viewModel);
+        }
+
+        [HttpPost("[action]/{locationId:int}/{permissionGroupId:int}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> RemovePermissionGroup(int locationId, int permissionGroupId)
+        {
+            try
+            {
+                await _permissionGroupService
+                    .RemoveFromPermissionGroupAsync<PermissionGroupIncidentLocation>(locationId,
+                        permissionGroupId);
+                var permissionInfo = await _permissionGroupService.GetGroupsAsync([permissionGroupId]);
+                var location = await _locationService.GetLocationByIdAsync(locationId);
+                AlertInfo = $"Group <strong>{permissionInfo.FirstOrDefault()?.PermissionGroupName}</strong> removed from viewing incidents at <strong>{location.Name}</strong>. This will take effect after {CacheLocationPermissionsMinutes} minutes.";
+            }
+            catch (OcudaException oex)
+            {
+                AlertDanger = $"Problem removing permission: {oex.Message}";
+            }
+
+            return RedirectToAction(nameof(Permissions), new { locationId });
         }
 
         [HttpPost("[action]")]
@@ -451,7 +586,8 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
 
             try
             {
-                await _incidentService.UpdateIncidentTypeAsync(incidentTypeId, incidentTypeDescription);
+                await _incidentService.UpdateIncidentTypeAsync(incidentTypeId,
+                    incidentTypeDescription);
             }
             catch (OcudaException oex)
             {
@@ -508,6 +644,13 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                     ApplicationPermission.ViewAllIncidentReports);
         }
 
+        private async Task<bool> CanViewLocationsAsync()
+        {
+            var authorizedLocations = await GetLocationAuthorizationsAsync();
+
+            return authorizedLocations.Any();
+        }
+
         private async Task<IndexViewModel> GetIncidentsAsync(IncidentFilter filter, int currentPage)
         {
             var incidents = await _incidentService.GetPaginatedAsync(filter);
@@ -519,6 +662,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 AllLocationNames = await _locationService.GetAllNamesIncludingDeletedAsync(),
                 CanConfigureIncidents = IsSiteManager(),
                 CanViewAll = await CanViewAllAsync(),
+                CanViewLocation = await CanViewLocationsAsync(),
                 CurrentPage = currentPage,
                 IncidentDocumentLink = await _siteSettingService
                     .GetSettingStringAsync(Models.Keys.SiteSetting.Incident.Documentation),
@@ -528,6 +672,45 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 ItemsPerPage = filter.Take.Value,
                 SearchText = filter.SearchText
             };
+        }
+
+        private async Task<IEnumerable<int>> GetLocationAuthorizationsAsync()
+        {
+            var cacheKey = string.Format(CultureInfo.InvariantCulture,
+                Cache.OpsIncidentLocationAuthorizations,
+                CurrentUserId);
+
+            var list = await _cache.GetObjectFromCacheAsync<IEnumerable<int>>(cacheKey);
+
+            if (list != null)
+            {
+                return list;
+            }
+
+            var authorizedLocations = new List<int>();
+            var locations = await _locationService.GetAllLocationsAsync();
+            var permissionGroups = new List<PermissionGroupIncidentLocation>();
+            foreach (var location in locations)
+            {
+                var locationGroups = await _permissionGroupService
+                    .GetPermissionsAsync<PermissionGroupIncidentLocation>(location.Id);
+                if (locationGroups?.Count > 0)
+                {
+                    var locationAuthorized = await _permissionGroupService
+                        .HasAPermissionAsync<PermissionGroupIncidentLocation>(locationGroups
+                            .Select(_ => _.PermissionGroupId));
+                    if (locationAuthorized)
+                    {
+                        authorizedLocations.Add(location.Id);
+                    }
+                }
+            }
+
+            await _cache.SaveToCacheAsync(cacheKey,
+                authorizedLocations.AsEnumerable(),
+                TimeSpan.FromMinutes(CacheLocationPermissionsMinutes));
+
+            return authorizedLocations;
         }
     }
 }

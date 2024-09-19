@@ -42,9 +42,13 @@ namespace Ocuda.Ops.Data.Ops
                     || _.IncidentType.Description.Contains(filter.SearchText)
                     || _.InjuriesDamages.Contains(filter.SearchText)
                     || _.LocationDescription.Contains(filter.SearchText)
-                    || filter.LocationIds.Contains(_.LocationId)
                     || _.CreatedByUser.Name.Contains(filter.SearchText)
                     || filter.IncludeIds.Contains(_.Id));
+            }
+
+            if (filter.LocationIds?.Count() > 0)
+            {
+                query = query.Where(_ => filter.LocationIds.Contains(_.LocationId));
             }
 
             return new CollectionWithCount<Incident>

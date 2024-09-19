@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
 {
@@ -8,12 +9,15 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
         {
             Heading = "Incident Report";
             SecondaryHeading = "Configuration";
+            LocationPermissions = new Dictionary<int, int>();
         }
 
         public bool CanConfigureEmails { get; set; }
         public int EmailTemplateId { get; set; }
-        public ICollection<Models.Entities.IncidentType> IncidentTypes { get; set; }
+        public IEnumerable<Models.Entities.IncidentType> IncidentTypes { get; set; }
 
         public string LawEnforcementAddresses { get; set; }
+        public IDictionary<int, int> LocationPermissions { get; }
+        public IEnumerable<Location> Locations { get; set; }
     }
 }
