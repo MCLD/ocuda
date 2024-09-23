@@ -371,7 +371,15 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
 
             if (!hasPermission)
             {
-                return RedirectToUnauthorized();
+                var authorizedLocations = await GetLocationAuthorizationsAsync();
+                if (authorizedLocations.Contains(incident.LocationId))
+                {
+                    hasPermission = true;
+                }
+                else
+                {
+                    return RedirectToUnauthorized();
+                }
             }
 
             if (!incident.IsVisible && !IsSiteManager())
