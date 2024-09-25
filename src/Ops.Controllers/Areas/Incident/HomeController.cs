@@ -688,28 +688,35 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 Cache.OpsIncidentLocationAuthorizations,
                 CurrentUserId);
 
-            var list = await _cache.GetObjectFromCacheAsync<IEnumerable<int>>(cacheKey);
+            var authorizedLocations = new List<int>();
 
-            if (list != null)
+            authorizedLocations
+                .AddRange(await _cache.GetObjectFromCacheAsync<IEnumerable<int>>(cacheKey));
+
+            if (authorizedLocations?.Count > 0)
             {
-                return list;
+                return authorizedLocations;
             }
 
-            var authorizedLocations = new List<int>();
-            var locations = await _locationService.GetAllLocationsAsync();
+            var userClaimIdStrings = UserClaims(ClaimType.PermissionId);
 
-            foreach (var location in locations)
+            if (userClaimIdStrings?.Count > 0)
             {
-                var locationGroups = await _permissionGroupService
-                    .GetPermissionsAsync<PermissionGroupIncidentLocation>(location.Id);
-                if (locationGroups?.Count > 0)
+                var userClaimIds = userClaimIdStrings
+                    .Select(_ => int.Parse(_, CultureInfo.InvariantCulture));
+
+                var locations = await _locationService.GetAllLocationsAsync();
+
+                foreach (var location in locations)
                 {
-                    var locationAuthorized = await _permissionGroupService
-                        .HasAPermissionAsync<PermissionGroupIncidentLocation>(locationGroups
-                            .Select(_ => _.PermissionGroupId));
-                    if (locationAuthorized)
+                    var locationGroups = await _permissionGroupService
+                        .GetPermissionsAsync<PermissionGroupIncidentLocation>(location.Id);
+
+                    if (locationGroups?.Count > 0)
                     {
-                        authorizedLocations.Add(location.Id);
+                        authorizedLocations.AddRange(locationGroups
+                            .Where(_ => userClaimIds.Contains(_.PermissionGroupId))
+                            .Select(_ => _.LocationId));
                     }
                 }
             }
