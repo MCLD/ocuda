@@ -688,15 +688,14 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 Cache.OpsIncidentLocationAuthorizations,
                 CurrentUserId);
 
-            var authorizedLocations = new List<int>();
+            var cachedLocations = await _cache.GetObjectFromCacheAsync<IEnumerable<int>>(cacheKey);
 
-            authorizedLocations
-                .AddRange(await _cache.GetObjectFromCacheAsync<IEnumerable<int>>(cacheKey));
-
-            if (authorizedLocations?.Count > 0)
+            if (cachedLocations != null)
             {
-                return authorizedLocations;
+                return cachedLocations;
             }
+
+            var authorizedLocations = new List<int>();
 
             var userClaimIdStrings = UserClaims(ClaimType.PermissionId);
 
