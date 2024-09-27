@@ -14,7 +14,7 @@ namespace Ocuda.Ops.Service
 {
     public class LdapService : ILdapService
     {
-        private const string ADAllEnabledUserFilter = "(&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
+        private const string ADAllEnabledUserFilter = "(&(objectCategory=person)(objectClass=user)(!(memberOf:1.2.840.113556.1.4.1941:=OU=DisabledUsers,DC=library,DC=local))(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
         private const string ADDepartment = "department";
         private const string ADDescription = "description";
         private const string ADDirectReports = "directReports";
@@ -49,6 +49,7 @@ namespace Ocuda.Ops.Service
             ADPhysicalDeliveryOfficeName,
             ADsAMAccountName,
             ADTelephoneNumber,
+            "memberOf",
             ADTitle
         };
 
