@@ -8,6 +8,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDispla
         public IEnumerable<Models.DigitalDisplayCurrentAsset> Assets { get; set; }
         public DigitalDisplay Display { get; set; }
         public bool HasPermissions { get; set; }
+        public string LocationName { get; set; }
+        public string LocationSlug { get; set; }
 
         public static string CssIsEnabled(bool enabled)
         {

@@ -70,28 +70,19 @@ namespace Ocuda.Ops.Service
 
         public Task<DigitalDisplayAsset> AddAssetAsync(DigitalDisplayAsset asset)
         {
-            if (asset == null)
-            {
-                throw new ArgumentNullException(nameof(asset));
-            }
+            ArgumentNullException.ThrowIfNull(asset);
             return AddAssetInternalAsync(asset);
         }
 
         public Task AddDisplayAsync(DigitalDisplay display)
         {
-            if (display == null)
-            {
-                throw new ArgumentNullException(nameof(display));
-            }
+            ArgumentNullException.ThrowIfNull(display);
             return AddDisplayInternalAsync(display);
         }
 
         public Task AddSetAsync(DigitalDisplaySet displaySet)
         {
-            if (displaySet == null)
-            {
-                throw new ArgumentNullException(nameof(displaySet));
-            }
+            ArgumentNullException.ThrowIfNull(displaySet);
             return AddSetInternalAsync(displaySet);
         }
 
@@ -175,12 +166,8 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAssetAsync(int digitalDisplayAssetId)
         {
-            var asset = await _digitalDisplayAssetRepository.FindAsync(digitalDisplayAssetId);
-
-            if (asset == null)
-            {
-                throw new OcudaException($"Unable to find asset id {digitalDisplayAssetId} to delete it");
-            }
+            var asset = await _digitalDisplayAssetRepository.FindAsync(digitalDisplayAssetId)
+                ?? throw new OcudaException($"Unable to find asset id {digitalDisplayAssetId} to delete it");
 
             _digitalDisplayItemRepository.RemoveByAssetId(digitalDisplayAssetId);
             await _digitalDisplayItemRepository.SaveAsync();
@@ -258,11 +245,7 @@ namespace Ocuda.Ops.Service
 
         public IDictionary<int, string> GetAssetUrlPaths(IEnumerable<DigitalDisplayAsset> assets)
         {
-            if (assets == null)
-            {
-                throw new ArgumentNullException(nameof(assets));
-            }
-
+            ArgumentNullException.ThrowIfNull(assets);
             return assets
                 .ToDictionary(k => k.Id,
                     v => _pathResolver.GetPublicContentLink(BaseFilePath, v.Path));
@@ -270,11 +253,13 @@ namespace Ocuda.Ops.Service
 
         public string GetAssetWebPath(DigitalDisplayAsset asset)
         {
-            if (asset == null)
-            {
-                throw new ArgumentNullException(nameof(asset));
-            }
+            ArgumentNullException.ThrowIfNull(asset);
             return _pathResolver.GetPublicContentLink(BaseFilePath, asset.Path);
+        }
+
+        public async Task<IEnumerable<DigitalDisplay>> GetByLocationAsync(int locationId)
+        {
+            return await _digitalDisplayRepository.GetByLocation(locationId);
         }
 
         public async Task<DigitalDisplay> GetDisplayAsync(int displayId)
@@ -429,11 +414,8 @@ namespace Ocuda.Ops.Service
         {
             var updateDisplay = display ?? throw new ArgumentNullException(nameof(display));
 
-            var databaseDisplay = await _digitalDisplayRepository.FindAsync(display.Id);
-            if (databaseDisplay == null)
-            {
-                throw new OcudaException($"Unable to find digital display id {display.Id}");
-            }
+            var databaseDisplay = await _digitalDisplayRepository.FindAsync(display.Id)
+                ?? throw new OcudaException($"Unable to find digital display id {display.Id}");
 
             // these are system variables and are not editable
             updateDisplay.LastAttempt = databaseDisplay.LastAttempt;
@@ -453,11 +435,8 @@ namespace Ocuda.Ops.Service
         {
             var updateSet = displaySet ?? throw new ArgumentNullException(nameof(displaySet));
 
-            var databaseSet = await _digitalDisplaySetRepository.FindAsync(displaySet.Id);
-            if (databaseSet == null)
-            {
-                throw new OcudaException($"Unable to find digital display set id {displaySet.Id}");
-            }
+            var databaseSet = await _digitalDisplaySetRepository.FindAsync(displaySet.Id)
+                ?? throw new OcudaException($"Unable to find digital display set id {displaySet.Id}");
 
             databaseSet.Name = updateSet.Name;
             databaseSet.UpdatedAt = DateTime.Now;

@@ -2,22 +2,30 @@
 
 @using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDisplays
 
-<div class="row">
-    <div class="col-sm-7">
-        <h1>Digital Display Sets</h1>
-    </div>
-    <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Index))">Back</a>
+<div class="d-flex justify-content-between">
+    <h1>Digital Display Sets</h1>
+    <div class="pt-2">
+        @if (Model.HasPermissions)
+        {
+            <button class="btn btn-outline-success"
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#uploadAsset">
+                <span class="fa-solid fa-file-arrow-up" aria-hidden="true"></span>
+                Upload Image
+            </button>
+        }
         @if (Model.IsSiteManager)
         {
-            <a class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+            <a class="btn btn-outline-success"
                asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.AddSet))">
                 <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Add set
             </a>
         }
+        <a class="btn btn-outline-dark ms-2"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Index))">Back</a>
     </div>
 </div>
 
@@ -107,6 +115,8 @@
         </div>
     </div>
 </form>
+
+@await Html.PartialAsync("_UploadImagePartial")
 
 @section Scripts {
     <script>

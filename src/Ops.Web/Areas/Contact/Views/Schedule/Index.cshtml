@@ -20,7 +20,7 @@
            asp-route-requestedDate=""
            class="btn btn-outline-warning @Model.ActiveUnclaimed">Unclaimed</a>
         <a asp-controller="Schedule"
-           asp-action="Index"
+          asp-action="Index"
            asp-area="Contact"
            asp-route-requestedDate="@Model.RequestedDate.AddDays(-1).ToString("yyyy-MM-dd")"
            class="btn btn-outline-primary"><span class="fa-solid fa-circle-chevron-left"></span></a>

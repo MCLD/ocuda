@@ -2,17 +2,33 @@
 
 @using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDisplays
 
-<div class="row">
-    <div class="col-sm-7">
-        <h1>
-            Current Display Assets
-            <small class="text-muted">@Model.Display.Name</small>
-        </h1>
-    </div>
-    <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
+<div class="d-flex justify-content-between">
+    <h1>
+        Current Display Assets
+        <small class="text-muted">@Model.Display.Name</small>
+    </h1>
+    <div class="pt-2">
+        @if (Model.HasPermissions)
+        {
+            <button class="btn btn-outline-success"
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#uploadAsset">
+                <span class="fa-solid fa-file-arrow-up" aria-hidden="true"></span>
+                Upload Image
+            </button>
+        }
+        <a class="btn btn-outline-secondary ms-2"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Index))">Back</a>
+           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Index)">Display Index</a>
+        @if (!string.IsNullOrEmpty(Model.LocationSlug) && !string.IsNullOrEmpty(Model.LocationName))
+        {
+            <a class="btn btn-outline-secondary"
+               asp-area=""
+               asp-controller="@Ocuda.Ops.Controllers.LocationsController.Name"
+               asp-action="@nameof(Ocuda.Ops.Controllers.LocationsController.Details)"
+               asp-route-slug="@Model.LocationSlug">@Model.LocationName</a>
+        }
     </div>
 </div>
 
@@ -52,14 +68,14 @@
                     <td class="align-middle text-center @CurrentDisplayAssetsViewModel.CssIsEnabled(assetInfo.IsEnabled)">@Html.Raw(CurrentDisplayAssetsViewModel.HtmlIsEnabled(assetInfo.IsEnabled))</td>
                     <td class="align-middle">
                         <a href="@assetInfo.AssetLink"
-                   target="_blank"><img src="@assetInfo.AssetLink" style="max-height: 100px;" /></a>
+                           target="_blank"><img src="@assetInfo.AssetLink" style="max-height: 100px;" /></a>
                     </td>
                     <td>
                         @if (Model.HasPermissions)
                         {
                             <a asp-action="@nameof(DigitalDisplaysController.AssetAssociations)"
-                   asp-route-digitalDisplayAssetId="@assetInfo.Asset.Id"
-                   class="btn btn-outline-primary my-1"><span class="fa-solid fa-tv"></span></a>
+                               asp-route-digitalDisplayAssetId="@assetInfo.Asset.Id"
+                               class="btn btn-outline-primary my-1"><span class="fa-solid fa-tv"></span></a>
                         }
                     </td>
                 </tr>
@@ -68,3 +84,4 @@
     </tbody>
 </table>
 
+@await Html.PartialAsync("_UploadImagePartial")

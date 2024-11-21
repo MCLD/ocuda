@@ -27,6 +27,15 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<DigitalDisplay>> GetByLocation(int locationId)
+        {
+            return await DbSet
+                .Where(_ => _.LocationId == locationId)
+                .OrderBy(_ => _.Name)
+                .AsNoTracking()
+                .ToArrayAsync();
+        }
+
         public async Task UpdateLastAttemptAsync(int displayId, DateTime lastAttemptAt)
         {
             var display = DbSet.SingleOrDefault(_ => _.Id == displayId);
