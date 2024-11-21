@@ -9,6 +9,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     {
         public Task<ICollection<DigitalDisplay>> GetAllAsync();
 
+        public Task<IEnumerable<DigitalDisplay>> GetByLocation(int locationId);
+
         public Task UpdateLastAttemptAsync(int displayId, DateTime lastAttemptAt);
 
         public Task UpdateLastCommunicationAsync(int displayId, DateTime lastCommunicationAt);

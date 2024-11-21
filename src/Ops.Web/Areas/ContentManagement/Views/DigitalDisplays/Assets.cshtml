@@ -2,17 +2,12 @@
 
 @using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDisplays
 
-<div class="row">
-    <div class="col-sm-7">
-        <h1>Digital Display Assets</h1>
-    </div>
-    <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
+<div class="d-flex justify-content-between">
+    <h1>Digital Display Assets</h1>
+    <div class="pt-2">
         @if (Model.HasPermissions)
         {
-            <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+            <button class="btn btn-outline-success"
                     type="button"
                     data-bs-toggle="modal"
                     data-bs-target="#uploadAsset">
@@ -20,6 +15,9 @@
                 Upload Image
             </button>
         }
+        <a class="btn btn-outline-dark ms-2"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
     </div>
 </div>
 
@@ -139,48 +137,7 @@
     </div>
 </form>
 
-<form asp-action="@nameof(DigitalDisplaysController.UploadAsset)"
-      method="post"
-      role="form"
-      enctype="multipart/form-data">
-    <div class="modal fade"
-         id="uploadAsset"
-         data-bs-backdrop="static"
-         data-keyboard="false"
-         tabindex="-1"
-         aria-labelledby="uploadAssetLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="uploadAssetLabel">Upload image</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                        <span class="visually-hidden" aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <label for="assetFile" classt="form-label">Select an image file (.jpg or .png)</label>
-                    <div class="input-group">
-                        <input type="file"
-                               class="form-control"
-                               name="assetFile"
-                               id="assetFile"
-                               accept=".jpg,.png" />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn btn-outline-success" button-spinner>
-                        <span class="fa-solid fa-file-arrow-up" aria-hidden="true"></span>
-                        Upload image
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
+@await Html.PartialAsync("_UploadImagePartial")
 
 @section Scripts {
     <script>

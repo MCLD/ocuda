@@ -14,6 +14,10 @@
                asp-route-slug="@Model.Location.Stub">Add Feature to Location</a>
         </div>
     }
+    <div>
+        <a class="btn btn-outline-secondary ms-2"
+           asp-action="@nameof(LocationsController.Index)">Back</a>
+    </div>
 </div>
 
 <div class="row">
@@ -133,6 +137,38 @@
         </div>
     </div>
     <div class="col">
+        @if (Model.Displays?.Any() == true)
+        {
+            <div class="card mb-2 border-primary">
+                <div class="card-header text-primary-emphasis">Digital displays <em>(in the library)</em></div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var display in Model.Displays)
+                    {
+                        <li class="list-group-item d-flex">
+                            <div class="flex-grow-1">
+                                @display.Name
+                                @if (!string.IsNullOrEmpty(display.LocationDescription))
+                                {
+                                    @:/ @display.LocationDescription
+                                }
+                                (@display.SlideCount assets)
+                            </div>
+                            <div>
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Area"
+                                   asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.DisplayAssets)"
+                                   asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Name"
+                                   asp-route-displayId="@display.Id"
+                                   title="View digital display">
+                                    <span class="fa-solid fa-tv fa-fw" aria-hidden="true"></span>
+                                </a>
+
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
         <div class="card mb-2">
             <div class="card-header">At this location</div>
             <ul class="list-group list-group-flush">

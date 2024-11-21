@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Controllers.ViewModels.Locations
@@ -13,10 +14,9 @@ namespace Ocuda.Ops.Controllers.ViewModels.Locations
         }
 
         public IDictionary<int, string> AllLanguages { get; }
-
         public IEnumerable<Feature> AtThisLocation { get; set; }
-
         public ICollection<string> DescriptionLanguages { get; }
+        public IEnumerable<DigitalDisplay> Displays { get; set; }
 
         public string LanguageCssClass
         {

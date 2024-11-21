@@ -48,6 +48,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
         }
 
+        public static string Area
+        { get { return "ContentManagement"; } }
+
         public static string Name
         { get { return "DigitalDisplays"; } }
 
@@ -243,11 +246,20 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToAction(nameof(Index));
             }
 
+            Location location = null;
+
+            if (display.LocationId.HasValue)
+            {
+                location = await _locationService.GetLocationByIdAsync(display.LocationId.Value);
+            }
+
             return View("CurrentDisplayAssets", new CurrentDisplayAssetsViewModel
             {
                 Assets = await _digitalDisplayService.GetNonExpiredAssetsAsync(displayId),
                 Display = display,
-                HasPermissions = await HasContentManagementRightsAsync()
+                HasPermissions = await HasContentManagementRightsAsync(),
+                LocationName = location?.Name,
+                LocationSlug = location?.Stub
             });
         }
 
@@ -273,8 +285,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                         sets.Where(_ => setIds.Contains(_.Id)).Select(_ => _.Name)));
                 displayActiveElements.Add(display.Id, setActiveElements
                     .Where(_ => setIds.Contains(_.Key))
-                    .Select(_ => _.Value)
-                    .Sum());
+                    .Sum(_ => _.Value));
             }
 
             return View(new DisplayListViewModel
@@ -593,7 +604,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             };
         }
 
-        private static IEnumerable<SelectListItem> LocationDropDown(List<Location> locations)
+        private static List<SelectListItem> LocationDropDown(List<Location> locations)
         {
             var locationList = locations.ConvertAll(_ =>
                 new SelectListItem(_.Name, _.Id.ToString(CultureInfo.InvariantCulture)));
@@ -601,7 +612,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return locationList;
         }
 
-        private static IEnumerable<SelectListItem> SetDropDown(ICollection<DigitalDisplaySet> sets)
+        private static List<SelectListItem> SetDropDown(ICollection<DigitalDisplaySet> sets)
         {
             return sets.ToList().ConvertAll(_ =>
                 new SelectListItem(_.Name, _.Id.ToString(CultureInfo.InvariantCulture)));
@@ -629,10 +640,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                     Path.GetExtension(assetFile.FileName)));
             }
 
-            using var fileStream = new FileStream(fullFilePath, FileMode.Create);
+            await using var fileStream = new FileStream(fullFilePath, FileMode.Create);
             await assetFile.CopyToAsync(fileStream);
 
-            using var sha = new SHA256Managed();
+            using var sha = SHA256.Create();
             byte[] checksum = await sha.ComputeHashAsync(assetFile.OpenReadStream());
 
             var asset = await _digitalDisplayService.FindAssetByChecksumAsync(checksum);

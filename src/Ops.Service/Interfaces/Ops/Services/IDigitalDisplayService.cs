@@ -42,6 +42,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         public string GetAssetWebPath(DigitalDisplayAsset asset);
 
+        public Task<IEnumerable<DigitalDisplay>> GetByLocationAsync(int locationId);
+
         public Task<DigitalDisplay> GetDisplayAsync(int displayId);
 
         public Task<ICollection<DigitalDisplay>> GetDisplaysAsync();

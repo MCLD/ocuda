@@ -26,6 +26,7 @@ namespace Ocuda.Ops.Controllers
     public class LocationsController : BaseController<LocationsController>
     {
         private readonly IConfiguration _configuration;
+        private readonly IDigitalDisplayService _digitalDisplayService;
         private readonly IFeatureService _featureService;
         private readonly IImageService _imageService;
         private readonly ILanguageService _languageService;
@@ -36,6 +37,7 @@ namespace Ocuda.Ops.Controllers
 
         public LocationsController(Controller<LocationsController> context,
             IConfiguration configuration,
+            IDigitalDisplayService digitalDisplayService,
             IFeatureService featureService,
             IImageService imageService,
             ILanguageService languageService,
@@ -45,6 +47,7 @@ namespace Ocuda.Ops.Controllers
             ISegmentService segmentService) : base(context)
         {
             ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(digitalDisplayService);
             ArgumentNullException.ThrowIfNull(featureService);
             ArgumentNullException.ThrowIfNull(imageService);
             ArgumentNullException.ThrowIfNull(languageService);
@@ -54,6 +57,7 @@ namespace Ocuda.Ops.Controllers
             ArgumentNullException.ThrowIfNull(segmentService);
 
             _configuration = configuration;
+            _digitalDisplayService = digitalDisplayService;
             _featureService = featureService;
             _imageService = imageService;
             _languageService = languageService;
@@ -371,13 +375,18 @@ namespace Ocuda.Ops.Controllers
 
             var viewModel = new DetailsViewModel
             {
-                AtThisLocation = featuresHere.Where(_ => _.IsAtThisLocation).OrderBy(_ => _.SortOrder).ToList(),
+                AtThisLocation = featuresHere.Where(_ => _.IsAtThisLocation)
+                    .OrderBy(_ => _.SortOrder)
+                    .ToList(),
+                Displays = await _digitalDisplayService.GetByLocationAsync(location.Id),
                 Location = location,
-                ServicesAvailable = featuresHere.Where(_ => !_.IsAtThisLocation).OrderBy(_ => _.SortOrder).ToList(),
                 LocationManager = await HasAppPermissionAsync(_permissionGroupService,
                     ApplicationPermission.LocationManagement),
                 SegmentEditor = await HasAppPermissionAsync(_permissionGroupService,
-                    ApplicationPermission.WebPageContentManagement)
+                    ApplicationPermission.WebPageContentManagement),
+                ServicesAvailable = featuresHere.Where(_ => !_.IsAtThisLocation)
+                    .OrderBy(_ => _.SortOrder)
+                    .ToList(),
             };
 
             viewModel.DescriptionLanguages.AddRange(await _segmentService
