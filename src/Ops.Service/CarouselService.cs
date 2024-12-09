@@ -40,24 +40,25 @@ namespace Ocuda.Ops.Service
             ISiteSettingService siteSettingService)
             : base(logger, httpContextAccessor)
         {
-            _carouselButtonLabelRepository = carouselButtonLabelRepository
-                ?? throw new ArgumentNullException(nameof(carouselButtonLabelRepository));
-            _carouselButtonRepository = carouselButtonRepository
-                ?? throw new ArgumentNullException(nameof(carouselButtonRepository));
-            _carouselItemRepository = carouselItemRepository
-                ?? throw new ArgumentNullException(nameof(carouselItemRepository));
-            _carouselItemTextRepository = carouselItemTextRepository
-                ?? throw new ArgumentNullException(nameof(carouselItemTextRepository));
-            _carouselRepository = carouselRepository
-                ?? throw new ArgumentNullException(nameof(carouselRepository));
-            _carouselTemplateRepository = carouselTemplateRepository
-                ?? throw new ArgumentNullException(nameof(carouselTemplateRepository));
-            _carouselTextRepository = carouselTextRepository
-                ?? throw new ArgumentNullException(nameof(carouselTextRepository));
-            _languageRepository = languageRepository
-                ?? throw new ArgumentNullException(nameof(languageRepository));
-            _siteSettingService = siteSettingService
-                ?? throw new ArgumentNullException(nameof(siteSettingService));
+            ArgumentNullException.ThrowIfNull(carouselButtonLabelRepository);
+            ArgumentNullException.ThrowIfNull(carouselButtonRepository);
+            ArgumentNullException.ThrowIfNull(carouselItemRepository);
+            ArgumentNullException.ThrowIfNull(carouselItemTextRepository);
+            ArgumentNullException.ThrowIfNull(carouselRepository);
+            ArgumentNullException.ThrowIfNull(carouselTemplateRepository);
+            ArgumentNullException.ThrowIfNull(carouselTextRepository);
+            ArgumentNullException.ThrowIfNull(languageRepository);
+            ArgumentNullException.ThrowIfNull(siteSettingService);
+
+            _carouselButtonLabelRepository = carouselButtonLabelRepository;
+            _carouselButtonRepository = carouselButtonRepository;
+            _carouselItemRepository = carouselItemRepository;
+            _carouselItemTextRepository = carouselItemTextRepository;
+            _carouselRepository = carouselRepository;
+            _carouselTemplateRepository = carouselTemplateRepository;
+            _carouselTextRepository = carouselTextRepository;
+            _languageRepository = languageRepository;
+            _siteSettingService = siteSettingService;
         }
 
         public async Task<Carousel> CloneAsync(int currentCarouselId)
@@ -79,6 +80,7 @@ namespace Ocuda.Ops.Service
                 var newText = new CarouselText
                 {
                     CarouselId = newCarousel.Id,
+                    Footer = text.Footer,
                     LanguageId = text.LanguageId,
                     Title = text.Title
                 };
@@ -95,8 +97,8 @@ namespace Ocuda.Ops.Service
                 var newItem = new CarouselItem
                 {
                     CarouselId = newCarousel.Id,
-                    Order = item.Order,
                     Name = item.Name,
+                    Order = item.Order,
                 };
 
                 await _carouselItemRepository.AddAsync(newItem);
@@ -109,11 +111,11 @@ namespace Ocuda.Ops.Service
                     await _carouselItemTextRepository.AddAsync(new CarouselItemText
                     {
                         CarouselItemId = newItem.Id,
-                        LanguageId = itemText.LanguageId,
-                        Label = itemText.Label,
-                        ImageUrl = itemText.ImageUrl,
-                        Title = itemText.Title,
                         Description = itemText.Description,
+                        ImageUrl = itemText.ImageUrl,
+                        Label = itemText.Label,
+                        LanguageId = itemText.LanguageId,
+                        Title = itemText.Title,
                     });
                 }
 
@@ -124,9 +126,9 @@ namespace Ocuda.Ops.Service
                     await _carouselButtonRepository.AddAsync(new CarouselButton
                     {
                         CarouselItemId = newItem.Id,
+                        LabelId = button.LabelId,
                         Order = button.Order,
                         Url = button.Url,
-                        LabelId = button.LabelId,
                     });
                 }
 
@@ -146,6 +148,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<CarouselButton> CreateButtonAsync(CarouselButton button)
         {
+            ArgumentNullException.ThrowIfNull(button);
+
             button.Url = button.Url?.Trim();
 
             var carouselTemplate = await _carouselTemplateRepository
@@ -170,8 +174,8 @@ namespace Ocuda.Ops.Service
                         throw new OcudaException("Invalid URL");
                     }
 
-                    if (!allowedLinkDomains.Any(_ => _
-                        .IndexOf(linkDomain, StringComparison.OrdinalIgnoreCase) != -1))
+                    if (!allowedLinkDomains
+                            .Any(_ => _.Contains(linkDomain, StringComparison.OrdinalIgnoreCase)))
                     {
                         throw new OcudaException("URL is not from an accepted domain.");
                     }
@@ -192,6 +196,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<CarouselItem> CreateItemAsync(CarouselItem carouselItem)
         {
+            ArgumentNullException.ThrowIfNull(carouselItem);
+
             var itemText = carouselItem.CarouselItemText;
 
             var imageUrl = itemText.ImageUrl?.Trim();
@@ -219,6 +225,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<Carousel> CreateNoSaveAsync(Carousel carousel)
         {
+            ArgumentNullException.ThrowIfNull(carousel);
+
             var carouselText = carousel.CarouselText;
             carouselText.LanguageId = await _languageRepository.GetDefaultLanguageId();
             carouselText.Carousel = carousel;
@@ -256,12 +264,8 @@ namespace Ocuda.Ops.Service
         public async Task DeleteItemAsync(int carouselItemId)
         {
             var carouselItem = await _carouselItemRepository
-                .GetIncludingChildrenAsync(carouselItemId);
-
-            if (carouselItem == null)
-            {
-                throw new OcudaException("Carousel item does not exist.");
-            }
+                .GetIncludingChildrenAsync(carouselItemId)
+                ?? throw new OcudaException("Carousel item does not exist.");
 
             var subsequentItems = await _carouselItemRepository.GetCarouselSubsequentAsync(
                 carouselItem.CarouselId, carouselItem.Order);
@@ -283,12 +287,8 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteNoSaveAsync(int carouselId)
         {
-            var carousel = await _carouselRepository.GetIncludingChildrenAsync(carouselId);
-
-            if (carousel == null)
-            {
-                throw new OcudaException("Carousel does not exist.");
-            }
+            var carousel = await _carouselRepository.GetIncludingChildrenAsync(carouselId)
+                ?? throw new OcudaException("Carousel does not exist.");
 
             var carouselTexts = await _carouselTextRepository.GetForCarouselAsync(carousel.Id);
             _carouselTextRepository.RemoveRange(carouselTexts);
@@ -307,6 +307,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<CarouselButton> EditButtonAsync(CarouselButton carouselButton)
         {
+            ArgumentNullException.ThrowIfNull(carouselButton);
+
             var currentCarouselButton = await _carouselButtonRepository.FindAsync(carouselButton.Id);
 
             var linkUrl = carouselButton.Url?.Trim();
@@ -333,8 +335,8 @@ namespace Ocuda.Ops.Service
                         throw new OcudaException("Invalid URL");
                     }
 
-                    if (!allowedLinkDomains.Any(_ => _
-                        .IndexOf(linkDomain, StringComparison.OrdinalIgnoreCase) != -1))
+                    if (!allowedLinkDomains
+                            .Any(_ => _.Contains(linkDomain, StringComparison.OrdinalIgnoreCase)))
                     {
                         throw new OcudaException("URL is not from an accepted domain.");
                     }
@@ -419,8 +421,7 @@ namespace Ocuda.Ops.Service
             return await _carouselRepository.GetPageLayoutIdForCarouselAsync(id);
         }
 
-        public async Task<DataWithCount<ICollection<Carousel>>> GetPaginatedListAsync(
-                                                                                                                                                            BaseFilter filter)
+        public async Task<DataWithCount<ICollection<Carousel>>> GetPaginatedListAsync(BaseFilter filter)
         {
             return await _carouselRepository.GetPaginatedListAsync(filter);
         }
@@ -432,6 +433,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<CarouselText> SetCarouselTextAsync(CarouselText carouselText)
         {
+            ArgumentNullException.ThrowIfNull(carouselText);
+
             var currentText = await _carouselTextRepository
                 .GetByCarouselAndLanguageAsync(carouselText.CarouselId, carouselText.LanguageId);
 
@@ -457,6 +460,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<CarouselItemText> SetItemTextAsync(CarouselItemText itemText)
         {
+            ArgumentNullException.ThrowIfNull(itemText);
+
             var imageUrl = itemText.ImageUrl?.Trim();
             await ValidateItemImageUrl(imageUrl);
 
@@ -506,12 +511,8 @@ namespace Ocuda.Ops.Service
             }
 
             var buttonInPosition = await _carouselButtonRepository.GetByItemAndOrderAsync(
-                button.CarouselItemId, newSortOrder);
-
-            if (buttonInPosition == null)
-            {
-                throw new OcudaException("Button is already in the last position.");
-            }
+                button.CarouselItemId, newSortOrder)
+                ?? throw new OcudaException("Button is already in the last position.");
 
             buttonInPosition.Order = button.Order;
             button.Order = newSortOrder;
@@ -540,12 +541,8 @@ namespace Ocuda.Ops.Service
             }
 
             var itemInPosition = await _carouselItemRepository.GetByCarouselAndOrderAsync(
-                item.CarouselId, newSortOrder);
-
-            if (itemInPosition == null)
-            {
-                throw new OcudaException("Item is already in the last position.");
-            }
+                item.CarouselId, newSortOrder)
+                ?? throw new OcudaException("Item is already in the last position.");
 
             itemInPosition.Order = item.Order;
             item.Order = newSortOrder;
@@ -574,8 +571,8 @@ namespace Ocuda.Ops.Service
                     throw new OcudaException("Invalid Image URL");
                 }
 
-                if (!allowedImageDomains.Any(_ => _
-                    .IndexOf(imageDomain, StringComparison.OrdinalIgnoreCase) != -1))
+                if (!allowedImageDomains
+                    .Any(_ => _.Contains(imageDomain, StringComparison.OrdinalIgnoreCase)))
                 {
                     throw new OcudaException("Image URL is not from an accepted domain.");
                 }
