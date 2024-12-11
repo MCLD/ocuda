@@ -83,19 +83,19 @@ namespace Ocuda.Promenade.Web
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "{Product} instance {Instance} v{Version} exited unexpectedly: {Message}",
+                Log.Fatal(ex, "{Product} v{Version} instance {Instance} exited unexpectedly: {Message}",
                     Product,
-                    instance,
                     version,
+                    instance,
                     ex.Message);
                 return 1;
             }
             finally
             {
-                Log.Information("{Product} instance {Instance} v{Version} shutting down",
+                Log.Information("{Product} v{Version} instance {Instance} shutting down",
                    Product,
-                   instance,
-                   version);
+                   version,
+                   instance);
                 Log.CloseAndFlush();
             }
         }
