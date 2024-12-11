@@ -135,6 +135,7 @@ namespace Ocuda.Ops.Service
                         AltText = cardDetail.AltText,
                         CardId = newCard.Id,
                         Filename = cardDetail.Filename,
+                        Footer = cardDetail.Footer,
                         Header = cardDetail.Header,
                         LanguageId = cardDetail.LanguageId,
                         Link = cardDetail.Link,
