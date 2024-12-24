@@ -53,8 +53,10 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         public Task<(DateTime AsOf, string Message)> GetDisplayStatusAsync(int displayId);
 
+        public Task<int> GetNonExpiredAssetCountAsync(int displayId);
+
         public Task<IEnumerable<DigitalDisplayCurrentAsset>>
-            GetNonExpiredAssetsAsync(int displayId);
+                    GetNonExpiredAssetsAsync(int displayId);
 
         public Task<DataWithCount<ICollection<DigitalDisplayAsset>>>
             GetPaginatedAssetsAsync(BaseFilter filter);

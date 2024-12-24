@@ -48,24 +48,27 @@ namespace Ocuda.Ops.Service
             IUserRepository userRepository)
             : base(logger, httpContextAccessor)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _dateTimeProvider = dateTimeProvider
-                ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-            _digitalDisplayAssetRepository = digitalDisplayAssetRepository
-                ?? throw new ArgumentNullException(nameof(digitalDisplayAssetRepository));
-            _digitalDisplayAssetSetRepository = digitalDisplayAssetSetRepository
-                ?? throw new ArgumentNullException(nameof(digitalDisplayAssetSetRepository));
-            _digitalDisplayDisplaySetRepository = digitalDisplayDisplaySetRepository
-                ?? throw new ArgumentNullException(nameof(digitalDisplayDisplaySetRepository));
-            _digitalDisplayItemRepository = digitalDisplayItemRepository
-                ?? throw new ArgumentNullException(nameof(digitalDisplayItemRepository));
-            _digitalDisplayRepository = digitalDisplayRepository
-                ?? throw new ArgumentNullException(nameof(digitalDisplayRepository));
-            _digitalDisplaySetRepository = digitalDisplaySetRepository
-                ?? throw new ArgumentNullException(nameof(digitalDisplaySetRepository));
-            _pathResolver = pathResolver ?? throw new ArgumentNullException(nameof(pathResolver));
-            _userRepository = userRepository
-                ?? throw new ArgumentNullException(nameof(userRepository));
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(dateTimeProvider);
+            ArgumentNullException.ThrowIfNull(digitalDisplayAssetRepository);
+            ArgumentNullException.ThrowIfNull(digitalDisplayAssetSetRepository);
+            ArgumentNullException.ThrowIfNull(digitalDisplayDisplaySetRepository);
+            ArgumentNullException.ThrowIfNull(digitalDisplayItemRepository);
+            ArgumentNullException.ThrowIfNull(digitalDisplayRepository);
+            ArgumentNullException.ThrowIfNull(digitalDisplaySetRepository);
+            ArgumentNullException.ThrowIfNull(pathResolver);
+            ArgumentNullException.ThrowIfNull(userRepository);
+
+            _cache = cache;
+            _dateTimeProvider = dateTimeProvider;
+            _digitalDisplayAssetRepository = digitalDisplayAssetRepository;
+            _digitalDisplayAssetSetRepository = digitalDisplayAssetSetRepository;
+            _digitalDisplayDisplaySetRepository = digitalDisplayDisplaySetRepository;
+            _digitalDisplayItemRepository = digitalDisplayItemRepository;
+            _digitalDisplayRepository = digitalDisplayRepository;
+            _digitalDisplaySetRepository = digitalDisplaySetRepository;
+            _pathResolver = pathResolver;
+            _userRepository = userRepository;
         }
 
         public Task<DigitalDisplayAsset> AddAssetAsync(DigitalDisplayAsset asset)
@@ -302,6 +305,18 @@ namespace Ocuda.Ops.Service
                 : default;
 
             return (asOf, message);
+        }
+
+        public async Task<int> GetNonExpiredAssetCountAsync(int displayId)
+        {
+            var displaySets = await _digitalDisplayDisplaySetRepository
+                .GetByDisplayIdsAsync(new[] { displayId });
+
+            var setIds = displaySets.Select(_ => _.DigitalDisplaySetId).Distinct();
+
+            var allAssetSets = await _digitalDisplayAssetSetRepository.GetAssetsBySetsAsync(setIds);
+
+            return allAssetSets.Count(_ => _.EndDate >= _dateTimeProvider.Now);
         }
 
         public async Task<IEnumerable<DigitalDisplayCurrentAsset>> GetNonExpiredAssetsAsync(int displayId)

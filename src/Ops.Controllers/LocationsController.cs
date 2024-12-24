@@ -389,6 +389,12 @@ namespace Ocuda.Ops.Controllers
                     .ToList(),
             };
 
+            foreach(var display in viewModel.Displays)
+            {
+                var assets = await _digitalDisplayService.GetNonExpiredAssetsAsync(display.Id);
+                display.SlideCount = assets.Count();
+            }
+
             viewModel.DescriptionLanguages.AddRange(await _segmentService
                 .GetSegmentLanguagesByIdAsync(location.DescriptionSegmentId));
             viewModel.AllLanguages.AddRange(await _languageService.GetActiveNamesAsync());
