@@ -16,7 +16,9 @@ else
 <div class="row">
     <div class="col-12">
         <form method="post"
-              action="@Url.Action(nameof(HelpController.ScheduleTimes), HelpController.Name)"
+              asp-action="@nameof(HelpController.ScheduleTimes)"
+              asp-controller="@HelpController.Name"
+              asp-route-culture=""
               type="date"
               formgroup>
             <input type="hidden" name="ScheduleRequestTime" value="@Model.ScheduleRequestTime">
@@ -57,7 +59,9 @@ else
                 </select>
             </div>
             <div>
-                <a href="@Url.Action(nameof(HelpController.Schedule), HelpController.Name)"
+                <a asp-action="@nameof(HelpController.Schedule)"
+                   asp-controller="@HelpController.Name"
+                   asp-route-culture=""
                    class="btn btn-outline-dark m-2 btn-lg float-start">
                     <span class="fa-solid fa-chevron-left"></span>
                     @Localizer[Promenade.ButtonBack]

@@ -6,13 +6,19 @@
     {
         <div class="col-12 col-sm-6 col-md-4 mb-3">
             <div class="card">
-                <a href="@Url.Action(nameof(PodcastsController.Podcast), new { stub = podcast.Stub})">
+                <a asp-action="@nameof(PodcastsController.Podcast)"
+                   asp-route-stub="@podcast.Stub"
+                   asp-route-culture="">
                     <img class="card-img-top"
                          alt="@podcast.Title"
                          src="@(podcast.ImageThumbnailUrl ?? podcast.ImageUrl)" />
                 </a>
                 <div class="card-body">
-                    <div class="card-title h5"><a href="@Url.Action(nameof(PodcastsController.Podcast), new { stub = podcast.Stub})">@podcast.Title</a></div>
+                    <div class="card-title h5">
+                        <a asp-action="@nameof(PodcastsController.Podcast)"
+                           asp-route-stub="@podcast.Stub"
+                           asp-route-culture="">@podcast.Title</a>
+                    </div>
                     <p class="card-text">@podcast.Description</p>
                 </div>
             </div>

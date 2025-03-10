@@ -15,6 +15,7 @@
                     </div>
                     <p style="margin-left: 1rem;">
                         <a asp-action="@nameof(HomeController.Location)"
+                           asp-route-culture=""
                            asp-route-locationSlug="@Model.Location.Stub"
                            asp-route-featureSlug="" class="btn btn-outline-dark">
                             <span class="fa-solid fa-circle-left" aria-hidden="true"></span>

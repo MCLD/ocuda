@@ -30,8 +30,9 @@
             <tr>
                 <td>
                     <a asp-action="@nameof(HomeController.Location)"
-               asp-controller="@HomeController.Name"
-               asp-route-locationSlug="@item.Stub">@item.Name</a>
+                       asp-controller="@HomeController.Name"
+                       asp-route-culture=""
+                       asp-route-locationSlug="@item.Stub">@item.Name</a>
                 </td>
                 <td class="@item.CurrentStatusClass">@item.CurrentStatus</td>
                 <td class="@item.InventoryStatusClass">@item.InventoryStatus</td>

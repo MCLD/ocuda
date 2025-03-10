@@ -25,7 +25,9 @@
                        class="btn btn-outline-secondary mt-1"
                        target="_blank">@directoryInfo.PodcastDirectory.Name</a>
                 }
-                <a href="@Url.Action(nameof(PodcastsController.RSS), new { stub = Model.Podcast.Stub })"
+                <a asp-action="@nameof(PodcastsController.RSS)"
+                   asp-route-culture=""
+                   asp-route-stub="@Model.Podcast.Stub"
                    target="_blank"
                    class="btn btn-outline-secondary mt-1"><span class="fa-solid fa-square-rss"></span> RSS</a>
             </div>
@@ -41,7 +43,10 @@
             <div class="row">
                 <div class="col-12 col-lg-6 col-xl-7">
                     <h2 class="mb-2">
-                        <a href="@Url.Action(nameof(PodcastsController.Episode), new { podcastStub = Model.Podcast.Stub, episodeStub = item.Stub})">
+                        <a asp-action="@nameof(PodcastsController.Episode)"
+                           asp-route-culture=""
+                           asp-route-episodeStub="@item.Stub"
+                           asp-route-podcastStub="@Model.Podcast.Stub">
                             @item.Title
                         </a>
                     </h2>
@@ -60,13 +65,16 @@
             <p>@item.Description</p>
             @if (item.ShowNotesSegmentId.HasValue)
             {
-                <a href="@Url.Action(nameof(PodcastsController.ShowNotes), new { podcastStub = Model.Podcast.Stub, episodeStub = item.Stub})"
+                <a asp-action="@nameof(PodcastsController.ShowNotes)"
+                   asp-route-culture=""
+                   asp-route-episodeStub="@item.Stub"
+                   asp-route-podcastStub="@Model.Podcast.Stub"
                    target="_blank"
                    aria-label="@Localizer[Promenade.NewWindow]"
                    title="@Localizer[Promenade.ShowNotesFor, item.Title]"
                    class="btn d-block d-md-inline-block btn-outline-primary">
-                   <span class="fa-regular fa-file-lines"></span>
-                   @Localizer[Promenade.ViewShowNotes]
+                    <span class="fa-regular fa-file-lines"></span>
+                    @Localizer[Promenade.ViewShowNotes]
                 </a>
             }
         </div>
@@ -86,18 +94,18 @@
     @if (Context.Items.ContainsKey(Ocuda.Promenade.Controllers.ItemKey.GoogleAnalyticsTrackingCode))
     {
         <script>
-        var players = document.getElementsByTagName("audio");
-        for (var index = 0; index < players.length; index++) {
-            var episode = players[index].getAttribute("data-episode");
-            players[index].addEventListener("play", function () {
-                if (typeof gtag !== 'undefined') {
-                    gtag('event', 'Podcast play', {
-                        'event_category': '@Html.Raw(Model.Podcast.Title.Replace("'", "\\'"))',
-                        'event_label': episode
-                    });
-                }
-            });
-        }
+            var players = document.getElementsByTagName("audio");
+            for (var index = 0; index < players.length; index++) {
+                var episode = players[index].getAttribute("data-episode");
+                players[index].addEventListener("play", function () {
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'Podcast play', {
+                            'event_category': '@Html.Raw(Model.Podcast.Title.Replace("'", "\\'"))',
+                            'event_label': episode
+                        });
+                    }
+                });
+            }
         </script>
     }
 }

@@ -1,4 +1,5 @@
-﻿@model Ocuda.Promenade.Controllers.ViewModels.Shared.PageLayoutViewModel
+﻿@using Ocuda.Promenade.Controllers.ViewModels.Shared
+@model PageLayoutViewModel
 
 @section metadata {
     <link rel="canonical" href="@Model.CanonicalUrl" />
@@ -64,9 +65,9 @@
             <div class="mb-4">
                 <div class="row g-0">
                     <div class="col-12 col-lg-7">
-                        <img class="img-fluid" 
-                                src="@item.NavBanner.NavBannerImage.ImageLinkPath" 
-                                alt="@item.NavBanner.NavBannerImage.ImageAltText" />
+                        <img class="img-fluid"
+                             src="@item.NavBanner.NavBannerImage.ImageLinkPath"
+                             alt="@item.NavBanner.NavBannerImage.ImageAltText" />
                     </div>
                     <div class="col-12 col-lg-5 p-2 gap-2 fs-5 text-bold navbanner-link-container">
                         <div class="navbanner-link-grid-container gap-2 h-100">
@@ -173,17 +174,14 @@
                             @foreach (var carouselItem in item.Carousel.Items)
                             {
                                 <div>
-                                    <a href="@Url.Action(nameof(HomeController.CarouselItem), new { stub = Model.Stub, id = carouselItem.Id })"
+                                    <a href="@Url.Action(nameof(HomeController.CarouselItem), new { stub = Model.Stub, id = carouselItem.Id, culture = string.Empty})"
                                        class="prom-carousel-modal"
                                        data-title="@carouselItem.CarouselItemText.Title"
                                        data-img="@carouselItem.CarouselItemText.ImageUrl"
                                        data-description="@carouselItem.CarouselItemText.Description"
-                                    @foreach (var button in carouselItem.Buttons)
-                                    {
-                                        <text>data-button-@button.Order='{"Sort":"@button.Order","Button":"@button.LabelText.Text","Link":"@button.Url"}' </text>
-                                    }>
-                                                    <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p>
-                                                </a>
+                                    @Html.Raw(PageLayoutViewModel.DataButtonFields(carouselItem.Buttons))>
+                                        <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p>
+                                    </a>
                                 </div>
                             }
                         </div>
@@ -206,7 +204,10 @@
                 @foreach (var carouselItem in item.Carousel.Items)
                 {
                     <li>
-                        <a href="@Url.Action(nameof(HomeController.CarouselItem), new { stub = Model.Stub, id = carouselItem.Id })">
+                        <a asp-action="@nameof(HomeController.CarouselItem)"
+                           asp-route-culture=""
+                           asp-route-id="@carouselItem.Id"
+                           asp-route-stub="@Model.Stub">
                             @carouselItem.CarouselItemText.Title
                         </a>
                     </li>

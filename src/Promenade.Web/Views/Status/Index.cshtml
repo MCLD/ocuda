@@ -11,7 +11,11 @@
     {
         @foreach (var item in Model)
         {
-            <li><a asp-action="Product" asp-route-slug="@item.Slug">@item.Name</a></li>
+            <li>
+                <a asp-action="Product"
+                   asp-route-culture=""
+                   asp-route-slug="@item.Slug">@item.Name</a>
+            </li>
         }
     }
 </ul>

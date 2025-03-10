@@ -116,12 +116,13 @@
                                 {
                                     <a asp-action="@nameof(HomeController.Feature)"
                                        asp-controller="@HomeController.Name"
+                                       asp-route-culture=""
                                        asp-route-locationSlug="@Model.Location.Stub"
                                        asp-route-featureSlug="@feature.Stub"
                                        data-bs-toggle="modal"
                                        data-bs-target="#featureModal"
                                        target="@(feature.NewTab == true ? "_blank" : null)"
-                                       data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
+                                       data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub, culture = string.Empty })"
                                        data-name="@feature.Name">
                                         @if (feature.Icon.StartsWith("fa"))
                                         {
@@ -213,7 +214,7 @@
                                data-bs-toggle="modal"
                                data-bs-target="#featureModal"
                                target="@(feature.NewTab == true ? "_blank" : null)"
-                               data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
+                               data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub, culture = string.Empty })"
                                data-name="@feature.Name">
                                 <div class="d-flex gap-2 align-items-center ps-2 py-3 location-feature-button">
                                     @if (feature.Icon.StartsWith("fa"))
@@ -317,9 +318,9 @@
         <div class="row g-0 col-lg-10 offset-lg-1 border-4 border-bottom">
             <div class="mx-auto" style="max-width: 740px;">
                 <div class="row">
-                    @if(!string.IsNullOrEmpty(Model.SocialLink) && 
-                        !string.IsNullOrEmpty(Model.SocialName) &&
-                        !string.IsNullOrEmpty(Model.SocialIcon))
+                    @if (!string.IsNullOrEmpty(Model.SocialLink) &&
+                    !string.IsNullOrEmpty(Model.SocialName) &&
+                    !string.IsNullOrEmpty(Model.SocialIcon))
                     {
                         <div class="col-12 col-sm-6 mb-4 location-feature-link">
                             <a href="@Model.SocialLink"
@@ -394,6 +395,7 @@
                                 <td colspan="@(locationGroup.Location.HasEvents ? 1 : 2)">
                                     <a asp-action="@nameof(HomeController.Location)"
                                        asp-controller="@HomeController.Name"
+                                       asp-route-culture=""
                                        asp-route-locationStub="@locationGroup.Location.Stub">@locationGroup.Location.Name</a>
                                 </td>
                                 @if (locationGroup.Location.HasEvents)

@@ -14,7 +14,10 @@ else
 }
 <div class="row">
     <div class="col-12">
-        <form method="post" action="@Url.Action("ScheduleDetails", "Help")"
+        <form method="post"
+              asp-action="@nameof(HelpController.ScheduleDetails)"
+              asp-controller="@HelpController.Name"
+              asp-route-culture=""
               type="date"
               formgroup>
             <input asp-for="DisplayTime" formgroup readonly />
@@ -29,14 +32,16 @@ else
                    formgroup-val-required="@Model.EmailRequiredMessage"
                    type="email" />
             <select asp-for="ScheduleRequest.Language"
-                    asp-items="Ocuda.Promenade.Controllers.ViewModels.Help.ScheduleDetailsViewModel.Languages" 
+                    asp-items="Ocuda.Promenade.Controllers.ViewModels.Help.ScheduleDetailsViewModel.Languages"
                     formgroup></select>
             <textarea asp-for="ScheduleRequest.Notes"
                       maxlength="255"
                       formgroup-val-required="@Model.NotesRequiredMessage"
                       formgroup />
             <div>
-                <a href="@Url.Action("Schedule", "Help")"
+                <a asp-action="@nameof(HelpController.Schedule)"
+                   asp-controller="@HelpController.Name"
+                   asp-route-culture=""
                    class="btn btn-outline-dark m-2 btn-lg float-start">
                     <span class="fa-solid fa-chevron-left"></span>
                     @Localizer[Promenade.ButtonBack]

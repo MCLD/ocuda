@@ -26,7 +26,10 @@ else
 
 <div class="row">
     <div class="col-12">
-        <form method="post" action="@Url.Action("Schedule", "Help")">
+        <form method="post"
+              asp-action="@nameof(HelpController.Schedule)"
+              asp-controller="@HelpController.Name"
+              asp-route-culture="">
             <input asp-for="RequestedDate"
                    type="date"
                    formgroup />
@@ -52,7 +55,7 @@ else
 <script>
     const today = '@Model.FirstAvailable.ToString("O").Substring(0, 10)';
     const lastDate = '@(Model.LastAvailableDate.HasValue ? Model.LastAvailableDate.Value.ToString("O").Substring(0, 10) : "")';
-    const baseUrl = '@Url.Action(nameof(HelpController.Availability))';
+    const baseUrl = '@Url.Action(nameof(HelpController.Availability), new { culture = string.Empty })';
     document.querySelector("#RequestedDate").setAttribute('min', today);
     if (lastDate.length > 0) {
         document.querySelector("#RequestedDate").setAttribute('max', lastDate);
@@ -64,8 +67,8 @@ else
     })
 
     async function getTimeBlocks(selectedDate) {
-        const fullUrl = baseUrl.endsWith('/') 
-            ? baseUrl + selectedDate 
+        const fullUrl = baseUrl.endsWith('/')
+            ? baseUrl + selectedDate
             : baseUrl + '/' + selectedDate;
         console.info(fullUrl)
         const response = await fetch(fullUrl);
