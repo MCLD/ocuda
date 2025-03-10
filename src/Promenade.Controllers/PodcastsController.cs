@@ -32,12 +32,13 @@ namespace Ocuda.Promenade.Controllers
             SegmentService segmentService)
             : base(context)
         {
-            _pathResolverService = pathResolverService
-                ?? throw new ArgumentNullException(nameof(pathResolverService));
-            _podcastService = podcastService
-                ?? throw new ArgumentNullException(nameof(podcastService));
-            _segmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
+            ArgumentNullException.ThrowIfNull(pathResolverService);
+            ArgumentNullException.ThrowIfNull(podcastService);
+            ArgumentNullException.ThrowIfNull(segmentService);
+
+            _pathResolverService = pathResolverService;
+            _podcastService = podcastService;
+            _segmentService = segmentService;
         }
 
         public static string Name
@@ -196,7 +197,10 @@ namespace Ocuda.Promenade.Controllers
 
             var scheme = (await _siteSettingService
                 .GetSettingBoolAsync(Models.Keys.SiteSetting.Site.IsTLS)) ? "https" : "http";
-            viewModel.RSSUrl = Url.Action(nameof(RSS), Name, new { stub = podcast.Stub }, scheme);
+            viewModel.RSSUrl = Url.Action(nameof(RSS),
+                Name,
+                new { stub = podcast.Stub, culture = string.Empty },
+                scheme);
 
             foreach (var item in viewModel.PodcastItems)
             {
@@ -243,8 +247,11 @@ namespace Ocuda.Promenade.Controllers
                 .GetSettingBoolAsync(Models.Keys.SiteSetting.Site.IsTLS)) ? "https" : "http";
 
             var podcastUri = new Uri(
-                Url.Action(nameof(Podcast), Name, new { stub = podcast.Stub }, scheme),
-                UriKind.Absolute);
+                Url.Action(nameof(Podcast),
+                    Name,
+                    new { stub = podcast.Stub, culture = string.Empty },
+                    scheme),
+                    UriKind.Absolute);
 
             var imageUrl = new UriBuilder
             {
@@ -352,7 +359,8 @@ namespace Ocuda.Promenade.Controllers
             foreach (var podcastItem in podcastItems)
             {
                 var itemUri = new Uri(Url.Action(nameof(Episode), Name,
-                    new { podcastStub = podcast.Stub, episodeStub = podcastItem.Stub }, scheme),
+                    new { podcastStub = podcast.Stub, episodeStub = podcastItem.Stub, culture = string.Empty },
+                    scheme),
                     UriKind.Absolute);
 
                 var item = new SyndicationItem
@@ -481,10 +489,9 @@ namespace Ocuda.Promenade.Controllers
             rssFormatter.WriteTo(xmlWriter);
             await xmlWriter.FlushAsync();
 
-            Response.Headers.Add("Last-Modified",
-                new DateTime(lastModified)
+            Response.Headers.LastModified = new DateTime(lastModified)
                     .ToUniversalTime()
-                    .ToString("R", CultureInfo.InvariantCulture));
+                    .ToString("R", CultureInfo.InvariantCulture);
 
             return File(stream.ToArray(), "application/rss+xml; charset=utf-8");
         }

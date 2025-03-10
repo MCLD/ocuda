@@ -1,4 +1,8 @@
-﻿using Ocuda.Promenade.Models.Entities;
+﻿using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Controllers.ViewModels.Shared
 {
@@ -14,5 +18,26 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Shared
         public string PageHeaderClasses { get; set; }
         public PageLayout PageLayout { get; set; }
         public string Stub { get; set; }
+
+        public static string DataButtonFields(IEnumerable<CarouselButton> buttons)
+        {
+            if (buttons?.Any() != true)
+            {
+                return string.Empty;
+            }
+            var output = new StringBuilder();
+            foreach (var button in buttons)
+            {
+                output.AppendFormat(CultureInfo.InvariantCulture, "data-button-{0}='{1}' ",
+                    button.Order,
+                    System.Text.Json.JsonSerializer.Serialize(new
+                    {
+                        Sort = button.Order,
+                        Button = button.LabelText.Text,
+                        Link = button.Url
+                    }));
+            }
+            return output.ToString().Trim();
+        }
     }
 }

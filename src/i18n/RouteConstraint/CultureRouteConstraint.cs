@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -13,7 +13,9 @@ namespace Ocuda.i18n.RouteConstraint
 
         public CultureRouteConstraint(IOptions<RequestLocalizationOptions> l10nOptions)
         {
-            _l10nOptions = l10nOptions ?? throw new ArgumentNullException(nameof(l10nOptions));
+            ArgumentNullException.ThrowIfNull(l10nOptions);
+
+            _l10nOptions = l10nOptions;
         }
 
         public bool Match(HttpContext httpContext,
@@ -23,10 +25,18 @@ namespace Ocuda.i18n.RouteConstraint
             RouteDirection routeDirection)
         {
             string culture = values?[routeKey] as string;
-            return _l10nOptions
-                    .Value
-                    .SupportedCultures
-                    .Any(_ => _.Name == culture);
+            if (string.IsNullOrEmpty(culture))
+            {
+                return false;
+            }
+            try
+            {
+                return _l10nOptions.Value.SupportedCultures.Contains(new CultureInfo(culture));
+            }
+            catch (CultureNotFoundException)
+            {
+                return false;
+            }
         }
     }
 }

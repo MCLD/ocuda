@@ -53,7 +53,9 @@ namespace Ocuda.Promenade.Controllers.Abstract
             var viewModel = new CarouselItemViewModel
             {
                 Item = carouselItem,
-                ReturnUrl = Url.Action(nameof(Page), PageTitle, new { stub })
+                ReturnUrl = Url.Action(nameof(Page),
+                    PageTitle,
+                    new { stub, culture = string.Empty })
             };
 
             return View("CarouselItem", viewModel);
