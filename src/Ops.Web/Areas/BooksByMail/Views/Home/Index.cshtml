@@ -1,0 +1,99 @@
+﻿@model BooksByMail.ViewModels.Home.IndexViewModel
+
+@if (!string.IsNullOrEmpty(Model.Search))
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-info alert-dismissible">
+                Search for '<strong>@Model.Search</strong>' found @Model.SearchCount
+                @(Model.SearchCount == 1 ? "match." : "matches.")
+                <button type="button" class="close" id="clearSearch" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+}
+<div class="row">
+    <div class="col-12">
+        @if (Model.Patrons.Count() == 0)
+        {
+            <div class="alert alert-warning">No customers found.</div>
+        }
+        else
+        {
+            <div>
+                <table class="table table-sm table-bordered table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a class="sortable-column" asp-route-Search="@Model.Search" asp-route-OrderBy="0" asp-route-OrderDesc="@(Model.OrderBy == 0 && Model.OrderDesc == false ? "true" : "false")">
+                                    First Name
+                                    @if (Model.OrderBy == 0)
+                                    {
+                                        <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
+                                    }
+                                </a>
+                            </th>
+                            <th>
+                                <a class="sortable-column" asp-route-Search="@Model.Search" asp-route-OrderBy="1" asp-route-OrderDesc="@(Model.OrderBy == 1 && Model.OrderDesc == false ? "true" : "false")">
+                                    Last Name
+                                    @if (Model.OrderBy == 1)
+                                    {
+                                        <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
+                                    }
+                                </a>
+                            </th>
+                            <th>
+                                <a class="sortable-column" asp-route-Search="@Model.Search" asp-route-OrderBy="2" asp-route-OrderDesc="@(Model.OrderBy == 2 && Model.OrderDesc == false ? "true" : "false")">
+                                    Last Activity Date
+                                    @if (Model.OrderBy == 2)
+                                    {
+                                        <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
+                                    }
+                                </a>
+                            </th>
+                            <th>Barcode</th>
+                            <th>Patron ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var patron in Model.Patrons)
+                        {
+                            <tr class="row-link" data-id="@patron.PatronID">
+                                <td>@patron.NameFirst</td>
+                                <td>@patron.NameLast</td>
+                                <td class="@patron.LastActivityClass">
+                                    @patron.LastActivityDate
+                                    @if (!string.IsNullOrEmpty(patron.LastActivityClass))
+                                    {
+                                        <span class="fa fa-exclamation-triangle"
+                                              data-toggle="tooltip"
+                                              title="More than 3 weeks!"></span>
+                                    }
+                                </td>
+                                <td>@patron.Barcode</td>
+                                <td>@patron.PatronID</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (Model.PaginateModel.MaxPage > 1)
+            {
+                <paginate paginateModel="@Model.PaginateModel"></paginate>
+            }
+        }
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(".row-link").on("click", function () {
+            window.location.href = "@Url.Action(nameof(HomeController.Customer))/" + $(this).data("id");
+        });
+        $("#clearSearch").click(function () {
+            window.location.href = "@Url.Action(nameof(HomeController.Index))";
+        });
+    </script>
+}
