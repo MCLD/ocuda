@@ -15,9 +15,12 @@ using Microsoft.Extensions.Logging;
 
 namespace BooksByMail.Controllers
 {
+    [Area(nameof(BooksByMail))]
+    [Route("[area]")]
     public class HomeController : BaseController
     {
         private const int DefaultDays = -21;
+        private const string PageTitle = "Books By Mail";
 
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _config;
@@ -35,6 +38,9 @@ namespace BooksByMail.Controllers
             _polarisService = polarisService
                 ?? throw new ArgumentNullException(nameof(polarisService));
         }
+
+        public static string Name
+        { get { return "BooksByMail"; } }
 
         public async Task<IActionResult> Index(string search, int orderBy, bool orderDesc,
             int page = 1)

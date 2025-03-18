@@ -144,6 +144,13 @@
                                 <span class="fa-solid fa-hands-helping fa-fw"></span>
                                 Volunteer Submissions
                             </a>
+                            <a class="dropdown-item"
+                               asp-controller="@BooksByMail.Controllers.HomeController.Name"
+                               asp-area="@(nameof(BooksByMail.Controllers.HomeController))"
+                               asp-action="@(nameof(BooksByMail.Controllers.HomeController.Index))">
+                                <span class="fa-solid fa-book fa-fw"></span>
+                                Books By Mail
+                            </a>
                         </div>
                     </li>
                 </ul>
