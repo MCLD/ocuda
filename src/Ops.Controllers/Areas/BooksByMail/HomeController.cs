@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BooksByMail.Controllers.Abstract;
 using BooksByMail.Data.Models;
-using BooksByMail.Helpers;
 using BooksByMail.Models;
 using BooksByMail.QueryFilters;
 using BooksByMail.Services;
