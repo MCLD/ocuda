@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BooksByMail.Controllers.Abstract;
 using BooksByMail.Data.Models;
-using BooksByMail.Helpers;
 using BooksByMail.Models;
 using BooksByMail.QueryFilters;
 using BooksByMail.Services;
@@ -15,8 +14,8 @@ using Microsoft.Extensions.Logging;
 
 namespace BooksByMail.Controllers
 {
-    [Area(nameof(BooksByMail))]
-    [Route("[area]")]
+    [Area("BooksByMail")]
+    [Route("BooksByMail/[controller]/[action]")]
     public class HomeController : BaseController
     {
         private const int DefaultDays = -21;

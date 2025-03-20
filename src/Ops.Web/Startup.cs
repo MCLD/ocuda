@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using BooksByMail.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -162,6 +163,8 @@ namespace Ocuda.Ops.Web
                 ?? throw new OcudaException("ConnectionString:Ops not configured.");
             string promCs = _config.GetConnectionString("Promenade")
                 ?? throw new OcudaException("ConnectionString:Promenade not configured.");
+            string bbmCs = _config.GetConnectionString("BooksByMail") 
+                ?? throw new OcudaException("ConnectionString:Promenade not configured.");
 
             var provider = _config[Configuration.OpsDatabaseProvider];
             switch (provider)
@@ -171,6 +174,7 @@ namespace Ocuda.Ops.Web
                         DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
                     services.AddDbContextPool<PromenadeContext,
                         DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+                    services.AddDbContextPool<Context>(_ => _.UseSqlServer(bbmCs));
                     services.AddHealthChecks();
                     break;
 
@@ -559,6 +563,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ICarouselService, CarouselService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ICoverIssueService, CoverIssueService>();
+            services.AddScoped <BooksByMail.Services.CustomerService>();
             services.AddScoped<IDeckService, DeckService>();
             services.AddScoped<IDigitalDisplayService, DigitalDisplayService>();
             services.AddScoped<IDigitalDisplayCleanupService, DigitalDisplayCleanupService>();
@@ -593,6 +598,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
                 Utility.Services.PathResolverService>();
             services.AddScoped<IPodcastService, PodcastService>();
+            services.AddScoped<BooksByMail.Services.PolarisService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IPermissionGroupService, PermissionGroupService>();
             services.AddScoped<IProductService, ProductService>();

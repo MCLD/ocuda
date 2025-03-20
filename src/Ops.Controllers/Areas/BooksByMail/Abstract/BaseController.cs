@@ -1,10 +1,8 @@
 ﻿using System.Linq;
-using BooksByMail.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BooksByMail.Controllers.Abstract
 {
-    [ServiceFilter(typeof(AuthenticationFilter))]
     public abstract class BaseController: Controller
     {
         protected string AlertDanger
