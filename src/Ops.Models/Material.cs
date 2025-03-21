@@ -2,7 +2,7 @@
 
 namespace BooksByMail.Models
 {
-    public class PolarisItem
+    public class Material
     {
         public string Title { get; set; }
         public string Author { get; set; }

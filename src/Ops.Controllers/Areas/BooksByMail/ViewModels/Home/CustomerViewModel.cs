@@ -8,9 +8,9 @@ namespace BooksByMail.ViewModels.Home
     {
         public BooksByMailCustomer BooksByMailCustomer { get; set; }
         public BooksByMailComment BooksByMailComment { get; set; }
-        public PolarisPatron Patron { get; set; }
-        public List<PolarisItem> PatronCheckouts { get; set; }
-        public List<PolarisItem> PatronHolds { get; set; }
+        public Customer Patron { get; set; }
+        public List<Material> PatronCheckouts { get; set; }
+        public List<Material> PatronHolds { get; set; }
         public int PatronHistoryCount { get; set; }
     }
 }

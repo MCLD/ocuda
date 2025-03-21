@@ -28,15 +28,15 @@ namespace BooksByMail.Services
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public async Task<DataWithCount<List<PolarisPatron>>> GetPaginatedPatronListAsync(
+        public async Task<DataWithCount<List<Customer>>> GetPaginatedPatronListAsync(
             PolarisPatronFilter filter)
         {
             using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
-            var dataQuery = $"SELECT PT.PatronID AS {nameof(PolarisPatron.PatronID)}," +
-                                $" PT.Barcode AS {nameof(PolarisPatron.Barcode)}," +
-                                $" PT.LastActivityDate AS {nameof(PolarisPatron.LastActivityDate)}," +
-                                $" PTR.NameFirst AS {nameof(PolarisPatron.NameFirst)}," +
-                                $" PTR.NameLast AS {nameof(PolarisPatron.NameLast)}" +
+            var dataQuery = $"SELECT PT.PatronID AS {nameof(Customer.PatronID)}," +
+                                $" PT.Barcode AS {nameof(Customer.Barcode)}," +
+                                $" PT.LastActivityDate AS {nameof(Customer.LastActivityDate)}," +
+                                $" PTR.NameFirst AS {nameof(Customer.NameFirst)}," +
+                                $" PTR.NameLast AS {nameof(Customer.NameLast)}" +
                                 " FROM Polaris.Polaris.Patrons AS PT WITH (NOLOCK)" +
                                 " JOIN Polaris.Polaris.PatronRegistration AS PTR WITH (NOLOCK)" +
                                 " ON PT.PatronID = PTR.PatronID";
@@ -66,21 +66,21 @@ namespace BooksByMail.Services
             parameters.Add(SkipParam, filter.Skip);
             parameters.Add(TakeParam, filter.Take);
 
-            return new DataWithCount<List<PolarisPatron>>
+            return new DataWithCount<List<Customer>>
             {
                 Count = await db.ExecuteScalarAsync<int>(countQuery, parameters),
-                Data = (await db.QueryAsync<PolarisPatron>(dataQuery, parameters)).ToList()
+                Data = (await db.QueryAsync<Customer>(dataQuery, parameters)).ToList()
             };
         }
 
-        public async Task<PolarisPatron> GetPatronInfoAsync(int patronID)
+        public async Task<Customer> GetPatronInfoAsync(int patronID)
         {
             using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
-            var query = $"SELECT PT.PatronID AS {nameof(PolarisPatron.PatronID)}," +
-                $" PT.Barcode AS {nameof(PolarisPatron.Barcode)}," +
-                $" PT.LastActivityDate AS {nameof(PolarisPatron.LastActivityDate)}," +
-                $" PTR.NameFirst AS {nameof(PolarisPatron.NameFirst)}," +
-                $" PTR.NameLast AS {nameof(PolarisPatron.NameLast)}" +
+            var query = $"SELECT PT.PatronID AS {nameof(Customer.PatronID)}," +
+                $" PT.Barcode AS {nameof(Customer.Barcode)}," +
+                $" PT.LastActivityDate AS {nameof(Customer.LastActivityDate)}," +
+                $" PTR.NameFirst AS {nameof(Customer.NameFirst)}," +
+                $" PTR.NameLast AS {nameof(Customer.NameLast)}" +
                 " FROM Polaris.Polaris.Patrons AS PT WITH (NOLOCK)" +
                 " JOIN Polaris.Polaris.PatronRegistration AS PTR WITH (NOLOCK)" +
                 " ON PT.PatronID = PTR.PatronID" +
@@ -89,16 +89,16 @@ namespace BooksByMail.Services
             var parameters = new DynamicParameters();
             parameters.Add(IdParam, patronID);
 
-            return await db.QueryFirstOrDefaultAsync<PolarisPatron>(query, parameters);
+            return await db.QueryFirstOrDefaultAsync<Customer>(query, parameters);
         }
 
-        public async Task<List<PolarisItem>> GetPatronCheckoutsAsync(int patronID)
+        public async Task<List<Material>> GetPatronCheckoutsAsync(int patronID)
         {
             using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
-            var query = $"SELECT BR.BrowseAuthor AS {nameof(PolarisItem.Author)}," +
-                $" BR.BrowseTitle AS {nameof(PolarisItem.Title)}," +
-                $" COALESCE(IRD.ClassificationNumber, IRD.CutterNumber) AS {nameof(PolarisItem.Category)}," +
-                $" IC.DueDate AS {nameof(PolarisItem.DueDate)}" +
+            var query = $"SELECT BR.BrowseAuthor AS {nameof(Material.Author)}," +
+                $" BR.BrowseTitle AS {nameof(Material.Title)}," +
+                $" COALESCE(IRD.ClassificationNumber, IRD.CutterNumber) AS {nameof(Material.Category)}," +
+                $" IC.DueDate AS {nameof(Material.DueDate)}" +
                 " FROM [Polaris].[Polaris].[ItemCheckouts] AS IC WITH (NOLOCK)" +
                 " JOIN [Polaris].[Polaris].[ItemRecordDetails] AS IRD WITH (NOLOCK)" +
                 " ON IC.ItemRecordID = IRD.ItemRecordID" +
@@ -111,7 +111,7 @@ namespace BooksByMail.Services
             var parameters = new DynamicParameters();
             parameters.Add(IdParam, patronID);
 
-            return (await db.QueryAsync<PolarisItem>(query, parameters)).ToList();
+            return (await db.QueryAsync<Material>(query, parameters)).ToList();
         }
 
         public async Task<int> GetPatronHistoryCountAsync(int patronID)
@@ -127,14 +127,14 @@ namespace BooksByMail.Services
             return await db.ExecuteScalarAsync<int>(query, parameters);
         }
 
-        public async Task<DataWithCount<List<PolarisItem>>> GetPaginatedPatronHistoryAsync(
+        public async Task<DataWithCount<List<Material>>> GetPaginatedPatronHistoryAsync(
             PolarisItemFilter filter)
         {
             using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
-            var dataQuery = $"SELECT BR.BrowseAuthor AS {nameof(PolarisItem.Author)}," +
-                $" BR.BrowseTitle AS {nameof(PolarisItem.Title)}," +
-                $" COALESCE(IRD.ClassificationNumber, IRD.CutterNumber) AS {nameof(PolarisItem.Category)}," +
-                $" PRH.CheckOutDate AS {nameof(PolarisItem.CheckoutDate)}" +
+            var dataQuery = $"SELECT BR.BrowseAuthor AS {nameof(Material.Author)}," +
+                $" BR.BrowseTitle AS {nameof(Material.Title)}," +
+                $" COALESCE(IRD.ClassificationNumber, IRD.CutterNumber) AS {nameof(Material.Category)}," +
+                $" PRH.CheckOutDate AS {nameof(Material.CheckoutDate)}" +
                 " FROM [Polaris].[Polaris].[PatronReadingHistory] AS PRH WITH (NOLOCK)" +
                 " JOIN [Polaris].[Polaris].[ItemRecordDetails] AS IRD WITH (NOLOCK)" +
                 " ON PRH.ItemRecordID = IRD.ItemRecordID" +
@@ -168,19 +168,19 @@ namespace BooksByMail.Services
             parameters.Add(SkipParam, filter.Skip);
             parameters.Add(TakeParam, filter.Take);
 
-            return new DataWithCount<List<PolarisItem>>
+            return new DataWithCount<List<Material>>
             {
                 Count = await db.ExecuteScalarAsync<int>(countQuery, parameters),
-                Data = (await db.QueryAsync<PolarisItem>(dataQuery, parameters)).ToList()
+                Data = (await db.QueryAsync<Material>(dataQuery, parameters)).ToList()
             };
         }
 
-        public async Task<List<PolarisItem>> GetPatronHoldsAsync(int patronID)
+        public async Task<List<Material>> GetPatronHoldsAsync(int patronID)
         {
             using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
-            var query = $"SELECT BR.BrowseAuthor AS {nameof(PolarisItem.Author)}," +
-                $" BR.BrowseTitle AS {nameof(PolarisItem.Title)}," +
-                $" SHS.Name AS {nameof(PolarisItem.HoldStatus)}" +
+            var query = $"SELECT BR.BrowseAuthor AS {nameof(Material.Author)}," +
+                $" BR.BrowseTitle AS {nameof(Material.Title)}," +
+                $" SHS.Name AS {nameof(Material.HoldStatus)}" +
                 " FROM [Polaris].[Polaris].[SysHoldRequests] AS SHR WITH (NOLOCK)" +
                 " JOIN [Polaris].[Polaris].[SysHoldStatuses] AS SHS WITH (NOLOCK)" +
                 " ON SHR.SysHoldStatusID = SHS.SysHoldStatusID" +
@@ -191,7 +191,7 @@ namespace BooksByMail.Services
             var parameters = new DynamicParameters();
             parameters.Add(IdParam, patronID);
 
-            return (await db.QueryAsync<PolarisItem>(query, parameters)).ToList();
+            return (await db.QueryAsync<Material>(query, parameters)).ToList();
         }
     }
 }

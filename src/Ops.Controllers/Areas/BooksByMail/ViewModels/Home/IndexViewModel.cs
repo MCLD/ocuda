@@ -8,7 +8,7 @@ namespace BooksByMail.ViewModels.Home
 {
     public class IndexViewModel
     {
-        public ICollection<PolarisPatron> Patrons { get; set; }
+        public ICollection<Customer> Patrons { get; set; }
         public PaginateModel PaginateModel { get; set; }
         public int OrderBy { get; set; }
         public bool OrderDesc { get; set; }

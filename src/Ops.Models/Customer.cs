@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BooksByMail.Models
 {
-    public class PolarisPatron
+    public class Customer
     {
         public int PatronID { get; set; }
         public string Barcode { get; set; }
