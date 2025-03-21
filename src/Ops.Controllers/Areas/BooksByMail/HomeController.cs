@@ -123,16 +123,16 @@ namespace BooksByMail.Controllers
             var customer = await _customerService.GetByPatronIdAsync(id);
             if (customer == null)
             {
-                customer = new Customer
+                customer = new BooksByMailCustomer
                 {
                     PatronID = id
                 };
                 customer = await _customerService.AddAsync(customer);
             }
 
-            var viewModel = new CustomerViewModel
+            var viewModel = new BooksByMailCustomerViewModel
             {
-                Customer = customer,
+                BooksByMailCustomer = customer,
                 Patron = patronInfo,
                 PatronCheckouts = await _polarisService.GetPatronCheckoutsAsync(id),
                 PatronHolds = await _polarisService.GetPatronHoldsAsync(id),
@@ -238,7 +238,7 @@ namespace BooksByMail.Controllers
                 message = $"Could not find customer.";
             }
 
-            var comment = new Comment
+            var comment = new BooksByMailComment
             {
                 CreatedAt = DateTime.Now,
                 CustomerId = id,

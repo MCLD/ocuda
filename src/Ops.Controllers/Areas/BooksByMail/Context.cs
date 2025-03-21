@@ -24,7 +24,7 @@ namespace BooksByMail.Data
             Database.Migrate();
         }
 
-        public DbSet<Models.Comment> Comments { get; set; }
-        public DbSet<Models.Customer> Customers { get; set; }
+        public DbSet<Models.BooksByMailComment> Comments { get; set; }
+        public DbSet<Models.BooksByMailCustomer> Customers { get; set; }
     }
 }

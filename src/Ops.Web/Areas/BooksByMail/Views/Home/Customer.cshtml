@@ -1,4 +1,4 @@
-﻿@model BooksByMail.ViewModels.Home.CustomerViewModel
+﻿@model BooksByMail.ViewModels.Home.BooksByMailCustomerViewModel
 
 <div modal id="historyModal" name="History" isLarge="true">
     <div class="d-flex mb-4">
@@ -39,7 +39,7 @@
      data-field="Notes"
      data-display-id="#notesText"
      type="BooksByMail.TagHelpers.ModalTypes.Edit">
-    <textarea asp-for="Customer.Notes" class="fieldText" formgroup isSingleField="true"></textarea>
+    <textarea asp-for="BooksByMailCustomer.Notes" class="fieldText" formgroup isSingleField="true"></textarea>
 </div>
 
 <div modal
@@ -50,7 +50,7 @@
      data-field="Likes"
      data-display-id="#likesText"
      type="BooksByMail.TagHelpers.ModalTypes.Edit">
-    <textarea asp-for="Customer.Likes" class="fieldText" formgroup isSingleField="true"></textarea>
+    <textarea asp-for="BooksByMailCustomer.Likes" class="fieldText" formgroup isSingleField="true"></textarea>
 </div>
 
 <div modal
@@ -61,7 +61,7 @@
      data-field="Dislikes"
      data-display-id="#dislikesText"
      type="BooksByMail.TagHelpers.ModalTypes.Edit">
-    <textarea asp-for="Customer.Dislikes" class="fieldText" formgroup isSingleField="true"></textarea>
+    <textarea asp-for="BooksByMailCustomer.Dislikes" class="fieldText" formgroup isSingleField="true"></textarea>
 </div>
 
 <div modal
@@ -69,7 +69,7 @@
      id="commentModal"
      name="Comment"
      type="BooksByMail.TagHelpers.ModalTypes.Add">
-    <textarea asp-for="Comment.Text" formgroup isSingleField="true"></textarea>
+    <textarea asp-for="BooksByMailComment.Text" formgroup isSingleField="true"></textarea>
 </div>
 
 <div class="row" style="position: relative;">
@@ -119,13 +119,13 @@
                 <hr class="mt-2 mb-0" />
                 <div class="row">
                     <div id="notesText" class="col-12 pt-2">
-                        @if (string.IsNullOrEmpty(Model.Customer.Notes))
+                        @if (string.IsNullOrEmpty(Model.BooksByMailCustomer.Notes))
                         {
                             <em>No customer notes.</em>
                         }
                         else
                         {
-                            @Model.Customer.Notes
+                            @Model.BooksByMailCustomer.Notes
                         }
                     </div>
                 </div>
@@ -228,8 +228,8 @@
                       data-toggle="modal"
                       data-target="#likesModal"></span>
             </div>
-            <div id="likesText" class="card-body p-2 @(string.IsNullOrEmpty(Model.Customer.Likes) ? "font-italic" : "")">
-                @(!string.IsNullOrEmpty(Model.Customer.Likes) ? Model.Customer.Likes : "None recorded.")
+            <div id="likesText" class="card-body p-2 @(string.IsNullOrEmpty(Model.BooksByMailCustomer.Likes) ? "font-italic" : "")">
+                @(!string.IsNullOrEmpty(Model.BooksByMailCustomer.Likes) ? Model.BooksByMailCustomer.Likes : "None recorded.")
             </div>
         </div>
         <div class="card mb-3">
@@ -240,8 +240,8 @@
                       data-toggle="modal"
                       data-target="#dislikesModal"></span>
             </div>
-            <div id="dislikesText" class="card-body p-2 @(string.IsNullOrEmpty(Model.Customer.Dislikes) ? "font-italic" : "")">
-                @(!string.IsNullOrEmpty(Model.Customer.Dislikes) ? Model.Customer.Dislikes : "None recorded.")
+            <div id="dislikesText" class="card-body p-2 @(string.IsNullOrEmpty(Model.BooksByMailCustomer.Dislikes) ? "font-italic" : "")">
+                @(!string.IsNullOrEmpty(Model.BooksByMailCustomer.Dislikes) ? Model.BooksByMailCustomer.Dislikes : "None recorded.")
             </div>
         </div>
     </div>
@@ -259,9 +259,9 @@
             </div>
             <div class="card-body p-2">
                 <div id="commentSection">
-                    @if (Model.Customer.Comments?.Count > 0)
+                    @if (Model.BooksByMailCustomer.Comments?.Count > 0)
                     {
-                        @foreach (var comment in Model.Customer.Comments)
+                        @foreach (var comment in Model.BooksByMailCustomer.Comments)
                         {
                             <div class="row mb-2">
                                 <div class="col-12">
@@ -443,7 +443,7 @@
         $(".updateFieldModal").on("click", ".modal-btn-confirm", function (e) {
             var button = $(this);
             var modal = $(e.delegateTarget);
-            var id = "@Model.Customer.Id";
+            var id = "@Model.BooksByMailCustomer.Id";
             var field = modal.data("field");
             var text = modal.find(".fieldText").val();
             $.post(updateFieldUrl, { id, field, text }, function (response) {
@@ -466,7 +466,7 @@
         $("#commentModal").on("click", ".modal-btn-confirm", function (e) {
             var button = $(this);
             var modal = $(e.delegateTarget);
-            var id = "@Model.Customer.Id";
+            var id = "@Model.BooksByMailCustomer.Id";
             var text = modal.find("#Comment_Text").val();
             $.post(addCommentUrl, { id, text }, function (response) {
                 ResetSpinners(button);

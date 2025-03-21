@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BooksByMail.Data.Models
 {
-    public class Customer
+    public class BooksByMailCustomer
     {
         public int Id { get; set; }
         public int PatronID { get; set; }
@@ -12,6 +12,6 @@ namespace BooksByMail.Data.Models
         public string Dislikes { get; set; }
         public string Notes { get; set; }
 
-        public ICollection<Comment> Comments { get; set; }
+        public ICollection<BooksByMailComment> Comments { get; set; }
     }
 }

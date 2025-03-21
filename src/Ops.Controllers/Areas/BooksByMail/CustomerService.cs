@@ -16,7 +16,7 @@ namespace BooksByMail.Services
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<Customer> GetByIdAsync(int id)
+        public async Task<BooksByMailCustomer> GetByIdAsync(int id)
         {
             return await _context.Customers
                 .AsNoTracking()
@@ -24,7 +24,7 @@ namespace BooksByMail.Services
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<Customer> GetByPatronIdAsync(int patronId)
+        public async Task<BooksByMailCustomer> GetByPatronIdAsync(int patronId)
         {
             var customer = await _context.Customers
                 .AsNoTracking()
@@ -40,7 +40,7 @@ namespace BooksByMail.Services
             return customer;
         }
 
-        public async Task<Customer> AddAsync(Customer customer)
+        public async Task<BooksByMailCustomer> AddAsync(BooksByMailCustomer customer)
         {
             await _context.Customers.AddAsync(customer);
             await _context.SaveChangesAsync();
@@ -48,13 +48,13 @@ namespace BooksByMail.Services
             return customer;
         }
 
-        public async Task UpdateAsync(Customer customer)
+        public async Task UpdateAsync(BooksByMailCustomer customer)
         {
             _context.Customers.Update(customer);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Comment> AddCommentAsync(Comment comment)
+        public async Task<BooksByMailComment> AddCommentAsync(BooksByMailComment comment)
         {
             await _context.Comments.AddAsync(comment);
             await _context.SaveChangesAsync();
