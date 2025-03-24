@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BooksByMail.Services
 {
-    public class CustomerService
+    public class BooksByMailService
     {
         private readonly Context _context;
-        public CustomerService(Context context)
+        public BooksByMailService(Context context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

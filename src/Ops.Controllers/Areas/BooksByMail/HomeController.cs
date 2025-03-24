@@ -23,11 +23,11 @@ namespace BooksByMail.Controllers
 
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _config;
-        private readonly CustomerService _customerService;
+        private readonly BooksByMailService _customerService;
         private readonly PolarisService _polarisService;
         public HomeController(ILogger<HomeController> logger,
             IConfiguration config,
-            CustomerService customerService,
+            BooksByMailService customerService,
             PolarisService polarisService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
