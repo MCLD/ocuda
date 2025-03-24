@@ -1,12 +1,13 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
+using Ocuda.Ops.Models.Entities;
 
-namespace BooksByMail.Data
+namespace Ocuda.Ops.Data
 {
-    public class Context : DbContext
+    public class BooksByMailContext : DbContext
     {
-        public Context(DbContextOptions options) : base(options) { }
+        public BooksByMailContext(DbContextOptions options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,7 +25,7 @@ namespace BooksByMail.Data
             Database.Migrate();
         }
 
-        public DbSet<Models.BooksByMailComment> Comments { get; set; }
-        public DbSet<Models.BooksByMailCustomer> Customers { get; set; }
+        public DbSet<BooksByMailComment> Comments { get; set; }
+        public DbSet<BooksByMailCustomer> Customers { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace BooksByMail.Data.Models
+namespace Ocuda.Ops.Models.Entities
 {
     public class BooksByMailComment
     {

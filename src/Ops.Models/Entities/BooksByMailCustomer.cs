@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BooksByMail.Data.Models
+namespace Ocuda.Ops.Models.Entities
 {
     public class BooksByMailCustomer
     {

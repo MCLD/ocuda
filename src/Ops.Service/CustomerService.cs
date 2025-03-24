@@ -4,14 +4,15 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using BooksByMail.Models;
-using BooksByMail.QueryFilters;
+using Ocuda.Ops.Controllers.Areas.BooksByMail.QueryFilters;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace BooksByMail.Services
 {
-    public class CustomerService
+    public class CustomerService : ICustomerService
     {
         public static readonly int BooksByMailPatronID = 5;
 

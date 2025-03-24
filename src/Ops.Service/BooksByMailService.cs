@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BooksByMail.Data;
-using BooksByMail.Data.Models;
+using Ocuda.Ops.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
-namespace BooksByMail.Services
+namespace Ocuda.Ops.Service
 {
-    public class BooksByMailService
+    public class BooksByMailService : IBooksByMailService
     {
-        private readonly Context _context;
-        public BooksByMailService(Context context)
+        private readonly BooksByMailContext _context;
+        public BooksByMailService(BooksByMailContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

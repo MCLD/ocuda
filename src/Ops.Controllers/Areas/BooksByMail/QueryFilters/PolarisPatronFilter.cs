@@ -1,4 +1,4 @@
-﻿namespace BooksByMail.QueryFilters
+﻿namespace Ocuda.Ops.Controllers.Areas.BooksByMail.QueryFilters
 {
     public class PolarisPatronFilter : BaseFilter
     {
