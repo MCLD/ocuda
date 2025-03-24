@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace BooksByMail.Services
 {
-    public class PolarisService
+    public class CustomerService
     {
         public static readonly int BooksByMailPatronID = 5;
 
@@ -23,7 +23,7 @@ namespace BooksByMail.Services
         private const string PolarisDbCSName = "polarisdb";
         private readonly IConfiguration _config;
 
-        public PolarisService(IConfiguration configuration)
+        public CustomerService(IConfiguration configuration)
         {
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }

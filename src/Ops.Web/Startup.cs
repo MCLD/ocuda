@@ -598,7 +598,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
                 Utility.Services.PathResolverService>();
             services.AddScoped<IPodcastService, PodcastService>();
-            services.AddScoped<BooksByMail.Services.PolarisService>();
+            services.AddScoped<BooksByMail.Services.CustomerService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IPermissionGroupService, PermissionGroupService>();
             services.AddScoped<IProductService, ProductService>();
