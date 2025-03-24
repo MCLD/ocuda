@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BooksByMail.Models;
-using Ocuda.Ops.Controllers.Areas.BooksByMail.QueryFilters;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {

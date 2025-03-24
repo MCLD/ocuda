@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using BooksByMail.Models;
-using Ocuda.Ops.Controllers.Areas.BooksByMail.QueryFilters;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
