@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using BooksByMail.Models;
 using Ocuda.Ops.Service.Filters;
 
-namespace Ocuda.Ops.Service.Interfaces.Ops.Services
+namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface ICustomerService
+    public interface ICustomerRepository
     {
         Task<DataWithCount<List<Customer>>> GetPaginatedPatronListAsync(PolarisPatronFilter filter);
         Task<Customer> GetPatronInfoAsync(int patronID);

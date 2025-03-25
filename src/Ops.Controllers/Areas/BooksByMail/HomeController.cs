@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BooksByMail.Controllers.Abstract;
-using BooksByMail.Data.Models;
 using BooksByMail.Models;
 using Ocuda.Ops.Controllers.Areas.BooksByMail.QueryFilters;
 using Ocuda.Ops.Service;
@@ -11,6 +10,8 @@ using BooksByMail.ViewModels.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Models.Entities;
 
 namespace BooksByMail.Controllers
 {

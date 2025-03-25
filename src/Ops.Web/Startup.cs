@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using BooksByMail.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -348,6 +347,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.CoverIssueDetailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICoverIssueHeaderRepository,
                 Data.Ops.CoverIssueHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ICustomerRepository,
+                Data.Ops.CustomerRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayAssetRepository,
                 Data.Ops.DigitalDisplayAssetRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayAssetSetRepository,
@@ -564,10 +565,11 @@ namespace Ocuda.Ops.Web
 
             // services
             services.AddScoped<IAuthorizationService, AuthorizationService>();
+            services.AddScoped<IBooksByMailService, BooksByMailService>();
             services.AddScoped<ICarouselService, CarouselService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ICoverIssueService, CoverIssueService>();
-            services.AddScoped <IBooksByMailService, BooksByMailService>();
+            services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IDeckService, DeckService>();
             services.AddScoped<IDigitalDisplayService, DigitalDisplayService>();
             services.AddScoped<IDigitalDisplayCleanupService, DigitalDisplayCleanupService>();
@@ -602,7 +604,6 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
                 Utility.Services.PathResolverService>();
             services.AddScoped<IPodcastService, PodcastService>();
-            services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IPermissionGroupService, PermissionGroupService>();
             services.AddScoped<IProductService, ProductService>();

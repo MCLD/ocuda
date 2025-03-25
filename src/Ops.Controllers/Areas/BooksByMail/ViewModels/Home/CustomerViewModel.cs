@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using BooksByMail.Data.Models;
+using Ocuda.Ops.Models.Entities;
 using BooksByMail.Models;
 
 namespace BooksByMail.ViewModels.Home
