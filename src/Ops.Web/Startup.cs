@@ -17,8 +17,10 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Ocuda.Ops.Controllers;
 using Ocuda.Ops.Data;
+using Ocuda.Ops.Data.Ops;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Clients;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Ops.Web.JobScheduling;
@@ -174,7 +176,7 @@ namespace Ocuda.Ops.Web
                         DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
                     services.AddDbContextPool<PromenadeContext,
                         DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
-                    services.AddDbContextPool<Context>(_ => _.UseSqlServer(bbmCs));
+                    services.AddDbContextPool<BooksByMailContext>(_ => _.UseSqlServer(bbmCs));
                     services.AddHealthChecks();
                     break;
 
@@ -336,6 +338,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Utility.Email.Sender>();
 
             // repositories
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IBooksByMailRepository,
+                Data.Ops.BooksByMailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
                 Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,

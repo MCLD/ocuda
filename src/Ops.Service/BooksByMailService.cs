@@ -5,61 +5,42 @@ using System.Threading.Tasks;
 using Ocuda.Ops.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 
 namespace Ocuda.Ops.Service
 {
     public class BooksByMailService : IBooksByMailService
     {
-        private readonly BooksByMailContext _context;
-        public BooksByMailService(BooksByMailContext context)
+        private readonly IBooksByMailRepository _repository;
+
+        public BooksByMailService(IBooksByMailRepository repository)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public async Task<BooksByMailCustomer> GetByIdAsync(int id)
+        public Task<BooksByMailCustomer> GetByIdAsync(int id)
         {
-            return await _context.Customers
-                .AsNoTracking()
-                .Where(_ => _.Id == id)
-                .FirstOrDefaultAsync();
+            return _repository.GetByIdAsync(id);
         }
 
-        public async Task<BooksByMailCustomer> GetByPatronIdAsync(int patronId)
+        public Task<BooksByMailCustomer> GetByPatronIdAsync(int patronId)
         {
-            var customer = await _context.Customers
-                .AsNoTracking()
-                .Include(_ => _.Comments)
-                .Where(_ => _.PatronID == patronId)
-                .FirstOrDefaultAsync();
-
-            if (customer?.Comments != null)
-            {
-                customer.Comments = customer.Comments.OrderByDescending(_ => _.CreatedAt).ToList();
-            }
-            
-            return customer;
+            return _repository.GetByPatronIdAsync(patronId);
         }
 
-        public async Task<BooksByMailCustomer> AddAsync(BooksByMailCustomer customer)
+        public Task<BooksByMailCustomer> AddAsync(BooksByMailCustomer customer)
         {
-            await _context.Customers.AddAsync(customer);
-            await _context.SaveChangesAsync();
-
-            return customer;
+            return _repository.AddAsync(customer);
         }
 
-        public async Task UpdateAsync(BooksByMailCustomer customer)
+        public Task UpdateAsync(BooksByMailCustomer customer)
         {
-            _context.Customers.Update(customer);
-            await _context.SaveChangesAsync();
+            return _repository.UpdateAsync(customer);
         }
 
-        public async Task<BooksByMailComment> AddCommentAsync(BooksByMailComment comment)
+        public Task<BooksByMailComment> AddCommentAsync(BooksByMailComment comment)
         {
-            await _context.Comments.AddAsync(comment);
-            await _context.SaveChangesAsync();
-
-            return comment;
+            return _repository.AddCommentAsync(comment);
         }
     }
 }
