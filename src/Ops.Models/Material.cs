@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BooksByMail.Models
+namespace Ocuda.Ops.Models
 {
     public class Material
     {

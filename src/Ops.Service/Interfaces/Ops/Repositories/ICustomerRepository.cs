@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BooksByMail.Models;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
