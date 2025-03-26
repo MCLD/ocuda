@@ -1,6 +1,6 @@
 using System;
 
-namespace BooksByMail.ViewModels
+namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels
 {
     public class ErrorViewModel
     {

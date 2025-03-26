@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BooksByMail.Models;
 
-namespace BooksByMail.ViewModels.Home
+namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home
 {
     public class IndexViewModel
     {

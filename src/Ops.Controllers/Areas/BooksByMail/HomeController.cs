@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BooksByMail.Models;
-using BooksByMail.ViewModels.Home;
+using Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

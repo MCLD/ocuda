@@ -2,7 +2,7 @@
 using Ocuda.Ops.Models.Entities;
 using BooksByMail.Models;
 
-namespace BooksByMail.ViewModels.Home
+namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home
 {
     public class BooksByMailCustomerViewModel
     {
