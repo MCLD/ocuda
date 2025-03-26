@@ -2,32 +2,35 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BooksByMail.Models;
-using Ocuda.Ops.Service;
-using BooksByMail.ViewModels;
 using BooksByMail.ViewModels.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Controllers.Abstract;
+using Ocuda.Ops.Controllers.Filters;
+using Ocuda.Ops.Controllers.ServiceFacades;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 {
     [Area("BooksByMail")]
     [Route("BooksByMail/[controller]/[action]")]
-    public class HomeController : BaseController
+    public class HomeController : BaseController<HomeController>
     {
         private const int DefaultDays = -21;
         private const string PageTitle = "Books By Mail";
 
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _config;
-        private readonly BooksByMailService _customerService;
-        private readonly CustomerService _polarisService;
-        public HomeController(ILogger<HomeController> logger,
+        private readonly IBooksByMailService _customerService;
+        private readonly ICustomerService _polarisService;
+        public HomeController(Controller<HomeController> context,
+            ILogger<HomeController> logger,
             IConfiguration config,
-            BooksByMailService customerService,
-            CustomerService polarisService)
+            IBooksByMailService customerService,
+            ICustomerService polarisService) : base(context)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config ?? throw new ArgumentNullException(nameof(config));
@@ -53,18 +56,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 
             var patronList = await _polarisService.GetPaginatedPatronListAsync(filter);
 
-            string daysFromConfig = _config[Keys.Configuration.AlertAfterDays];
             int days = DefaultDays;
-            if (!string.IsNullOrEmpty(daysFromConfig))
-            {
-                if (!int.TryParse(daysFromConfig, out days))
-                {
-                    _logger.LogError("Set {AlertAftaerDays} to default of {DefaultDays}: provided configuration not a number",
-                        Keys.Configuration.AlertAfterDays,
-                        DefaultDays);
-                }
-            }
-
             foreach (var patron in patronList.Data.Where(_ => _.LastActivityDate != null))
             {
                 if (patron.LastActivityDate <= DateTime.Now.AddDays(days))
@@ -264,29 +256,6 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
                 username = comment.StaffUsername,
                 createdAt = comment.CreatedAt.ToShortDateString()
             });
-        }
-
-        public IActionResult Unauthorized(string returnUrl)
-        {
-            return View(new UnauthorizedViewModel
-            {
-                ReturnUrl = returnUrl,
-                Username = CurrentUsername
-            });
-        }
-
-        public IActionResult Authenticate(string returnUrl)
-        {
-            // by the time we get here the user is probably authenticated - if so we can take them
-            // back to their initial destination
-            if (HttpContext.Items[Keys.Item.Username] != null)
-            {
-                return Redirect(returnUrl);
-            }
-
-            TempData[Keys.TempData.AlertWarning]
-                = $"Could not authenticate you for access to {returnUrl}.";
-            return RedirectToAction("Index");
         }
     }
 }
