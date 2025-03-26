@@ -1,4 +1,4 @@
-﻿namespace BooksByMail.Keys
+﻿namespace Ocuda.Ops.Controllers.Areas.BooksByMail.Keys
 {
     public struct Cookie
     {
