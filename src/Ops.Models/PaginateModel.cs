@@ -1,4 +1,4 @@
-﻿namespace Ocuda.Ops.Models
+﻿namespace BooksByMail.Models
 {
     public class PaginateModel
     {

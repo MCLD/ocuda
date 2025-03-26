@@ -7,7 +7,7 @@ using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
-using Ocuda.Ops.Models;
+using BooksByMail.Models;
 using Dapper;
 using Ocuda.Ops.Service.Filters;
 
