@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Configuration;
 
-namespace BooksByMail.TagHelpers
+namespace Ocuda.Ops.Controllers.Areas.BooksByMail.TagHelpers
 {
     public class InstanceTagHelper : TagHelper
     {

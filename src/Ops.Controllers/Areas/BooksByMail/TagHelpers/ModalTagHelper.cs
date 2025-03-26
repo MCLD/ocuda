@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace BooksByMail.TagHelpers
+namespace Ocuda.Ops.Controllers.Areas.BooksByMail.TagHelpers
 {
     [HtmlTargetElement("div", Attributes = attributeName)]
     public class ModalTagHelper : TagHelper

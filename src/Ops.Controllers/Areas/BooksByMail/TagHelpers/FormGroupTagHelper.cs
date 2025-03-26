@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace BooksByMail.TagHelpers
+namespace Ocuda.Ops.Controllers.Areas.BooksByMail.TagHelpers
 {
     [HtmlTargetElement("input", Attributes = attributeName)]
     [HtmlTargetElement("select", Attributes = attributeName)]
