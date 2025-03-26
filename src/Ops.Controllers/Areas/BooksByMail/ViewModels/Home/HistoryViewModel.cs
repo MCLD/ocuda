@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using BooksByMail.Models;
+using Ocuda.Utility.Models;
+using Ocuda.Ops.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home
 {

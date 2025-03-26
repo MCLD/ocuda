@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BooksByMail.Models;
+using Ocuda.Ops.Models;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home
 {
