@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using BooksByMail.Controllers.Abstract;
 using BooksByMail.Models;
-using Ocuda.Ops.Controllers.Areas.BooksByMail.QueryFilters;
 using Ocuda.Ops.Service;
 using BooksByMail.ViewModels;
 using BooksByMail.ViewModels.Home;
@@ -13,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Models.Entities;
 
-namespace BooksByMail.Controllers
+namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 {
     [Area("BooksByMail")]
     [Route("BooksByMail/[controller]/[action]")]
