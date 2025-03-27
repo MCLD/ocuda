@@ -39,8 +39,8 @@ namespace Ocuda.Ops.Data.Ops
                                 $" PT.LastActivityDate AS {nameof(Customer.LastActivityDate)}," +
                                 $" PTR.NameFirst AS {nameof(Customer.NameFirst)}," +
                                 $" PTR.NameLast AS {nameof(Customer.NameLast)}" +
-                                " FROM Polaris.Polaris.Patrons AS PT WITH (NOLOCK)" +
-                                " JOIN Polaris.Polaris.PatronRegistration AS PTR WITH (NOLOCK)" +
+                                " FROM polarisdb.dbo.Patrons AS PT WITH (NOLOCK)" +
+                                " JOIN polarisdb.dbo.PatronRegistration AS PTR WITH (NOLOCK)" +
                                 " ON PT.PatronID = PTR.PatronID";
 
             var whereClause = $" WHERE PT.PatronCodeID = {BooksByMailPatronID}";
@@ -82,8 +82,8 @@ namespace Ocuda.Ops.Data.Ops
                 $" PT.LastActivityDate AS {nameof(Customer.LastActivityDate)}," +
                 $" PTR.NameFirst AS {nameof(Customer.NameFirst)}," +
                 $" PTR.NameLast AS {nameof(Customer.NameLast)}" +
-                " FROM Polaris.Polaris.Patrons AS PT WITH (NOLOCK)" +
-                " JOIN Polaris.Polaris.PatronRegistration AS PTR WITH (NOLOCK)" +
+                " FROM polarisdb.dbo.Patrons AS PT WITH (NOLOCK)" +
+                " JOIN polarisdb.dbo.PatronRegistration AS PTR WITH (NOLOCK)" +
                 " ON PT.PatronID = PTR.PatronID" +
                 $" WHERE PT.PatronID = {IdParam}";
 
@@ -100,12 +100,12 @@ namespace Ocuda.Ops.Data.Ops
                 $" BR.BrowseTitle AS {nameof(Material.Title)}," +
                 $" COALESCE(IRD.ClassificationNumber, IRD.CutterNumber) AS {nameof(Material.Category)}," +
                 $" IC.DueDate AS {nameof(Material.DueDate)}" +
-                " FROM [Polaris].[Polaris].[ItemCheckouts] AS IC WITH (NOLOCK)" +
-                " JOIN [Polaris].[Polaris].[ItemRecordDetails] AS IRD WITH (NOLOCK)" +
+                " FROM [polarisdb].[dbo].[ItemCheckouts] AS IC WITH (NOLOCK)" +
+                " JOIN [polarisdb].[dbo].[ItemRecordDetails] AS IRD WITH (NOLOCK)" +
                 " ON IC.ItemRecordID = IRD.ItemRecordID" +
-                " JOIN [Polaris].[Polaris].[CircItemRecords] AS CIR WITH (NOLOCK)" +
+                " JOIN [polarisdb].[dbo].[CircItemRecords] AS CIR WITH (NOLOCK)" +
                 " ON IC.ItemRecordID = CIR.ItemRecordID" +
-                " JOIN [Polaris].[Polaris].[BibliographicRecords] AS BR WITH (NOLOCK)" +
+                " JOIN [polarisdb].[dbo].[BibliographicRecords] AS BR WITH (NOLOCK)" +
                 " ON CIR.AssociatedBibRecordID = BR.BibliographicRecordID" +
                 $" WHERE IC.PatronID = {IdParam}";
 
@@ -119,7 +119,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             var query = "SELECT COUNT(*)" +
-                " FROM [Polaris].[Polaris].[PatronReadingHistory] AS PRH WITH (NOLOCK)" +
+                " FROM [polarisdb].[dbo].[PatronReadingHistory] AS PRH WITH (NOLOCK)" +
                 $" WHERE PRH.PatronID = {IdParam}";
 
             var parameters = new DynamicParameters();
@@ -135,12 +135,12 @@ namespace Ocuda.Ops.Data.Ops
                 $" BR.BrowseTitle AS {nameof(Material.Title)}," +
                 $" COALESCE(IRD.ClassificationNumber, IRD.CutterNumber) AS {nameof(Material.Category)}," +
                 $" PRH.CheckOutDate AS {nameof(Material.CheckoutDate)}" +
-                " FROM [Polaris].[Polaris].[PatronReadingHistory] AS PRH WITH (NOLOCK)" +
-                " JOIN [Polaris].[Polaris].[ItemRecordDetails] AS IRD WITH (NOLOCK)" +
+                " FROM [polarisdb].[dbo].[PatronReadingHistory] AS PRH WITH (NOLOCK)" +
+                " JOIN [polarisdb].[dbo].[ItemRecordDetails] AS IRD WITH (NOLOCK)" +
                 " ON PRH.ItemRecordID = IRD.ItemRecordID" +
-                " JOIN [Polaris].[Polaris].[CircItemRecords] AS CIR WITH (NOLOCK)" +
+                " JOIN [polarisdb].[dbo].[CircItemRecords] AS CIR WITH (NOLOCK)" +
                 " ON PRH.ItemRecordID = CIR.ItemRecordID" +
-                " JOIN [Polaris].[Polaris].[BibliographicRecords] AS BR WITH (NOLOCK)" +
+                " JOIN [polarisdb].[dbo].[BibliographicRecords] AS BR WITH (NOLOCK)" +
                 " ON CIR.AssociatedBibRecordID = BR.BibliographicRecordID";
 
             var whereClause = $" WHERE PRH.PatronID = {IdParam}";
@@ -181,10 +181,10 @@ namespace Ocuda.Ops.Data.Ops
             var query = $"SELECT BR.BrowseAuthor AS {nameof(Material.Author)}," +
                 $" BR.BrowseTitle AS {nameof(Material.Title)}," +
                 $" SHS.Name AS {nameof(Material.HoldStatus)}" +
-                " FROM [Polaris].[Polaris].[SysHoldRequests] AS SHR WITH (NOLOCK)" +
-                " JOIN [Polaris].[Polaris].[SysHoldStatuses] AS SHS WITH (NOLOCK)" +
+                " FROM [polarisdb].[dbo].[SysHoldRequests] AS SHR WITH (NOLOCK)" +
+                " JOIN [polarisdb].[dbo].[SysHoldStatuses] AS SHS WITH (NOLOCK)" +
                 " ON SHR.SysHoldStatusID = SHS.SysHoldStatusID" +
-                " JOIN [Polaris].[Polaris].[BibliographicRecords] AS BR WITH (NOLOCK)" +
+                " JOIN [polarisdb].[dbo].[BibliographicRecords] AS BR WITH (NOLOCK)" +
                 " ON SHR.BibliographicRecordID = BR.BibliographicRecordID" +
                 $" WHERE SHR.PatronID = {IdParam}";
 
