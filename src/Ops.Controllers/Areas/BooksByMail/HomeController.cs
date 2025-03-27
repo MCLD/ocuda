@@ -115,14 +115,14 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             var booksbymailcustomer = await _customerService.GetByPatronIdAsync(id);
             if (booksbymailcustomer == null)
             {
-                booksbymailcustomer = new BooksByMailCustomer
+                booksbymailcustomer = new Models.Entities.BooksByMailCustomer
                 {
                     PatronID = id
                 };
                 booksbymailcustomer = await _customerService.AddAsync(booksbymailcustomer);
             }
 
-            var viewModel = new BooksByMailCustomerViewModel
+            var viewModel = new ViewModels.Home.BooksByMailCustomerViewModel
             {
                 BooksByMailCustomer = booksbymailcustomer,
                 Patron = patronInfo,

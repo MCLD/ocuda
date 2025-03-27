@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Ops.Models.Entities
 {
+    [Table("BooksByMailComment")]
     public class BooksByMailComment
     {
         public int Id { get; set; }

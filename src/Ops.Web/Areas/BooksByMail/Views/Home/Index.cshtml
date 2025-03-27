@@ -90,7 +90,12 @@
 @section scripts {
     <script>
         $(".row-link").on("click", function () {
-            window.location.href = "@Url.Action(nameof(HomeController.BooksByMailCustomer))/" + $(this).data("id");
+            var patronId = $(this).data("id");
+            if (patronId) {
+                window.location.href = "@Url.Action(nameof(HomeController.BooksByMailCustomer), new { id = "__ID__" })".replace("__ID__", patronId);
+            } else {
+                console.error("Patron ID is undefined!");
+            }
         });
         $("#clearSearch").click(function () {
             window.location.href = "@Url.Action(nameof(HomeController.Index))";
