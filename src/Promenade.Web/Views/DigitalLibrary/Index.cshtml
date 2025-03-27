@@ -32,36 +32,46 @@
             {
                 <div class="col-12 col-md-4 d-flex mb-4">
                     <div class="card flex-fill w-100">
-                        <div class="card-header">
-                            <a aria-label="@Localizer[Promenade.NewWindowItem, emedia.Name]"
-                               href="@emedia.RedirectUrl"
-                               target="_blank"><h2 class="fs-6 d-inline btn-link">@emedia.Name</h2></a>
+                        <div class="card-header d-flex">
+                            <div class="flex-grow-1">
+                                <a aria-label="@Localizer[Promenade.NewWindowItem, emedia.Name]"
+                                   href="@emedia.RedirectUrl"
+                                   target="_blank">
+                                    <h2 class="fs-5 d-inline btn-link">
+                                        @emedia.Name
+                                    </h2>
+                                </a>
+                            </div>
                             @if (!string.IsNullOrEmpty(emedia.EmediaText?.Details))
                             {
-                                <a href="#"
-                                   class="emedia-help fa-float-end"
-                                   data-bs-target="#infoModal"
-                                   data-bs-toggle="modal"
-                                   data-name="@Localizer[Promenade.HelpItem, emedia.Name]"
-                                   data-details="@emedia.EmediaText.Details"
-                                   title="@Localizer[Promenade.HelpItem, emedia.Name]">
-                                    <span class="fa-solid fa-circle-question"></span>
-                                </a>
+                                <div>
+                                    <a href="#"
+                                       class="digital-library-card-header text-dark"
+                                       data-bs-target="#infoModal"
+                                       data-bs-toggle="modal"
+                                       data-name="@Localizer[Promenade.HelpItem, emedia.Name]"
+                                       data-details="@emedia.EmediaText.Details"
+                                       title="@Localizer[Promenade.HelpItem, emedia.Name]">
+                                        <span class="fa-solid fa-circle-question"></span>
+                                    </a>
+                                </div>
                             }
                         </div>
                         <div class="card-body">
                             @Html.Raw(emedia.EmediaText?.Description)
                         </div>
-                        <div class="card-footer">
-                            <span class="visually-hidden">@Localizer[Promenade.OffersItem, emedia.Name]</span>
+                        <div class="card-footer h5">
+                            <span class="visually-hidden">
+                                @Localizer[Promenade.OffersItem, emedia.Name]
+                            </span>
                             @if (emedia.Categories?.Count > 0)
                             {
-                                <h5>
-                                    @foreach (var category in emedia.Categories)
-                                    {
-                                        <span class="badge text-dark @category.Class">@category.CategoryText?.Text</span>
-                                    }
-                                </h5>
+                                @foreach (var category in emedia.Categories)
+                                {
+                                    <span class="badge mt-1 text-dark @category.Class">
+                                        @category.CategoryText?.Text
+                                    </span>
+                                }
                             }
                         </div>
                     </div>

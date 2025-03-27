@@ -19,6 +19,16 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Shared
         public PageLayout PageLayout { get; set; }
         public string Stub { get; set; }
 
+        public static string CardTitleClasses(CardDetail cardDetail)
+        {
+            var sb = new StringBuilder("card-title h5 ");
+            if (string.IsNullOrEmpty(cardDetail?.Text))
+            {
+                sb.Append("mb-0");
+            }
+            return sb.ToString()?.Trim();
+        }
+
         public static string DataButtonFields(IEnumerable<CarouselButton> buttons)
         {
             if (buttons?.Any() != true)

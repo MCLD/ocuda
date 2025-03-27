@@ -134,21 +134,44 @@
                                      alt="@card.AltText"
                                      src="@card.ImagePath" />
                             }
+                            <div class="card-body">
+                                @if (!string.IsNullOrEmpty(card.Header))
+                                {
+                                    if (!string.IsNullOrEmpty(card.Link))
+                                    {
+                                        <div class="@PageLayoutViewModel.CardTitleClasses(card)">
+                                            <a href="@card.Link">@card.Header</a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="@PageLayoutViewModel.CardTitleClasses(card)">
+                                            @card.Header
+                                        </div>
+                                    }
+                                }
+                                @Html.Raw(card.Text)
+                            </div>
                         }
-                        <div class="card-body">
+                        else
+                        {
                             @if (!string.IsNullOrEmpty(card.Header))
                             {
-                                if (!string.IsNullOrEmpty(card.Link))
-                                {
-                                    <div class="card-title h5"><a href="@card.Link">@card.Header</a></div>
-                                }
-                                else
-                                {
-                                    <div class="card-title h5">@card.Header</div>
-                                }
+                                <div class="card-header h5">
+                                    @if (!string.IsNullOrEmpty(card.Link))
+                                    {
+                                        <a href="@card.Link">@card.Header</a>
+                                    }
+                                    else
+                                    {
+                                        @card.Header
+                                    }
+                                </div>
                             }
-                            <p class="card-text">@Html.Raw(card.Text)</p>
-                        </div>
+                            <div class="card-body pb-2">
+                                @Html.Raw(card.Text)
+                            </div>
+                        }
                         @if (!string.IsNullOrEmpty(card.Footer))
                         {
                             <div class="card-footer prom-card-footer">
@@ -219,7 +242,8 @@
     {
         <div class="row mb-3">
             <div class="col-12 mb-2">
-                <div style="max-width: 740px; background-color: lightgray" class="mx-auto d-block p-2">
+                <div style="max-width: 740px; background-color: lightgray"
+                     class="mx-auto d-block p-2">
                     <div class="row g-2">
                         @{
                             int count = 0;
@@ -229,11 +253,14 @@
                             <div class="col-xs-12 col-sm-6 col-md-3">
                                 @if (!string.IsNullOrEmpty(featureItem.ImageFeatureItemText.FileContent))
                                 {
-                                    <a href="@featureItem.ImageFeatureItemText.Link" class="d-block prom-tile">
+                                    <a href="@featureItem.ImageFeatureItemText.Link"
+                                       class="d-block prom-tile">
                                         <svg viewBox="0 0 200 200" class="d-block mx-auto">
                                             @Html.Raw(featureItem.ImageFeatureItemText.FileContent)
                                         </svg>
-                                        <p class="px-2 mb-0">@featureItem.ImageFeatureItemText.AltText</p>
+                                        <p class="px-2 mb-0">
+                                            @featureItem.ImageFeatureItemText.AltText
+                                        </p>
                                     </a>
                                 }
                                 else
