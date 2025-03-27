@@ -9,6 +9,9 @@ namespace Ocuda.Promenade.Models.Entities
         public int Id { get; set; }
 
         [Required]
+        public bool IsDisabled { get; set; }
+
+        [Required]
         [MaxLength(50)]
         public string Name { get; set; }
     }

@@ -17,10 +17,11 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
-        public async Task<ICollection<CarouselButtonLabel>> GetAllAsync()
+        public async Task<ICollection<CarouselButtonLabel>> GetActiveAsync()
         {
             return await DbSet
                 .AsNoTracking()
+                .Where(_ => !_.IsDisabled)
                 .OrderBy(_ => _.Name)
                 .ToListAsync();
         }
