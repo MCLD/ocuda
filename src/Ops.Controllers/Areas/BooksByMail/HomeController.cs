@@ -12,6 +12,7 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Controllers.ServiceFacades;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 {
@@ -101,7 +102,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             return View(viewModel);
         }
 
-        public async Task<IActionResult> Customer(int id)
+        public async Task<IActionResult> BooksByMailCustomer(int id)
         {
             var patronInfo = await _polarisService.GetPatronInfoAsync(id);
             if (patronInfo == null)
@@ -111,19 +112,19 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
                 return RedirectToAction(nameof(Index));
             }
 
-            var customer = await _customerService.GetByPatronIdAsync(id);
-            if (customer == null)
+            var booksbymailcustomer = await _customerService.GetByPatronIdAsync(id);
+            if (booksbymailcustomer == null)
             {
-                customer = new BooksByMailCustomer
+                booksbymailcustomer = new BooksByMailCustomer
                 {
                     PatronID = id
                 };
-                customer = await _customerService.AddAsync(customer);
+                booksbymailcustomer = await _customerService.AddAsync(booksbymailcustomer);
             }
 
             var viewModel = new BooksByMailCustomerViewModel
             {
-                BooksByMailCustomer = customer,
+                BooksByMailCustomer = booksbymailcustomer,
                 Patron = patronInfo,
                 PatronCheckouts = await _polarisService.GetPatronCheckoutsAsync(id),
                 PatronHolds = await _polarisService.GetPatronHoldsAsync(id),

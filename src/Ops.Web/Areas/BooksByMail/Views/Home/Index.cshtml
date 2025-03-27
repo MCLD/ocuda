@@ -90,7 +90,7 @@
 @section scripts {
     <script>
         $(".row-link").on("click", function () {
-            window.location.href = "@Url.Action(nameof(HomeController.Customer))/" + $(this).data("id");
+            window.location.href = "@Url.Action(nameof(HomeController.BooksByMailCustomer))/" + $(this).data("id");
         });
         $("#clearSearch").click(function () {
             window.location.href = "@Url.Action(nameof(HomeController.Index))";
