@@ -1,74 +1,73 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home.IndexViewModel
 
-    <nav class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark oc-navbar">
-        <a class="navbar-brand"
-           asp-area=""
-           asp-route-section=""
-           asp-controller="Home"
-           asp-action="@(nameof(HomeController.Index))">
-            <span class="fas fa-mail-bulk"></span>
-            <span class="font-weight-light oc-navbrand">Books By Mail</span>
-        </a>
-        <button class="navbar-toggler"
-                type="button"
-                data-toggle="collapse"
-                data-target="#navbarCollapsableContent"
-                aria-controls="navbarCollapsableContent"
-                aria-expanded="false"
-                aria-label="Toggle navigation">
-            Menu
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapsableContent">
-            <span class="mr-auto"></span>
-            <form asp-controller="Home" asp-action="Index" method="get" role="form" class="form-inline">
-                <input type="search"
-                       id="search"
-                       name="search"
-                       class="form-control mr-2 mb-1 mb-sm-0"
-                       placeholder="Name/Barcode"
-                       value="@ViewData["Search"]" />
-                <input type="submit"
-                       value="Search"
-                       class="btn btn-info" />
-            </form>
-        </div>
-    </nav>
-
-    <div class="container-fluid">
-
-        @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertDanger] != null)
-        {
-            <div class="row">
-                <div class="col-12 col-md-6 offset-md-3">
-                    <div class="alert alert-danger">@Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertDanger])</div>
-                </div>
-            </div>
-        }
-        @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertWarning] != null)
-        {
-            <div class="row">
-                <div class="col-12 col-md-6 offset-md-3">
-                    <div class="alert alert-warning">@Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertWarning])</div>
-                </div>
-            </div>
-        }
-        @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertSuccess] != null)
-        {
-            <div class="row">
-                <div class="col-12 col-md-6 offset-md-3">
-                    <div class="alert alert-success">@Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertSuccess])</div>
-                </div>
-            </div>
-        }
-        @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertInfo] != null)
-        {
-            <div class="row">
-                <div class="col-12 col-md-6 offset-md-3">
-                    <div class="alert alert-info">@Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertInfo])</div>
-                </div>
-            </div>
-        }
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark oc-navbar">
+    <a class="navbar-brand" asp-area="" asp-route-section="" asp-controller="Home" asp-action="@(nameof(HomeController.Index))">
+        <span class="fas fa-mail-bulk"></span>
+        <span class="fw-light oc-navbrand">Books By Mail</span>
+    </a>
+    <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarCollapsableContent"
+            aria-controls="navbarCollapsableContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapsableContent">
+        <span class="me-auto"></span>
+        <form asp-controller="Home" asp-action="Index" method="get" role="form" class="d-flex">
+            <input type="search" id="search" name="search" class="form-control me-2 mb-1 mb-sm-0" placeholder="Name/Barcode" value="@ViewData["Search"]" />
+            <input type="submit" value="Search" class="btn btn-info" />
+        </form>
     </div>
+</nav>
+
+<div class="container-fluid">
+    @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertDanger] != null)
+    {
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertDanger])
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+    @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertWarning] != null)
+    {
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3">
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    @Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertWarning])
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+    @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertSuccess] != null)
+    {
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertSuccess])
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+    @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertInfo] != null)
+    {
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3">
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    @Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertInfo])
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
 
 @if (!string.IsNullOrEmpty(Model.Search))
@@ -78,7 +77,7 @@
             <div class="alert alert-info alert-dismissible">
                 Search for '<strong>@Model.Search</strong>' found @Model.SearchCount
                 @(Model.SearchCount == 1 ? "match." : "matches.")
-                <button type="button" class="close" id="clearSearch" aria-label="Close">
+                <button type="button" class="btn-close" id="clearSearch" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -139,7 +138,7 @@
                                     @if (!string.IsNullOrEmpty(patron.LastActivityClass))
                                     {
                                         <span class="fa fa-exclamation-triangle"
-                                              data-toggle="tooltip"
+                                              data-bs-toggle="tooltip"
                                               title="More than 3 weeks!"></span>
                                     }
                                 </td>

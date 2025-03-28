@@ -1,84 +1,184 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home.BooksByMailCustomerViewModel
 
-<div modal id="historyModal" name="History" isLarge="true">
-    <div class="d-flex mb-4">
-        <div class="flex-fill">
-            <input id="historySearchText"
-                   placeholder="Title/author"
-                   class="form-control" />
-        </div>
-        <div class="ml-2">
-            <button type="button"
-                    id="historySearchButton"
-                    class="btn btn-outline-info">
-                Search
-            </button>
-        </div>
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark oc-navbar">
+    <a class="navbar-brand" asp-area="" asp-route-section="" asp-controller="Home" asp-action="@(nameof(HomeController.Index))">
+        <span class="fas fa-mail-bulk"></span>
+        <span class="fw-light oc-navbrand">Books By Mail</span>
+    </a>
+    <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarCollapsableContent"
+            aria-controls="navbarCollapsableContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapsableContent">
+        <span class="me-auto"></span>
+        <form asp-controller="Home" asp-action="Index" method="get" role="form" class="d-flex">
+            <input type="search" id="search" name="search" class="form-control me-2 mb-1 mb-sm-0" placeholder="Name/Barcode" value="@ViewData["Search"]" />
+            <input type="submit" value="Search" class="btn btn-info" />
+        </form>
     </div>
-    <div id="historySearchMessage" class="row d-none">
-        <div class="col-12">
-            <div class="alert alert-sm alert-info alert-dismissible">
-                Search for '<strong id="historySearchTerm"></strong>' found <span id="historySearchCount"></span>
-                <button type="button" class="close" id="historyClearSearch" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button><a href="c:\users\abrams-flohra\source\repos\ocuda\src\ops.web\areas\booksbymail\views\_viewstart.cshtml">c:\users\abrams-flohra\source\repos\ocuda\src\ops.web\areas\booksbymail\views\_viewstart.cshtml</a>
+</nav>
+
+<div class="container-fluid">
+    @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertDanger] != null)
+    {
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertDanger])
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+    @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertWarning] != null)
+    {
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3">
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    @Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertWarning])
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+    @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertSuccess] != null)
+    {
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertSuccess])
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+    @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertInfo] != null)
+    {
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3">
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    @Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertInfo])
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="historyModalLabel">History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex mb-4">
+                    <div class="flex-fill">
+                        <input id="historySearchText" placeholder="Title/author" class="form-control" />
+                    </div>
+                    <div class="ms-2">
+                        <button type="button" id="historySearchButton" class="btn btn-outline-info">Search</button>
+                    </div>
+                </div>
+                <div id="historySearchMessage" class="row d-none">
+                    <div class="col-12">
+                        <div class="alert alert-sm alert-info alert-dismissible">
+                            Search for '<strong id="historySearchTerm"></strong>' found <span id="historySearchCount"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" id="historyClearSearch"></button>
+                            <a href="~/areas/booksbymail/views/_viewstart.cshtml">~/areas/booksbymail/views/_viewstart.cshtml</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="modalHistoryList" class="col-12"></div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div id="modalHistoryList" class="col-12">
+</div>
+
+<div class="modal fade updateFieldModal" id="notesModal" tabindex="-1" aria-labelledby="notesModalLabel" aria-hidden="true" data-field="Notes" data-display-id="#notesText">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notesModalLabel">Customer Notes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea asp-for="BooksByMailCustomer.Notes" class="form-control"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary modal-btn-confirm">Save</button>
+            </div>
         </div>
     </div>
 </div>
 
-<div modal
-     isNonSubmit="true"
-     id="notesModal"
-     name="Customer Notes"
-     class="updateFieldModal"
-     data-field="Notes"
-     data-display-id="#notesText"
-     type="Ocuda.Ops.Controllers.Areas.BooksByMail.TagHelpers.ModalTypes.Edit">
-    <textarea asp-for="BooksByMailCustomer.Notes" class="fieldText" formgroup isSingleField="true"></textarea>
+<div class="modal fade updateFieldModal" id="likesModal" tabindex="-1" aria-labelledby="likesModalLabel" aria-hidden="true" data-field="Likes" data-display-id="#likesText">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="likesModalLabel">Likes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea asp-for="BooksByMailCustomer.Likes" class="form-control"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary modal-btn-confirm">Save</button>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div modal
-     isNonSubmit="true"
-     id="likesModal"
-     name="Likes"
-     class="updateFieldModal"
-     data-field="Likes"
-     data-display-id="#likesText"
-     type="Ocuda.Ops.Controllers.Areas.BooksByMail.TagHelpers.ModalTypes.Edit">
-    <textarea asp-for="BooksByMailCustomer.Likes" class="fieldText" formgroup isSingleField="true"></textarea>
+<div class="modal fade updateFieldModal" id="dislikesModal" tabindex="-1" aria-labelledby="dislikesModalLabel" aria-hidden="true" data-field="Dislikes" data-display-id="#dislikesText">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dislikesModalLabel">Dislikes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea asp-for="BooksByMailCustomer.Dislikes" class="form-control"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary modal-btn-confirm">Save</button>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div modal
-     isNonSubmit="true"
-     id="dislikesModal"
-     name="Dislikes"
-     class="updateFieldModal"
-     data-field="Dislikes"
-     data-display-id="#dislikesText"
-     type="Ocuda.Ops.Controllers.Areas.BooksByMail.TagHelpers.ModalTypes.Edit">
-    <textarea asp-for="BooksByMailCustomer.Dislikes" class="fieldText" formgroup isSingleField="true"></textarea>
-</div>
-
-<div modal
-     isNonSubmit="true"
-     id="commentModal"
-     name="Comment"
-     type="Ocuda.Ops.Controllers.Areas.BooksByMail.TagHelpers.ModalTypes.Add">
-    <textarea asp-for="BooksByMailComment.Text" formgroup isSingleField="true"></textarea>
+<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="commentModalLabel">Add Comment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea asp-for="BooksByMailComment.Text" class="form-control" id="Comment_Text"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary modal-btn-confirm">Add Comment</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row" style="position: relative;">
-    <div class="col-12 col-md-6 offset-md-3" style="position:fixed; z-index: 3">
+    <div class="col-12 col-md-6 offset-md-3" style="position: fixed; z-index: 1050;">
         <div id="pageAlert" class="alert alert-dismissible fade d-none" role="alert">
             <span id="pageAlertText"></span>
-            <button type="button" class="close" id="pageAlertClose" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+            <button type="button" class="btn-close" id="pageAlertClose" aria-label="Close"></button>
         </div>
     </div>
 </div>
@@ -87,14 +187,11 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header py-1 px-2">
-                <span class="d-inline-block mt-1 mb-0 font-weight-bold">
+                <span class="d-inline-block mt-1 mb-0 fw-bold">
                     <span class="fa-icon fas fa-user"></span>
                     @Model.Patron.NameFirst @Model.Patron.NameLast
                 </span>
-                <span class="fas fa-edit text-primary fa-pull-right pt-1"
-                      style="cursor: pointer;"
-                      data-toggle="modal"
-                      data-target="#notesModal"></span>
+                <span class="fas fa-edit text-primary float-end pt-1" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#notesModal"></span>
             </div>
             <div class="card-body p-2">
                 <div class="row">
@@ -105,11 +202,7 @@
                     <div class="col-12 col-md-4">
                         <strong>Barcode:</strong>
                         <span id="patronBarcode">@Model.Patron.Barcode</span>
-                        <span id="copyBarcode"
-                              class="far fa-copy text-primary"
-                              style="cursor: pointer;"
-                              data-title="Barcode copied to clipboard"
-                              data-trigger="manual"></span>
+                        <span id="copyBarcode" class="far fa-copy text-primary" style="cursor: pointer;" data-bs-toggle="tooltip" title="Barcode copied to clipboard"></span>
                     </div>
                     <div class="col-12 col-md-4">
                         <strong>Patron ID:</strong>
@@ -138,11 +231,9 @@
     <div class="col-12 col-md-6">
         <div class="card mb-3">
             <div class="card-header py-1 px-2">
-                <span class="d-inline-block mt-1 mb-0 font-weight-bold">Checked out</span>
-                <button class="float-right btn btn-sm btn-outline-primary @(Model.PatronHistoryCount == 0 ? "d-none" : "")"
-                        data-toggle="modal"
-                        data-target="#historyModal">
-                    Reading list <span class="badge badge-primary">@Model.PatronHistoryCount</span>
+                <span class="d-inline-block mt-1 mb-0 fw-bold">Checked out</span>
+                <button class="float-end btn btn-sm btn-outline-primary @(Model.PatronHistoryCount == 0 ? "d-none" : "")" data-bs-toggle="modal" data-bs-target="#historyModal">
+                    Reading list <span class="badge bg-primary">@Model.PatronHistoryCount</span>
                 </button>
             </div>
             <div class="card-body p-0">
@@ -159,9 +250,7 @@
                         @if (Model.PatronCheckouts.Count == 0)
                         {
                             <tr>
-                                <td colspan="4">
-                                    <em class="ml-1">No items checked out.</em>
-                                </td>
+                                <td colspan="4"><em class="ms-1">No items checked out.</em></td>
                             </tr>
                         }
                         else
@@ -172,7 +261,7 @@
                                     <td>@item.Title</td>
                                     <td>@item.Author</td>
                                     <td>@item.Category</td>
-                                    <td style="white-space: nowrap;">@item.DueDate.ToShortDateString()</td>
+                                    <td class="text-nowrap">@item.DueDate.ToShortDateString()</td>
                                 </tr>
                             }
                         }
@@ -182,7 +271,7 @@
         </div>
         <div class="card mb-3">
             <div class="card-header py-1 px-2">
-                <span class="d-inline-block mt-1 mb-0 font-weight-bold">On hold</span>
+                <span class="d-inline-block mt-1 mb-0 fw-bold">On hold</span>
             </div>
             <div class="card-body p-0">
                 <table class="table table-sm table-striped m-0">
@@ -197,9 +286,7 @@
                         @if (Model.PatronHolds.Count == 0)
                         {
                             <tr>
-                                <td colspan="3">
-                                    <em class="ml-1">No items on hold.</em>
-                                </td>
+                                <td colspan="3"><em class="ms-1">No items on hold.</em></td>
                             </tr>
                         }
                         else
@@ -222,40 +309,32 @@
     <div class="col-12 col-md-6">
         <div class="card mb-3">
             <div class="card-header py-1 px-2">
-                <span class="d-inline-block mt-1 mb-0 font-weight-bold">Likes</span>
-                <span class="fas fa-edit text-primary fa-pull-right pt-1"
-                      style="cursor: pointer;"
-                      data-toggle="modal"
-                      data-target="#likesModal"></span>
+                <span class="d-inline-block mt-1 mb-0 fw-bold">Likes</span>
+                <span class="fas fa-edit text-primary float-end pt-1" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#likesModal"></span>
             </div>
-            <div id="likesText" class="card-body p-2 @(string.IsNullOrEmpty((string)Model.BooksByMailCustomer.Likes) ? "font-italic" : "")">
+            <div id="likesText" class="card-body p-2 @(string.IsNullOrEmpty((string)Model.BooksByMailCustomer.Likes) ? "fst-italic" : "")">
                 @(!string.IsNullOrEmpty((string)Model.BooksByMailCustomer.Likes) ? Model.BooksByMailCustomer.Likes : "None recorded.")
             </div>
         </div>
         <div class="card mb-3">
             <div class="card-header py-1 px-2">
-                <span class="d-inline-block mt-1 mb-0 font-weight-bold">Dislikes</span>
-                <span class="fas fa-edit text-primary fa-pull-right pt-1"
-                      style="cursor: pointer;"
-                      data-toggle="modal"
-                      data-target="#dislikesModal"></span>
+                <span class="d-inline-block mt-1 mb-0 fw-bold">Dislikes</span>
+                <span class="fas fa-edit text-primary float-end pt-1" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#dislikesModal"></span>
             </div>
-            <div id="dislikesText" class="card-body p-2 @(string.IsNullOrEmpty((string)Model.BooksByMailCustomer.Dislikes) ? "font-italic" : "")">
+            <div id="dislikesText" class="card-body p-2 @(string.IsNullOrEmpty((string)Model.BooksByMailCustomer.Dislikes) ? "fst-italic" : "")">
                 @(!string.IsNullOrEmpty((string)Model.BooksByMailCustomer.Dislikes) ? Model.BooksByMailCustomer.Dislikes : "None recorded.")
             </div>
         </div>
     </div>
 </div>
 
+@* Comments Section *@
 <div class="row">
     <div class="col-12">
         <div class="card">
             <div class="card-header py-1 px-2">
-                <span class="d-inline-block mt-1 mb-0 font-weight-bold">Comments</span>
-                <span class="fas fa-plus-circle text-primary fa-pull-right pt-1"
-                      style="cursor: pointer;"
-                      data-toggle="modal"
-                      data-target="#commentModal"></span>
+                <span class="d-inline-block mt-1 mb-0 fw-bold">Comments</span>
+                <span class="fas fa-plus-circle text-primary float-end pt-1" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#commentModal"></span>
             </div>
             <div class="card-body p-2">
                 <div id="commentSection">
@@ -271,12 +350,8 @@
                                         </div>
                                         <div class="card-footer text-muted py-1 px-2">
                                             <small>
-                                                <span class="footer-username">
-                                                    @comment.StaffUsername
-                                                </span>
-                                                <span class="footer-createdAt float-right">
-                                                    @comment.CreatedAt.ToShortDateString()
-                                                </span>
+                                                <span class="footer-username">@comment.StaffUsername</span>
+                                                <span class="footer-createdAt float-end">@comment.CreatedAt.ToShortDateString()</span>
                                             </small>
                                         </div>
                                     </div>
@@ -289,9 +364,7 @@
                         <em>No comments.</em>
                     }
                 </div>
-
             </div>
-
         </div>
     </div>
 </div>
@@ -303,7 +376,7 @@
             <div class="card-footer text-muted py-1 px-2">
                 <small>
                     <span class="footer-username"></span>
-                    <span class="footer-createdAt float-right"></span>
+                    <span class="footer-createdAt float-end"></span>
                 </small>
             </div>
         </div>
@@ -323,33 +396,20 @@
 
         function GetHistoryList(updateSearchText) {
             var patronID = "@Model.Patron.PatronID";
-            $.get(historyUrl,
-                {
-                    patronID,
-                    search,
-                    orderBy,
-                    orderDesc,
-                    page
-                }, function (response) {
-                    $("#modalHistoryList").html(response);
-                    if (updateSearchText) {
-                        if (search != "") {
-                            $("#historySearchMessage").removeClass("d-none");
-                            $("#historySearchTerm").html(search);
-                            var searchCountText = " " + historySearchCount;
-                            if (historySearchCount == 1) {
-                                searchCountText += " match.";
-                            }
-                            else {
-                                searchCountText += " matches.";
-                            }
-                            $("#historySearchCount").html(searchCountText);
-                        }
-                        else {
-                            $("#historySearchMessage").addClass("d-none");
-                        }
+            $.get(historyUrl, { patronID, search, orderBy, orderDesc, page }, function (response) {
+                $("#modalHistoryList").html(response);
+                if (updateSearchText) {
+                    if (search !== "") {
+                        $("#historySearchMessage").removeClass("d-none");
+                        $("#historySearchTerm").html(search);
+                        var searchCountText = " " + historySearchCount;
+                        searchCountText += historySearchCount == 1 ? " match." : " matches.";
+                        $("#historySearchCount").html(searchCountText);
+                    } else {
+                        $("#historySearchMessage").addClass("d-none");
                     }
-                });
+                }
+            });
         }
 
         $("#historyModal").on("show.bs.modal", function () {
@@ -372,7 +432,6 @@
 
         $("#historyClearSearch").on("click", function () {
             $("#historySearchText").val("");
-
             search = "";
             orderBy = 0;
             orderDesc = false;
@@ -423,8 +482,7 @@
         }
 
         $("#pageAlertClose").click(function () {
-            $("#pageAlert").removeClass("show");
-            $("#pageAlert").removeClass("d-none");
+            $("#pageAlert").removeClass("show").addClass("d-none");
             clearTimeout(closeTimeout);
         });
 
@@ -432,12 +490,10 @@
             if (goodAlert === true) {
                 $("#pageAlert").removeClass("alert-danger").addClass("alert-success");
             } else {
-                $("#pageAlert")
-                    .removeClass("alert-success").addClass("alert-danger");
+                $("#pageAlert").removeClass("alert-success").addClass("alert-danger");
             }
             $("#pageAlertText").text(alertText);
-            $("#pageAlert").removeClass("d-none");
-            $("#pageAlert").addClass("show");
+            $("#pageAlert").removeClass("d-none").addClass("show");
         }
 
         $(".updateFieldModal").on("click", ".modal-btn-confirm", function (e) {
@@ -445,22 +501,21 @@
             var modal = $(e.delegateTarget);
             var id = "@Model.BooksByMailCustomer.Id";
             var field = modal.data("field");
-            var text = modal.find(".fieldText").val();
+            var text = modal.find(".form-control").val();
             $.post(updateFieldUrl, { id, field, text }, function (response) {
                 ResetSpinners(button);
                 if (response.success) {
                     modal.modal("hide");
                     $(modal.data("display-id")).text(response.text);
                     modal.find(".modal-alert").addClass("d-none");
-                }
-                else {
+                } else {
                     modal.find(".modal-alert").removeClass("d-none").text(response.message);
                 }
             })
-            .fail(function () {
-                ResetSpinners(button);
-                modal.find(".modal-alert").removeClass("d-none").text("An error occured when trying to set the " + field + " value.");
-            });
+                .fail(function () {
+                    ResetSpinners(button);
+                    modal.find(".modal-alert").removeClass("d-none").text("An error occurred when trying to set the " + field + " value.");
+                });
         });
 
         $("#commentModal").on("click", ".modal-btn-confirm", function (e) {
@@ -472,7 +527,7 @@
                 ResetSpinners(button);
                 if (response.success) {
                     modal.modal("hide");
-                    modal.find("#Comment_Text").text("").val("");
+                    modal.find("#Comment_Text").val("");
                     var commentCard = $("#templateCard").clone();
                     commentCard.removeAttr("id").removeClass("d-none");
                     commentCard.find(".card-body").text(response.text);
@@ -480,15 +535,14 @@
                     commentCard.find(".footer-createdAt").text(response.createdAt);
                     commentCard.prependTo("#commentSection");
                     modal.find(".modal-alert").addClass("d-none");
-                }
-                else {
+                } else {
                     modal.find(".modal-alert").removeClass("d-none").text(response.message);
                 }
             })
-            .fail(function () {
-                ResetSpinners(button);
-                modal.find(".modal-alert").removeClass("d-none").text("An error occured when trying to set the " + field + " value.");
-            });
+                .fail(function () {
+                    ResetSpinners(button);
+                    modal.find(".modal-alert").removeClass("d-none").text("An error occurred when trying to add the comment.");
+                });
         });
 
         $("#customerDetailsHelp").click(function () {
@@ -497,14 +551,14 @@
                 console.log("Title: " + elementTitle);
                 var faIcon = $(this).find(".fa-icon");
                 faIcon.removeClass();
-                faIcon.addClass("font-weight-bold");
+                faIcon.addClass("fw-bold");
                 faIcon.text(elementTitle + ":");
                 $("#customerDetailsHelp").hide();
             });
         });
 
         $(function () {
-            $('[data-toggle="tooltip"]').tooltip();
+            $('[data-bs-toggle="tooltip"]').tooltip();
         });
     </script>
 }
