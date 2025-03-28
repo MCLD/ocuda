@@ -7,6 +7,8 @@
           href="@Model.RSSUrl" />
 }
 
+<h1 class="prom-title">@Model.Podcast.Title Podcast</h1>
+
 <div class="row">
     <div class="col-6 col-md-3 mx-auto mb-2">
         <img class="img-thumbnail img-fluid"
@@ -14,7 +16,6 @@
              alt="@Model.Podcast.Title" />
     </div>
     <div class="col-12 col-md-9">
-        <h1>@Model.Podcast.Title Podcast</h1>
         <p>@Model.Podcast.Description</p>
         <div class="row">
             <div class="col-12">
@@ -29,7 +30,9 @@
                    asp-route-culture=""
                    asp-route-stub="@Model.Podcast.Stub"
                    target="_blank"
-                   class="btn btn-outline-secondary mt-1"><span class="fa-solid fa-square-rss"></span> RSS</a>
+                   class="btn btn-outline-secondary mt-1">
+                    <span class="fa-solid fa-square-rss"></span> RSS
+                </a>
             </div>
         </div>
     </div>
