@@ -17,6 +17,8 @@ namespace Ocuda.Ops.Data
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<ClaimGroup> ClaimGroups { get; set; }
+        public DbSet<BooksByMailComment> Comments { get; set; }
+        public DbSet<BooksByMailCustomer> Customers { get; set; }
         public DbSet<CoverIssueDetail> CoverIssueDetails { get; set; }
         public DbSet<CoverIssueHeader> CoverIssueHeaders { get; set; }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }

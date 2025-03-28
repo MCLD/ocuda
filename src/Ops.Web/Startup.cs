@@ -164,8 +164,6 @@ namespace Ocuda.Ops.Web
                 ?? throw new OcudaException("ConnectionString:Ops not configured.");
             string promCs = _config.GetConnectionString("Promenade")
                 ?? throw new OcudaException("ConnectionString:Promenade not configured.");
-            string polarisMock = _config.GetConnectionString("polarisdb")
-                ?? throw new OcudaException("ConnectionString:Promenade not configured.");
 
             var provider = _config[Configuration.OpsDatabaseProvider];
             switch (provider)
@@ -175,7 +173,6 @@ namespace Ocuda.Ops.Web
                         DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
                     services.AddDbContextPool<PromenadeContext,
                         DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
-                    services.AddDbContextPool<BooksByMailContext>(_ => _.UseSqlServer(polarisMock));
                     services.AddHealthChecks();
                     break;
 

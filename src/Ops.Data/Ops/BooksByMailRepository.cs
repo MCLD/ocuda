@@ -11,9 +11,9 @@ namespace Ocuda.Ops.Data.Ops
 {
     public class BooksByMailRepository : IBooksByMailRepository
     {
-        private readonly BooksByMailContext _context;
+        private readonly OpsContext _context;
 
-        public BooksByMailRepository(BooksByMailContext context)
+        public BooksByMailRepository(OpsContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
