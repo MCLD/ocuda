@@ -219,6 +219,12 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
         [HttpPost]
         public async Task<JsonResult> AddComment(int id, string text)
         {
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return Json(new { success = false, message = "Comment text cannot be empty." });
+            }
+
             string message = string.Empty;
             bool success = false;
 
