@@ -1,5 +1,76 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home.IndexViewModel
 
+    <nav class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark oc-navbar">
+        <a class="navbar-brand"
+           asp-area=""
+           asp-route-section=""
+           asp-controller="Home"
+           asp-action="@(nameof(HomeController.Index))">
+            <span class="fas fa-mail-bulk"></span>
+            <span class="font-weight-light oc-navbrand">Books By Mail</span>
+        </a>
+        <button class="navbar-toggler"
+                type="button"
+                data-toggle="collapse"
+                data-target="#navbarCollapsableContent"
+                aria-controls="navbarCollapsableContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            Menu
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapsableContent">
+            <span class="mr-auto"></span>
+            <form asp-controller="Home" asp-action="Index" method="get" role="form" class="form-inline">
+                <input type="search"
+                       id="search"
+                       name="search"
+                       class="form-control mr-2 mb-1 mb-sm-0"
+                       placeholder="Name/Barcode"
+                       value="@ViewData["Search"]" />
+                <input type="submit"
+                       value="Search"
+                       class="btn btn-info" />
+            </form>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+
+        @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertDanger] != null)
+        {
+            <div class="row">
+                <div class="col-12 col-md-6 offset-md-3">
+                    <div class="alert alert-danger">@Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertDanger])</div>
+                </div>
+            </div>
+        }
+        @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertWarning] != null)
+        {
+            <div class="row">
+                <div class="col-12 col-md-6 offset-md-3">
+                    <div class="alert alert-warning">@Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertWarning])</div>
+                </div>
+            </div>
+        }
+        @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertSuccess] != null)
+        {
+            <div class="row">
+                <div class="col-12 col-md-6 offset-md-3">
+                    <div class="alert alert-success">@Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertSuccess])</div>
+                </div>
+            </div>
+        }
+        @if (TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertInfo] != null)
+        {
+            <div class="row">
+                <div class="col-12 col-md-6 offset-md-3">
+                    <div class="alert alert-info">@Html.Raw(TempData[Ocuda.Ops.Controllers.Areas.BooksByMail.Keys.TempData.AlertInfo])</div>
+                </div>
+            </div>
+        }
+    </div>
+
+
 @if (!string.IsNullOrEmpty(Model.Search))
 {
     <div class="row">
