@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data;
 using System.Text;
-using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Models;
 using Ocuda.Utility.Models;
-using Dapper;
 using Ocuda.Ops.Service.Filters;
 
 namespace Ocuda.Ops.Data.Ops
