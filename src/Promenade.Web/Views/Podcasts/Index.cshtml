@@ -1,6 +1,7 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.Podcasts.IndexViewModel
 
-<h1>@Localizer[Promenade.PodcastsHeader]</h1>
+<h1 class="prom-title">@Localizer[Promenade.PodcastsHeader]</h1>
+
 <div class="row">
     @foreach (var podcast in Model.Podcasts)
     {

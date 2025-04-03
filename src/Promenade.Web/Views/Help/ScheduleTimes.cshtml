@@ -4,13 +4,13 @@
 {
     if (!string.IsNullOrEmpty(Model.SegmentText.Header))
     {
-        <h1>@Model.SegmentText.Header</h1>
+        <h1 class="prom-title">@Model.SegmentText.Header</h1>
     }
     @Html.Raw(Model.SegmentText.Text)
 }
 else
 {
-    <h1>@Localizer[Promenade.ScheduleYourTime]</h1>
+    <h1 class="prom-title">@Localizer[Promenade.ScheduleYourTime]</h1>
 }
 
 <div class="row">

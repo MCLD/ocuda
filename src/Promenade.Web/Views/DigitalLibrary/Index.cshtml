@@ -4,25 +4,25 @@
     <socialcard card="@Model.SocialCard"></socialcard>
 }
 
-@foreach (var group in Model.GroupedEmedia)
+@for (var i = 0; i < Model.GroupedEmedia.Count; i++)
 {
+    var group = Model.GroupedEmedia.ElementAt(i);
     if (group.Segment?.SegmentText != null)
     {
         if (!string.IsNullOrWhiteSpace(group.Segment.SegmentText.Header))
         {
-            <div class="row">
-                <div class="col-12">
-                    <h1>@group.Segment.SegmentText.Header</h1>
-                </div>
-            </div>
+            if(i == 0)
+            {
+                <h1 class="prom-title">@group.Segment.SegmentText.Header</h1>
+            }
+            else
+            {
+                <h2>@group.Segment.SegmentText.Header</h2>
+            }
         }
         if (!string.IsNullOrWhiteSpace(group.Segment.SegmentText.Text))
         {
-            <div class="row">
-                <div class="col-12">
-                    @Html.Raw(group.Segment.SegmentText.Text)
-                </div>
-            </div>
+            @Html.Raw(group.Segment.SegmentText.Text)
         }
     }
     if (group.Emedias.Any())
