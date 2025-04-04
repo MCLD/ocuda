@@ -358,7 +358,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<ICollection<CarouselButtonLabel>> GetButtonLabelsAsync()
         {
-            return await _carouselButtonLabelRepository.GetAllAsync();
+            return await _carouselButtonLabelRepository.GetActiveAsync();
         }
 
         public async Task<Carousel> GetCarouselDetailsAsync(int id, int languageId)
