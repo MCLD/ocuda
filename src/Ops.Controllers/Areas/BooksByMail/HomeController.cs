@@ -48,10 +48,10 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             int page = 1)
         {
             search = search?.Trim();
-            var filter = new PolarisPatronFilter(page)
+            var filter = new CustomerLookupFilter(page)
             {
                 Search = search,
-                OrderBy = (PolarisPatronFilter.OrderType)orderBy,
+                OrderBy = (CustomerLookupFilter.OrderType)orderBy,
                 OrderDesc = orderDesc
             };
 
@@ -142,11 +142,11 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             bool orderDesc, int page = 1)
         {
             search = search?.Trim();
-            var filter = new PolarisItemFilter(page)
+            var filter = new MaterialFilter(page)
             {
                 PatronID = patronID,
                 Search = search,
-                OrderBy = (PolarisItemFilter.OrderType)orderBy,
+                OrderBy = (MaterialFilter.OrderType)orderBy,
                 OrderDesc = orderDesc
             };
 

@@ -29,7 +29,7 @@ namespace Ocuda.Ops.Data.Ops
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public async Task<DataWithCount<List<Customer>>> GetPaginatedPatronListAsync(PolarisPatronFilter filter)
+        public async Task<DataWithCount<List<Customer>>> GetPaginatedPatronListAsync(CustomerLookupFilter filter)
         {
             //using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //var dataQuery = $"SELECT PT.PatronID AS {nameof(Customer.PatronID)}," +
@@ -160,7 +160,7 @@ namespace Ocuda.Ops.Data.Ops
             return await Task.FromResult(3);
         }
 
-        public async Task<DataWithCount<List<Material>>> GetPaginatedPatronHistoryAsync(PolarisItemFilter filter)
+        public async Task<DataWithCount<List<Material>>> GetPaginatedPatronHistoryAsync(MaterialFilter filter)
         {
             //using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //var dataQuery = $"SELECT BR.BrowseAuthor AS {nameof(Material.Author)}," +

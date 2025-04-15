@@ -18,7 +18,7 @@ namespace Ocuda.Ops.Service
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
         }
 
-        public Task<DataWithCount<List<Customer>>> GetPaginatedPatronListAsync(PolarisPatronFilter filter)
+        public Task<DataWithCount<List<Customer>>> GetPaginatedPatronListAsync(CustomerLookupFilter filter)
         {
             return _customerRepository.GetPaginatedPatronListAsync(filter);
         }
@@ -38,7 +38,7 @@ namespace Ocuda.Ops.Service
             return _customerRepository.GetPatronHistoryCountAsync(patronID);
         }
 
-        public Task<DataWithCount<List<Material>>> GetPaginatedPatronHistoryAsync(PolarisItemFilter filter)
+        public Task<DataWithCount<List<Material>>> GetPaginatedPatronHistoryAsync(MaterialFilter filter)
         {
             return _customerRepository.GetPaginatedPatronHistoryAsync(filter);
         }
