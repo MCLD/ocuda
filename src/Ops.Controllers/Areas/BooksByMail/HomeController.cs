@@ -25,18 +25,18 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _config;
-        private readonly IBooksByMailService _customerService;
-        private readonly ICustomerService _polarisService;
+        private readonly IBooksByMailService _booksByMailService;
+        private readonly ICustomerLookupService _polarisService;
         public HomeController(Controller<HomeController> context,
             ILogger<HomeController> logger,
             IConfiguration config,
-            IBooksByMailService customerService,
-            ICustomerService polarisService) : base(context)
+            IBooksByMailService booksByMailService,
+            ICustomerLookupService polarisService) : base(context)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config ?? throw new ArgumentNullException(nameof(config));
-            _customerService = customerService
-                ?? throw new ArgumentNullException(nameof(customerService));
+            _booksByMailService = booksByMailService
+                ?? throw new ArgumentNullException(nameof(booksByMailService));
             _polarisService = polarisService
                 ?? throw new ArgumentNullException(nameof(polarisService));
         }
@@ -112,14 +112,14 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
                 return RedirectToAction(nameof(Index));
             }
 
-            var booksbymailcustomer = await _customerService.GetByPatronIdAsync(id);
+            var booksbymailcustomer = await _booksByMailService.GetByPatronIdAsync(id);
             if (booksbymailcustomer == null)
             {
                 booksbymailcustomer = new Models.Entities.BooksByMailCustomer
                 {
                     PatronID = id
                 };
-                booksbymailcustomer = await _customerService.AddAsync(booksbymailcustomer);
+                booksbymailcustomer = await _booksByMailService.AddAsync(booksbymailcustomer);
             }
 
             var viewModel = new ViewModels.Home.BooksByMailCustomerViewModel
@@ -176,7 +176,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             string message = string.Empty;
             bool success = false;
 
-            var customer = await _customerService.GetByIdAsync(id);
+            var customer = await _booksByMailService.GetByIdAsync(id);
 
             if (customer == null)
             {
@@ -203,7 +203,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 
                 try
                 {
-                    await _customerService.UpdateAsync(customer);
+                    await _booksByMailService.UpdateAsync(customer);
                     success = true;
                 }
                 catch (Exception ex)
@@ -228,7 +228,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             string message = string.Empty;
             bool success = false;
 
-            var customer = await _customerService.GetByIdAsync(id);
+            var customer = await _booksByMailService.GetByIdAsync(id);
 
             if (customer == null)
             {
@@ -246,7 +246,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 
             try
             {
-                comment = await _customerService.AddCommentAsync(comment);
+                comment = await _booksByMailService.AddCommentAsync(comment);
                 success = true;
             }
             catch (Exception ex)

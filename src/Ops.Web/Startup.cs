@@ -564,7 +564,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ICarouselService, CarouselService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ICoverIssueService, CoverIssueService>();
-            services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<ICustomerLookupService, CustomerLookupService>();
             services.AddScoped<IDeckService, DeckService>();
             services.AddScoped<IDigitalDisplayService, DigitalDisplayService>();
             services.AddScoped<IDigitalDisplayCleanupService, DigitalDisplayCleanupService>();

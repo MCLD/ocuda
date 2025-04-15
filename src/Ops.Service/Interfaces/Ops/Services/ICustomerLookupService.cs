@@ -6,7 +6,7 @@ using Ocuda.Ops.Service.Filters;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
-    public interface ICustomerService
+    public interface ICustomerLookupService
     {
         Task<DataWithCount<List<Customer>>> GetPaginatedPatronListAsync(PolarisPatronFilter filter);
         Task<Customer> GetPatronInfoAsync(int patronID);
