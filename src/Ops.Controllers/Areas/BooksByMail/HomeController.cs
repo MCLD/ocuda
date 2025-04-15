@@ -26,19 +26,19 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _config;
         private readonly IBooksByMailService _booksByMailService;
-        private readonly ICustomerLookupService _polarisService;
+        private readonly ICustomerLookupService _customerLookupService;
         public HomeController(Controller<HomeController> context,
             ILogger<HomeController> logger,
             IConfiguration config,
             IBooksByMailService booksByMailService,
-            ICustomerLookupService polarisService) : base(context)
+            ICustomerLookupService customerLookupService) : base(context)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _booksByMailService = booksByMailService
                 ?? throw new ArgumentNullException(nameof(booksByMailService));
-            _polarisService = polarisService
-                ?? throw new ArgumentNullException(nameof(polarisService));
+            _customerLookupService = customerLookupService
+                ?? throw new ArgumentNullException(nameof(customerLookupService));
         }
 
         public static string Name
@@ -55,7 +55,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
                 OrderDesc = orderDesc
             };
 
-            var patronList = await _polarisService.GetPaginatedPatronListAsync(filter);
+            var patronList = await _customerLookupService.GetPaginatedPatronListAsync(filter);
 
             int days = DefaultDays;
             foreach (var patron in patronList.Data.Where(_ => _.LastActivityDate != null))
@@ -104,7 +104,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 
         public async Task<IActionResult> BooksByMailCustomer(int id)
         {
-            var patronInfo = await _polarisService.GetPatronInfoAsync(id);
+            var patronInfo = await _customerLookupService.GetPatronInfoAsync(id);
             if (patronInfo == null)
             {
                 _logger.LogInformation($"No patron found in Polaris for id {id}");
@@ -126,9 +126,9 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             {
                 BooksByMailCustomer = booksbymailcustomer,
                 Patron = patronInfo,
-                PatronCheckouts = await _polarisService.GetPatronCheckoutsAsync(id),
-                PatronHolds = await _polarisService.GetPatronHoldsAsync(id),
-                PatronHistoryCount = await _polarisService.GetPatronHistoryCountAsync(id)
+                PatronCheckouts = await _customerLookupService.GetPatronCheckoutsAsync(id),
+                PatronHolds = await _customerLookupService.GetPatronHoldsAsync(id),
+                PatronHistoryCount = await _customerLookupService.GetPatronHistoryCountAsync(id)
             };
 
             ViewData["Title"] = string.IsNullOrEmpty(patronInfo.NameLast)
@@ -150,7 +150,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
                 OrderDesc = orderDesc
             };
 
-            var itemList = await _polarisService.GetPaginatedPatronHistoryAsync(filter);
+            var itemList = await _customerLookupService.GetPaginatedPatronHistoryAsync(filter);
 
             var paginateModel = new PaginateModel
             {
