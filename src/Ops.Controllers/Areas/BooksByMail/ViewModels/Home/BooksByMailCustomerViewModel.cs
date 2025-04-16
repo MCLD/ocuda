@@ -11,6 +11,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home
         public Customer Patron { get; set; }
         public List<Material> PatronCheckouts { get; set; }
         public List<Material> PatronHolds { get; set; }
+        public string Search { get; set; }
         public int PatronHistoryCount { get; set; }
     }
 }

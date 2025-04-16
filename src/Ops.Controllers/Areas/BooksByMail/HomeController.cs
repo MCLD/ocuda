@@ -92,9 +92,6 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
                 SearchCount = patronList.Count
             };
 
-            ViewData["Search"] = search;
-
-
             ViewData["Title"] = string.IsNullOrEmpty(search)
                 ? "Books By Mail"
                 : $"Books By Mail - search for '{search}'";
@@ -102,8 +99,9 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             return View(viewModel);
         }
 
-        public async Task<IActionResult> BooksByMailCustomer(int id)
+        public async Task<IActionResult> BooksByMailCustomer(int id, string search)
         {
+            search = search?.Trim();
             var patronInfo = await _customerLookupService.GetPatronInfoAsync(id);
             if (patronInfo == null)
             {
@@ -128,7 +126,8 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
                 Patron = patronInfo,
                 PatronCheckouts = await _customerLookupService.GetPatronCheckoutsAsync(id),
                 PatronHolds = await _customerLookupService.GetPatronHoldsAsync(id),
-                PatronHistoryCount = await _customerLookupService.GetPatronHistoryCountAsync(id)
+                PatronHistoryCount = await _customerLookupService.GetPatronHistoryCountAsync(id),
+                Search = search
             };
 
             ViewData["Title"] = string.IsNullOrEmpty(patronInfo.NameLast)

@@ -16,7 +16,7 @@
     <div class="collapse navbar-collapse" id="navbarCollapsableContent">
         <span class="me-auto"></span>
         <form asp-controller="Home" asp-action="Index" method="get" role="form" class="d-flex">
-            <input type="search" id="search" name="search" class="form-control me-2 mb-1 mb-sm-0" placeholder="Name/Barcode" value="@ViewData["Search"]" />
+            <input type="search" id="search" name="search" class="form-control me-2 mb-1 mb-sm-0" placeholder="Name/Barcode" value="@Model.Search"]" />
             <input type="submit" value="Search" class="btn btn-info" />
         </form>
     </div>
