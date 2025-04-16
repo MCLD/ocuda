@@ -20,7 +20,7 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<BooksByMailCustomer> GetByIdAsync(int id)
         {
-            return await _context.Customers
+            return await _context.BooksByMailCustomers
                 .AsNoTracking()
                 .Where(_ => _.Id == id)
                 .FirstOrDefaultAsync();
@@ -28,7 +28,7 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<BooksByMailCustomer> GetByPatronIdAsync(int patronId)
         {
-            var booksbymailcustomer = await _context.Customers
+            var booksbymailcustomer = await _context.BooksByMailCustomers
                 .AsNoTracking()
                 .Include(_ => _.Comments)
                 .Where(_ => _.PatronID == patronId)
@@ -44,7 +44,7 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<BooksByMailCustomer> AddAsync(BooksByMailCustomer customer)
         {
-            await _context.Customers.AddAsync(customer);
+            await _context.BooksByMailCustomers.AddAsync(customer);
             await _context.SaveChangesAsync();
 
             return customer;
@@ -52,13 +52,13 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task UpdateAsync(BooksByMailCustomer customer)
         {
-            _context.Customers.Update(customer);
+            _context.BooksByMailCustomers.Update(customer);
             await _context.SaveChangesAsync();
         }
 
         public async Task<BooksByMailComment> AddCommentAsync(BooksByMailComment comment)
         {
-            await _context.Comments.AddAsync(comment);
+            await _context.BooksByMailComments.AddAsync(comment);
             await _context.SaveChangesAsync();
 
             return comment;
