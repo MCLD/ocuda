@@ -44,7 +44,6 @@ namespace Ocuda.Ops.Service
             return await _categoryRepository.GetAllAsync();
         }
 
-
         public async Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(
             BaseFilter filter)
         {
@@ -113,7 +112,7 @@ namespace Ocuda.Ops.Service
                 languageId);
         }
 
-        public async Task SetCategoryTextAsync (CategoryText categoryText)
+        public async Task SetCategoryTextAsync(CategoryText categoryText)
         {
             var currentText = await _categoryTextRepository.GetByCategoryAndLanguageAsync(
                 categoryText.CategoryId, categoryText.LanguageId);

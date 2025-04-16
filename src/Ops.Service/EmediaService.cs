@@ -263,7 +263,7 @@ namespace Ocuda.Ops.Service
 
             group.SegmentId = null;
             _emediaGroupRepository.Update(group);
-            
+
             await _emediaGroupRepository.SaveAsync();
         }
 

@@ -6,6 +6,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         where TEntity : class
     {
         Task<TEntity> FindAsync(TKeyType id);
+
         void Remove(TKeyType id);
     }
 }

@@ -64,8 +64,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
-        public static string Area { get { return "SiteManagement"; } }
-        public static string Name { get { return "Podcasts"; } }
+        public static string Area
+        { get { return "SiteManagement"; } }
+        public static string Name
+        { get { return "Podcasts"; } }
 
         [Route("[action]/{podcastId}")]
         public async Task<IActionResult> AddEpisode(int podcastId)

@@ -8,6 +8,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         : IOpsRepository<PermissionGroupApplication, int>
     {
         Task<int> GetApplicationPermissionGroupCountAsync(string permission);
+
         Task<ICollection<PermissionGroup>> GetApplicationPermissionGroupsAsync(string permission);
     }
 }

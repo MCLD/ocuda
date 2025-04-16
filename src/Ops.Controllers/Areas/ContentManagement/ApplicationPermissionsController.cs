@@ -21,8 +21,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
     {
         private readonly IPermissionGroupService _permissionGroupService;
 
-        public static string Name { get { return "ApplicationPermissions"; } }
-        public static string Area { get { return "ContentManagement"; } }
+        public static string Name
+        { get { return "ApplicationPermissions"; } }
+        public static string Area
+        { get { return "ContentManagement"; } }
 
         public ApplicationPermissionsController(
             ServiceFacades.Controller<ApplicationPermissionsController> context,

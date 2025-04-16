@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -45,13 +44,13 @@ namespace Ocuda.Utility.TagHelpers
 
             var areaCompare = string.IsNullOrEmpty(linkArea) || linkArea == routeArea;
 
-            var controllerCompare = string.IsNullOrEmpty(linkController) 
+            var controllerCompare = string.IsNullOrEmpty(linkController)
                 || linkController == routeController;
 
             if (linkAction == routeAction && areaCompare && controllerCompare)
             {
                 var cssClass = new StringBuilder("active");
-                if(output.Attributes.TryGetAttribute("class", out var classAttribute))
+                if (output.Attributes.TryGetAttribute("class", out var classAttribute))
                 {
                     cssClass.Append(' ').Append(classAttribute.Value.ToString().Trim());
                     output.Attributes.Remove(classAttribute);

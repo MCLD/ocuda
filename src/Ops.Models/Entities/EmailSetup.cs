@@ -22,6 +22,7 @@ namespace Ocuda.Ops.Models.Entities
 
         [Required]
         public int EmailTemplateId { get; set; }
+
         public EmailTemplate EmailTemplate { get; set; }
     }
 }

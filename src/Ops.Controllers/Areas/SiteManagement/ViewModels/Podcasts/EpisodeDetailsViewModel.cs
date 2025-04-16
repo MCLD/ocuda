@@ -8,6 +8,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts
         public bool EditEpisode { get; set; }
         public string PodcastTitle { get; set; }
         public PodcastItem Episode { get; set; }
+
         [System.ComponentModel.DisplayName("Upload podcast file")]
         public IFormFile UploadedFile { get; set; }
 

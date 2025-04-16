@@ -29,8 +29,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly ISegmentService _segmentService;
 
-        public static string Name { get { return "Emedia"; } }
-        public static string Area { get { return "SiteManagement"; } }
+        public static string Name
+        { get { return "Emedia"; } }
+        public static string Area
+        { get { return "SiteManagement"; } }
 
         public EmediaController(ServiceFacades.Controller<EmediaController> context,
             ICategoryService categoryService,

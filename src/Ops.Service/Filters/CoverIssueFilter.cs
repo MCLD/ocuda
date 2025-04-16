@@ -6,6 +6,8 @@ namespace Ocuda.Ops.Service.Filters
     {
         public CoverIssueType? CoverIssueType { get; set; }
 
-        public CoverIssueFilter(int? page = null, int take = 15) : base(page, take) { }
+        public CoverIssueFilter(int? page = null, int take = 15) : base(page, take)
+        {
+        }
     }
 }

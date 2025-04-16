@@ -8,7 +8,9 @@ namespace Ocuda.Utility.Data
 {
     public abstract class DbContextBase : DbContext
     {
-        protected DbContextBase(DbContextOptions options) : base(options) { }
+        protected DbContextBase(DbContextOptions options) : base(options)
+        {
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

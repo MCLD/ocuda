@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Ocuda.Utility.Models;
-using Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.Filters;
+using Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home;
 using Ocuda.Ops.Controllers.ServiceFacades;
+using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Ops.Models;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 {
@@ -27,6 +25,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
         private readonly IConfiguration _config;
         private readonly IBooksByMailService _booksByMailService;
         private readonly ICustomerLookupService _customerLookupService;
+
         public HomeController(Controller<HomeController> context,
             ILogger<HomeController> logger,
             IConfiguration config,
@@ -184,18 +183,20 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             }
             else
             {
-
                 switch (field.ToLower())
                 {
                     case "notes":
                         customer.Notes = text?.Trim();
                         break;
+
                     case "likes":
                         customer.Likes = text?.Trim();
                         break;
+
                     case "dislikes":
                         customer.Dislikes = text?.Trim();
                         break;
+
                     default:
                         break;
                 }
@@ -218,7 +219,6 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
         [HttpPost]
         public async Task<JsonResult> AddComment(int id, string text)
         {
-
             if (string.IsNullOrWhiteSpace(text))
             {
                 return Json(new { success = false, message = "Comment text cannot be empty." });

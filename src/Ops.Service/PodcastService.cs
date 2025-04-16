@@ -20,8 +20,10 @@ namespace Ocuda.Ops.Service
     {
         private readonly IPermissionGroupPodcastItemRepository
             _permissionGroupPodcastItemRepository;
+
         private readonly IPodcastRepository _podcastRepository;
         private readonly IPodcastItemsRepository _podcastItemRepository;
+
         public PodcastService(ILogger<PodcastService> logger,
             IHttpContextAccessor httpContextAccessor,
             IPermissionGroupPodcastItemRepository permissionGroupPodcastItemRepository,

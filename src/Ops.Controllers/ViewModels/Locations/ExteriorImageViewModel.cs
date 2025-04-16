@@ -8,7 +8,7 @@ namespace Ocuda.Ops.Controllers.ViewModels.Locations
         public int CropHeight { get; set; }
 
         public int CropWidth { get; set; }
-         
+
         public string Filename { get; set; }
 
         public IFormFile Image { get; set; }

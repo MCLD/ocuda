@@ -20,8 +20,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly ISiteSettingPromService _siteSettingPromService;
 
-        public static string Name { get { return "SiteSettings"; } }
-        public static string Area { get { return "SiteManagement"; } }
+        public static string Name
+        { get { return "SiteSettings"; } }
+        public static string Area
+        { get { return "SiteManagement"; } }
 
         public SiteSettingsController(ServiceFacades.Controller<SiteSettingsController> context,
             ISiteSettingPromService siteSettingPromService) : base(context)

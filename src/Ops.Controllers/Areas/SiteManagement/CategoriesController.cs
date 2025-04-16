@@ -26,8 +26,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ICategoryService _categoryService;
         private readonly ILanguageService _languageService;
 
-        public static string Name { get { return "Categories"; } }
-        public static string Area { get { return "SiteManagement"; } }
+        public static string Name
+        { get { return "Categories"; } }
+        public static string Area
+        { get { return "SiteManagement"; } }
 
         public CategoriesController(ServiceFacades.Controller<CategoriesController> context,
             ICategoryService categoryService,
@@ -220,7 +222,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost]
         [Route("[action]/{id}")]
         [SaveModelState]
-        public async Task<IActionResult> Details (DetailsViewModel model)
+        public async Task<IActionResult> Details(DetailsViewModel model)
         {
             if (ModelState.IsValid)
             {

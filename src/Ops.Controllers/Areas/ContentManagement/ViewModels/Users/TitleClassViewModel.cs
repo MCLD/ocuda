@@ -9,6 +9,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Users
         {
             Titles = new List<string>();
         }
+
         public TitleClass TitleClass { get; set; }
         public List<string> Titles { get; set; }
     }

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Data;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Models;
-using Ocuda.Utility.Models;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {

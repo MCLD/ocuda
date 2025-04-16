@@ -109,6 +109,7 @@ namespace Ocuda.Ops.Service
         {
             return await _scheduleClaimRepository.GetClaimsForUserAsync(GetCurrentUserId());
         }
+
         public Task AddLogAsync(ScheduleLog log)
         {
             return AddLogAsync(log, false);

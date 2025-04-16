@@ -49,6 +49,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         public static string Area
         { get { return "SiteManagement"; } }
+
         public static string Name
         { get { return "Carousels"; } }
 

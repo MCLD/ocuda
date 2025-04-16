@@ -6,6 +6,8 @@ namespace Ocuda.Ops.Service.Filters
     {
         public ExternalResourceType? ExternalResourceType { get; set; }
 
-        public ExternalResourceFilter(int? page = null, int take = 15) : base(page, take) { }
+        public ExternalResourceFilter(int? page = null, int take = 15) : base(page, take)
+        {
+        }
     }
 }

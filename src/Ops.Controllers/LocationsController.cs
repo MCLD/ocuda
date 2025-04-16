@@ -389,7 +389,7 @@ namespace Ocuda.Ops.Controllers
                     .ToList(),
             };
 
-            foreach(var display in viewModel.Displays)
+            foreach (var display in viewModel.Displays)
             {
                 var assets = await _digitalDisplayService.GetNonExpiredAssetsAsync(display.Id);
                 display.SlideCount = assets.Count();
