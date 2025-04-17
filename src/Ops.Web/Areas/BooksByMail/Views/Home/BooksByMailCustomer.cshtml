@@ -189,7 +189,7 @@
             <div class="card-header py-1 px-2">
                 <span class="d-inline-block mt-1 mb-0 fw-bold">
                     <span class="fa-icon fas fa-user"></span>
-                    @Model.Patron.NameFirst @Model.Patron.NameLast
+                    @Model.CustomerLookup.NameFirst @Model.CustomerLookup.NameLast
                 </span>
                 <span class="fas fa-edit text-primary float-end pt-1" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#notesModal"></span>
             </div>
@@ -197,16 +197,16 @@
                 <div class="row">
                     <div class="col-12 col-md-4">
                         <strong>Last activity:</strong>
-                        @(Model.Patron.LastActivityDate != null ? Model.Patron.LastActivityDate?.ToShortDateString() : "No activity")
+                        @(Model.CustomerLookup.LastActivityDate != null ? Model.CustomerLookup.LastActivityDate?.ToShortDateString() : "No activity")
                     </div>
                     <div class="col-12 col-md-4">
                         <strong>Barcode:</strong>
-                        <span id="patronBarcode">@Model.Patron.Barcode</span>
+                        <span id="customerLookupBarcode">@Model.CustomerLookup.Barcode</span>
                         <span id="copyBarcode" class="far fa-copy text-primary" style="cursor: pointer;" data-bs-toggle="tooltip" title="Barcode copied to clipboard"></span>
                     </div>
                     <div class="col-12 col-md-4">
-                        <strong>Patron ID:</strong>
-                        @Model.Patron.PatronID
+                        <strong>Customer Lookup ID:</strong>
+                        @Model.CustomerLookup.CustomerLookupID
                     </div>
                 </div>
                 <hr class="mt-2 mb-0" />
@@ -232,8 +232,8 @@
         <div class="card mb-3">
             <div class="card-header py-1 px-2">
                 <span class="d-inline-block mt-1 mb-0 fw-bold">Checked out</span>
-                <button class="float-end btn btn-sm btn-outline-primary @(Model.PatronHistoryCount == 0 ? "d-none" : "")" data-bs-toggle="modal" data-bs-target="#historyModal">
-                    Reading list <span class="badge bg-primary">@Model.PatronHistoryCount</span>
+                <button class="float-end btn btn-sm btn-outline-primary @(Model.CustomerLookupHistoryCount == 0 ? "d-none" : "")" data-bs-toggle="modal" data-bs-target="#historyModal">
+                    Reading list <span class="badge bg-primary">@Model.CustomerLookupHistoryCount</span>
                 </button>
             </div>
             <div class="card-body p-0">
@@ -247,7 +247,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model.PatronCheckouts.Count == 0)
+                        @if (Model.CustomerLookupCheckouts.Count == 0)
                         {
                             <tr>
                                 <td colspan="4"><em class="ms-1">No items checked out.</em></td>
@@ -255,7 +255,7 @@
                         }
                         else
                         {
-                            @foreach (var item in Model.PatronCheckouts)
+                            @foreach (var item in Model.CustomerLookupCheckouts)
                             {
                                 <tr>
                                     <td>@item.Title</td>
@@ -283,7 +283,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model.PatronHolds.Count == 0)
+                        @if (Model.CustomerLookupHolds.Count == 0)
                         {
                             <tr>
                                 <td colspan="3"><em class="ms-1">No items on hold.</em></td>
@@ -291,7 +291,7 @@
                         }
                         else
                         {
-                            @foreach (var item in Model.PatronHolds)
+                            @foreach (var item in Model.CustomerLookupHolds)
                             {
                                 <tr>
                                     <td>@item.Title</td>
@@ -385,7 +385,7 @@
 
 @section scripts {
     <script>
-        var historyUrl = "@Url.Action(nameof(HomeController.GetPatronHistory))";
+        var historyUrl = "@Url.Action(nameof(HomeController.GetCustomerLookupHistory))";
         var updateFieldUrl = "@Url.Action(nameof(HomeController.UpdateCustomerField))";
         var addCommentUrl = "@Url.Action(nameof(HomeController.AddComment))";
 
@@ -395,8 +395,8 @@
         var page = 1;
 
         function GetHistoryList(updateSearchText) {
-            var patronID = "@Model.Patron.PatronID";
-            $.get(historyUrl, { patronID, search, orderBy, orderDesc, page }, function (response) {
+            var customerLookupID = "@Model.CustomerLookup.CustomerLookupID";
+            $.get(historyUrl, { customerLookupID, search, orderBy, orderDesc, page }, function (response) {
                 $("#modalHistoryList").html(response);
                 if (updateSearchText) {
                     if (search !== "") {
@@ -460,7 +460,7 @@
         });
 
         $("#copyBarcode").on("click", function () {
-            copyToClipboard($("#patronBarcode"));
+            copyToClipboard($("#customerLookupBarcode"));
             $("#copyBarcode").tooltip('show');
             setTimeout(function () {
                 $("#copyBarcode").tooltip('hide');

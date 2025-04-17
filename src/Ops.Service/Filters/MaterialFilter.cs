@@ -2,7 +2,7 @@
 {
     public class MaterialFilter : BaseFilter
     {
-        public int PatronID { get; set; }
+        public int CustomerLookupID { get; set; }
         public OrderType OrderBy { get; set; }
         public bool OrderDesc { get; set; }
         public string Search { get; set; }

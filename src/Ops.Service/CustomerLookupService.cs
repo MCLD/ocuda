@@ -18,34 +18,34 @@ namespace Ocuda.Ops.Service
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
         }
 
-        public Task<DataWithCount<List<Customer>>> GetPaginatedPatronListAsync(CustomerLookupFilter filter)
+        public Task<DataWithCount<List<Customer>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter)
         {
-            return _customerRepository.GetPaginatedPatronListAsync(filter);
+            return _customerRepository.GetPaginatedCustomerLookupListAsync(filter);
         }
 
-        public Task<Customer> GetPatronInfoAsync(int patronID)
+        public Task<Customer> GetCustomerLookupInfoAsync(int customerLookupID)
         {
-            return _customerRepository.GetPatronInfoAsync(patronID);
+            return _customerRepository.GetCustomerLookupInfoAsync(customerLookupID);
         }
 
-        public Task<List<Material>> GetPatronCheckoutsAsync(int patronID)
+        public Task<List<Material>> GetCustomerLookupCheckoutsAsync(int customerLookupID)
         {
-            return _customerRepository.GetPatronCheckoutsAsync(patronID);
+            return _customerRepository.GetCustomerLookupCheckoutsAsync(customerLookupID);
         }
 
-        public Task<int> GetPatronHistoryCountAsync(int patronID)
+        public Task<int> GetCustomerLookupHistoryCountAsync(int customerLookupID)
         {
-            return _customerRepository.GetPatronHistoryCountAsync(patronID);
+            return _customerRepository.GetCustomerLookupHistoryCountAsync(customerLookupID);
         }
 
-        public Task<DataWithCount<List<Material>>> GetPaginatedPatronHistoryAsync(MaterialFilter filter)
+        public Task<DataWithCount<List<Material>>> GetPaginatedCustomerLookupHistoryAsync(MaterialFilter filter)
         {
-            return _customerRepository.GetPaginatedPatronHistoryAsync(filter);
+            return _customerRepository.GetPaginatedCustomerLookupHistoryAsync(filter);
         }
 
-        public Task<List<Material>> GetPatronHoldsAsync(int patronID)
+        public Task<List<Material>> GetCustomerLookupHoldsAsync(int customerLookupID)
         {
-            return _customerRepository.GetPatronHoldsAsync(patronID);
+            return _customerRepository.GetCustomerLookupHoldsAsync(customerLookupID);
         }
     }
 }

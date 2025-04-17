@@ -4,7 +4,7 @@ namespace Ocuda.Ops.Models
 {
     public class Customer
     {
-        public int PatronID { get; set; }
+        public int CustomerLookupID { get; set; }
         public string Barcode { get; set; }
         public string NameFirst { get; set; }
         public string NameLast { get; set; }

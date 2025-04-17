@@ -54,20 +54,20 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
                 OrderDesc = orderDesc
             };
 
-            var patronList = await _customerLookupService.GetPaginatedPatronListAsync(filter);
+            var customerLookupList = await _customerLookupService.GetPaginatedCustomerLookupListAsync(filter);
 
             int days = DefaultDays;
-            foreach (var patron in patronList.Data.Where(_ => _.LastActivityDate != null))
+            foreach (var customerLookup in customerLookupList.Data.Where(_ => _.LastActivityDate != null))
             {
-                if (patron.LastActivityDate <= DateTime.Now.AddDays(days))
+                if (customerLookup.LastActivityDate <= DateTime.Now.AddDays(days))
                 {
-                    patron.LastActivityClass = "text-danger add-alert";
+                    customerLookup.LastActivityClass = "text-danger add-alert";
                 }
             }
 
             var paginateModel = new PaginateModel
             {
-                ItemCount = patronList.Count,
+                ItemCount = customerLookupList.Count,
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value
             };
@@ -83,12 +83,12 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 
             var viewModel = new IndexViewModel
             {
-                Patrons = patronList.Data,
+                CustomerLookup = customerLookupList.Data,
                 PaginateModel = paginateModel,
                 OrderBy = orderBy,
                 OrderDesc = orderDesc,
                 Search = search,
-                SearchCount = patronList.Count
+                SearchCount = customerLookupList.Count
             };
 
             ViewData["Title"] = string.IsNullOrEmpty(search)
@@ -101,20 +101,20 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
         public async Task<IActionResult> BooksByMailCustomer(int id, string search)
         {
             search = search?.Trim();
-            var patronInfo = await _customerLookupService.GetPatronInfoAsync(id);
-            if (patronInfo == null)
+            var customerLookup = await _customerLookupService.GetCustomerLookupInfoAsync(id);
+            if (customerLookup == null)
             {
-                _logger.LogInformation($"No patron found in Polaris for id {id}");
-                ShowAlertWarning("Patron could not be found.");
+                _logger.LogInformation($"No customer found in Polaris for id {id}");
+                ShowAlertWarning("Customer could not be found.");
                 return RedirectToAction(nameof(Index));
             }
 
-            var booksbymailcustomer = await _booksByMailService.GetByPatronIdAsync(id);
+            var booksbymailcustomer = await _booksByMailService.GetByCustomerLookupIdAsync(id);
             if (booksbymailcustomer == null)
             {
                 booksbymailcustomer = new Models.Entities.BooksByMailCustomer
                 {
-                    PatronID = id
+                    CustomerLookupID = id
                 };
                 booksbymailcustomer = await _booksByMailService.AddAsync(booksbymailcustomer);
             }
@@ -122,33 +122,33 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             var viewModel = new ViewModels.Home.BooksByMailCustomerViewModel
             {
                 BooksByMailCustomer = booksbymailcustomer,
-                Patron = patronInfo,
-                PatronCheckouts = await _customerLookupService.GetPatronCheckoutsAsync(id),
-                PatronHolds = await _customerLookupService.GetPatronHoldsAsync(id),
-                PatronHistoryCount = await _customerLookupService.GetPatronHistoryCountAsync(id),
+                CustomerLookup = customerLookup,
+                CustomerLookupCheckouts = await _customerLookupService.GetCustomerLookupCheckoutsAsync(id),
+                CustomerLookupHolds = await _customerLookupService.GetCustomerLookupHoldsAsync(id),
+                CustomerLookupHistoryCount = await _customerLookupService.GetCustomerLookupHistoryCountAsync(id),
                 Search = search
             };
 
-            ViewData["Title"] = string.IsNullOrEmpty(patronInfo.NameLast)
+            ViewData["Title"] = string.IsNullOrEmpty(customerLookup.NameLast)
                 ? "Books By Mail"
-                : $"Books By Mail - customer '{patronInfo.NameFirst} {patronInfo.NameLast}'";
+                : $"Books By Mail - customer '{customerLookup.NameFirst} {customerLookup.NameLast}'";
 
             return View(viewModel);
         }
 
-        public async Task<IActionResult> GetPatronHistory(int patronID, string search, int orderBy,
+        public async Task<IActionResult> GetCustomerLookupHistory(int customerLookupID, string search, int orderBy,
             bool orderDesc, int page = 1)
         {
             search = search?.Trim();
             var filter = new MaterialFilter(page)
             {
-                PatronID = patronID,
+                CustomerLookupID = customerLookupID,
                 Search = search,
                 OrderBy = (MaterialFilter.OrderType)orderBy,
                 OrderDesc = orderDesc
             };
 
-            var itemList = await _customerLookupService.GetPaginatedPatronHistoryAsync(filter);
+            var itemList = await _customerLookupService.GetPaginatedCustomerLookupHistoryAsync(filter);
 
             var paginateModel = new PaginateModel
             {

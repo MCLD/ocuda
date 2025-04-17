@@ -26,7 +26,7 @@ namespace Ocuda.Ops.Data.Ops
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public async Task<DataWithCount<List<Customer>>> GetPaginatedPatronListAsync(CustomerLookupFilter filter)
+        public async Task<DataWithCount<List<Customer>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter)
         {
             //using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //var dataQuery = $"SELECT PT.PatronID AS {nameof(Customer.PatronID)}," +
@@ -74,7 +74,7 @@ namespace Ocuda.Ops.Data.Ops
             {
             new Customer
             {
-                PatronID = 101,
+                CustomerLookupID = 101,
                 Barcode = "1234567890",
                 LastActivityDate = DateTime.UtcNow.AddDays(-1),
                 NameFirst = "John",
@@ -84,7 +84,7 @@ namespace Ocuda.Ops.Data.Ops
             });
         }
 
-        public async Task<Customer> GetPatronInfoAsync(int patronID)
+        public async Task<Customer> GetCustomerLookupInfoAsync(int customerLookupID)
         {
             //using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //var query = $"SELECT PT.PatronID AS {nameof(Customer.PatronID)}," +
@@ -103,7 +103,7 @@ namespace Ocuda.Ops.Data.Ops
             //return await db.QueryFirstOrDefaultAsync<Customer>(query, parameters);
             return await Task.FromResult(new Customer
             {
-                PatronID = patronID,
+                CustomerLookupID = customerLookupID,
                 Barcode = "1234567890",
                 LastActivityDate = DateTime.UtcNow,
                 NameFirst = "Jane",
@@ -111,7 +111,7 @@ namespace Ocuda.Ops.Data.Ops
             });
         }
 
-        public async Task<List<Material>> GetPatronCheckoutsAsync(int patronID)
+        public async Task<List<Material>> GetCustomerLookupCheckoutsAsync(int customerLookupID)
         {
             //using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //var query = $"SELECT BR.BrowseAuthor AS {nameof(Material.Author)}," +
@@ -143,7 +143,7 @@ namespace Ocuda.Ops.Data.Ops
             });
         }
 
-        public async Task<int> GetPatronHistoryCountAsync(int patronID)
+        public async Task<int> GetCustomerLookupHistoryCountAsync(int customerLookupID)
         {
             //using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //var query = "SELECT COUNT(*)" +
@@ -157,7 +157,7 @@ namespace Ocuda.Ops.Data.Ops
             return await Task.FromResult(3);
         }
 
-        public async Task<DataWithCount<List<Material>>> GetPaginatedPatronHistoryAsync(MaterialFilter filter)
+        public async Task<DataWithCount<List<Material>>> GetPaginatedCustomerLookupHistoryAsync(MaterialFilter filter)
         {
             //using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //var dataQuery = $"SELECT BR.BrowseAuthor AS {nameof(Material.Author)}," +
@@ -225,7 +225,7 @@ namespace Ocuda.Ops.Data.Ops
             });
         }
 
-        public async Task<List<Material>> GetPatronHoldsAsync(int patronID)
+        public async Task<List<Material>> GetCustomerLookupHoldsAsync(int customerLookupID)
         {
             //    using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //    var query = $"SELECT BR.BrowseAuthor AS {nameof(Material.Author)}," +

@@ -86,7 +86,7 @@
 }
 <div class="row">
     <div class="col-12">
-        @if (Model.Patrons.Count() == 0)
+        @if (Model.CustomerLookup.Count() == 0)
         {
             <div class="alert alert-warning">No customers found.</div>
         }
@@ -124,26 +124,26 @@
                                 </a>
                             </th>
                             <th>Barcode</th>
-                            <th>Patron ID</th>
+                            <th>Customer Lookup ID</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var patron in Model.Patrons)
+                        @foreach (var customerLookup in Model.CustomerLookup)
                         {
-                            <tr class="row-link" data-id="@patron.PatronID">
-                                <td>@patron.NameFirst</td>
-                                <td>@patron.NameLast</td>
-                                <td class="@patron.LastActivityClass">
-                                    @patron.LastActivityDate
-                                    @if (!string.IsNullOrEmpty(patron.LastActivityClass))
+                            <tr class="row-link" data-id="@customerLookup.CustomerLookupID">
+                                <td>@customerLookup.NameFirst</td>
+                                <td>@customerLookup.NameLast</td>
+                                <td class="@customerLookup.LastActivityClass">
+                                    @customerLookup.LastActivityDate
+                                    @if (!string.IsNullOrEmpty(customerLookup.LastActivityClass))
                                     {
                                         <span class="fa fa-exclamation-triangle"
                                               data-bs-toggle="tooltip"
                                               title="More than 3 weeks!"></span>
                                     }
                                 </td>
-                                <td>@patron.Barcode</td>
-                                <td>@patron.PatronID</td>
+                                <td>@customerLookup.Barcode</td>
+                                <td>@customerLookup.CustomerLookupID</td>
                             </tr>
                         }
                     </tbody>
@@ -160,11 +160,11 @@
 @section scripts {
     <script>
         $(".row-link").on("click", function () {
-            var patronId = $(this).data("id");
-            if (patronId) {
-                window.location.href = "@Url.Action(nameof(HomeController.BooksByMailCustomer), new { id = "__ID__" })".replace("__ID__", patronId);
+            var customerLookupId = $(this).data("id");
+            if (customerLookupId) {
+                window.location.href = "@Url.Action(nameof(HomeController.BooksByMailCustomer), new { id = "__ID__" })".replace("__ID__", customerLookupId);
             } else {
-                console.error("Patron ID is undefined!");
+                console.error("Customer Lookup ID is undefined!");
             }
         });
         $("#clearSearch").click(function () {

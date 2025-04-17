@@ -20,9 +20,9 @@ namespace Ocuda.Ops.Service
             return _repository.GetByIdAsync(id);
         }
 
-        public Task<BooksByMailCustomer> GetByPatronIdAsync(int patronId)
+        public Task<BooksByMailCustomer> GetByCustomerLookupIdAsync(int customerLookupId)
         {
-            return _repository.GetByPatronIdAsync(patronId);
+            return _repository.GetByCustomerLookupIdAsync(customerLookupId);
         }
 
         public Task<BooksByMailCustomer> AddAsync(BooksByMailCustomer customer)

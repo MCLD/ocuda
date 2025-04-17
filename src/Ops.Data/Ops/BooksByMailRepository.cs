@@ -24,12 +24,12 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<BooksByMailCustomer> GetByPatronIdAsync(int patronId)
+        public async Task<BooksByMailCustomer> GetByCustomerLookupIdAsync(int customerLookupId)
         {
             var booksbymailcustomer = await _context.BooksByMailCustomers
                 .AsNoTracking()
                 .Include(_ => _.Comments)
-                .Where(_ => _.PatronID == patronId)
+                .Where(_ => _.CustomerLookupID == customerLookupId)
                 .FirstOrDefaultAsync();
 
             if (booksbymailcustomer?.Comments != null)
