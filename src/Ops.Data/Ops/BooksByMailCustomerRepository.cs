@@ -7,11 +7,11 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class BooksByMailRepository : IBooksByMailRepository
+    public class BooksByMailCustomerRepository : IBooksByMailRepository
     {
         private readonly OpsContext _context;
 
-        public BooksByMailRepository(OpsContext context)
+        public BooksByMailCustomerRepository(OpsContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

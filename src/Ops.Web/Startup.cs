@@ -333,7 +333,7 @@ namespace Ocuda.Ops.Web
 
             // repositories
             services.AddScoped<Service.Interfaces.Ops.Repositories.IBooksByMailRepository,
-                Data.Ops.BooksByMailRepository>();
+                Data.Ops.BooksByMailCustomerRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
                 Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
