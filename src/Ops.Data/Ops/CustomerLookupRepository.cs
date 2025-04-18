@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Data.ServiceFacade;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class CustomerLookupRepository : ICustomerRepository
+    public class CustomerLookupRepository : OpsRepository<OpsContext, BooksByMailCustomer, int>, ICustomerRepository
     {
         //private const string PolarisDbCSName = "polarisdb";
         //private static readonly int BooksByMailPatronID = 5;
@@ -18,13 +21,11 @@ namespace Ocuda.Ops.Data.Ops
         //private static readonly string SearchParam = "@search";
         //private static readonly string SkipParam = "@skip";
         //private static readonly string TakeParam = "@take";
-
-        private readonly IConfiguration _config;
-
-        public CustomerLookupRepository(IConfiguration configuration)
+        public CustomerLookupRepository(Repository<OpsContext> repositoryFacade,
+            ILogger<CustomerLookupRepository> logger) : base(repositoryFacade, logger)
         {
-            _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
+
 
         public async Task<DataWithCount<List<Customer>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter)
         {
