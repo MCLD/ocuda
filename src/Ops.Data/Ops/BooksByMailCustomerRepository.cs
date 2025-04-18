@@ -2,18 +2,18 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Data.ServiceFacade;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class BooksByMailCustomerRepository : IBooksByMailRepository
+    public class BooksByMailCustomerRepository : OpsRepository<OpsContext, BooksByMailCustomer, int>, IBooksByMailRepository
     {
-        private readonly OpsContext _context;
-
-        public BooksByMailCustomerRepository(OpsContext context)
+        public BooksByMailCustomerRepository(Repository<OpsContext> repositoryFacade,
+            ILogger<BooksByMailCustomerRepository> logger) : base(repositoryFacade, logger)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<BooksByMailCustomer> GetByIdAsync(int id)
