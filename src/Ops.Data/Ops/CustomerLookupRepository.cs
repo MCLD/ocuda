@@ -26,7 +26,6 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-
         public async Task<DataWithCount<List<Customer>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter)
         {
             //using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
