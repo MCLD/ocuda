@@ -4,10 +4,9 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home
 {
-    public class IndexViewModel
+    public class IndexViewModel : PaginateModel
     {
         public ICollection<Customer> CustomerLookup { get; set; }
-        public PaginateModel PaginateModel { get; set; }
         public int OrderBy { get; set; }
         public bool OrderDesc { get; set; }
         public string Search { get; set; }

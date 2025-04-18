@@ -65,26 +65,12 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
                 }
             }
 
-            var paginateModel = new PaginateModel
-            {
-                ItemCount = customerLookupList.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
-
-            if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
-            {
-                return RedirectToRoute(
-                    new
-                    {
-                        page = paginateModel.LastPage ?? 1
-                    });
-            }
-
             var viewModel = new IndexViewModel
             {
                 CustomerLookup = customerLookupList.Data,
-                PaginateModel = paginateModel,
+                ItemCount = customerLookupList.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value,
                 OrderBy = orderBy,
                 OrderDesc = orderDesc,
                 Search = search,
