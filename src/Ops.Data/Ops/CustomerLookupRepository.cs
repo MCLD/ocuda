@@ -9,7 +9,7 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class CustomerRepository : ICustomerRepository
+    public class CustomerLookupRepository : ICustomerRepository
     {
         //private const string PolarisDbCSName = "polarisdb";
         //private static readonly int BooksByMailPatronID = 5;
@@ -21,7 +21,7 @@ namespace Ocuda.Ops.Data.Ops
 
         private readonly IConfiguration _config;
 
-        public CustomerRepository(IConfiguration configuration)
+        public CustomerLookupRepository(IConfiguration configuration)
         {
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }

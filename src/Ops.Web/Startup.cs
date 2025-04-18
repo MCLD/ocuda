@@ -343,7 +343,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICoverIssueHeaderRepository,
                 Data.Ops.CoverIssueHeaderRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICustomerRepository,
-                Data.Ops.CustomerRepository>();
+                Data.Ops.CustomerLookupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayAssetRepository,
                 Data.Ops.DigitalDisplayAssetRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayAssetSetRepository,
