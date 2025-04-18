@@ -40,20 +40,6 @@ namespace Ocuda.Ops.Data.Ops
             return booksbymailcustomer;
         }
 
-        public async Task<BooksByMailCustomer> AddAsync(BooksByMailCustomer customer)
-        {
-            await _context.BooksByMailCustomers.AddAsync(customer);
-            await _context.SaveChangesAsync();
-
-            return customer;
-        }
-
-        public async Task UpdateAsync(BooksByMailCustomer customer)
-        {
-            _context.BooksByMailCustomers.Update(customer);
-            await _context.SaveChangesAsync();
-        }
-
         public async Task<BooksByMailComment> AddCommentAsync(BooksByMailComment comment)
         {
             await _context.BooksByMailComments.AddAsync(comment);
