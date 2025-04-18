@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Ops.Models.Entities
 {
-    [Table("BooksByMailComments")]
     public class BooksByMailComment
     {
         public int Id { get; set; }

@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Ops.Models.Entities
 {
-    [Table("BooksByMailCustomers")]
     public class BooksByMailCustomer
     {
         public int Id { get; set; }
