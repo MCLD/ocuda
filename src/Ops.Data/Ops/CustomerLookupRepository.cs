@@ -78,8 +78,8 @@ namespace Ocuda.Ops.Data.Ops
                 CustomerLookupID = 101,
                 Barcode = "1234567890",
                 LastActivityDate = DateTime.UtcNow.AddDays(-1),
-                NameFirst = "John",
-                NameLast = "Doe"
+                NameFirst = "Jane",
+                NameLast = "Smith"
             }
             }
             });
