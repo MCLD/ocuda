@@ -19,5 +19,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
         public List<PostCategory> PostCategories { get; set; }
 
         public ICollection<Post> AllCategoryPosts { get; set; }
+
     }
 }

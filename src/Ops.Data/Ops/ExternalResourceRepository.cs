@@ -17,6 +17,7 @@ namespace Ocuda.Ops.Data.Ops
         public ExternalResourceRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<ExternalResourceRepository> logger) : base(repositoryFacade, logger)
         {
+
         }
 
         public async Task<ICollection<ExternalResource>> GetAllAsync(ExternalResourceType? type)

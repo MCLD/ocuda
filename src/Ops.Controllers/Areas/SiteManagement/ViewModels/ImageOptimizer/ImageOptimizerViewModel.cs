@@ -11,7 +11,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ImageOptimizer
     {
         public IFormFile FormFile { get; set; }
         public Format TargetFormat { get; set; } = Format.Auto;
-
         public static ICollection<SelectListItem> Formats
         {
             get

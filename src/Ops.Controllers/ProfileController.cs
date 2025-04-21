@@ -12,6 +12,7 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Profile;
 using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 
@@ -308,7 +309,7 @@ namespace Ocuda.Ops.Controllers
             {
                 return RedirectToAction(nameof(Index));
             }
-
+            
             var viewModel = new BatchUploadPicturesViewModel();
             return View(viewModel);
         }
@@ -318,10 +319,9 @@ namespace Ocuda.Ops.Controllers
         {
             if (!IsSiteManager())
             {
-                return Json(new
-                {
+                return Json(new { 
                     success = false,
-                    message = "Only users with site manager privileges can batch upload profile pictures"
+                    message = "Only users with site manager privileges can batch upload profile pictures" 
                 });
             }
 
@@ -336,8 +336,7 @@ namespace Ocuda.Ops.Controllers
                 if (lastNameUsers.Count() == 1)
                 {
                     user = lastNameUsers.First();
-                }
-                else if (lastNameUsers.Count() > 1)
+                } else if (lastNameUsers.Count() > 1)
                 {
                     var fullNameUsers = lastNameUsers.Where(u => NormalizeString(u.Name).Contains(viewModel.FirstName, StringComparison.OrdinalIgnoreCase));
 
@@ -354,17 +353,17 @@ namespace Ocuda.Ops.Controllers
                         if (locationUsers.Count() == 1)
                         {
                             user = locationUsers.First();
-                        }
-                        else if (locationUsers.Count() > 1)
+                        } else if (locationUsers.Count() > 1)
                         {
                             var fullNameLocation = locationUsers.Where(u => u.Name.Contains(viewModel.FirstName, StringComparison.OrdinalIgnoreCase));
                             user = fullNameLocation.Count() == 1 ? fullNameLocation.First() : null;
                         }
-                    }
-                    catch (OcudaException ex)
+                    } 
+                    catch (OcudaException ex) 
                     {
                         Console.WriteLine(ex.Message + " Location code: " + viewModel.LocationCode);
                     }
+                    
                 }
 
                 if (user != null)
@@ -379,6 +378,7 @@ namespace Ocuda.Ops.Controllers
                     {
                         ShowAlertDanger("Problem with upload: " + oex.Message);
                     }
+                    
                 }
             }
 
@@ -390,12 +390,10 @@ namespace Ocuda.Ops.Controllers
         {
             return RemoveNonAlphaChars(RemoveDiacritics(text));
         }
-
         private static string RemoveNonAlphaChars(string text)
         {
             return NonAlphaCharsRegex().Replace(text, "");
         }
-
         private static string RemoveDiacritics(string text)
         {
             return string.Concat(

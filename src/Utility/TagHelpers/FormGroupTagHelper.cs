@@ -43,7 +43,6 @@ namespace Ocuda.Utility.TagHelpers
         private readonly IHtmlHelper _htmlHelper;
         private readonly IHtmlGenerator _htmlGenerator;
         private readonly IStringLocalizer<i18n.Resources.Shared> _localizer;
-
         public FormGroupTagHelper(IHtmlGenerator htmlGenerator,
             IHtmlHelper htmlHelper,
             IStringLocalizer<i18n.Resources.Shared> localizer)

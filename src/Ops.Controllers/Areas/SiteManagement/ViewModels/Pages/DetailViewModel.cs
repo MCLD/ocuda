@@ -29,7 +29,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
 
         [DisplayName("Language")]
         public string SelectedLanguage { get; set; }
-
         public bool IsSiteManager { get; set; }
     }
 }

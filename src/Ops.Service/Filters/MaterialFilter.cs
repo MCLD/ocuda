@@ -7,9 +7,7 @@
         public bool OrderDesc { get; set; }
         public string Search { get; set; }
 
-        public MaterialFilter(int? page = null, int take = 10) : base(page, take)
-        {
-        }
+        public MaterialFilter(int? page = null, int take = 10) : base(page, take) { }
 
         public enum OrderType
         {

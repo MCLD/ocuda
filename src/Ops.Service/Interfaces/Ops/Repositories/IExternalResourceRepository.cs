@@ -9,14 +9,10 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     public interface IExternalResourceRepository : IOpsRepository<ExternalResource, int>
     {
         Task<ICollection<ExternalResource>> GetAllAsync(ExternalResourceType? type);
-
         Task<DataWithCount<ICollection<ExternalResource>>> GetPaginatedListAsync(
             ExternalResourceFilter filter);
-
         Task<int?> GetMaxSortOrderAsync(ExternalResourceType type);
-
         Task<ExternalResource> GetBySortOrderAsync(ExternalResourceType type, int sortOrder);
-
         Task<List<ExternalResource>> GetSubsequentAsync(ExternalResourceType type, int sortOrder);
     }
 }

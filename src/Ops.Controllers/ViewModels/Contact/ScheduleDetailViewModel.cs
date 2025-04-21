@@ -16,7 +16,6 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
         public ScheduleRequest ScheduleRequest { get; set; }
         public ScheduleClaim ScheduleClaim { get; set; }
         public IEnumerable<ScheduleLog> ScheduleLogs { get; set; }
-
         public string FormattedPhone
         {
             get
@@ -25,7 +24,6 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
                     .FormatPhone(ScheduleRequest?.ScheduleRequestTelephone?.Phone);
             }
         }
-
         public bool IsClaimedByCurrentUser { get; set; }
         public ScheduleLog AddLog { get; set; }
         public IEnumerable<SelectListItem> CallDispositions { get; set; }

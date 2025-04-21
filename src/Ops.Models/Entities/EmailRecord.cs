@@ -5,12 +5,8 @@ namespace Ocuda.Ops.Models.Entities
 {
     public class EmailRecord : Utility.Email.Record
     {
-        public EmailRecord()
-        { }
-
-        public EmailRecord(Utility.Email.Record incoming) : base(incoming)
-        {
-        }
+        public EmailRecord() { }
+        public EmailRecord(Utility.Email.Record incoming) : base(incoming) { }
 
         [Key]
         [Required]

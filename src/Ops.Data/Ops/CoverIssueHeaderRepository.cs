@@ -42,7 +42,6 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync()
             };
         }
-
         private IQueryable<CoverIssueHeader> ApplyFilters(CoverIssueFilter filter)
         {
             var items = DbSet.AsNoTracking();

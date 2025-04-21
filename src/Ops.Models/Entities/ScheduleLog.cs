@@ -12,21 +12,16 @@ namespace Ocuda.Ops.Models.Entities
 
         [Display(Name = "Call disposition")]
         public int? ScheduleLogCallDispositionId { get; set; }
-
         public ScheduleLogCallDisposition ScheduleLogCallDisposition { get; set; }
 
         [Display(Name = "Duration (minutes)")]
         public int? DurationMinutes { get; set; }
-
         [Required]
         public DateTime CreatedAt { get; set; }
-
         [MaxLength(1000)]
         public string Notes { get; set; }
-
         [Required]
         public int ScheduleRequestId { get; set; }
-
         public int UserId { get; set; }
 
         [Display(Name = "Call is complete")]
@@ -48,7 +43,6 @@ namespace Ocuda.Ops.Models.Entities
 
         [NotMapped]
         public string Username { get; set; }
-
         public int? RelatedEmailId { get; set; }
         public bool IsCancelled { get; set; }
     }

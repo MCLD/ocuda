@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
-using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
@@ -49,3 +49,4 @@ namespace Ocuda.Ops.Service
         }
     }
 }
+

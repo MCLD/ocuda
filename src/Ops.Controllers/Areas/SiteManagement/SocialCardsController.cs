@@ -33,10 +33,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(socialCardService));
         }
 
-        public static string Area
-        { get { return "SiteManagement"; } }
-        public static string Name
-        { get { return "SocialCards"; } }
+        public static string Area { get { return "SiteManagement"; } }
+        public static string Name { get { return "SocialCards"; } }
 
         [Route("[action]")]
         [RestoreModelState]

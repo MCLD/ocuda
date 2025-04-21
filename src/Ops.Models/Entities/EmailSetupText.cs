@@ -7,7 +7,6 @@ namespace Ocuda.Ops.Models.Entities
         [Key]
         [Required]
         public int EmailSetupId { get; set; }
-
         public EmailSetup EmailSetup { get; set; }
 
         [Key]

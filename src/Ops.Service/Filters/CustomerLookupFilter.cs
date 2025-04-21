@@ -6,9 +6,7 @@
         public bool OrderDesc { get; set; }
         public string Search { get; set; }
 
-        public CustomerLookupFilter(int? page = null) : base(page)
-        {
-        }
+        public CustomerLookupFilter(int? page = null) : base(page) { }
 
         public enum OrderType
         {

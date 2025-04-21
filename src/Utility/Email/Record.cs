@@ -4,8 +4,7 @@ namespace Ocuda.Utility.Email
 {
     public class Record
     {
-        public Record()
-        { }
+        public Record() { }
 
         public Record(Record incoming)
         {
@@ -27,7 +26,6 @@ namespace Ocuda.Utility.Email
 
         [Required]
         public string Subject { get; set; }
-
         public string OverrideEmailToAddress { get; set; }
         public string RestrictToDomain { get; set; }
         public string BccEmailAddress { get; set; }
@@ -37,10 +35,8 @@ namespace Ocuda.Utility.Email
 
         [Required]
         public string FromName { get; set; }
-
         [Required]
         public string ToEmailAddress { get; set; }
-
         [Required]
         public string ToName { get; set; }
 

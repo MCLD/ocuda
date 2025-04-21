@@ -38,10 +38,8 @@ namespace Ocuda.Ops.Controllers
             {
                 case 0:
                     return null;
-
                 case 1:
                     return claim.First().Value;
-
                 default:
                     string userId = user.Claims
                         .FirstOrDefault(_ => _.Type == ClaimType.UserId)?.Value ?? "Unknown";

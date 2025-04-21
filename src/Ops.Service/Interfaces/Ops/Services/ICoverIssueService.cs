@@ -12,13 +12,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
             CoverIssueFilter filter);
 
         Task<CoverIssueHeader> GetHeaderByIdAsync(int id);
-
         Task<ICollection<CoverIssueDetail>> GetDetailsByHeaderIdAsync(int headerId);
-
         Task AddCoverIssueAsync(int bibId);
-
         Task ResolveCoverIssueAsnyc(int headerId);
-
         Task<CoverIssueHeader> GetHeaderByBibIdAsync(int bibId);
     }
 }

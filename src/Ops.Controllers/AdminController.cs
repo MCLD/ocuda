@@ -9,12 +9,12 @@ namespace Ocuda.Ops.Controllers
     [Route("[controller]")]
     public class AdminController : BaseController<AdminController>
     {
-        public static string Name
-        { get { return "Admin"; } }
+        public static string Name { get { return "Admin"; } }
 
         public AdminController(ServiceFacades.Controller<AdminController> context)
             : base(context)
         {
+
         }
 
         [Route("")]
@@ -22,5 +22,6 @@ namespace Ocuda.Ops.Controllers
         {
             return View();
         }
+
     }
 }

@@ -17,7 +17,7 @@ namespace Ocuda.Utility.TagHelpers.Extensions
             }
             else
             {
-                attributeList.SetAttribute("class", $"{cssClass} {existingCssClassValue}");
+                attributeList.SetAttribute("class", $"{ cssClass } { existingCssClassValue }");
             }
         }
     }

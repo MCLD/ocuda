@@ -12,7 +12,6 @@ namespace Ocuda.Ops.Controllers.Filters
     {
         private readonly ILogger<ExternalResourceFilterAttribute> _logger;
         private readonly IExternalResourceService _externalResourceService;
-
         public ExternalResourceFilterAttribute(ILogger<ExternalResourceFilterAttribute> logger,
             IExternalResourceService externalResourceService)
         {

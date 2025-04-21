@@ -1,4 +1,5 @@
-﻿namespace Ocuda.Utility.Models
+﻿
+namespace Ocuda.Utility.Models
 {
     public enum CoverIssueType
     {

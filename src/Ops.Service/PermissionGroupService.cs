@@ -272,7 +272,7 @@ namespace Ocuda.Ops.Service
                 .SingleOrDefault(_ => string.Equals(_.Id, applicationPermission,
                     StringComparison.OrdinalIgnoreCase))
                 ?? throw new OcudaException("Invalid application permission.");
-
+            
             _permissionGroupApplicationRepository.Remove(new PermissionGroupApplication
             {
                 ApplicationPermission = applicationPermission,

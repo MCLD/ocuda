@@ -10,5 +10,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts
         public PaginateModel PaginateModel { get; set; }
         public bool IsSiteManager { get; set; }
         public IList<string> PermissionIds { get; set; }
+
     }
 }

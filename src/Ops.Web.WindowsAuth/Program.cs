@@ -16,6 +16,7 @@ namespace Ops.Web.WindowsAuth
                 .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
                 .UseSerilog();
 
+
         public static int Main(string[] args)
         {
             using var webHost = CreateHostBuilder(args).Build();
