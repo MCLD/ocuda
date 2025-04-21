@@ -15,39 +15,45 @@ using Ocuda.Utility.Models;
 namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 {
     [Area("BooksByMail")]
-    [Route("BooksByMail/[controller]/[action]")]
+    [Route("[area]/[controller]")]
     public class HomeController : BaseController<HomeController>
     {
         private const int DefaultDays = -21;
         private const string PageTitle = "Books By Mail";
 
-        private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _config;
         private readonly IBooksByMailService _booksByMailService;
         private readonly ICustomerLookupService _customerLookupService;
 
         public HomeController(Controller<HomeController> context,
-            ILogger<HomeController> logger,
+
             IConfiguration config,
             IBooksByMailService booksByMailService,
             ICustomerLookupService customerLookupService) : base(context)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-            _booksByMailService = booksByMailService
-                ?? throw new ArgumentNullException(nameof(booksByMailService));
-            _customerLookupService = customerLookupService
-                ?? throw new ArgumentNullException(nameof(customerLookupService));
+            ArgumentNullException.ThrowIfNull(booksByMailService);
+            ArgumentNullException.ThrowIfNull(customerLookupService);
+            ArgumentNullException.ThrowIfNull(config);
+
+            _config = config;
+            _booksByMailService = booksByMailService;
+            _customerLookupService = customerLookupService;
         }
 
         public static string Name
+        { get { return "Home"; } }
+
+        public static string Area
         { get { return "BooksByMail"; } }
 
+        [HttpGet("[action]")]
         public async Task<IActionResult> Index(string search, int orderBy, bool orderDesc,
-            int page = 1)
+            int page)
         {
+            int currentPage = page != 0 ? page : 1;
+
             search = search?.Trim();
-            var filter = new CustomerLookupFilter(page)
+            var filter = new CustomerLookupFilter(currentPage)
             {
                 Search = search,
                 OrderBy = (CustomerLookupFilter.OrderType)orderBy,
@@ -65,61 +71,58 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
                 }
             }
 
-            var viewModel = new IndexViewModel
+            ViewData["Title"] = string.IsNullOrEmpty(search)
+                ? "Books By Mail"
+                : $"Books By Mail - search for '{search}'";
+
+            return View(new IndexViewModel
             {
                 CustomerLookup = customerLookupList.Data,
                 ItemCount = customerLookupList.Count,
-                CurrentPage = page,
+                CurrentPage = currentPage,
                 ItemsPerPage = filter.Take.Value,
                 OrderBy = orderBy,
                 OrderDesc = orderDesc,
                 Search = search,
                 SearchCount = customerLookupList.Count
-            };
-
-            ViewData["Title"] = string.IsNullOrEmpty(search)
-                ? "Books By Mail"
-                : $"Books By Mail - search for '{search}'";
-
-            return View(viewModel);
+            });
         }
 
+        [HttpGet("[action]")]
         public async Task<IActionResult> BooksByMailCustomer(int id, string search)
         {
             search = search?.Trim();
             var customerLookup = await _customerLookupService.GetCustomerLookupInfoAsync(id);
             if (customerLookup == null)
             {
-                _logger.LogInformation($"No customer found in Polaris for id {id}");
+                _logger.LogInformation("No customer found in Polaris for id {id}", id);
                 ShowAlertWarning("Customer could not be found.");
                 return RedirectToAction(nameof(Index));
             }
 
-            var booksbymailcustomer = await _booksByMailService.GetByCustomerLookupIdAsync(id);
-            if (booksbymailcustomer == null)
+            var booksByMailCustomer = await _booksByMailService.GetByCustomerLookupIdAsync(id);
+            if (booksByMailCustomer == null)
             {
-                booksbymailcustomer = new Models.Entities.BooksByMailCustomer
+                booksByMailCustomer = new Models.Entities.BooksByMailCustomer
                 {
                     CustomerLookupID = id
                 };
-                booksbymailcustomer = await _booksByMailService.AddAsync(booksbymailcustomer);
+                booksByMailCustomer = await _booksByMailService.AddAsync(booksByMailCustomer);
             }
-
-            var viewModel = new ViewModels.Home.BooksByMailCustomerViewModel
-            {
-                BooksByMailCustomer = booksbymailcustomer,
-                CustomerLookup = customerLookup,
-                CustomerLookupCheckouts = await _customerLookupService.GetCustomerLookupCheckoutsAsync(id),
-                CustomerLookupHolds = await _customerLookupService.GetCustomerLookupHoldsAsync(id),
-                CustomerLookupHistoryCount = await _customerLookupService.GetCustomerLookupHistoryCountAsync(id),
-                Search = search
-            };
 
             ViewData["Title"] = string.IsNullOrEmpty(customerLookup.NameLast)
                 ? "Books By Mail"
                 : $"Books By Mail - customer '{customerLookup.NameFirst} {customerLookup.NameLast}'";
 
-            return View(viewModel);
+            return View(new BooksByMailCustomerViewModel
+            {
+                BooksByMailCustomer = booksByMailCustomer,
+                CustomerLookup = customerLookup,
+                CustomerLookupCheckouts = await _customerLookupService.GetCustomerLookupCheckoutsAsync(id),
+                CustomerLookupHolds = await _customerLookupService.GetCustomerLookupHoldsAsync(id),
+                CustomerLookupHistoryCount = await _customerLookupService.GetCustomerLookupHistoryCountAsync(id),
+                Search = search
+            });
         }
 
         public async Task<IActionResult> GetCustomerLookupHistory(int customerLookupID, string search, int orderBy,
@@ -143,18 +146,16 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
                 ItemsPerPage = filter.Take.Value
             };
 
-            var viewModel = new HistoryViewModel
+            return PartialView("_HistoryPartial", new HistoryViewModel
             {
                 Items = itemList.Data,
                 PaginateModel = paginateModel,
                 OrderBy = orderBy,
                 OrderDesc = orderDesc
-            };
-
-            return PartialView("_HistoryPartial", viewModel);
+            });
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         public async Task<JsonResult> UpdateCustomerField(int id, string field, string text)
         {
             string message = string.Empty;
@@ -164,7 +165,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 
             if (customer == null)
             {
-                _logger.LogError($"Could not find customer {id} for updating {field}");
+                _logger.LogError("Could not find customer {CustomerId} for updating {FieldName}", id, field);
                 message = $"Could not find customer.";
             }
             else
@@ -194,7 +195,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Error updating field {field} for customer {id}", ex);
+                    _logger.LogError("Error updating field {field} for customer {id}. {ex}", id, field, ex);
                     message = $"Error updating customer {field}.";
                 }
             }
@@ -202,7 +203,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             return Json(new { success, message, text });
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         public async Task<JsonResult> AddComment(int id, string text)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -217,7 +218,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 
             if (customer == null)
             {
-                _logger.LogError($"Could not find customer {id} for adding comment");
+                _logger.LogError("Could not find customer {id} for adding comment", id);
                 message = $"Could not find customer.";
             }
 
@@ -236,7 +237,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error adding comment for customer {id}", ex);
+                _logger.LogError("Error adding comment for customer {id}. {ex}", id, ex);
                 message = $"Error adding comment.";
             }
 
