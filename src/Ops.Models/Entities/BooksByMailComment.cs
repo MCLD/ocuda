@@ -10,9 +10,11 @@ namespace Ocuda.Ops.Models.Entities
         public int CustomerId { get; set; }
         public BooksByMailCustomer Customer { get; set; }
         public DateTime CreatedAt { get; set; }
+
         [Required]
         [MaxLength(255)]
         public string StaffUsername { get; set; }
+
         [Required]
         [DisplayName("Comment")]
         public string Text { get; set; }
