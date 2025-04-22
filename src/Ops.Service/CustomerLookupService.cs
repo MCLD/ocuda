@@ -18,7 +18,7 @@ namespace Ocuda.Ops.Service
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
         }
 
-        public Task<DataWithCount<List<Customer>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter)
+        public Task<DataWithCount<IList<Customer>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter)
         {
             return _customerRepository.GetPaginatedCustomerLookupListAsync(filter);
         }
@@ -28,7 +28,7 @@ namespace Ocuda.Ops.Service
             return _customerRepository.GetCustomerLookupInfoAsync(customerLookupID);
         }
 
-        public Task<List<Material>> GetCustomerLookupCheckoutsAsync(int customerLookupID)
+        public Task<IList<Material>> GetCustomerLookupCheckoutsAsync(int customerLookupID)
         {
             return _customerRepository.GetCustomerLookupCheckoutsAsync(customerLookupID);
         }
@@ -38,12 +38,12 @@ namespace Ocuda.Ops.Service
             return _customerRepository.GetCustomerLookupHistoryCountAsync(customerLookupID);
         }
 
-        public Task<DataWithCount<List<Material>>> GetPaginatedCustomerLookupHistoryAsync(MaterialFilter filter)
+        public Task<DataWithCount<IList<Material>>> GetPaginatedCustomerLookupHistoryAsync(MaterialFilter filter)
         {
             return _customerRepository.GetPaginatedCustomerLookupHistoryAsync(filter);
         }
 
-        public Task<List<Material>> GetCustomerLookupHoldsAsync(int customerLookupID)
+        public Task<IList<Material>> GetCustomerLookupHoldsAsync(int customerLookupID)
         {
             return _customerRepository.GetCustomerLookupHoldsAsync(customerLookupID);
         }

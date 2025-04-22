@@ -25,7 +25,7 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public async Task<DataWithCount<List<Customer>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter)
+        public async Task<DataWithCount<IList<Customer>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter)
         {
             //using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //var dataQuery = $"SELECT PT.PatronID AS {nameof(Customer.PatronID)}," +
@@ -66,7 +66,7 @@ namespace Ocuda.Ops.Data.Ops
             //    Count = await db.ExecuteScalarAsync<int>(countQuery, parameters),
             //    Data = (await db.QueryAsync<Customer>(dataQuery, parameters)).ToList()
             //};
-            return await Task.FromResult(new DataWithCount<List<Customer>>
+            return await Task.FromResult(new DataWithCount<IList<Customer>>
             {
                 Count = 1,
                 Data = new List<Customer>
@@ -110,7 +110,7 @@ namespace Ocuda.Ops.Data.Ops
             });
         }
 
-        public async Task<List<Material>> GetCustomerLookupCheckoutsAsync(int customerLookupID)
+        public async Task<IList<Material>> GetCustomerLookupCheckoutsAsync(int customerLookupID)
         {
             //using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //var query = $"SELECT BR.BrowseAuthor AS {nameof(Material.Author)}," +
@@ -156,7 +156,7 @@ namespace Ocuda.Ops.Data.Ops
             return await Task.FromResult(3);
         }
 
-        public async Task<DataWithCount<List<Material>>> GetPaginatedCustomerLookupHistoryAsync(MaterialFilter filter)
+        public async Task<DataWithCount<IList<Material>>> GetPaginatedCustomerLookupHistoryAsync(MaterialFilter filter)
         {
             //using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //var dataQuery = $"SELECT BR.BrowseAuthor AS {nameof(Material.Author)}," +
@@ -201,7 +201,7 @@ namespace Ocuda.Ops.Data.Ops
             //    Count = await db.ExecuteScalarAsync<int>(countQuery, parameters),
             //    Data = (await db.QueryAsync<Material>(dataQuery, parameters)).ToList()
             //};
-            return await Task.FromResult(new DataWithCount<List<Material>>
+            return await Task.FromResult(new DataWithCount<IList<Material>>
             {
                 Count = 2,
                 Data = new List<Material>
@@ -224,7 +224,7 @@ namespace Ocuda.Ops.Data.Ops
             });
         }
 
-        public async Task<List<Material>> GetCustomerLookupHoldsAsync(int customerLookupID)
+        public async Task<IList<Material>> GetCustomerLookupHoldsAsync(int customerLookupID)
         {
             //    using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //    var query = $"SELECT BR.BrowseAuthor AS {nameof(Material.Author)}," +
