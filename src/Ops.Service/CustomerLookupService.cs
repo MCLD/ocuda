@@ -18,12 +18,12 @@ namespace Ocuda.Ops.Service
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
         }
 
-        public Task<DataWithCount<IList<Customer>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter)
+        public Task<DataWithCount<IList<CustomerLookup>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter)
         {
             return _customerRepository.GetPaginatedCustomerLookupListAsync(filter);
         }
 
-        public Task<Customer> GetCustomerLookupInfoAsync(int customerLookupID)
+        public Task<CustomerLookup> GetCustomerLookupInfoAsync(int customerLookupID)
         {
             return _customerRepository.GetCustomerLookupInfoAsync(customerLookupID);
         }

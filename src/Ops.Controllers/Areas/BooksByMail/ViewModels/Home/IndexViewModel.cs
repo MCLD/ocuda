@@ -6,7 +6,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home
 {
     public class IndexViewModel : PaginateModel
     {
-        public ICollection<Customer> CustomerLookup { get; set; }
+        public ICollection<CustomerLookup> CustomerLookup { get; set; }
         public int OrderBy { get; set; }
         public bool OrderDesc { get; set; }
         public string Search { get; set; }

@@ -25,7 +25,7 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public async Task<DataWithCount<IList<Customer>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter)
+        public async Task<DataWithCount<IList<CustomerLookup>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter)
         {
             //using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //var dataQuery = $"SELECT PT.PatronID AS {nameof(Customer.PatronID)}," +
@@ -66,12 +66,12 @@ namespace Ocuda.Ops.Data.Ops
             //    Count = await db.ExecuteScalarAsync<int>(countQuery, parameters),
             //    Data = (await db.QueryAsync<Customer>(dataQuery, parameters)).ToList()
             //};
-            return await Task.FromResult(new DataWithCount<IList<Customer>>
+            return await Task.FromResult(new DataWithCount<IList<CustomerLookup>>
             {
                 Count = 1,
-                Data = new List<Customer>
+                Data = new List<CustomerLookup>
             {
-            new Customer
+            new CustomerLookup
             {
                 CustomerLookupID = 101,
                 Barcode = "1234567890",
@@ -83,7 +83,7 @@ namespace Ocuda.Ops.Data.Ops
             });
         }
 
-        public async Task<Customer> GetCustomerLookupInfoAsync(int customerLookupID)
+        public async Task<CustomerLookup> GetCustomerLookupInfoAsync(int customerLookupID)
         {
             //using IDbConnection db = new SqlConnection(_config.GetConnectionString(PolarisDbCSName));
             //var query = $"SELECT PT.PatronID AS {nameof(Customer.PatronID)}," +
@@ -100,7 +100,7 @@ namespace Ocuda.Ops.Data.Ops
             //parameters.Add(IdParam, patronID);
 
             //return await db.QueryFirstOrDefaultAsync<Customer>(query, parameters);
-            return await Task.FromResult(new Customer
+            return await Task.FromResult(new CustomerLookup
             {
                 CustomerLookupID = customerLookupID,
                 Barcode = "1234567890",

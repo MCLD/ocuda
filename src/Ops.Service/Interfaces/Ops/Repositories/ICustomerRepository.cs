@@ -8,9 +8,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface ICustomerRepository
     {
-        Task<DataWithCount<IList<Customer>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter);
+        Task<DataWithCount<IList<CustomerLookup>>> GetPaginatedCustomerLookupListAsync(CustomerLookupFilter filter);
 
-        Task<Customer> GetCustomerLookupInfoAsync(int customerLookupID);
+        Task<CustomerLookup> GetCustomerLookupInfoAsync(int customerLookupID);
 
         Task<IList<Material>> GetCustomerLookupCheckoutsAsync(int customerLookupID);
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Ocuda.Ops.Models
 {
-    public class Customer
+    public class CustomerLookup
     {
         public int CustomerLookupID { get; set; }
         public string Barcode { get; set; }

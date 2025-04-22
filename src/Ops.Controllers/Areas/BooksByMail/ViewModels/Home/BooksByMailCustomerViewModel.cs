@@ -8,7 +8,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home
     {
         public BooksByMailCustomer BooksByMailCustomer { get; set; }
         public BooksByMailComment BooksByMailComment { get; set; }
-        public Customer CustomerLookup { get; set; }
+        public CustomerLookup CustomerLookup { get; set; }
         public IList<Material> CustomerLookupCheckouts { get; set; }
         public IList<Material> CustomerLookupHolds { get; set; }
         public string Search { get; set; }
