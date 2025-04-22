@@ -15,14 +15,6 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public async Task<BooksByMailCustomer> GetByIdAsync(int id)
-        {
-            return await _context.BooksByMailCustomers
-                .AsNoTracking()
-                .Where(_ => _.Id == id)
-                .FirstOrDefaultAsync();
-        }
-
         public async Task<BooksByMailCustomer> GetByCustomerLookupIdAsync(int customerLookupId)
         {
             var booksByMailCustomer = await _context.BooksByMailCustomers

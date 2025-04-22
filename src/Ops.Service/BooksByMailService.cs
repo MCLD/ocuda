@@ -22,9 +22,9 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(booksByMailRepository));
         }
 
-        public Task<BooksByMailCustomer> GetByIdAsync(int id)
+        public Task<BooksByMailCustomer> FindAsync(int id)
         {
-            return _booksByMailRepository.GetByIdAsync(id);
+            return _booksByMailRepository.FindAsync(id);
         }
 
         public Task<BooksByMailCustomer> GetByCustomerLookupIdAsync(int customerLookupId)

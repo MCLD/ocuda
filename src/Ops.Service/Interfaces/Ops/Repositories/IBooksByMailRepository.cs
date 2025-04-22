@@ -5,8 +5,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface IBooksByMailRepository : IOpsRepository<BooksByMailCustomer, int>
     {
-        Task<BooksByMailCustomer> GetByIdAsync(int id);
-
         Task<BooksByMailCustomer> GetByCustomerLookupIdAsync(int customerLookupId);
 
         Task<BooksByMailComment> AddCommentAsync(BooksByMailComment comment);

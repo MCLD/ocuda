@@ -5,7 +5,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IBooksByMailService
     {
-        Task<BooksByMailCustomer> GetByIdAsync(int id);
+        Task<BooksByMailCustomer> FindAsync(int id);
 
         Task<BooksByMailCustomer> GetByCustomerLookupIdAsync(int customerLookupId);
 

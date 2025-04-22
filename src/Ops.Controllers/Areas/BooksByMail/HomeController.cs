@@ -161,7 +161,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             string message = string.Empty;
             bool success = false;
 
-            var customer = await _booksByMailService.GetByIdAsync(id);
+            var customer = await _booksByMailService.FindAsync(id);
 
             if (customer == null)
             {
@@ -214,7 +214,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
             string message = string.Empty;
             bool success = false;
 
-            var customer = await _booksByMailService.GetByIdAsync(id);
+            var customer = await _booksByMailService.FindAsync(id);
 
             if (customer == null)
             {
