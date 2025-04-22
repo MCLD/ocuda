@@ -25,18 +25,18 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<BooksByMailCustomer> GetByCustomerLookupIdAsync(int customerLookupId)
         {
-            var booksbymailcustomer = await _context.BooksByMailCustomers
+            var booksByMailCustomer = await _context.BooksByMailCustomers
                 .AsNoTracking()
                 .Include(_ => _.Comments)
                 .Where(_ => _.CustomerLookupID == customerLookupId)
                 .FirstOrDefaultAsync();
 
-            if (booksbymailcustomer?.Comments != null)
+            if (booksByMailCustomer?.Comments != null)
             {
-                booksbymailcustomer.Comments = booksbymailcustomer.Comments.OrderByDescending(_ => _.CreatedAt).ToList();
+                booksByMailCustomer.Comments = booksByMailCustomer.Comments.OrderByDescending(_ => _.CreatedAt).ToList();
             }
 
-            return booksbymailcustomer;
+            return booksByMailCustomer;
         }
 
         public async Task<BooksByMailComment> AddCommentAsync(BooksByMailComment comment)
