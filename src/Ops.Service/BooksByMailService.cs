@@ -42,9 +42,13 @@ namespace Ocuda.Ops.Service
             return customer;
         }
 
-        public void Update(BooksByMailCustomer customer)
+        public async Task<BooksByMailCustomer> UpdateCustomer(BooksByMailCustomer customer)
         {
             _booksByMailRepository.Update(customer);
+            await _booksByMailRepository.SaveAsync();
+
+            return customer;
+
         }
 
         public Task<BooksByMailComment> AddCommentAsync(BooksByMailComment comment)

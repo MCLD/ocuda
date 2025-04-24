@@ -11,7 +11,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<BooksByMailCustomer> AddAsync(BooksByMailCustomer customer);
 
-        void Update(BooksByMailCustomer customer);
+        Task<BooksByMailCustomer> UpdateCustomer(BooksByMailCustomer customer);
 
         Task<BooksByMailComment> AddCommentAsync(BooksByMailComment comment);
     }

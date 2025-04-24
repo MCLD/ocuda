@@ -190,7 +190,7 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 
                 try
                 {
-                    _booksByMailService.Update(customer);
+                    await _booksByMailService.UpdateCustomer(customer);
                     success = true;
                 }
                 catch (Exception ex)
