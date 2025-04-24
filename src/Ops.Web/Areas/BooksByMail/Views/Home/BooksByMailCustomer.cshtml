@@ -350,7 +350,6 @@
                                         </div>
                                         <div class="card-footer text-muted py-1 px-2">
                                             <small>
-                                                <span class="footer-username">@comment.StaffUsername</span>
                                                 <span class="footer-createdAt float-end">@comment.CreatedAt.ToShortDateString()</span>
                                             </small>
                                         </div>
@@ -375,7 +374,6 @@
             <div class="card-body p-2"></div>
             <div class="card-footer text-muted py-1 px-2">
                 <small>
-                    <span class="footer-username"></span>
                     <span class="footer-createdAt float-end"></span>
                 </small>
             </div>
@@ -531,7 +529,6 @@
                     var commentCard = $("#templateCard").clone();
                     commentCard.removeAttr("id").removeClass("d-none");
                     commentCard.find(".card-body").text(response.text);
-                    commentCard.find(".footer-username").text(response.username);
                     commentCard.find(".footer-createdAt").text(response.createdAt);
                     commentCard.prependTo("#commentSection");
                     modal.find(".modal-alert").addClass("d-none");

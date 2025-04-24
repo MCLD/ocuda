@@ -1,19 +1,13 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Ocuda.Ops.Models.Abstract;
 
 namespace Ocuda.Ops.Models.Entities
 {
-    public class BooksByMailComment
+    public class BooksByMailComment : BaseEntity
     {
-        public int Id { get; set; }
         public int CustomerId { get; set; }
         public BooksByMailCustomer Customer { get; set; }
-        public DateTime CreatedAt { get; set; }
-
-        [Required]
-        [MaxLength(255)]
-        public string StaffUsername { get; set; }
 
         [Required]
         [DisplayName("Comment")]

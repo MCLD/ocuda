@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+using Ocuda.Ops.Models.Abstract;
 
 namespace Ocuda.Ops.Models.Entities
 {
-    public class BooksByMailCustomer
+    public class BooksByMailCustomer : BaseEntity
     {
-        public int Id { get; set; }
         public int CustomerLookupID { get; set; }
         public string Likes { get; set; }
         public string Dislikes { get; set; }

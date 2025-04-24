@@ -224,10 +224,10 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
 
             var comment = new BooksByMailComment
             {
-                CreatedAt = DateTime.Now,
                 CustomerId = id,
-                StaffUsername = HttpContext.User.Identity.Name,
-                Text = text.Trim()
+                Text = text.Trim(),
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = CurrentUserId
             };
 
             try
@@ -246,7 +246,6 @@ namespace Ocuda.Ops.Controllers.Areas.BooksByMail
                 success,
                 message,
                 text = comment.Text,
-                username = comment.StaffUsername,
                 createdAt = comment.CreatedAt.ToShortDateString()
             });
         }
