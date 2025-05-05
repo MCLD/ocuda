@@ -129,6 +129,7 @@ namespace Ocuda.Ops.Service
                             IsActive = item.Segment.IsActive,
                             Name = item.Segment.Name,
                             SegmentLanguages = item.Segment.SegmentLanguages,
+                            SegmentWrapId = item.Segment.SegmentWrapId,
                             StartDate = item.Segment.StartDate
                         }
                     });
