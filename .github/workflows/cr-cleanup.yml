@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} is cleaning up containers
 
 on:
   schedule:
-    - cron: "10 5 * * 5"
+    - cron: "10 4 * * 5"
   workflow_dispatch:
 
 jobs:
