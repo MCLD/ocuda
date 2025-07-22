@@ -8,10 +8,29 @@
     </h1>
     @if (Model.LocationManager)
     {
+        @if (Model.SegmentEditor && !Model.Location.PreFeatureSegmentId.HasValue)
+        {
+            <form asp-action="@nameof(LocationsController.AddLocationNotice)" class="d-inline">
+                <input type="hidden" name="stub" value="@Model.Location.Stub" />
+                <button class="btn btn-outline-success ms-1">Add location notice</button>
+            </form>
+        }
         <div>
-            <a class="btn btn-outline-success"
+            <a class="btn btn-outline-success ms-1"
                asp-action="@nameof(LocationsController.AddFeature)"
                asp-route-slug="@Model.Location.Stub">Add Feature to Location</a>
+        </div>
+    }
+    @if (Model.IsSiteManager)
+    {
+        <div>
+            <a asp-area="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Area"
+               asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
+               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Location)"
+               asp-route-locationStub="@Model.Location.Stub"
+               class="btn btn-outline-warning ms-2">
+                Admin
+            </a>
         </div>
     }
     <div>
@@ -30,16 +49,17 @@
                 @Model.Location.Phone
             </div>
         </div>
+
         <div class="card mb-2">
             <div class="card-header">Description</div>
             <div class="card-body">
                 <p class="card-text">@(Html.Raw(Model.Location.DescriptionSegment?.Text ?? "No description available."))</p>
             </div>
             <div class="card-footer d-flex">
-                <div class="d-inline-block fa-fw @Model.LanguageCssClass flex-grow-1 text-start"
+                <div class="d-inline-block fa-fw @Model.LanguagesCssClass(Model.DescriptionLanguages) flex-grow-1 text-start"
                      style="font-size: 1.5rem;"
-                     title="@Model.LanguageTitle">
-                    <span class="fa-solid fa-language"></span>
+                     title="@DetailsViewModel.LanguagesTitle(Model.DescriptionLanguages)">
+                    <span class="fa-solid fa-language fa-fw"></span>
                 </div>
                 @if (Model.LocationManager && Model.SegmentEditor)
                 {
@@ -63,7 +83,7 @@
                 <a asp-action="@nameof(LocationsController.MapImage)"
                    asp-route-slug="@Model.Location.Stub">
                     <img class="img-fluid"
-                         src="@Url.Action(nameof(LocationsController.MapImage), new { slug = Model.Location.Stub })?@DetailsViewModel.Now()">
+                         src="@Url.Action(nameof(LocationsController.MapImage), new { slug = Model.Location.Stub })?@DetailsViewModel.Now">
                 </a>
             </div>
             @if (Model.LocationManager)
@@ -86,7 +106,7 @@
                 <a asp-action="@nameof(LocationsController.ExteriorImage)"
                    asp-route-slug="@Model.Location.Stub">
                     <img class="img-fluid"
-                         src="@Url.Action(nameof(LocationsController.ExteriorImage), new { slug = Model.Location.Stub })?@DetailsViewModel.Now()">
+                         src="@Url.Action(nameof(LocationsController.ExteriorImage), new { slug = Model.Location.Stub })?@DetailsViewModel.Now">
                 </a>
             </div>
             @if (Model.LocationManager)
@@ -113,7 +133,7 @@
                         <a asp-action="@nameof(LocationsController.InteriorImage)"
                            asp-route-id="@interiorImage.Id">
                             <img class="img-thumbnail" style="max-width: 200px; max-height: 200px;"
-                                 src="@Url.Action(nameof(LocationsController.InteriorImage), new { id = interiorImage.Id })?@DetailsViewModel.Now()">
+                                 src="@Url.Action(nameof(LocationsController.InteriorImage), new { id = interiorImage.Id })?@DetailsViewModel.Now">
                         </a>
                     }
                 }
@@ -136,11 +156,58 @@
             }
         </div>
     </div>
+
     <div class="col">
+        @if (Model.Location.PreFeatureSegmentId.HasValue)
+        {
+            <div class="card @Model.ActiveLocationNoticeBorderCssClass mb-2">
+                <div class="card-header d-flex">
+                    <div class="flex-grow-1">Location Notice</div>
+                    <div class="@Model.ActiveLocationNoticeCssClass">
+                        @Model.LocationNoticeStatus
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">@(Html.Raw(Model.Location.PreFeatureSegmentText?.Text ?? "<em>Location notice has no content.</em>"))</p>
+                </div>
+                <div class="card-footer d-flex">
+                    <div class="flex-grow-1">
+                        <div class="d-inline-block @Model.LanguagesCssClass(Model.LocationNoticeLanguages)"
+                             style="font-size: 1.5rem;"
+                             title="@DetailsViewModel.LanguagesTitle(Model.LocationNoticeLanguages)">
+                            <span class="fa-solid fa-language fa-fw"></span>
+                        </div>
+                    </div>
+                    @if (Model.LocationManager && Model.SegmentEditor)
+                    {
+                        <div>
+                            <button class="btn btn-sm btn-outline-danger"
+                                    data-bs-target="#deleteLocationNotice"
+                                    data-bs-toggle="modal"
+                                    type="button">
+                                <span class="fa-solid fa-circle-minus fa-fw"></span>
+                            </button>
+                            <a class="btn btn-sm btn-outline-primary"
+                               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Detail)"
+                               asp-area="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Area"
+                               asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Name"
+                               asp-route-id="@Model.Location.PreFeatureSegmentId"
+                               title="Edit notice">
+                                <span aria-hidden="true"
+                                      class="fa-regular fa-file-lines fa-fw"></span>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
         @if (Model.Displays?.Any() == true)
         {
             <div class="card mb-2 border-primary">
-                <div class="card-header text-primary-emphasis">Digital displays <em>(in the library)</em></div>
+                <div class="card-header text-primary-emphasis">
+                    Digital displays <em>(in the library)</em>
+                </div>
                 <ul class="list-group list-group-flush">
                     @foreach (var display in Model.Displays)
                     {
@@ -184,7 +251,8 @@
                                     <input type="hidden" name="slug" value="@Model.Location.Stub" />
                                     <input type="hidden" name="featureId" value="@feature.Id" />
                                     <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <span class="fa-solid fa-circle-minus fa-fw" aria-hidden="true"></span>
+                                        <span aria-hidden="true"
+                                              class="fa-solid fa-circle-minus fa-fw"></span>
                                     </button>
                                 </form>
                                 <a class="btn btn-sm btn-outline-primary"
@@ -192,7 +260,8 @@
                                    asp-route-slug="@Model.Location.Stub"
                                    asp-route-featureId="@feature.Id"
                                    title="Edit location feature">
-                                    <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                                    <span aria-hidden="true"
+                                          class="fa-regular fa-file-lines fa-fw"></span>
                                 </a>
                             </div>
                         }
@@ -215,7 +284,8 @@
                                     <input type="hidden" name="slug" value="@Model.Location.Stub" />
                                     <input type="hidden" name="featureId" value="@feature.Id" />
                                     <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <span class="fa-solid fa-circle-minus fa-fw" aria-hidden="true"></span>
+                                        <span aria-hidden="true"
+                                              class="fa-solid fa-circle-minus fa-fw"></span>
                                     </button>
                                 </form>
                                 <a class="btn btn-sm btn-outline-primary"
@@ -223,7 +293,8 @@
                                    asp-route-slug="@Model.Location.Stub"
                                    asp-route-featureId="@feature.Id"
                                    title="Edit location feature">
-                                    <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+                                    <span aria-hidden="true"
+                                          class="fa-regular fa-file-lines fa-fw"></span>
                                 </a>
                             </div>
                         }
@@ -233,3 +304,43 @@
         </div>
     </div>
 </div>
+
+@if (Model.LocationManager && Model.SegmentEditor)
+{
+    <form asp-action="@nameof(LocationsController.RemoveLocationNotice)">
+        <input type="hidden" name="Id" value="@Model.Location.Id" />
+        <div aria-hidden="true"
+             aria-labelledby="deleteLocationNoticeLabel"
+             class="modal fade"
+             data-bs-backdrop="static"
+             data-bs-keyboard="false"
+             id="deleteLocationNotice"
+             tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5"
+                            id="deleteLocationNoticeLabel">
+                            Delete location notice
+                        </h1>
+                        <button aria-label="Close"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this location notice?
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal"
+                                type="button">
+                            Close
+                        </button>
+                        <button class="btn btn-outline-danger" type="submit">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+}

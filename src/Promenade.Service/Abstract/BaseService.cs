@@ -23,8 +23,9 @@ namespace Ocuda.Promenade.Service.Abstract
             IDateTimeProvider dateTimeProvider)
             : base(logger)
         {
-            _dateTimeProvider = dateTimeProvider
-                ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+            ArgumentNullException.ThrowIfNull(dateTimeProvider);
+
+            _dateTimeProvider = dateTimeProvider;
 
             CacheSlidingExpiration = new TimeSpan(1, 0, 0);
         }
@@ -65,21 +66,28 @@ namespace Ocuda.Promenade.Service.Abstract
         }
 
         /// <summary>
-        /// Get an adjusted cache duration for items that have an end date or a replacement item
+        /// Get an adjusted cache duration for items that may have a limited period for caching
         /// </summary>
         /// <param name="cacheSpan">The default cache span for this type of item</param>
-        /// <param name="nextItemStart">The end date of this item or next item's start date</param>
+        /// <param name="dates">
+        /// An array of dates for new information for computation of a cache expiration
         /// <returns>The lower of the two values</returns>
-        protected TimeSpan GetCacheDuration(TimeSpan cacheSpan, DateTime nextItemStart)
+        protected TimeSpan GetCacheDuration(TimeSpan cacheSpan, DateTime?[] dates)
         {
-            if (nextItemStart == default)
+            var validDates = dates?.Where(_ => _ != null);
+
+            if (validDates == null)
             {
                 return cacheSpan;
             }
 
-            var nextUpIn = nextItemStart - _dateTimeProvider.Now;
-            return nextUpIn.Ticks < cacheSpan.Ticks
-                ? nextUpIn
+            var nextDate = validDates
+                .Where(_ => _ > _dateTimeProvider.Now)
+                .Order()
+                .FirstOrDefault(_ => _dateTimeProvider.Now + cacheSpan > _);
+
+            return nextDate != null
+                ? nextDate.Value - _dateTimeProvider.Now
                 : cacheSpan;
         }
 
@@ -89,20 +97,14 @@ namespace Ocuda.Promenade.Service.Abstract
         /// <param name="httpContextAccessor"></param>
         /// <param name="languageService"></param>
         /// <returns>A list of language ids in the preferred order.</returns>
-        /// <exception cref="ArgumentNullException">A required argument was not specified.</exception>
+        /// <exception cref="ArgumentNullException">A required argument was not specified.
+        /// </exception>
         protected async Task<IEnumerable<int>> GetCurrentDefaultLanguageIdAsync(
             IHttpContextAccessor httpContextAccessor,
             LanguageService languageService)
         {
-            if (httpContextAccessor == null)
-            {
-                throw new ArgumentNullException(nameof(httpContextAccessor));
-            }
-
-            if (languageService == null)
-            {
-                throw new ArgumentNullException(nameof(languageService));
-            }
+            ArgumentNullException.ThrowIfNull(httpContextAccessor);
+            ArgumentNullException.ThrowIfNull(languageService);
 
             var currentCultureName = httpContextAccessor
                 .HttpContext

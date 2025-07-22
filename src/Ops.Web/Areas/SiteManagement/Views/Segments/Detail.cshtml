@@ -4,10 +4,13 @@
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
-<div class="d-flex justify-content-between">
+<div class="d-flex justify-content-between mb-2">
     <h1>
         Segment
-        <small class="text-muted">@Model.SegmentName</small>
+        @if (!string.IsNullOrEmpty(Model.SegmentName))
+        {
+            <small class="text-muted">@Model.SegmentName</small>
+        }
     </h1>
     <div class="pt-2">
         @if (!Model.NewSegmentText && string.IsNullOrEmpty(Model.BackLink))
@@ -25,16 +28,15 @@
         }
         @if (!string.IsNullOrEmpty(Model.BackLink))
         {
-            <a href="@Model.BackLink"
-               class="btn btn-outline-dark ms-2">Back</a>
+            <a href="@Model.BackLink" class="btn btn-outline-dark">Back</a>
         }
         else
         {
-            <a asp-action="Index"
-               class="btn btn-outline-dark ms-2">Cancel</a>
+            <a asp-action="Index" class="btn btn-outline-dark">Cancel</a>
         }
     </div>
 </div>
+
 <form asp-controller="@SegmentsController.Name"
       asp-action="@(nameof(SegmentsController.DeleteText))"
       method="post"
@@ -46,61 +48,66 @@
          name="Segment"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
+
 @if (!string.IsNullOrEmpty(Model.Relationship))
 {
-    <div class="row" style="padding-top: 1rem;">
-        <div class="col-12 col-md-3 text-end">
-            Relationship(s)
-        </div>
-        <div class="col-12 col-md-9">
-            @Model.Relationship
-        </div>
+    <div class="row my-3">
+        <div class="col-12 col-md-3 text-end">Relationship(s)</div>
+        <div class="col-12 col-md-9">@Model.Relationship</div>
     </div>
 }
-<div class="row py-2">
-    <div class="col-12">
-        <span class="d-none"><input asp-for="SegmentName" formgroup readonly /></span>
-        @if (Model.SegmentStartDate.HasValue || Model.SegmentEndDate.HasValue)
-        {
-            <input asp-for="SegmentStartDate"
-                   formgroup
-                   value="@Model.SegmentStartDate?.ToString()"
-                   readonly />
-            <input asp-for="SegmentEndDate"
-                   formgroup
-                   value="@Model.SegmentStartDate?.ToString()"
-                   readonly />
-        }
-        @if (Model.LanguageList?.Count() > 1)
-        {
-            <div class="mb-3 row">
-                <div class="col-md-3 text-md-end">
-                    <label asp-for="SelectedLanguage" class="col-form-label"></label>
-                </div>
-                <div class="col-md-9">
-                    @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
-                    {
-                        <a href="@Url.Action(nameof(SegmentsController.Detail), new { id = Model.SegmentId, language = item.Value })"
-                           class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">@item.Text</a>
-                    }
-                </div>
-            </div>
-            <div class="row d-none oc-save-warning">
-                <div class="offset-md-3 col-md-9">
-                    <div class="alert alert-warning">
-                        <span class="fa-solid fa-circle-arrow-up"></span> Unsaved changes will be lost if you change languages.
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-</div>
+
 <form asp-action="@nameof(SegmentsController.Detail)" method="post" role="form">
     <input asp-for="SegmentId" type="hidden" />
     <input asp-for="LanguageId" type="hidden" />
-
-    <select asp-for="SegmentWrapId"
-            asp-items="Model.SegmentWrapList" formgroup></select>
+    <div class="row mb-2">
+        <div class="col-12">
+            <span class="d-none"><input asp-for="SegmentName" formgroup readonly /></span>
+        </div>
+    </div>
+    <select asp-for="IsActive" formgroup>
+        <option value="true">Active</option>
+        <option value="false">Disabled</option>
+    </select>
+    <div class="row">
+        <div class="col-12">
+            @if (Model.CanBeScheduled)
+            {
+                <input asp-for="SegmentStartDate" formgroup type="datetime-local" />
+                <input asp-for="SegmentEndDate" formgroup type="datetime-local" />
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <select asp-for="SegmentWrapId" asp-items="Model.SegmentWrapList" formgroup></select>
+        </div>
+    </div>
+    @if (Model.LanguageList?.Count() > 1)
+    {
+        <div class="row mb-2">
+            <div class="col-md-3 text-md-end">
+                <label asp-for="SelectedLanguage" class="col-form-label"></label>
+            </div>
+            <div class="col-md-9">
+                @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
+                {
+                    <a asp-action="@nameof(SegmentsController.Detail)"
+                       asp-route-id="@Model.SegmentId"
+                       asp-route-language="@item.Value"
+                       class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">
+                        @item.Text
+                    </a>
+                }
+            </div>
+            <div class="d-none oc-save-warning offset-md-3 col-md-9">
+                <div class="alert alert-warning py-2">
+                    <span class="fa-solid fa-circle-arrow-up"></span>
+                    Unsaved changes will be lost if you change languages.
+                </div>
+            </div>
+        </div>
+    }
 
     @if (!string.IsNullOrEmpty(Model.AutomatedHeaderMarkup))
     {
@@ -118,30 +125,14 @@
         <input asp-for="SegmentText.Header" formgroup />
     }
 
-    @if (Model.TemplateFields.Any())
-    {
-        <div class="mb-3 row">
-            <div class="col-md-3 text-md-end">
-                <label asp-for="TemplateFields" class="col-form-label"></label>
-            </div>
-            <div class="col-md-9 pt-1">
-                <ul class="ps-3">
-                    @foreach (var item in Model.TemplateFields)
-                    {
-                        <li><code>{{@item.Key}}</code> - @item.Description</li>
-                    }
-                </ul>
-            </div>
-        </div>
-    }
-
-    <div class="mb-3 row">
-        <div class="mb-3-inner col-12 border-top border-bottom p-3">
+    <div class="mb-3 row border-top border-bottom">
+        <div class="mb-3-inner col-12 p-3">
             <textarea asp-for="SegmentText.Text" markdown-editor></textarea>
             <span asp-validation-for="SegmentText.Text"
                   class="validation-message text-danger"></span>
         </div>
     </div>
+
     <div class="row">
         <div class="col">
             <div class="text-end mb-2">
@@ -163,36 +154,41 @@
             </div>
         </div>
     </div>
-    </div>
 </form>
 
 @section scripts {
     <script src="~/js/md.min.js" asp-append-version="true"></script>
-
     <script>
-        $(function () {
-            var editor = new Markdown.Editor($("#SegmentText_Text"), {
+        const editorAllowCode = "@Json.Serialize(!Model.IsShowNotes)";
+        const editorAllowHr = "@Json.Serialize(!Model.IsShowNotes)";
+
+        function showSaveWarning() {
+            document.querySelectorAll('.oc-save-warning').forEach(_ => {
+                _.classList.remove('d-none');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let editor = new Markdown.Editor($("#SegmentText_Text"), {
                 allowUploads: false,
                 allowImages: false,
-                allowCode: @Json.Serialize(!Model.IsShowNotes),
-                allowHR: @Json.Serialize(!Model.IsShowNotes)
-                                                    });
+                allowCode: editorAllowCode,
+                allowHR: editorAllowHr
+            });
             if (editor) {
                 editor.run();
             }
         });
 
-        $("#SegmentText_Text").keydown(function (event) {
-            $(".oc-save-warning").removeClass("d-none");
-        });
+        document.getElementById('SegmentText_Text').addEventListener('keydown', showSaveWarning);
+        document.getElementById('SegmentText_Header').addEventListener('keydown', showSaveWarning);
 
-        $("#SegmentText_Header").keydown(function (event) {
-            $(".oc-save-warning").removeClass("d-none");
-        });
-
-        $("#deleteModal").on("show.bs.modal", function (e) {
-            var languageDescription = $(e.relatedTarget).data("languagedescription");
-            $(this).find(".modal-text").text("Are you sure you want to delete the " + languageDescription + " text for this segment?");
+        document.getElementById('deleteModal').addEventListener('show.bs.modal', e => {
+            e.target.querySelectorAll('.modal-text').forEach(_ => {
+                _.innerHTML = "Are you sure you want to delete the <strong>"
+                    + e.relatedTarget.dataset.languagedescription
+                    + "</strong> text for this segment?";
+            })
         });
     </script>
 }

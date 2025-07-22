@@ -11,13 +11,26 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment
     {
         public DetailViewModel()
         {
-            TemplateFields = new List<KeyWithDescription>();
+            TemplateFields = [];
         }
 
         [DisplayName("Displayed header")]
         public string AutomatedHeaderMarkup { get; set; }
 
         public string BackLink { get; set; }
+
+        public bool CanBeScheduled
+        {
+            get
+            {
+                return IsSchedulable || SegmentStartDate.HasValue || SegmentEndDate.HasValue;
+            }
+        }
+
+        [DisplayName("Is active?")]
+        public bool IsActive { get; set; }
+
+        public bool IsSchedulable { get; set; }
         public bool IsShowNotes { get; set; }
         public string LanguageDescription { get; set; }
         public int LanguageId { get; set; }

@@ -115,7 +115,8 @@ namespace Ocuda.Ops.Controllers
 
             if (segment == null)
             {
-                _logger.LogError("Unable to create segment for {LocationName} feature {FeatureName}",
+                _logger.LogError(
+                    "Unable to create segment for {LocationName} feature {FeatureName}",
                     location.Name,
                     feature.Name);
                 ShowAlertDanger("Unable to create segment. Please contact an administrator.");
@@ -228,7 +229,8 @@ namespace Ocuda.Ops.Controllers
 
         [HttpPost("[action]/{slug}")]
         [SaveModelState]
-        public async Task<IActionResult> AddInteriorImage(InteriorImageViewModel interiorImageViewModel,
+        public async Task<IActionResult> AddInteriorImage(
+            InteriorImageViewModel interiorImageViewModel,
             string slug)
         {
             var hasPermission = await HasAppPermissionAsync(_permissionGroupService,
@@ -245,8 +247,8 @@ namespace Ocuda.Ops.Controllers
 
             foreach (var language in languages)
             {
-                if (!interiorImageViewModel.AltTexts.TryGetValue(language.Id, out string value) ||
-                        string.IsNullOrWhiteSpace(value))
+                if (!interiorImageViewModel.AltTexts.TryGetValue(language.Id, out string value)
+                    || string.IsNullOrWhiteSpace(value))
                 {
                     ShowAlertDanger("You must supply Alt Text in all requested languages.");
                     return RedirectToAction(nameof(AddInteriorImage), new { slug });
@@ -267,6 +269,37 @@ namespace Ocuda.Ops.Controllers
             }
 
             return RedirectToAction(nameof(UpdateInteriorImages), new { slug });
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> AddLocationNotice(string stub)
+        {
+            var location = await _locationService.GetLocationByStubAsync(stub);
+            if (location != null)
+            {
+                if (!location.PreFeatureSegmentId.HasValue)
+                {
+                    var segment = new Segment
+                    {
+                        IsActive = false,
+                        Name = $"{location.Name} location notice",
+                    };
+                    segment = await _segmentService.CreateAsync(segment);
+                    location.PreFeatureSegmentId = segment.Id;
+                    await _locationService.EditAsync(location);
+                    ShowAlertSuccess("Location notice created.");
+                }
+                else
+                {
+                    ShowAlertDanger("There is already a location notice segment attached to this location.");
+                }
+                return RedirectToAction(nameof(Details), new { slug = location.Stub });
+            }
+            else
+            {
+                ShowAlertDanger("Location not found.");
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         [HttpPost("[action]/{slug}")]
@@ -361,6 +394,13 @@ namespace Ocuda.Ops.Controllers
                     .GetBySegmentAndLanguageAsync(location.DescriptionSegmentId, defaultLanguageId);
             }
 
+            if (location.PreFeatureSegmentId.HasValue)
+            {
+                location.PreFeatureSegmentText = await _segmentService
+                    .GetBySegmentAndLanguageAsync(location.PreFeatureSegmentId.Value,
+                        defaultLanguageId);
+            }
+
             var features = await _featureService.GetAllFeaturesAsync();
 
             var locationFeatures = await _locationFeatureService
@@ -371,7 +411,8 @@ namespace Ocuda.Ops.Controllers
 
             var languages = await _languageService.GetActiveAsync();
 
-            location.InteriorImages = await _locationService.GetLocationInteriorImagesAsync(location.Id);
+            location.InteriorImages = await _locationService
+                .GetLocationInteriorImagesAsync(location.Id);
 
             var viewModel = new DetailsViewModel
             {
@@ -379,6 +420,7 @@ namespace Ocuda.Ops.Controllers
                     .OrderBy(_ => _.SortOrder)
                     .ToList(),
                 Displays = await _digitalDisplayService.GetByLocationAsync(location.Id),
+                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
                 Location = location,
                 LocationManager = await HasAppPermissionAsync(_permissionGroupService,
                     ApplicationPermission.LocationManagement),
@@ -389,10 +431,18 @@ namespace Ocuda.Ops.Controllers
                     .ToList(),
             };
 
-            foreach(var display in viewModel.Displays)
+            foreach (var display in viewModel.Displays)
             {
                 var assets = await _digitalDisplayService.GetNonExpiredAssetsAsync(display.Id);
                 display.SlideCount = assets.Count();
+            }
+
+            if (location.PreFeatureSegmentId.HasValue)
+            {
+                viewModel.LocationNoticeSegment
+                    = await _segmentService.GetByIdAsync(location.PreFeatureSegmentId.Value);
+                viewModel.LocationNoticeLanguages.AddRange(await _segmentService
+                    .GetSegmentLanguagesByIdAsync(location.PreFeatureSegmentId.Value));
             }
 
             viewModel.DescriptionLanguages.AddRange(await _segmentService
@@ -413,7 +463,8 @@ namespace Ocuda.Ops.Controllers
                 return NotFound();
             }
 
-            var fullImagePath = await _locationService.GetExteriorImageFilePathAsync(location.ImagePath);
+            var fullImagePath = await _locationService
+                .GetExteriorImageFilePathAsync(location.ImagePath);
 
             if (!System.IO.File.Exists(fullImagePath))
             {
@@ -460,7 +511,8 @@ namespace Ocuda.Ops.Controllers
                 return NotFound();
             }
 
-            var fullImagePath = await _locationService.GetInteriorImageFilePathAsync(interiorImage.ImagePath);
+            var fullImagePath = await _locationService
+                .GetInteriorImageFilePathAsync(interiorImage.ImagePath);
 
             if (!System.IO.File.Exists(fullImagePath))
             {
@@ -531,8 +583,11 @@ namespace Ocuda.Ops.Controllers
             if (locationFeature.SegmentId.HasValue)
             {
                 var locationFeatureText = await _segmentService
-                    .GetBySegmentAndLanguageAsync(locationFeature.SegmentId.Value, defaultLanguageId);
-                locationFeature.Text = CommonMark.CommonMarkConverter.Convert(locationFeatureText?.Text);
+                    .GetBySegmentAndLanguageAsync(locationFeature.SegmentId.Value,
+                        defaultLanguageId);
+                locationFeature.Text = CommonMark
+                    .CommonMarkConverter
+                    .Convert(locationFeatureText?.Text);
                 viewModel.LocationFeatureLanguages.AddRange(await _segmentService
                     .GetSegmentLanguagesByIdAsync(locationFeature.SegmentId.Value));
             }
@@ -551,7 +606,8 @@ namespace Ocuda.Ops.Controllers
                 return NotFound();
             }
 
-            var fullImagePath = await _locationService.GetMapImageFilePathAsync(location.MapImagePath);
+            var fullImagePath = await _locationService
+                .GetMapImageFilePathAsync(location.MapImagePath);
 
             if (!System.IO.File.Exists(fullImagePath))
             {
@@ -607,6 +663,33 @@ namespace Ocuda.Ops.Controllers
             return RedirectToAction(nameof(UpdateInteriorImages), new { slug });
         }
 
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RemoveLocationNotice(int id)
+        {
+            var location = await _locationService.GetLocationByIdAsync(id);
+            if (location != null)
+            {
+                if (location.PreFeatureSegmentId.HasValue)
+                {
+                    var segmentId = location.PreFeatureSegmentId.Value;
+                    location.PreFeatureSegmentId = null;
+                    await _locationService.EditAsync(location);
+                    await _segmentService.DeleteAsync(segmentId);
+                    ShowAlertSuccess("Location notice removed.");
+                }
+                else
+                {
+                    ShowAlertDanger("No location notice segment attached to this location.");
+                }
+                return RedirectToAction(nameof(Details), new { slug = location.Stub });
+            }
+            else
+            {
+                ShowAlertDanger("Location not found.");
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
         [HttpGet("[action]/{slug}")]
         public async Task<IActionResult> UpdateExteriorImage(string slug)
         {
@@ -629,7 +712,8 @@ namespace Ocuda.Ops.Controllers
         }
 
         [HttpPost("[action]/{slug}")]
-        public async Task<IActionResult> UpdateExteriorImage(ExteriorImageViewModel viewModel, string slug)
+        public async Task<IActionResult> UpdateExteriorImage(ExteriorImageViewModel viewModel,
+            string slug)
         {
             if (viewModel == null) { return BadRequest(); }
 
@@ -649,7 +733,8 @@ namespace Ocuda.Ops.Controllers
 
             try
             {
-                await _locationService.UpdateExteriorImageAsync(viewModel.Image, viewModel.Filename, slug);
+                await _locationService
+                    .UpdateExteriorImageAsync(viewModel.Image, viewModel.Filename, slug);
             }
             catch (OcudaException oex)
             {
@@ -663,7 +748,8 @@ namespace Ocuda.Ops.Controllers
         }
 
         [HttpPost("[action]/{slug}")]
-        public async Task<IActionResult> UpdateInteriorImage(InteriorImageViewModel viewModel, string slug)
+        public async Task<IActionResult> UpdateInteriorImage(InteriorImageViewModel viewModel,
+            string slug)
         {
             if (viewModel == null) { return BadRequest(); }
 

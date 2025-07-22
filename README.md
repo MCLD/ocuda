@@ -2,12 +2,6 @@
 
 An experiment in content management.
 
-## Application settings
-
-### Promenade
-
-### Ops
-
 ## Configuring logging with Seq
 
 If you wish to log to Seq, ensure your `appsettings.json` contians the following (exclude `apiKey`

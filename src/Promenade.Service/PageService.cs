@@ -214,7 +214,7 @@ namespace Ocuda.Promenade.Service
                         var nextUp = await _pageLayoutRepository.GetNextStartDate(headerId);
                         if (nextUp.HasValue)
                         {
-                            var earliestSpan = GetCacheDuration(cacheSpan.Value, nextUp.Value);
+                            var earliestSpan = GetCacheDuration(cacheSpan.Value, [nextUp.Value]);
                             if (earliestSpan != cacheSpan.Value)
                             {
                                 _logger.LogInformation("Shortening layout id {LayoutId} cache to {CacheForTime}, next layout activates at {StartDate}",
@@ -281,12 +281,12 @@ namespace Ocuda.Promenade.Service
 
                 if (!string.IsNullOrWhiteSpace(currentCultureName))
                 {
-                    var currentLangaugeId = await _languageService
+                    var currentLanguageId = await _languageService
                         .GetLanguageIdAsync(currentCultureName);
 
                     var layoutTextCacheKey = string.Format(CultureInfo.InvariantCulture,
                         Utility.Keys.Cache.PromPageLayoutText,
-                        currentLangaugeId,
+                        currentLanguageId,
                         pageLayout.Id);
 
                     if (cacheSpan.HasValue && !forceReload)
@@ -298,7 +298,7 @@ namespace Ocuda.Promenade.Service
                     if (pageLayout.PageLayoutText == null)
                     {
                         pageLayout.PageLayoutText = await _pageLayoutTextRepository
-                            .GetByIdsAsync(pageLayout.Id, currentLangaugeId);
+                            .GetByIdsAsync(pageLayout.Id, currentLanguageId);
 
                         if (cacheSpan.HasValue && pageLayout?.PageLayoutText != null)
                         {

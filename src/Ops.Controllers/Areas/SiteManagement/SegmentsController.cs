@@ -260,6 +260,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var viewModel = new DetailViewModel
             {
+                IsActive = segment.IsActive,
                 LanguageDescription = selectedLanguage.Description,
                 LanguageId = selectedLanguage.Id,
                 LanguageList = new SelectList(languages,
@@ -321,9 +322,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (ModelState.IsValid)
             {
                 var segment = await _segmentService.GetByIdAsync(model.SegmentId);
-                if (segment != null && model.SegmentWrapId != segment.SegmentWrapId)
+                if (segment != null)
                 {
-                    await _segmentService.UpdateWrapAsync(segment.Id, model.SegmentWrapId);
+                    segment.IsActive = model.IsActive;
+                    segment.SegmentWrapId = model.SegmentWrapId;
+                    segment.StartDate = model.SegmentStartDate;
+                    segment.EndDate = model.SegmentEndDate;
+                    await _segmentService.EditAsync(segment);
                 }
 
                 var segmentText = model.SegmentText;
@@ -333,17 +338,24 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var currentSegmentText = await _segmentService.GetBySegmentAndLanguageAsync(
                     model.SegmentId, language.Id);
 
-                if (currentSegmentText == null)
+                if (currentSegmentText != null
+                    && string.IsNullOrWhiteSpace(model.SegmentText.Text)
+                    && string.IsNullOrWhiteSpace(model.SegmentText.Header))
                 {
-                    await _segmentService.CreateSegmentTextAsync(segmentText);
-
-                    ShowAlertSuccess("Added segment text!");
+                    await _segmentService.DeleteSegmentTextAsync(currentSegmentText);
                 }
                 else
                 {
-                    await _segmentService.EditSegmentTextAsync(segmentText);
-
-                    ShowAlertSuccess("Updated segment text!");
+                    if (currentSegmentText == null)
+                    {
+                        await _segmentService.CreateSegmentTextAsync(segmentText);
+                        ShowAlertSuccess("Added segment text!");
+                    }
+                    else
+                    {
+                        await _segmentService.EditSegmentTextAsync(segmentText);
+                        ShowAlertSuccess("Updated segment text!");
+                    }
                 }
 
                 // if this was an update to the name of a feature then update the name item as well
@@ -455,7 +467,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             foreach (var segment in segmentList.Data.ToList())
             {
-                segment.SegmentLanguages = await _segmentService.GetSegmentLanguagesByIdAsync(segment.Id);
+                segment.SegmentLanguages
+                    = await _segmentService.GetSegmentLanguagesByIdAsync(segment.Id);
             }
             var languages = await _languageService.GetActiveAsync();
             var selectedLanguage = languages.Single(_ => _.IsDefault);
@@ -512,8 +525,18 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         area = "",
                         slug = locations.First().Stub
                     });
-                viewModel.Relationship
-                    = $"This segment is used for location: {locations.First().Name}";
+
+                if (locations.First().DescriptionSegmentId == segmentId)
+                {
+                    viewModel.Relationship
+                        = $"This segment is used as the description of location: {locations.First().Name}";
+                }
+                else
+                {
+                    viewModel.IsSchedulable = true;
+                    viewModel.Relationship
+                        = $"This segment is used for location: {locations.First().Name}";
+                }
                 return;
             }
             if (locations?.Count > 1)
@@ -524,18 +547,22 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return;
             }
 
-            var locationFeature = await _locationFeatureService.GetLocationFeatureBySegmentIdAsync(segmentId);
+            var locationFeature = await _locationFeatureService
+                .GetLocationFeatureBySegmentIdAsync(segmentId);
+
             if (locationFeature != null)
             {
-                var location = await _locationService.GetLocationByIdAsync(locationFeature.LocationId);
-                viewModel.BackLink = Url.Action(nameof(Controllers.LocationsController.LocationFeature),
-                    Controllers.LocationsController.Name,
-                    new
-                    {
-                        area = "",
-                        slug = location.Stub,
-                        featureId = locationFeature.FeatureId
-                    });
+                var location = await _locationService
+                    .GetLocationByIdAsync(locationFeature.LocationId);
+                viewModel.BackLink
+                    = Url.Action(nameof(Controllers.LocationsController.LocationFeature),
+                        Controllers.LocationsController.Name,
+                        new
+                        {
+                            area = "",
+                            slug = location.Stub,
+                            featureId = locationFeature.FeatureId
+                        });
                 viewModel.Relationship = "This segment is used to customize a location feature description.";
                 return;
             }
@@ -619,7 +646,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         var permissionGroups = await _permissionGroupService
                             .GetPermissionsAsync<PermissionGroupPageContent>(pageHeaderId.Value);
                         var permissionGroupsStrings = permissionGroups
-                            .Select(_ => _.PermissionGroupId.ToString(CultureInfo.InvariantCulture));
+                            .Select(_ => _.PermissionGroupId
+                                .ToString(CultureInfo.InvariantCulture));
 
                         return permissionClaims.Any(_ => permissionGroupsStrings.Contains(_));
                     }
@@ -634,8 +662,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     var podcast = await _podcastService.GetEpisodeBySegmentIdAsync(segmentId);
                     if (podcast != null)
                     {
-                        return await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
-                            podcast.PodcastId) && await HasAppPermissionAsync(_permissionGroupService,
+                        return await HasPermissionAsync<PermissionGroupPodcastItem>(
+                            _permissionGroupService, podcast.PodcastId)
+                            && await HasAppPermissionAsync(_permissionGroupService,
                                 ApplicationPermission.PodcastShowNotesManagement);
                     }
                 }

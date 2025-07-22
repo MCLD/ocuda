@@ -21,7 +21,5 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<int?> GetPageLayoutIdForSegmentAsync(int id);
 
         Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(BaseFilter filter);
-
-        Task UpdateWrapAsync(int segmentId, int? segmentWrapId);
     }
 }
