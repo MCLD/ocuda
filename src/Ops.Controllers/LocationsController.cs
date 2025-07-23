@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
+using Ocuda.Ops.Controllers.Areas.SiteManagement;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Controllers.ServiceFacades;
 using Ocuda.Ops.Controllers.ViewModels.Locations;
@@ -287,7 +288,9 @@ namespace Ocuda.Ops.Controllers
                     segment = await _segmentService.CreateAsync(segment);
                     location.PreFeatureSegmentId = segment.Id;
                     await _locationService.EditAsync(location);
-                    ShowAlertSuccess("Location notice created.");
+                    return RedirectToAction(nameof(SegmentsController.Detail),
+                        SegmentsController.Name,
+                        new { area = SegmentsController.Area, id = segment.Id });
                 }
                 else
                 {

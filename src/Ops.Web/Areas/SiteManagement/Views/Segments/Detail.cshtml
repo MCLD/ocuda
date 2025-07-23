@@ -65,10 +65,17 @@
             <span class="d-none"><input asp-for="SegmentName" formgroup readonly /></span>
         </div>
     </div>
-    <select asp-for="IsActive" formgroup>
-        <option value="true">Active</option>
-        <option value="false">Disabled</option>
-    </select>
+    @if (Model.CanBeDeactivated)
+    {
+        <select asp-for="IsActive" formgroup>
+            <option value="true">Active</option>
+            <option value="false">Disabled</option>
+        </select>
+    }
+    else
+    {
+        <input type="hidden" asp-for="IsActive" value="true" />
+    }
     <div class="row">
         <div class="col-12">
             @if (Model.CanBeScheduled)
@@ -81,6 +88,17 @@
     <div class="row">
         <div class="col-12">
             <select asp-for="SegmentWrapId" asp-items="Model.SegmentWrapList" formgroup></select>
+            @if (!string.IsNullOrEmpty(Model.FlagWrap))
+            {
+                <div class="row">
+                    <div class="col-md-9 offset-md-3">
+                        <div class="alert alert-info px-2 py-1 mb-3">
+                            <span class="fa-solid fa-circle-info fa-fw"></span>
+                            @Model.FlagWrap
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     </div>
     @if (Model.LanguageList?.Count() > 1)
@@ -100,7 +118,7 @@
                     </a>
                 }
             </div>
-            <div class="d-none oc-save-warning offset-md-3 col-md-9">
+            <div class="d-none oc-save-warning offset-md-3 col-md-9 mt-2">
                 <div class="alert alert-warning py-2">
                     <span class="fa-solid fa-circle-arrow-up"></span>
                     Unsaved changes will be lost if you change languages.
@@ -122,14 +140,21 @@
     }
     else
     {
-        <input asp-for="SegmentText.Header" formgroup />
+        if (Model.SuppressHeader)
+        {
+            <input asp-for="SegmentText.Header" type="hidden" value="" />
+        }
+        else
+        {
+            <input asp-for="SegmentText.Header" formgroup />
+        }
     }
 
     <div class="mb-3 row border-top border-bottom">
         <div class="mb-3-inner col-12 p-3">
             <textarea asp-for="SegmentText.Text" markdown-editor></textarea>
             <span asp-validation-for="SegmentText.Text"
-                  class="validation-message text-danger"></span>
+                  class="validation-message text-danger fw-bold"></span>
         </div>
     </div>
 

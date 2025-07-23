@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -300,7 +301,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
-                await EstablishBacklinkAsync(segment.Id, viewModel);
+                await PopulateRelationshipInformation(segment.Id, viewModel);
             }
 
             return View(viewModel);
@@ -315,6 +316,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (!await HasSegmentPermissionAsync(model.SegmentId))
             {
                 return RedirectToUnauthorized();
+            }
+
+            if (string.IsNullOrWhiteSpace(model.SegmentText?.Header)
+                && string.IsNullOrWhiteSpace(model.SegmentText?.Text))
+            {
+                ModelState.AddModelError("SegmentText.Text",
+                    "You must supply text to save a segment.");
             }
 
             var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
@@ -368,6 +376,21 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         await _featureService.UpdateFeatureNameAsync(feature.Id, segmentText.Text);
                     }
                 }
+            }
+            else
+            {
+                var sb = new StringBuilder("Unable to save, please correct the following issues:<ul>");
+                foreach (var item in ModelState.Values)
+                {
+                    foreach (var error in item.Errors)
+                    {
+                        sb.Append("<li>")
+                            .Append(error.ErrorMessage)
+                            .Append("</li>");
+                    }
+                }
+                sb.Append("</li>");
+                ShowAlertDanger(sb.ToString());
             }
 
             return RedirectToAction(nameof(Detail), new
@@ -483,149 +506,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return View(viewModel);
         }
 
-        private async Task EstablishBacklinkAsync(int segmentId,
-            DetailViewModel viewModel)
-        {
-            var emediaGroup = await _emediaService.GetGroupUsingSegmentAsync(segmentId);
-
-            if (emediaGroup != null)
-            {
-                viewModel.BackLink = Url.Action(nameof(EmediaController.GroupDetails),
-                    EmediaController.Name,
-                    new
-                    {
-                        id = emediaGroup.Id
-                    });
-                viewModel.Relationship
-                    = $"This segment is used by emedia group: {emediaGroup.Name}";
-                return;
-            }
-
-            var feature = await _featureService.GetFeatureBySegmentIdAsync(segmentId);
-            if (feature != null)
-            {
-                viewModel.BackLink = Url.Action(nameof(FeaturesController.Feature),
-                    FeaturesController.Name,
-                    new
-                    {
-                        area = FeaturesController.Area,
-                        slug = feature.Stub
-                    });
-                viewModel.Relationship = $"This segment is used for feature: {feature.Name}";
-            }
-
-            var locations = await _locationService.GetLocationsBySegment(segmentId);
-
-            if (locations?.Count == 1)
-            {
-                viewModel.BackLink = Url.Action(nameof(Controllers.LocationsController.Details),
-                    Controllers.LocationsController.Name,
-                    new
-                    {
-                        area = "",
-                        slug = locations.First().Stub
-                    });
-
-                if (locations.First().DescriptionSegmentId == segmentId)
-                {
-                    viewModel.Relationship
-                        = $"This segment is used as the description of location: {locations.First().Name}";
-                }
-                else
-                {
-                    viewModel.IsSchedulable = true;
-                    viewModel.Relationship
-                        = $"This segment is used for location: {locations.First().Name}";
-                }
-                return;
-            }
-            if (locations?.Count > 1)
-            {
-                viewModel.Relationship = string.Format(CultureInfo.InvariantCulture,
-                    "This segment is used for multiple locations: {0}",
-                    string.Join(", ", locations.Select(_ => _.Name)));
-                return;
-            }
-
-            var locationFeature = await _locationFeatureService
-                .GetLocationFeatureBySegmentIdAsync(segmentId);
-
-            if (locationFeature != null)
-            {
-                var location = await _locationService
-                    .GetLocationByIdAsync(locationFeature.LocationId);
-                viewModel.BackLink
-                    = Url.Action(nameof(Controllers.LocationsController.LocationFeature),
-                        Controllers.LocationsController.Name,
-                        new
-                        {
-                            area = "",
-                            slug = location.Stub,
-                            featureId = locationFeature.FeatureId
-                        });
-                viewModel.Relationship = "This segment is used to customize a location feature description.";
-                return;
-            }
-
-            var episode = await _podcastService.GetEpisodeBySegmentIdAsync(segmentId);
-
-            if (episode != null)
-            {
-                viewModel.BackLink = Url.Action(nameof(PodcastsController.EditEpisode),
-                    PodcastsController.Name,
-                    new
-                    {
-                        episodeId = episode.Id
-                    });
-                viewModel.Relationship
-                    = $"This segment is used for podcast '{episode.Podcast.Title}' episode #{episode.Episode.Value}";
-                string published = episode.PublishDate.HasValue
-                    ? $"published {episode.PublishDate.Value.ToLongDateString()}"
-                    : "not yet published";
-                viewModel.AutomatedHeaderMarkup
-                    = $"<strong>Show notes for {episode.Title}</strong><br>{episode.Podcast.Title}. <em>Episode {episode.Episode}, {published}.</em>";
-                viewModel.IsShowNotes = episode != null;
-                return;
-            }
-
-            var forms = await _formService.GetFormBySegmentIdAsync(segmentId);
-            if (forms?.Count == 1)
-            {
-                viewModel.BackLink = Url.Action(nameof(VolunteerController.Form),
-                    VolunteerController.Name,
-                    new
-                    {
-                        id = forms.First().Id
-                    });
-                viewModel.Relationship
-                    = $"This segment is used for form type: {forms.First().VolunteerFormType}";
-                viewModel.TemplateFields.Add(Template.LocationName);
-                return;
-            }
-
-            var products = await _productService.GetBySegmentIdAsync(segmentId);
-
-            if (products?.Count == 1)
-            {
-                viewModel.BackLink = Url.Action(nameof(ProductsController.Details),
-                    ProductsController.Name,
-                    new
-                    {
-                        productSlug = products.First().Slug
-                    });
-                viewModel.Relationship
-                    = $"This segment is used for product: {products.First().Name}";
-                viewModel.AutomatedHeaderMarkup
-                    = $"<strong>{products.First().Name}</strong>";
-            }
-            else if (products?.Count > 1)
-            {
-                viewModel.Relationship = string.Format(CultureInfo.InvariantCulture,
-                    "This segment is used for multiple products: {0}",
-                    string.Join(", ", products.Select(_ => _.Name)));
-            }
-        }
-
         private async Task<bool> HasSegmentPermissionAsync(int segmentId)
         {
             if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
@@ -669,6 +549,148 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     }
                 }
                 return false;
+            }
+        }
+
+        private async Task PopulateRelationshipInformation(int segmentId,
+                    DetailViewModel viewModel)
+        {
+            var emediaGroup = await _emediaService.GetGroupUsingSegmentAsync(segmentId);
+            if (emediaGroup != null)
+            {
+                viewModel.BackLink = Url.Action(nameof(EmediaController.GroupDetails),
+                    EmediaController.Name,
+                    new
+                    {
+                        id = emediaGroup.Id
+                    });
+                viewModel.Relationship
+                    = $"This segment is used by emedia group: {emediaGroup.Name}";
+                return;
+            }
+
+            var feature = await _featureService.GetFeatureBySegmentIdAsync(segmentId);
+            if (feature != null)
+            {
+                viewModel.BackLink = Url.Action(nameof(FeaturesController.Feature),
+                    FeaturesController.Name,
+                    new
+                    {
+                        area = FeaturesController.Area,
+                        slug = feature.Stub
+                    });
+                viewModel.Relationship = $"This segment is used for feature: {feature.Name}";
+            }
+
+            var locations = await _locationService.GetLocationsBySegment(segmentId);
+            if (locations?.Count == 1)
+            {
+                viewModel.BackLink = Url.Action(nameof(Controllers.LocationsController.Details),
+                    Controllers.LocationsController.Name,
+                    new
+                    {
+                        area = "",
+                        slug = locations.First().Stub
+                    });
+
+                if (locations.First().DescriptionSegmentId == segmentId)
+                {
+                    viewModel.Relationship
+                        = $"This segment is used as the description of location: {locations.First().Name}";
+                    viewModel.SuppressHeader = true;
+                }
+                else
+                {
+                    viewModel.CanBeDeactivated = true;
+                    viewModel.FlagWrap = "You may wish to set a wrap for this location-based notice.";
+                    viewModel.IsSchedulable = true;
+                    viewModel.Relationship
+                        = $"This segment is used as a notice for location: {locations.First().Name}";
+                    viewModel.SuppressHeader = true;
+                }
+                return;
+            }
+            if (locations?.Count > 1)
+            {
+                viewModel.Relationship = string.Format(CultureInfo.InvariantCulture,
+                    "This segment is used for multiple locations: {0}",
+                    string.Join(", ", locations.Select(_ => _.Name)));
+                return;
+            }
+
+            var locationFeature = await _locationFeatureService
+                .GetLocationFeatureBySegmentIdAsync(segmentId);
+            if (locationFeature != null)
+            {
+                var location = await _locationService
+                    .GetLocationByIdAsync(locationFeature.LocationId);
+                viewModel.BackLink
+                    = Url.Action(nameof(Controllers.LocationsController.LocationFeature),
+                        Controllers.LocationsController.Name,
+                        new
+                        {
+                            area = "",
+                            slug = location.Stub,
+                            featureId = locationFeature.FeatureId
+                        });
+                viewModel.Relationship = "This segment is used to customize a location feature description.";
+                return;
+            }
+
+            var episode = await _podcastService.GetEpisodeBySegmentIdAsync(segmentId);
+            if (episode != null)
+            {
+                viewModel.BackLink = Url.Action(nameof(PodcastsController.EditEpisode),
+                    PodcastsController.Name,
+                    new
+                    {
+                        episodeId = episode.Id
+                    });
+                viewModel.Relationship
+                    = $"This segment is used for podcast '{episode.Podcast.Title}' episode #{episode.Episode.Value}";
+                string published = episode.PublishDate.HasValue
+                    ? $"published {episode.PublishDate.Value.ToLongDateString()}"
+                    : "not yet published";
+                viewModel.AutomatedHeaderMarkup
+                    = $"<strong>Show notes for {episode.Title}</strong><br>{episode.Podcast.Title}. <em>Episode {episode.Episode}, {published}.</em>";
+                viewModel.IsShowNotes = episode != null;
+                return;
+            }
+
+            var forms = await _formService.GetFormBySegmentIdAsync(segmentId);
+            if (forms?.Count == 1)
+            {
+                viewModel.BackLink = Url.Action(nameof(VolunteerController.Form),
+                    VolunteerController.Name,
+                    new
+                    {
+                        id = forms.First().Id
+                    });
+                viewModel.Relationship
+                    = $"This segment is used for form type: {forms.First().VolunteerFormType}";
+                viewModel.TemplateFields.Add(Template.LocationName);
+                return;
+            }
+
+            var products = await _productService.GetBySegmentIdAsync(segmentId);
+            if (products?.Count == 1)
+            {
+                viewModel.BackLink = Url.Action(nameof(ProductsController.Details),
+                    ProductsController.Name,
+                    new
+                    {
+                        productSlug = products.First().Slug
+                    });
+                viewModel.Relationship
+                    = $"This segment is used for product: {products.First().Name}";
+                viewModel.AutomatedHeaderMarkup
+                    = $"<strong>{products.First().Name}</strong>";
+            }
+            else if (products?.Count > 1)
+            {
+                viewModel.Relationship = string.Format(CultureInfo.InvariantCulture,
+                    "This segment is used for multiple products: {0}",
+                    string.Join(", ", products.Select(_ => _.Name)));
             }
         }
     }
