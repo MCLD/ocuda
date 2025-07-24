@@ -73,7 +73,7 @@ namespace Ocuda.Ops.Service
 
                     foreach (var pending in pendingNotifications)
                     {
-                        using (_logger.BeginScope("Handling {NotifciationType} notification for id {Id}",
+                        using (_logger.BeginScope("Handling {NotificationType} notification for id {NotificationId}",
                             NotificationType,
                             pending.Id))
                         {
