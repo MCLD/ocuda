@@ -11,14 +11,45 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment
     {
         public DetailViewModel()
         {
-            TemplateFields = new List<KeyWithDescription>();
+            TemplateFields = [];
         }
 
         [DisplayName("Displayed header")]
         public string AutomatedHeaderMarkup { get; set; }
 
         public string BackLink { get; set; }
+
+        /// <summary>
+        /// Set to true to show the activation drop-down, otherwise segment is set to always active
+        /// </summary>
+        public bool CanBeDeactivated { get; set; }
+
+        public bool CanBeScheduled
+        {
+            get
+            {
+                return IsSchedulable || SegmentStartDate.HasValue || SegmentEndDate.HasValue;
+            }
+        }
+
+        /// <summary>
+        /// Informational text to show below the wrap drop-down
+        /// </summary>
+        public string FlagWrap { get; set; }
+
+        [DisplayName("Is active?")]
+        public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Set to true to show the schedule start and end dates, otherwise dates are not editable
+        /// </summary>
+        public bool IsSchedulable { get; set; }
+
+        /// <summary>
+        /// Set to true if this segment is podcast show notes
+        /// </summary>
         public bool IsShowNotes { get; set; }
+
         public string LanguageDescription { get; set; }
         public int LanguageId { get; set; }
         public SelectList LanguageList { get; set; }
@@ -45,6 +76,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment
 
         [DisplayName("Language")]
         public Language SelectedLanguage { get; set; }
+
+        /// <summary>
+        /// Set to true to disable the segment header and keep it set to empty
+        /// </summary>
+        public bool SuppressHeader { get; set; }
+        /// <summary>
+        /// Set to true to disable the ability to select a segment wrap and keep it set to empty
+        /// </summary>
+        public bool SuppressWrap { get; set; }
 
         [DisplayName("Available tags")]
         public ICollection<KeyWithDescription> TemplateFields { get; }

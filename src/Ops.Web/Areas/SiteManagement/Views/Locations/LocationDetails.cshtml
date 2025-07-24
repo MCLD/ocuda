@@ -1,6 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location.LocationViewModel
 
-@section styles{
+@section styles {
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
     <style type="text/css">
         th.button-column {
@@ -9,19 +9,27 @@
     </style>
 }
 
-<div class="row">
-    <div class="col-sm-7">
-        <h1>
-            Details
-            <small class="text-muted">
-                @(Model.Location.IsNewLocation ? "Add Location" : Model.LocationName)
-            </small>
-        </h1>
+<div class="d-flex mb-2">
+    <h1 class="flex-grow-1 text-start">
+        Location
+        <small class="text-muted">
+            @(Model.Location.IsNewLocation ? "Add Location" : Model.LocationName)
+        </small>
+    </h1>
+    <div>
+        <a asp-controller="@Ocuda.Ops.Controllers.LocationsController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.LocationsController.Details)"
+           asp-route-slug="@Model.Location.Stub"
+           class="btn btn-outline-primary ms-2">
+            Manage
+        </a>
     </div>
-    <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
+    <div>
+        <a class="btn btn-outline-secondary ms-2"
            asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Index))">Back</a>
+           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Index)">
+            Back
+        </a>
     </div>
 </div>
 
@@ -72,7 +80,10 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editModalTitle">Edit Feature</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <button aria-label="Close"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            type="button">
                         <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -619,7 +630,8 @@
                     {
                         @if (form.FormMappings?.Count > 0)
                         {
-                            <table class="table table-sm table-bordered table-striped table-hover" id="staffRecipientTable">
+                            <table class="table table-sm table-bordered table-striped table-hover"
+                                   id="staffRecipientTable">
                                 <thead>
                                     <tr>
                                         <th class="button-column">Action</th>
@@ -631,12 +643,15 @@
                                     {
                                         <tr>
                                             <td class="text-center">
-                                                <form method="post" role="form" asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.RemoveFormUserMapping)"
+                                                <form asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.RemoveFormUserMapping)"
                                                       asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
                                                       asp-route-locationStub="@Model.Location.Stub"
+                                                      asp-route-type="@form.TypeId"
                                                       asp-route-userId="@formMapping.UserId"
-                                                      asp-route-type="@form.TypeId">
-                                                    <button class="btn btn-sm btn-outline-danger" type="submit">
+                                                      method="post"
+                                                      role="form">
+                                                    <button class="btn btn-sm btn-outline-danger"
+                                                            type="submit">
                                                         <span class="fa-solid fa-circle-minus"></span>
                                                     </button>
                                                 </form>
@@ -826,35 +841,22 @@
 
 }
 
-@section scripts{
+@section scripts {
     <script src="~/js/md.min.js" asp-append-version="true"></script>
-    <script>
-        function FormatStub(object) {
-            updateStub($(object), $(object).val());
-        }
-
-        $(function () {
-            $('[data-bs-toggle="tooltip"]').tooltip();
-            var ulMapList = document.createElement("ul");
-            ulMapList.classList.add("list-group");
-            ulMapList.setAttribute("id", "maplink-suggestions");
-            $($("#Location_Address").parent()).append(ulMapList);
-        });
-
-        @if (!Model.Location.IsNewLocation)
-        {
-            <text>
-                // Helpers
-                function GetItemList(objType) {
-                    $("#listAddModal").modal("show");
-                    $.get("@Url.Action(nameof(LocationsController.GetItemsList))",
-                        {
-                            objectType: objType,
-                            page: 1
-                        }, function (response) {
-                            $("#modalItemList").html(response);
-                        });
-                }
+    @if (!Model.Location.IsNewLocation)
+    {
+        <script>
+            // Helpers
+            function GetItemList(objType) {
+                $("#listAddModal").modal("show");
+                $.get("@Url.Action(nameof(LocationsController.GetItemsList))",
+                    {
+                        objectType: objType,
+                        page: 1
+                    }, function (response) {
+                        $("#modalItemList").html(response);
+                    });
+            }
 
             $(document).on('click', "button.page-link", function (e) {
                 $.get("@Url.Action(nameof(LocationsController.GetItemsList))",
@@ -928,11 +930,11 @@
             $(".edit-item").on('click', function (e) {
                 var url = "";
                 if ($(this).data("itemtype") == "Feature") {
-                    url = "@Url.Action(nameof(LocationsController.EditLocationFeature),LocationsController.Name)";
+                    url = "@Url.Action(nameof(LocationsController.EditLocationFeature), LocationsController.Name)";
                     $("#editModalTitle").text("Edit Feature: " + $(this).data("itemname"));
                 }
                 else {
-                    url = "@Url.Action(nameof(LocationsController.EditLocationGroup),LocationsController.Name)"
+                    url = "@Url.Action(nameof(LocationsController.EditLocationGroup), LocationsController.Name)"
                     $("#editModalTitle").text("Edit Group: " + $(this).data("itemname"));
                 }
                 $("#modalItemInfo").html('<div class="fa-3x text-center"><span class="fa-solid fa-spinner fa-spin"></span></div>');
@@ -964,7 +966,7 @@
                     {
                         itemId: itemId,
                         locationId: @Model.Location.Id
-                                                                                                                                }, function () {
+                    }, function () {
                     $("#deleteModal").modal('hide');
                     window.location.reload();
                 });
@@ -988,43 +990,63 @@
                 $('#oc-remove-segment').val(segment)
                 $('#oc-show-remove-segment').text(segmentDisplay)
             });
-            </text>
+        </script>
+    }
+
+    <script>
+        var currentPage = 1;
+        var users = [];
+        var adultTextInput = $('#staffSearchText');
+        var adultSearchBody = $('#searchResults');
+        var paginationAdult = $('#pagination');
+        var currentFormTypeId;
+
+        function FormatStub(object) {
+            updateStub($(object), $(object).val());
         }
 
-            // For Google Maps
-            $(document).on('click', '#maplink-suggestions li', function () {
-                let data = { placeId: $(this).find("a").data("placeid") };
-                console.info("Place id:", data)
-                $.get("@Url.Action(nameof(LocationsController.GetLocationLink))",
-                    data,
-                    function (response) {
-                        if (response.success === true) {
-                            $($("input#Location_MapLink")[0]).val(response.link);
-                        } else {
-                            alert(response.message);
-                        }
-                    }
-                );
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+            var ulMapList = document.createElement("ul");
+            ulMapList.classList.add("list-group");
+            ulMapList.setAttribute("id", "maplink-suggestions");
+            $($("#Location_Address").parent()).append(ulMapList);
+        });
 
-                let address = $(this).find("span.format-addr").text().split(", ");
-                if (address.length == 5) {
-                    $("#Location_Address").val(address[1]);
-                    $("#Location_City").val(address[2]);
-                    $("#Location_Country").val(address[4]);
-                    let stateZip = address[3].split(" ");
-                    $("#Location_State").val(stateZip[0]);
-                    $("#Location_Zip").val(stateZip[1]);
-                    $("#maplink-suggestions").html("");
-                } else {
-                    $("#Location_Address").val(address[0]);
-                    $("#Location_City").val(address[1]);
-                    $("#Location_Country").val(address[3]);
-                    let stateZip = address[2].split(" ");
-                    $("#Location_State").val(stateZip[0]);
-                    $("#Location_Zip").val(stateZip[1]);
-                    $("#maplink-suggestions").html("");
+        // For Google Maps
+        $(document).on('click', '#maplink-suggestions li', function () {
+            let data = { placeId: $(this).find("a").data("placeid") };
+            console.info("Place id:", data)
+            $.get("@Url.Action(nameof(LocationsController.GetLocationLink))",
+                data,
+                function (response) {
+                    if (response.success === true) {
+                        $($("input#Location_MapLink")[0]).val(response.link);
+                    } else {
+                        alert(response.message);
+                    }
                 }
-            });
+            );
+
+            let address = $(this).find("span.format-addr").text().split(", ");
+            if (address.length == 5) {
+                $("#Location_Address").val(address[1]);
+                $("#Location_City").val(address[2]);
+                $("#Location_Country").val(address[4]);
+                let stateZip = address[3].split(" ");
+                $("#Location_State").val(stateZip[0]);
+                $("#Location_Zip").val(stateZip[1]);
+                $("#maplink-suggestions").html("");
+            } else {
+                $("#Location_Address").val(address[0]);
+                $("#Location_City").val(address[1]);
+                $("#Location_Country").val(address[3]);
+                let stateZip = address[2].split(" ");
+                $("#Location_State").val(stateZip[0]);
+                $("#Location_Zip").val(stateZip[1]);
+                $("#maplink-suggestions").html("");
+            }
+        });
 
         function CollectAddress() {
             let address = [];
@@ -1128,15 +1150,6 @@
                 document.getElementById("maplink-suggestions").appendChild(listitem);
             }
         }
-    </script>
-
-    <script type="text/javascript">
-        var currentPage = 1;
-        var users = [];
-        var adultTextInput = $('#staffSearchText');
-        var adultSearchBody = $('#searchResults');
-        var paginationAdult = $('#pagination');
-        var currentFormTypeId;
 
         $().ready(function () {
             adultTextInput.keyup(function (e) {
@@ -1270,11 +1283,11 @@
                     alert("Staff lookup failed.");
                 }).then(() => {
                     ResetSpinners();
-                });;
+                });
         }
 
         async function performStaffSearch(searchText, page) {
-            let searchJsonUrl = '@Url.Action(nameof(Ocuda.Ops.Controllers.StaffController.SearchJson), Ocuda.Ops.Controllers.StaffController.Name, null, protocol:"http")';
+            let searchJsonUrl = '@Url.Action(nameof(Ocuda.Ops.Controllers.StaffController.SearchJson), Ocuda.Ops.Controllers.StaffController.Name, null, protocol: "http")';
             let searchParams = { searchText: searchText, page: page }
             return await OcudaFetch(searchJsonUrl, searchParams);
         }

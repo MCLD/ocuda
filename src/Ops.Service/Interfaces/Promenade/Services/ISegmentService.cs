@@ -15,7 +15,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task CreateSegmentTextAsync(SegmentText segmentText);
 
         /// <summary>
-        /// Delete a Segment and any related SegmentTexts after validating that they are not in use by:
+        /// Delete a Segment and any related SegmentTexts after validating that they are not in use
+        /// by:
         /// - Emedia Groups
         /// - Locations
         /// - Schedule Request Subjects
@@ -53,7 +54,5 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(BaseFilter filter);
 
         Task<ICollection<string>> GetSegmentLanguagesByIdAsync(int id);
-
-        Task UpdateWrapAsync(int segmentId, int? segmentWrapId);
     }
 }

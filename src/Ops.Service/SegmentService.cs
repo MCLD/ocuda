@@ -119,10 +119,11 @@ namespace Ocuda.Ops.Service
 
             var currentSegment = await _segmentRepository.FindAsync(segment.Id);
 
-            currentSegment.Name = segment.Name?.Trim();
-            currentSegment.IsActive = segment.IsActive;
-            currentSegment.StartDate = segment.StartDate;
             currentSegment.EndDate = segment.EndDate;
+            currentSegment.IsActive = segment.IsActive;
+            currentSegment.Name = segment.Name?.Trim();
+            currentSegment.SegmentWrapId = segment.SegmentWrapId;
+            currentSegment.StartDate = segment.StartDate;
 
             _segmentRepository.Update(currentSegment);
             await _segmentRepository.SaveAsync();
@@ -181,11 +182,6 @@ namespace Ocuda.Ops.Service
         public async Task<ICollection<string>> GetSegmentLanguagesByIdAsync(int id)
         {
             return await _segmentTextRepository.GetUsedLanguageNamesBySegmentId(id);
-        }
-
-        public async Task UpdateWrapAsync(int segmentId, int? segmentWrapId)
-        {
-            await _segmentRepository.UpdateWrapAsync(segmentId, segmentWrapId);
         }
 
         private async Task<ICollection<string>> GetSegmentInUseByAsync(int id)

@@ -101,7 +101,7 @@ namespace Ocuda.Promenade.Controllers
             {
                 builder.Path = _pathResolverService.GetPublicContentLink(UriPaths.Images,
                     UriPaths.Locations,
-                    location.ImagePath);
+                    location?.ImagePath);
                 location.ImagePath = builder.Uri.LocalPath;
                 builder.Path = _pathResolverService.GetPublicContentLink(UriPaths.Images,
                     UriPaths.Locations,

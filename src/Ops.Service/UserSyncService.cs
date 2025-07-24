@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
@@ -23,6 +23,7 @@ namespace Ocuda.Ops.Service
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILdapService _ldapService;
         private readonly ILocationService _locationService;
+        private readonly ISiteSettingService _siteSettingService;
         private readonly IUserManagementService _userManagementService;
         private readonly IUserRepository _userRepository;
         private readonly IUserSyncHistoryRepository _userSyncHistoryRepository;
@@ -33,6 +34,7 @@ namespace Ocuda.Ops.Service
             IDateTimeProvider dateTimeProvider,
             ILdapService ldapService,
             ILocationService locationService,
+            ISiteSettingService siteSettingService,
             IUserRepository userRepository,
             IUserManagementService userManagementService,
             IUserSyncHistoryRepository userSyncHistoryRepository,
@@ -42,6 +44,7 @@ namespace Ocuda.Ops.Service
             ArgumentNullException.ThrowIfNull(dateTimeProvider);
             ArgumentNullException.ThrowIfNull(ldapService);
             ArgumentNullException.ThrowIfNull(locationService);
+            ArgumentNullException.ThrowIfNull(siteSettingService);
             ArgumentNullException.ThrowIfNull(userRepository);
             ArgumentNullException.ThrowIfNull(userManagementService);
             ArgumentNullException.ThrowIfNull(userSyncHistoryRepository);
@@ -50,6 +53,7 @@ namespace Ocuda.Ops.Service
             _dateTimeProvider = dateTimeProvider;
             _ldapService = ldapService;
             _locationService = locationService;
+            _siteSettingService = siteSettingService;
             _userRepository = userRepository;
             _userManagementService = userManagementService;
             _userSyncHistoryRepository = userSyncHistoryRepository;
@@ -117,7 +121,7 @@ namespace Ocuda.Ops.Service
 
             try
             {
-                return System.Text.Json.JsonSerializer.Deserialize<StatusReport>(detail.Log);
+                return JsonSerializer.Deserialize<StatusReport>(detail.Log);
             }
             catch (JsonException jex)
             {
@@ -130,7 +134,8 @@ namespace Ocuda.Ops.Service
             return await _userSyncLocationRepository.GetAllAsync();
         }
 
-        public async Task<CollectionWithCount<UserSyncHistory>> GetPaginatedHeadersAsync(BaseFilter filter)
+        public async Task<CollectionWithCount<UserSyncHistory>>
+            GetPaginatedHeadersAsync(BaseFilter filter)
         {
             return await _userSyncHistoryRepository.GetPaginatedAsync(filter);
         }
@@ -150,7 +155,8 @@ namespace Ocuda.Ops.Service
 
             int timerCount = 1;
             long lastStop = timer.ElapsedMilliseconds;
-            result.StatusCounts.Add($"Timer {timerCount++}: completed LDAP query (ms)", (int)lastStop);
+            result.StatusCounts.Add($"Timer {timerCount++}: completed LDAP query (ms)",
+                (int)lastStop);
 
             var opsUsers = await _userRepository.GetAllAsync();
             result.StatusCounts.Add($"Timer {timerCount++}: Initial all-staff query (ms)",
@@ -178,6 +184,9 @@ namespace Ocuda.Ops.Service
             {
                 _logger.LogInformation("Scanning AD for user changes and *not* applying them");
             }
+
+            var disabledOu = await _siteSettingService
+                .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.UserSync.DisabledOu);
 
             foreach (var ldapUser in ldapUsers)
             {
@@ -410,6 +419,11 @@ namespace Ocuda.Ops.Service
 
                     if (staffUsername == null)
                     {
+                        if (!string.IsNullOrEmpty(disabledOu)
+                            && directReportDn.IndexOf($"OU={disabledOu}") > -1)
+                        {
+                            continue;
+                        }
                         result.AddStatus(directReportDn,
                             "Unable to find staff to attach supervisor for this DN, possibly disabled?",
                             LogLevel.Error);

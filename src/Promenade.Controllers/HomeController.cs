@@ -91,7 +91,7 @@ namespace Ocuda.Promenade.Controllers
                     DayOfWeek = _dateTimeProvider.Now.DayOfWeek,
                     LocationFeatures = new List<LocationsFeaturesViewModel>
                     {
-                        new LocationsFeaturesViewModel(locationFeature)
+                        new(locationFeature)
                     },
                     Location = location
                 });
@@ -354,18 +354,24 @@ namespace Ocuda.Promenade.Controllers
             }
             schema.BranchCode = location.Stub;
             schema.Email = location.Email;
-            schema.HasMap = new Uri(location.MapLink);
+            if (!string.IsNullOrEmpty(location?.MapLink))
+            {
+                schema.HasMap = new Uri(location.MapLink);
+            }
             schema.IsAccessibleForFree = location.IsAccessibleForFree;
             schema.Location = new Schema.NET.Place
             {
                 Id = locationUri
             };
             schema.Name = location.Name;
-            schema.ParentOrganization = new Schema.NET.Organization
+            if (location.ParentOrganization != null)
             {
-                Name = location.ParentOrganization,
-                Url = new Uri(location.ParentOrganization),
-            };
+                schema.ParentOrganization = new Schema.NET.Organization
+                {
+                    Name = location.ParentOrganization,
+                    Url = new Uri(location.ParentOrganization),
+                };
+            }
             schema.Telephone = location.Phone;
             schema.Url = locationUri;
 
@@ -420,17 +426,24 @@ namespace Ocuda.Promenade.Controllers
                 };
             }
 
-            var sameAs = new List<Uri>
+            var sameAs = new List<Uri>();
+
+            if (!string.IsNullOrEmpty(location.MapLink))
             {
-                new Uri(location.MapLink)
-            };
+                {
+                    sameAs.Add(new Uri(location.MapLink));
+                }
+            }
 
             if (!string.IsNullOrEmpty(location.Facebook))
             {
                 sameAs.Add(new Uri(location.Facebook));
             }
 
-            schema.SameAs = sameAs;
+            if (sameAs.Count > 0)
+            {
+                schema.SameAs = sameAs;
+            }
 
             return schema;
         }
@@ -528,10 +541,7 @@ namespace Ocuda.Promenade.Controllers
         public async Task<IActionResult> VolunteerTeen(string locationSlug,
             TeenVolunteerFormViewModel viewModel)
         {
-            if (viewModel == null)
-            {
-                throw new ArgumentNullException(nameof(viewModel));
-            }
+            ArgumentNullException.ThrowIfNull(viewModel);
 
             if (string.IsNullOrWhiteSpace(viewModel.GuardianName))
             {

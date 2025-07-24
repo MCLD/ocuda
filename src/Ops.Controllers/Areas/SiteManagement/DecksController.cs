@@ -19,6 +19,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
@@ -42,14 +43,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ILanguageService languageService,
             IPermissionGroupService permissionGroupService) : base(context)
         {
-            _deckService = deckService
-                ?? throw new ArgumentNullException(nameof(deckService));
-            _imageService = imageService
-                ?? throw new ArgumentNullException(nameof(imageService));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
+            ArgumentNullException.ThrowIfNull(deckService);
+            ArgumentNullException.ThrowIfNull(imageService);
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+
+            _deckService = deckService;
+            _imageService = imageService;
+            _languageService = languageService;
+            _permissionGroupService = permissionGroupService;
         }
 
         public static string Area
@@ -294,11 +296,29 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
                 ?? languages.Single(_ => _.IsDefault);
 
-            var cards = await _deckService.GetCardDetailsByDeckAsync(deckId, selectedLanguage.Id);
-
-            if (cards != null)
+            var viewModel = new DetailViewModel
             {
-                foreach (var card in cards)
+                BackLink = Url.Action(nameof(PagesController.LayoutDetail),
+                PagesController.Name,
+                new
+                {
+                    id = await _deckService.GetPageLayoutIdAsync(deckId)
+                }),
+                DeckId = deckId,
+                DeckName = deck.Name,
+                SelectedLanguage = selectedLanguage,
+                LanguageList = new SelectList(languages,
+                nameof(Language.Name),
+                nameof(Language.Description),
+                selectedLanguage.Name)
+            };
+
+            viewModel.CardDetails.AddRange(await _deckService
+                .GetCardDetailsByDeckAsync(deckId, selectedLanguage.Id));
+
+            if (viewModel.CardDetails != null)
+            {
+                foreach (var card in viewModel.CardDetails)
                 {
                     if (!string.IsNullOrEmpty(card.Footer))
                     {
@@ -307,23 +327,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
             }
 
-            return View(new DetailViewModel
-            {
-                BackLink = Url.Action(nameof(PagesController.LayoutDetail),
-                    PagesController.Name,
-                    new
-                    {
-                        id = await _deckService.GetPageLayoutIdAsync(deckId)
-                    }),
-                CardDetails = cards,
-                DeckId = deckId,
-                DeckName = deck.Name,
-                SelectedLanguage = selectedLanguage,
-                LanguageList = new SelectList(languages,
-                    nameof(Language.Name),
-                    nameof(Language.Description),
-                    selectedLanguage.Name)
-            });
+            return View(viewModel);
         }
 
         [HttpGet("[action]/{language}/{filename}")]

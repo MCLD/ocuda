@@ -61,5 +61,10 @@
             public static readonly string ModelStateTimeoutMinutes = "UserInterface.TimeOutMinutes";
             public static readonly string PageTitleBase = "UserInterface.PageTitleBase";
         }
+
+        public static class UserSync
+        {
+            public static readonly string DisabledOu = "UserSync.DisabledOu";
+        }
     }
 }
