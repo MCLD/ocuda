@@ -17,25 +17,28 @@ namespace Ocuda.Ops.Service
         : BaseService<ScheduleNotificationService>, IScheduleNotificationService
     {
         private const string DefaultLanguage = "en-US";
+        private const string NotificationType = "volunteer";
         private readonly IEmailService _emailService;
         private readonly IScheduleLogRepository _scheduleLogRepository;
         private readonly IScheduleRequestService _scheduleRequestService;
         private readonly ISiteSettingService _siteSettingService;
 
         public ScheduleNotificationService(ILogger<ScheduleNotificationService> logger,
-            IHttpContextAccessor httpContextAccessor,
             IEmailService emailService,
+            IHttpContextAccessor httpContextAccessor,
             IScheduleLogRepository scheduleLogRepsitory,
             IScheduleRequestService scheduleRequestService,
             ISiteSettingService siteSettingService) : base(logger, httpContextAccessor)
         {
-            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
-            _scheduleLogRepository = scheduleLogRepsitory
-                ?? throw new ArgumentNullException(nameof(scheduleLogRepsitory));
-            _scheduleRequestService = scheduleRequestService
-                ?? throw new ArgumentNullException(nameof(scheduleRequestService));
-            _siteSettingService = siteSettingService
-                ?? throw new ArgumentNullException(nameof(siteSettingService));
+            ArgumentNullException.ThrowIfNull(emailService);
+            ArgumentNullException.ThrowIfNull(scheduleLogRepsitory);
+            ArgumentNullException.ThrowIfNull(scheduleRequestService);
+            ArgumentNullException.ThrowIfNull(siteSettingService);
+
+            _emailService = emailService;
+            _scheduleLogRepository = scheduleLogRepsitory;
+            _scheduleRequestService = scheduleRequestService;
+            _siteSettingService = siteSettingService;
         }
 
         private enum EmailType
@@ -47,22 +50,19 @@ namespace Ocuda.Ops.Service
 
         public Task<EmailRecord> SendCancellationAsync(ScheduleRequest request)
         {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
+            ArgumentNullException.ThrowIfNull(request);
             return SendCancellationInternalAsync(request);
         }
 
         public Task<bool> SendFollowupAsync(ScheduleRequest request)
         {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
+            ArgumentNullException.ThrowIfNull(request);
             return SendFollowupInternalAsync(request);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1031:Do not catch general exception types",
+            Justification = "Catch all exceptions in jobs so as to not interrupt program flow.")]
         public async Task<int> SendPendingNotificationsAsync()
         {
             int sentNotifications = 0;
@@ -74,47 +74,53 @@ namespace Ocuda.Ops.Service
 
                 if (pendingNotifications?.Count > 0)
                 {
-                    _logger.LogDebug("Found {PendingNotificationCount} pending notification(s)",
-                        pendingNotifications.Count);
+                    _logger.LogDebug("Found {PendingNotificationCount} pending {NotificationType} notification(s)",
+                        pendingNotifications.Count,
+                        NotificationType);
 
                     foreach (var pending in pendingNotifications)
                     {
-                        try
+                        using (_logger.BeginScope("Handling {NotifciationType} notification for id {Id}",
+                            NotificationType,
+                            pending.Id))
                         {
-                            var lang = pending.Language
-                            .Equals("English", StringComparison.OrdinalIgnoreCase)
-                                ? DefaultLanguage
-                                : pending.Language;
-                            _logger.LogTrace("Using language: {Language}", pending.Language);
-
-                            var culture = CultureInfo.GetCultureInfo(lang);
-                            _logger.LogTrace("Found culture: {Culture}", culture.DisplayName);
-
-                            var sentEmail = await SendAsync(pending,
-                                lang,
-                                new Dictionary<string, string>
-                                {
-                                    { "ScheduledDate",
-                                        pending.RequestedTime.ToString("d", culture) },
-                                    { "ScheduledTime",
-                                        pending.RequestedTime.ToString("t", culture) },
-                                    { "Scheduled", pending.RequestedTime.ToString("g", culture) },
-                                    { "Subject", pending.ScheduleRequestSubject.Subject }
-                                },
-                                EmailType.ScheduleNotification);
-
-                            if (sentEmail != null)
+                            try
                             {
-                                sentNotifications++;
+                                var lang = pending.Language
+                                .Equals("English", StringComparison.OrdinalIgnoreCase)
+                                    ? DefaultLanguage
+                                    : pending.Language;
+                                _logger.LogTrace("Using language: {Language}", pending.Language);
 
-                                await _scheduleRequestService.SetNotificationSentAsync(pending);
+                                var culture = CultureInfo.GetCultureInfo(lang);
+                                _logger.LogTrace("Found culture: {Culture}", culture.DisplayName);
+
+                                var sentEmail = await SendAsync(pending,
+                                    lang,
+                                    new Dictionary<string, string> {
+                                        { "ScheduledDate",
+                                            pending.RequestedTime.ToString("d", culture) },
+                                        { "ScheduledTime",
+                                            pending.RequestedTime.ToString("t", culture) },
+                                        { "Scheduled", pending.RequestedTime.ToString("g", culture) },
+                                        { "Subject", pending.ScheduleRequestSubject.Subject }},
+                                    EmailType.ScheduleNotification);
+
+                                if (sentEmail != null)
+                                {
+                                    sentNotifications++;
+
+                                    await _scheduleRequestService.SetNotificationSentAsync(pending);
+                                }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError("Sending pending notification id {RequestId} failed: {ErrorMessage}",
-                                pending.Id,
-                                ex.Message);
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex,
+                                    "Sending pending {NotificationType} notification id {RequestId} failed: {ErrorMessage}",
+                                    NotificationType,
+                                    pending.Id,
+                                    ex.Message);
+                            }
                         }
 
                         await Task.Delay(TimeSpan.FromSeconds(2));
@@ -124,25 +130,31 @@ namespace Ocuda.Ops.Service
             catch (OcudaException oex)
             {
                 _logger.LogError(oex,
-                    "Uncaught error sending notifications: {ErrorMessage}",
+                    "Uncaught error sending {NotificationType} notifications: {ErrorMessage}",
+                    NotificationType,
                     oex.Message);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex,
-                    "Uncaught critical error sending notifications: {ErrorMessage}",
+                    "Uncaught critical error sending {NotificationType} notifications: {ErrorMessage}",
+                    NotificationType,
                     ex.Message);
             }
 
             if (sentNotifications > 0)
             {
-                _logger.LogInformation("Scheduled task sent {NotificationCount} email notifications",
+                _logger.LogInformation("Scheduled task sent {NotificationCount} {NotificationType} email notifications",
+                    NotificationType,
                     sentNotifications);
             }
 
             return sentNotifications;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1031:Do not catch general exception types",
+            Justification = "Catch all exceptions in jobs so as to not interrupt program flow.")]
         private async Task<EmailRecord> SendAsync(ScheduleRequest request,
             string lang,
             Dictionary<string, string> tagDictionary,
@@ -222,7 +234,8 @@ namespace Ocuda.Ops.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error sending email setup {EmailSetupId} to {EmailTo}: {ErrorMessage}",
+                _logger.LogError(ex,
+                    "Error sending email setup {EmailSetupId} to {EmailTo}: {ErrorMessage}",
                     setupId,
                     request.Email.Trim(),
                     ex.Message);
@@ -231,6 +244,9 @@ namespace Ocuda.Ops.Service
             return null;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1031:Do not catch general exception types",
+            Justification = "Catch all exceptions in jobs so as to not interrupt program flow.")]
         private async Task<EmailRecord> SendCancellationInternalAsync(ScheduleRequest request)
         {
             var lang = request.Language
@@ -246,14 +262,15 @@ namespace Ocuda.Ops.Service
                     lang,
                     new Dictionary<string, string>
                     {
-                            { "Scheduled", request.RequestedTime.ToString(culture) },
-                            { "Subject", request.ScheduleRequestSubject.Subject }
+                        { "Scheduled", request.RequestedTime.ToString(culture) },
+                        { "Subject", request.ScheduleRequestSubject.Subject }
                     },
                     EmailType.Cancellation);
             }
             catch (Exception ex)
             {
-                _logger.LogError("Sending cancellation notification id {RequestId} failed: {ErrorMessage}",
+                _logger.LogError(ex,
+                    "Sending cancellation notification id {RequestId} failed: {ErrorMessage}",
                     request.Id,
                     ex.Message);
             }
@@ -261,6 +278,9 @@ namespace Ocuda.Ops.Service
             return null;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1031:Do not catch general exception types",
+            Justification = "Catch all exceptions in jobs so as to not interrupt program flow.")]
         private async Task<bool> SendFollowupInternalAsync(ScheduleRequest request)
         {
             var lang = request.Language
@@ -275,8 +295,8 @@ namespace Ocuda.Ops.Service
                     lang,
                     new Dictionary<string, string>
                     {
-                            { "Scheduled", request.RequestedTime.ToString(culture) },
-                            { "Subject", request.ScheduleRequestSubject.Subject }
+                        { "Scheduled", request.RequestedTime.ToString(culture) },
+                        { "Subject", request.ScheduleRequestSubject.Subject }
                     },
                     EmailType.Followup);
 
@@ -288,7 +308,8 @@ namespace Ocuda.Ops.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError("Sending followup notification id {RequestId} failed: {ErrorMessage}",
+                _logger.LogError(ex,
+                    "Sending followup notification id {RequestId} failed: {ErrorMessage}",
                     request.Id,
                     ex.Message);
             }

@@ -15,14 +15,15 @@ using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Service
 {
-    public class VolunteerNotificationService : BaseService<ScheduleNotificationService>,
-        IVolunteerNotificationService
+    public class VolunteerNotificationService
+        : BaseService<ScheduleNotificationService>, IVolunteerNotificationService
     {
         private const string EmailDescription = "Volunteer submission notification";
         private const string EmailOverflowDescription = "Volunteer submission overflow notification";
         private const int MaximumEmailsPeriodHours = 1;
         private const int MaximumEmailsPerPeriod = 4;
         private const string NoIntranetLink = "the volunteer section of the Intranet";
+        private const string NotificationType = "volunteer";
         private const string VolunteerSubmissionBasePath = "/VolunteerSubmissions/";
         private const string VolunteerSubmissionPath = "/VolunteerSubmissions/Details/";
         private readonly IOcudaCache _cache;
@@ -33,7 +34,7 @@ namespace Ocuda.Ops.Service
         private IDictionary<VolunteerFormType, int> _overflowEmailIds;
 
         public VolunteerNotificationService(IEmailService emailService,
-                    IHttpContextAccessor httpContextAccessor,
+            IHttpContextAccessor httpContextAccessor,
             ILogger<ScheduleNotificationService> logger,
             IOcudaCache cache,
             ISiteSettingService siteSettingService,
@@ -63,36 +64,41 @@ namespace Ocuda.Ops.Service
 
                 if (pendingNotifications?.Count > 0)
                 {
-                    _logger.LogDebug("Found {PendingNotificationCount} pending notification(s)",
-                        pendingNotifications.Count);
+                    _logger.LogDebug("Found {PendingNotificationCount} pending {NotificationType} notification(s)",
+                        pendingNotifications.Count,
+                        NotificationType);
 
                     var emailSetupMapping = await _volunteerFormService
                         .GetFormEmailSetupMappingAsync();
 
                     foreach (var pending in pendingNotifications)
                     {
-                        try
+                        using (_logger.BeginScope("Handling {NotifciationType} notification for id {Id}",
+                            NotificationType,
+                            pending.Id))
                         {
-                            var culture = CultureInfo.CurrentCulture;
-                            _logger.LogTrace("Found culture: {Culture}", culture.DisplayName);
+                            try
+                            {
+                                var culture = CultureInfo.CurrentCulture;
+                                _logger.LogTrace("Found culture: {Culture}", culture.DisplayName);
 
-                            sentNotifications += await SendAsync(pending,
+                                sentNotifications += await SendAsync(pending,
                                     culture.Name,
-                                    new Dictionary<string, string>
-                                    {
-                                    { "FormType", pending.VolunteerFormType.ToString() },
-                                    { "SubmittedDate", pending.CreatedAt.ToString("g", culture) },
-                                    { "SubmissionLink", await GetLinkAsync(pending.Id) }
-                                    },
+                                    new Dictionary<string, string> {
+                                        { "FormType", pending.VolunteerFormType.ToString() },
+                                        { "SubmittedDate", pending.CreatedAt.ToString("g", culture) },
+                                        { "SubmissionLink", await GetLinkAsync(pending.Id) }},
                                     emailSetupMapping[pending.VolunteerFormType.Value]);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex,
+                                    "Sending pending {NotificationType} notification id {RequestId} failed: {ErrorMessage}",
+                                    NotificationType,
+                                    pending.Id,
+                                    ex.Message);
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError("Sending pending notification id {RequestId} failed: {ErrorMessage}",
-                                pending.Id,
-                                ex.Message);
-                        }
-
                         await Task.Delay(TimeSpan.FromSeconds(2));
                     }
                 }
@@ -100,19 +106,22 @@ namespace Ocuda.Ops.Service
             catch (OcudaException oex)
             {
                 _logger.LogError(oex,
-                    "Uncaught error sending notifications: {ErrorMessage}",
+                    "Uncaught error sending {NotificationType} notifications: {ErrorMessage}",
+                    NotificationType,
                     oex.Message);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex,
-                    "Uncaught critical error sending notifications: {ErrorMessage}",
+                    "Uncaught critical error sending {NotificationType} notifications: {ErrorMessage}",
+                    NotificationType,
                     ex.Message);
             }
 
             if (sentNotifications > 0)
             {
-                _logger.LogInformation("Scheduled task sent {NotificationCount} email notifications",
+                _logger.LogInformation("Scheduled task sent {NotificationCount} {NotificationType} email notifications",
+                    NotificationType,
                     sentNotifications);
             }
 
@@ -136,9 +145,7 @@ namespace Ocuda.Ops.Service
                 };
             }
 
-            return uri != null
-                ? uri.ToString()
-                : NoIntranetLink;
+            return uri != null ? uri.ToString() : NoIntranetLink;
         }
 
         /// <summary>
@@ -256,7 +263,8 @@ namespace Ocuda.Ops.Service
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Error sending email setup {EmailSetupId} to {EmailTo}: {ErrorMessage}",
+                    _logger.LogError(ex,
+                        "Error sending email setup {EmailSetupId} to {EmailTo}: {ErrorMessage}",
                         sentEmailSetup,
                         request.Email.Trim(),
                         ex.Message);
