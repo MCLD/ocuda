@@ -136,6 +136,38 @@ namespace Ocuda.Ops.Controllers
                 });
         }
 
+        [HttpPost("[action]")]
+        public async Task<IActionResult> AddDescription(string stub)
+        {
+            var location = await _locationService.GetLocationByStubAsync(stub);
+            if (location != null)
+            {
+                if (location.DescriptionSegmentId == default)
+                {
+                    var segment = new Segment
+                    {
+                        Name = $"{location.Name} description",
+                    };
+                    segment = await _segmentService.CreateAsync(segment);
+                    location.DescriptionSegmentId = segment.Id;
+                    await _locationService.EditAsync(location);
+                    return RedirectToAction(nameof(SegmentsController.Detail),
+                        SegmentsController.Name,
+                        new { area = SegmentsController.Area, id = segment.Id });
+                }
+                else
+                {
+                    ShowAlertDanger("There is already a location description segment attached to this location.");
+                }
+                return RedirectToAction(nameof(Details), new { slug = location.Stub });
+            }
+            else
+            {
+                ShowAlertDanger("Location not found.");
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
         [HttpPost("[action]/{slug}")]
         public async Task<IActionResult> AddFeature(string slug, int featureId)
         {

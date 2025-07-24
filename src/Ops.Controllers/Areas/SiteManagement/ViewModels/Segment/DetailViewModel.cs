@@ -81,6 +81,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment
         /// Set to true to disable the segment header and keep it set to empty
         /// </summary>
         public bool SuppressHeader { get; set; }
+        /// <summary>
+        /// Set to true to disable the ability to select a segment wrap and keep it set to empty
+        /// </summary>
+        public bool SuppressWrap { get; set; }
 
         [DisplayName("Available tags")]
         public ICollection<KeyWithDescription> TemplateFields { get; }

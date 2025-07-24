@@ -553,7 +553,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         private async Task PopulateRelationshipInformation(int segmentId,
-                    DetailViewModel viewModel)
+            DetailViewModel viewModel)
         {
             var emediaGroup = await _emediaService.GetGroupUsingSegmentAsync(segmentId);
             if (emediaGroup != null)
@@ -598,6 +598,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     viewModel.Relationship
                         = $"This segment is used as the description of location: {locations.First().Name}";
                     viewModel.SuppressHeader = true;
+                    viewModel.SuppressWrap = true;
                 }
                 else
                 {

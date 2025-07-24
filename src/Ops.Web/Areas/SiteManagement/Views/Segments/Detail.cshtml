@@ -51,8 +51,8 @@
 
 @if (!string.IsNullOrEmpty(Model.Relationship))
 {
-    <div class="row my-3">
-        <div class="col-12 col-md-3 text-end">Relationship(s)</div>
+    <div class="row mt-1 mb-2">
+        <div class="col-12 col-md-3 text-md-end">Relationship(s)</div>
         <div class="col-12 col-md-9">@Model.Relationship</div>
     </div>
 }
@@ -60,11 +60,7 @@
 <form asp-action="@nameof(SegmentsController.Detail)" method="post" role="form">
     <input asp-for="SegmentId" type="hidden" />
     <input asp-for="LanguageId" type="hidden" />
-    <div class="row mb-2">
-        <div class="col-12">
-            <span class="d-none"><input asp-for="SegmentName" formgroup readonly /></span>
-        </div>
-    </div>
+    <span class="d-none"><input asp-for="SegmentName" formgroup readonly /></span>
     @if (Model.CanBeDeactivated)
     {
         <select asp-for="IsActive" formgroup>
@@ -85,22 +81,29 @@
             }
         </div>
     </div>
-    <div class="row">
-        <div class="col-12">
-            <select asp-for="SegmentWrapId" asp-items="Model.SegmentWrapList" formgroup></select>
-            @if (!string.IsNullOrEmpty(Model.FlagWrap))
-            {
-                <div class="row">
-                    <div class="col-md-9 offset-md-3">
-                        <div class="alert alert-info px-2 py-1 mb-3">
-                            <span class="fa-solid fa-circle-info fa-fw"></span>
-                            @Model.FlagWrap
+    @if (Model.SuppressWrap)
+    {
+        <input asp-for="SegmentWrapId" type="hidden" value="" />
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <select asp-for="SegmentWrapId" asp-items="Model.SegmentWrapList" formgroup></select>
+                @if (!string.IsNullOrEmpty(Model.FlagWrap))
+                {
+                    <div class="row">
+                        <div class="col-md-9 offset-md-3">
+                            <div class="alert alert-info px-2 py-1 mb-3">
+                                <span class="fa-solid fa-circle-info fa-fw"></span>
+                                @Model.FlagWrap
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
         </div>
-    </div>
+    }
     @if (Model.LanguageList?.Count() > 1)
     {
         <div class="row mb-2">

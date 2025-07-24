@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -12,23 +13,25 @@ namespace Ocuda.Utility.Services
         private readonly IConfiguration _config;
         private readonly ILogger _logger;
 
-        public PathResolverService(ILogger<PathResolverService> logger,
-            IConfiguration config)
+        public PathResolverService(ILogger<PathResolverService> logger, IConfiguration config)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            ArgumentNullException.ThrowIfNull(config);
+            ArgumentNullException.ThrowIfNull(logger);
+
+            _config = config;
+            _logger = logger;
         }
 
         public string GetPrivateContentFilePath(string fileName = default,
             params object[] pathElement)
         {
-            return GetContentFilePath(true, fileName, pathElement);
+            return GetContentFilePath(true, fileName, pathElement ?? []);
         }
 
         public string GetPublicContentFilePath(string fileName = default,
             params object[] pathElement)
         {
-            return GetContentFilePath(false, fileName, pathElement);
+            return GetContentFilePath(false, fileName, pathElement ?? []);
         }
 
         public string GetPublicContentLink(params object[] pathElement)
@@ -40,7 +43,7 @@ namespace Ocuda.Utility.Services
             }
             if (pathElement != null)
             {
-                foreach (var element in pathElement)
+                foreach (var element in pathElement.Where(_ => _ != null))
                 {
                     path.Append('/').Append(element.ToString().TrimStart('/').TrimEnd('/'));
                 }

@@ -63,16 +63,33 @@
                 </div>
                 @if (Model.LocationManager && Model.SegmentEditor)
                 {
-                    <div>
-                        <a class="btn btn-sm btn-outline-primary"
-                           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Detail)"
-                           asp-area="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Area"
-                           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Name"
-                           asp-route-id="@Model.Location.DescriptionSegmentId"
-                           title="Edit description">
-                            <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
-                        </a>
-                    </div>
+                    if (Model.Location.DescriptionSegmentId == default)
+                    {
+                        <div>
+                            <form asp-action="@nameof(LocationsController.AddDescription)"
+                                  class="d-inline"
+                                  method="post">
+                                <input type="hidden" name="stub" value="@Model.Location.Stub" />
+                                <button class="btn btn-sm btn-outline-success">
+                                    <span class="fa-solid fa-circle-plus fa-fw"></span>
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            <a class="btn btn-sm btn-outline-primary"
+                               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Detail)"
+                               asp-area="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Area"
+                               asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentsController.Name"
+                               asp-route-id="@Model.Location.DescriptionSegmentId"
+                               title="Edit description">
+                                <span aria-hidden="true"
+                                      class="fa-regular fa-file-lines fa-fw"></span>
+                            </a>
+                        </div>
+                    }
                 }
             </div>
         </div>
