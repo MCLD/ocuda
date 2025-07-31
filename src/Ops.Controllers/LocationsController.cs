@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ImageOptimApi;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement;
+using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Controllers.ServiceFacades;
 using Ocuda.Ops.Controllers.ViewModels.Locations;
@@ -35,6 +37,7 @@ namespace Ocuda.Ops.Controllers
         private readonly ILocationService _locationService;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly ISegmentService _segmentService;
+        private readonly IVolunteerFormService _volunteerFormService;
 
         public LocationsController(Controller<LocationsController> context,
             IConfiguration configuration,
@@ -45,7 +48,8 @@ namespace Ocuda.Ops.Controllers
             ILocationFeatureService locationFeatureService,
             ILocationService locationService,
             IPermissionGroupService permissionGroupService,
-            ISegmentService segmentService) : base(context)
+            ISegmentService segmentService,
+            IVolunteerFormService volunteerFormService) : base(context)
         {
             ArgumentNullException.ThrowIfNull(configuration);
             ArgumentNullException.ThrowIfNull(digitalDisplayService);
@@ -56,6 +60,7 @@ namespace Ocuda.Ops.Controllers
             ArgumentNullException.ThrowIfNull(locationService);
             ArgumentNullException.ThrowIfNull(permissionGroupService);
             ArgumentNullException.ThrowIfNull(segmentService);
+            ArgumentNullException.ThrowIfNull(volunteerFormService);
 
             _configuration = configuration;
             _digitalDisplayService = digitalDisplayService;
@@ -66,6 +71,7 @@ namespace Ocuda.Ops.Controllers
             _locationService = locationService;
             _permissionGroupService = permissionGroupService;
             _segmentService = segmentService;
+            _volunteerFormService = volunteerFormService;
         }
 
         public static string Name
@@ -466,6 +472,56 @@ namespace Ocuda.Ops.Controllers
                     .ToList(),
             };
 
+            var volunteerFeature = await _featureService
+                .GetFeatureBySlugAsync("volunteer");
+            if (volunteerFeature != null)
+            {
+                var forms = await _volunteerFormService.GetVolunteerFormsAsync();
+                if (forms.Count != 0)
+                {
+                    var formsViewModel = new List<LocationVolunteerFormViewModel>();
+                    foreach (var form in forms)
+                    {
+                        var mappings = await _volunteerFormService
+                            .GetFormUserMappingsAsync(form.Id, location.Id);
+                        var newForm = new LocationVolunteerFormViewModel
+                        {
+                            TypeId = (int)form.VolunteerFormType,
+                            TypeName = form.VolunteerFormType.ToString(),
+                            FormMappings = mappings
+                                .ToList(
+                                ).ConvertAll(_ => new LocationVolunteerMappingViewModel(_)),
+                            IsDisabled = form.IsDisabled
+                        };
+                        if (form.IsDisabled)
+                        {
+                            newForm.AlertWarning = $"The {form.VolunteerFormType} volunteer form is not active.";
+                        }
+                        formsViewModel.Add(newForm);
+                    }
+
+                    var locationFeature = await _locationFeatureService
+                        .GetByFeatureIdLocationIdAsync(volunteerFeature.Id, location.Id);
+                    var hasForms = formsViewModel
+                        .Any(_ => _.FormMappings.Count != 0 && !_.IsDisabled);
+                    var hasLocationFeature = locationFeature != null;
+
+                    if (hasForms && !hasLocationFeature)
+                    {
+                        await _volunteerFormService
+                            .AddVolunteerLocationFeature(volunteerFeature.Id,
+                                location.Id,
+                                location.Stub);
+                    }
+                    else if (!hasForms && hasLocationFeature)
+                    {
+                        await _locationFeatureService
+                            .DeleteAsync(volunteerFeature.Id, location.Id);
+                    }
+                    viewModel.VolunteerForms.AddRange(formsViewModel);
+                }
+            }
+
             foreach (var display in viewModel.Displays)
             {
                 var assets = await _digitalDisplayService.GetNonExpiredAssetsAsync(display.Id);
@@ -656,6 +712,24 @@ namespace Ocuda.Ops.Controllers
                 ?? System.Net.Mime.MediaTypeNames.Application.Octet);
         }
 
+        [HttpPost]
+        [Route("{slug}/[action]")]
+        public async Task<IActionResult> MapVolunteerCoordinator(string slug, int type, int userId)
+        {
+            var location = await _locationService.GetLocationByStubAsync(slug);
+            try
+            {
+                await _volunteerFormService
+                    .AddFormUserMapping(location.Id, (VolunteerFormType)type, userId);
+                ShowAlertSuccess($"Added staff member to receive {(VolunteerFormType)type} Volunteer form submissions.");
+            }
+            catch (OcudaException oex)
+            {
+                ShowAlertDanger($"Unable to add staff member for for {location.Name}: {oex.Message}");
+            }
+            return RedirectToAction(nameof(Details), new { slug });
+        }
+
         [HttpPost("[action]")]
         public async Task<IActionResult> RemoveFeature(string slug, int featureId)
         {
@@ -680,6 +754,24 @@ namespace Ocuda.Ops.Controllers
 
             await _locationFeatureService.DeleteAsync(featureId, location.Id);
 
+            return RedirectToAction(nameof(Details), new { slug });
+        }
+
+        [HttpPost]
+        [Route("{slug}/[action]")]
+        public async Task<IActionResult> RemoveFormUserMapping(string slug, int userId, int type)
+        {
+            var location = await _locationService.GetLocationByStubAsync(slug);
+            try
+            {
+                await _volunteerFormService
+                    .RemoveFormUserMapping(location.Id, userId, (VolunteerFormType)type);
+                ShowAlertSuccess($"Removed staff member from receiving {(VolunteerFormType)type} Volunteer form submissions.");
+            }
+            catch (OcudaException oex)
+            {
+                ShowAlertDanger($"Unable to remove staff member for {location.Name}: {oex.Message}");
+            }
             return RedirectToAction(nameof(Details), new { slug });
         }
 
