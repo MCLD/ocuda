@@ -22,9 +22,11 @@ namespace Ocuda.Ops.Controllers
             IUserService userService)
             : base(context)
         {
-            _locationService = locationService
-                ?? throw new ArgumentNullException(nameof(locationService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            ArgumentNullException.ThrowIfNull(locationService);
+            ArgumentNullException.ThrowIfNull(userService);
+
+            _locationService = locationService;
+            _userService = userService;
         }
 
         public static string Name
@@ -38,8 +40,9 @@ namespace Ocuda.Ops.Controllers
 
             var filter = new StaffSearchFilter(currentPage, PerPage)
             {
-                SearchText = searchText,
-                AssociatedLocation = associatedLocation
+                AssociatedLocation = associatedLocation,
+                MustHaveName = true,
+                SearchText = searchText
             };
 
             var users = await _userService.FindAsync(filter);
@@ -70,6 +73,7 @@ namespace Ocuda.Ops.Controllers
 
             var filter = new StaffSearchFilter(currentPage, 5)
             {
+                MustHaveName = true,
                 SearchText = searchText
             };
 
@@ -80,11 +84,11 @@ namespace Ocuda.Ops.Controllers
                 CurrentPage = currentPage,
                 ItemCount = users.Count,
                 ItemsPerPage = filter.Take.Value,
-                Users = users.Data.Select(_ => new Models.Entities.User
+                Users = [.. users.Data.Select(_ => new Models.Entities.User
                 {
                     Id = _.Id,
                     Name = _.Name
-                }).ToList(),
+                })],
                 SearchText = searchText
             };
 

@@ -15,5 +15,6 @@
         }
 
         public int AssociatedLocation { get; set; }
+        public bool MustHaveName { get; set; }
     }
 }
