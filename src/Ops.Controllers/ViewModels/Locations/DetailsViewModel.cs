@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Promenade.Models.Entities;
 
@@ -12,6 +13,7 @@ namespace Ocuda.Ops.Controllers.ViewModels.Locations
             AllLanguages = new Dictionary<int, string>();
             DescriptionLanguages = [];
             LocationNoticeLanguages = [];
+            VolunteerForms = [];
         }
 
         public static string Now
@@ -77,6 +79,8 @@ namespace Ocuda.Ops.Controllers.ViewModels.Locations
         public bool SegmentEditor { get; set; }
 
         public IEnumerable<Feature> ServicesAvailable { get; set; }
+
+        public ICollection<LocationVolunteerFormViewModel> VolunteerForms { get; }
 
         private bool IsAfterEnd
         {

@@ -18,10 +18,10 @@ namespace Ocuda.Ops.Service
 {
     public class VolunteerFormService : BaseService<VolunteerFormService>, IVolunteerFormService
     {
-        private readonly IVolunteerFormSubmissionEmailRecordRepository _emailRecordRepository;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
         private readonly ILocationFormRepository _locationFormRepository;
         private readonly IVolunteerFormRepository _volunteerFormRepository;
+        private readonly IVolunteerFormSubmissionEmailRecordRepository _emailRecordRepository;
         private readonly IVolunteerFormSubmissionRepository _volunteerFormSubmissionRepository;
         private readonly IVolunteerUserMappingRepository _volunteerUserMappingRepository;
 
@@ -55,7 +55,16 @@ namespace Ocuda.Ops.Service
             var form = await GetFormByTypeAsync(type);
             if (form != null)
             {
-                await _volunteerUserMappingRepository.AddSaveFormUserMappingAsync(form.Id, locationId, userId);
+                var loc = await _volunteerUserMappingRepository
+                    .GetByLocationFormAsync(locationId, form.Id);
+                if (loc.Any(_ => _.UserId == userId))
+                {
+                    throw new OcudaException("Staff member already configured to receive those submissions.");
+                }
+
+                await _volunteerUserMappingRepository.AddSaveFormUserMappingAsync(form.Id,
+                    locationId,
+                    userId);
                 var locationForm = await _locationFormRepository.FindAsync(locationId, form.Id);
                 if (locationForm == null)
                 {
@@ -71,14 +80,16 @@ namespace Ocuda.Ops.Service
         public async Task<VolunteerForm> AddUpdateFormAsync(VolunteerForm form)
         {
             ArgumentNullException.ThrowIfNull(form);
-            var existingForm = await _volunteerFormRepository.FindByTypeAsync(form.VolunteerFormType);
+            var existingForm = await _volunteerFormRepository
+                .FindByTypeAsync(form.VolunteerFormType);
             if (existingForm != null)
             {
                 if (existingForm.IsDisabled)
                 {
                     existingForm.IsDisabled = false;
                     await _volunteerFormRepository.UpdateSaveAsync(existingForm);
-                    return await _volunteerFormRepository.FindByTypeAsync(existingForm.VolunteerFormType);
+                    return await _volunteerFormRepository
+                        .FindByTypeAsync(existingForm.VolunteerFormType);
                 }
 
                 throw new OcudaException($"Form type '{form.VolunteerFormType}' already exists.");
@@ -91,7 +102,9 @@ namespace Ocuda.Ops.Service
             return await _volunteerFormRepository.FindAsync(form.Id);
         }
 
-        public async Task AddVolunteerLocationFeature(int featureId, int locationId, string locationStub)
+        public async Task AddVolunteerLocationFeature(int featureId,
+            int locationId,
+            string locationStub)
         {
             await _locationFeatureRepository
                 .AddAsync(new LocationFeature
@@ -163,7 +176,8 @@ namespace Ocuda.Ops.Service
             return await _volunteerFormRepository.GetEmailSetupMappingAsync();
         }
 
-        public async Task<ICollection<VolunteerFormUserMapping>> GetFormUserMappingsAsync(int formId, int locationId)
+        public async Task<ICollection<VolunteerFormUserMapping>>
+            GetFormUserMappingsAsync(int formId, int locationId)
         {
             return await _volunteerUserMappingRepository.GetByLocationFormAsync(locationId, formId);
         }
@@ -207,7 +221,8 @@ namespace Ocuda.Ops.Service
                 .GetByIdAsync(submissionId);
         }
 
-        public async Task<ICollection<VolunteerFormSubmission>> GetVolunteerFormSubmissionsAsync(int locationId, int typeId)
+        public async Task<ICollection<VolunteerFormSubmission>>
+            GetVolunteerFormSubmissionsAsync(int locationId, int typeId)
         {
             var form = await _volunteerFormRepository.FindByTypeAsync(typeId);
             return await _volunteerFormSubmissionRepository.GetAllAsync(locationId, form.Id);
@@ -229,11 +244,13 @@ namespace Ocuda.Ops.Service
             var form = await GetFormByTypeAsync(type);
             if (form != null)
             {
-                await _volunteerUserMappingRepository.RemoveFormUserMappingAsync(form.Id, locationId, userId);
+                await _volunteerUserMappingRepository
+                    .RemoveFormUserMappingAsync(form.Id, locationId, userId);
 
-                var locationMappings = await _volunteerUserMappingRepository.GetByLocationFormAsync(locationId, form.Id);
+                var locationMappings = await _volunteerUserMappingRepository
+                    .GetByLocationFormAsync(locationId, form.Id);
                 var locationForm = await _locationFormRepository.FindAsync(locationId, form.Id);
-                if (locationForm != null && !locationMappings.Any())
+                if (locationForm != null && locationMappings.Count == 0)
                 {
                     await _locationFormRepository.RemoveSaveAsync(locationForm);
                 }
