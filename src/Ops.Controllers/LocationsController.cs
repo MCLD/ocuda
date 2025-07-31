@@ -520,6 +520,13 @@ namespace Ocuda.Ops.Controllers
                     }
                     viewModel.VolunteerForms.AddRange(formsViewModel);
                 }
+
+                // don't show the volunteer forms at all if there are non and not manager
+                if (!viewModel.LocationManager
+                    && viewModel.VolunteerForms.Sum(_ => _.FormMappings?.Count) == 0)
+                {
+                    viewModel.VolunteerForms.Clear();
+                }
             }
 
             foreach (var display in viewModel.Displays)

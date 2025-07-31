@@ -255,94 +255,110 @@
             </div>
         }
 
-        @if (Model.VolunteerForms != null)
+        @if (Model.VolunteerForms.Count > 0)
         {
             <div class="card mb-2">
                 <div class="card-header">Volunteer Forms</div>
                 <ul class="list-group list-group-flush">
                     @foreach (var form in Model.VolunteerForms)
                     {
-                        <li class="list-group-item d-flex align-items-center @((form.FormMappings?.Count ?? 0) > 0 ? "" : "fst-italic")">
-                            <div class="flex-grow-1">
-                                <label>
-                                    @form.TypeName (@(form.FormMappings?.Count ?? 0))
-                                </label>
-                            </div>
-                            <div class="me-2">
-                                <button type="button"
-                                        class="btn btn-sm btn-outline-success"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#addStaffModal"
-                                        data-formtype="@((VolunteerFormType)form.TypeId)"
-                                        data-formtypeid="@form.TypeId">
-                                    <span class="fa-solid fa-circle-plus fa-fw"
-                                          aria-hidden="true"></span>
-                                </button>
-                            </div>
-                        </li>
-                        @if (!form.IsDisabled)
+                        if (Model.LocationManager || form.FormMappings?.Count() > 0)
                         {
-                            @if (form.FormMappings?.Count > 0)
-                            {
-                                @foreach (var formMapping in form.FormMappings)
+                            <li class="list-group-item d-flex align-items-center @((form.FormMappings?.Count ?? 0) > 0 ? "" : "fst-italic")">
+                                <div class="flex-grow-1">
+                                    <label>
+                                        @form.TypeName (@(form.FormMappings?.Count ?? 0))
+                                    </label>
+                                </div>
+                                @if (Model.LocationManager)
                                 {
-                                    <li class="list-group-item d-flex align-items-center">
-                                        <div class="me-2">
-                                            <form asp-action="@nameof(Ocuda.Ops.Controllers.LocationsController.RemoveFormUserMapping)"
-                                                  asp-controller="@Ocuda.Ops.Controllers.LocationsController.Name"
-                                                  asp-route-slug="@Model.Location.Stub"
-                                                  asp-route-type="@form.TypeId"
-                                                  asp-route-userId="@formMapping.UserId"
-                                                  class="d-inline"
-                                                  method="post"
-                                                  role="form">
-                                                <button button-spinner
-                                                        class="btn btn-sm btn-outline-danger"
-                                                        type="submit">
-                                                    <span class="fa-solid fa-circle-minus fa-fw"></span>
-                                                </button>
-                                            </form>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            @formMapping.Name
-                                        </div>
-                                    </li>
+                                    <div class="me-2">
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-success"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#addStaffModal"
+                                                data-formtype="@((VolunteerFormType)form.TypeId)"
+                                                data-formtypeid="@form.TypeId">
+                                            <span class="fa-solid fa-circle-plus fa-fw"
+                                                  aria-hidden="true"></span>
+                                        </button>
+                                    </div>
+                                }
+                            </li>
+                            @if (!form.IsDisabled)
+                            {
+                                @if (form.FormMappings?.Count > 0)
+                                {
+                                    @foreach (var formMapping in form.FormMappings)
+                                    {
+                                        <li class="list-group-item d-flex align-items-center">
+                                            @if (Model.LocationManager)
+                                            {
+                                                <div class="me-2">
+                                                    <form asp-action="@nameof(Ocuda.Ops.Controllers.LocationsController.RemoveFormUserMapping)"
+                                                          asp-controller="@Ocuda.Ops.Controllers.LocationsController.Name"
+                                                          asp-route-slug="@Model.Location.Stub"
+                                                          asp-route-type="@form.TypeId"
+                                                          asp-route-userId="@formMapping.UserId"
+                                                          class="d-inline"
+                                                          method="post"
+                                                          role="form">
+                                                        <button button-spinner
+                                                                class="btn btn-sm btn-outline-danger"
+                                                                type="submit">
+                                                            <span class="fa-solid fa-circle-minus fa-fw"></span>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            }
+                                            <div class="flex-grow-1">
+                                                @if (!Model.LocationManager)
+                                                {
+                                                    @:—
+                                                }
+                                                @formMapping.Name
+                                            </div>
+                                        </li>
+                                    }
                                 }
                             }
+                            else
+                            {
+                                <li>
+                                    <div class="alert alert-warning">
+                                        @form.AlertWarning
+                                    </div>
+                                </li>
+                            }
                         }
-                        else
+                        @if (Model.LocationManager)
                         {
-                            <li>
-                                <div class="alert alert-warning">
-                                    @form.AlertWarning
+                            <div modal
+                                 id="addStaffModal"
+                                 name="Staff Member"
+                                 type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
+                                 suppress-footer="true"
+                                 data-backdrop="static">
+                                <input type="hidden" asp-for="@form.TypeId" />
+                                <div class="form-group mb-3">
+                                    <label for="staffSearchText">Search</label>
+                                    <div class="input-group">
+                                        <input type="text"
+                                               id="staffSearchText"
+                                               class="form-control"
+                                               aria-label="Search text" />
+                                        <button class="btn btn-outline-success"
+                                                id="staffSearchGo"
+                                                button-spinner
+                                                type="submit">
+                                            Go
+                                        </button>
+                                    </div>
                                 </div>
-                            </li>
-                        }
-                        <div modal
-                             id="addStaffModal"
-                             name="Staff Member"
-                             type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
-                             suppress-footer="true"
-                             data-backdrop="static">
-                            <input type="hidden" asp-for="@form.TypeId" />
-                            <div class="form-group mb-3">
-                                <label for="staffSearchText">Search</label>
-                                <div class="input-group">
-                                    <input type="text"
-                                           id="staffSearchText"
-                                           class="form-control"
-                                           aria-label="Search text" />
-                                    <button class="btn btn-outline-success"
-                                            id="staffSearchGo"
-                                            button-spinner
-                                            type="submit">
-                                        Go
-                                    </button>
-                                </div>
+                                <div id="searchResults"></div>
+                                <div id="pagination" class="d-none mt-3"></div>
                             </div>
-                            <div id="searchResults"></div>
-                            <div id="pagination" class="d-none mt-3"></div>
-                        </div>
+                        }
                     }
                 </ul>
             </div>
@@ -458,131 +474,134 @@
 }
 
 @section Scripts {
-    <script>
-        const mapCoordinatorUrl = new URL('@Url.Action(nameof(LocationsController.MapVolunteerCoordinator), LocationsController.Name, new { slug = Model.Location.Stub }, protocol: Context.Request.Scheme)');
-        const staffSearchUrl = new URL('@Url.Action(nameof(StaffController.SearchJson), StaffController.Name, null, protocol: Context.Request.Scheme)');
+    @if (Model.LocationManager)
+    {
+        <script>
+            const mapCoordinatorUrl = new URL('@Url.Action(nameof(LocationsController.MapVolunteerCoordinator), LocationsController.Name, new { slug = Model.Location.Stub }, protocol: Context.Request.Scheme)');
+            const staffSearchUrl = new URL('@Url.Action(nameof(StaffController.SearchJson), StaffController.Name, null, protocol: Context.Request.Scheme)');
 
-        document.getElementById('addStaffModal').addEventListener('show.bs.modal', (event) => {
-            currentFormTypeId = event.relatedTarget.dataset.formtypeid;
-            document.getElementById('addStaffModalLabel').innerHTML = `Add staff member - ${event.relatedTarget.dataset.formtype} Volunteer form`;
-            currentPage = 1;
-            document.getElementById('searchResults').innerHTML = '';
-            document.getElementById('pagination').classList.add('d-none');
-            document.getElementById("staffSearchText").value = '';
-        });
+            document.getElementById('addStaffModal').addEventListener('show.bs.modal', (event) => {
+                currentFormTypeId = event.relatedTarget.dataset.formtypeid;
+                document.getElementById('addStaffModalLabel').innerHTML = `Add staff member - ${event.relatedTarget.dataset.formtype} Volunteer form`;
+                currentPage = 1;
+                document.getElementById('searchResults').innerHTML = '';
+                document.getElementById('pagination').classList.add('d-none');
+                document.getElementById("staffSearchText").value = '';
+            });
 
-        document.getElementById("staffSearchText").addEventListener('keyup', (e) => {
-            if(e.key == 'Enter' || e.keyCode == 13) {
-                document.getElementById('staffSearchGo').click();
-            }
-        });
+            document.getElementById("staffSearchText").addEventListener('keyup', (e) => {
+                if(e.key == 'Enter' || e.keyCode == 13) {
+                    document.getElementById('staffSearchGo').click();
+                }
+            });
 
-        document.getElementById("staffSearchGo").addEventListener('click', () => {
-            currentPage = 1;
-            volunteerMappingSearch();
-        });
+            document.getElementById("staffSearchGo").addEventListener('click', () => {
+                currentPage = 1;
+                volunteerMappingSearch();
+            });
 
-        async function volunteerMappingSearch() {
-            await performStaffSearch(document.getElementById("staffSearchText").value, currentPage)
-                .then((response) => {
-                    return response.json();
-                }).then((data) => {
-                    if (data && data.itemCount > 0) {
-                        document.getElementById('searchResults').innerHTML = '';
-                        currentPage = data.currentPage;
-                        $.each(data.users, function (index, value) {
-                            const params = new URLSearchParams(mapCoordinatorUrl.search);
-                            params.append('type', currentFormTypeId);
-                            params.append('userId', value.id);
+            async function volunteerMappingSearch() {
+                await performStaffSearch(document.getElementById("staffSearchText").value, currentPage)
+                    .then((response) => {
+                        return response.json();
+                    }).then((data) => {
+                        if (data && data.itemCount > 0) {
+                            document.getElementById('searchResults').innerHTML = '';
+                            currentPage = data.currentPage;
+                            $.each(data.users, function (index, value) {
+                                const params = new URLSearchParams(mapCoordinatorUrl.search);
+                                params.append('type', currentFormTypeId);
+                                params.append('userId', value.id);
 
-                            const formDiv = document.createElement('div');
-                            formDiv.classList.add('me-2');
+                                const formDiv = document.createElement('div');
+                                formDiv.classList.add('me-2');
 
-                            const form = document.createElement('form');
-                            form.setAttribute('method', 'POST');
-                            form.setAttribute('action',
-                                new URL(`${mapCoordinatorUrl.origin}${mapCoordinatorUrl.pathname}?${params}`));
+                                const form = document.createElement('form');
+                                form.setAttribute('method', 'POST');
+                                form.setAttribute('action',
+                                    new URL(`${mapCoordinatorUrl.origin}${mapCoordinatorUrl.pathname}?${params}`));
 
-                            const submitButton = document.createElement('button');
-                            submitButton.classList.add('btn', 'btn-sm', 'btn-outline-success');
-                            submitButton.setAttribute('type', 'submit');
+                                const submitButton = document.createElement('button');
+                                submitButton.classList.add('btn', 'btn-sm', 'btn-outline-success');
+                                submitButton.setAttribute('type', 'submit');
 
-                            const span = document.createElement('span');
-                            span.classList.add('fa-solid', 'fa-circle-plus', 'fa-fw');
+                                const span = document.createElement('span');
+                                span.classList.add('fa-solid', 'fa-circle-plus', 'fa-fw');
 
-                            submitButton.appendChild(span);
-                            form.appendChild(submitButton);
-                            formDiv.appendChild(form);
+                                submitButton.appendChild(span);
+                                form.appendChild(submitButton);
+                                formDiv.appendChild(form);
 
-                            const nameDiv = document.createElement('div');
-                            nameDiv.classList.add('flex-grow-1');
-                            nameDiv.textContent = value.name
+                                const nameDiv = document.createElement('div');
+                                nameDiv.classList.add('flex-grow-1');
+                                nameDiv.textContent = value.name
 
-                            const row = document.createElement('div');
-                            row.classList.add('d-flex', 'align-content-center', 'my-2');
-                            row.appendChild(formDiv);
-                            row.appendChild(nameDiv);
-                            document.getElementById('searchResults').append(row);
-                        })
-                        const paginationContent = [];
-                        if (data.maxPage > 1) {
-                            if (data.currentPage == 1) {
-                                paginationContent.push('<button class="btn btn-sm btn-outline-primary" disabled>');
-                                paginationContent.push('<span class="fa fa-fw fa-backward"></span></button>');
-                            } else {
-                                paginationContent.push('<button class="btn btn-sm btn-outline-primary"');
-                                paginationContent.push(' onclick="prevPage(' + false + ');">');
-                                paginationContent.push('<span class="fa fa-fw fa-backward"></span></button>');
+                                const row = document.createElement('div');
+                                row.classList.add('d-flex', 'align-content-center', 'my-2');
+                                row.appendChild(formDiv);
+                                row.appendChild(nameDiv);
+                                document.getElementById('searchResults').append(row);
+                            })
+                            const paginationContent = [];
+                            if (data.maxPage > 1) {
+                                if (data.currentPage == 1) {
+                                    paginationContent.push('<button class="btn btn-sm btn-outline-primary" disabled>');
+                                    paginationContent.push('<span class="fa fa-fw fa-backward"></span></button>');
+                                } else {
+                                    paginationContent.push('<button class="btn btn-sm btn-outline-primary"');
+                                    paginationContent.push(' onclick="prevPage(' + false + ');">');
+                                    paginationContent.push('<span class="fa fa-fw fa-backward"></span></button>');
+                                }
+                                paginationContent.push('<span class="d-inline-block mx-2">')
+                                paginationContent.push(data.currentPage + '/' + data.maxPage);
+                                paginationContent.push('</span>')
+                                if (data.currentPage == data.maxPage) {
+                                    paginationContent.push('<button class="btn btn-sm btn-outline-primary" disabled>');
+                                    paginationContent.push('<span class="fa fa-fw fa-forward"></span></button>');
+                                } else {
+                                    paginationContent.push('<button class="btn btn-sm btn-outline-primary"');
+                                    paginationContent.push(' onclick="nextPage(' + false + ');">')
+                                    paginationContent.push('<span class="fa fa-fw fa-forward"></span></button>');
+                                }
                             }
-                            paginationContent.push('<span class="d-inline-block mx-2">')
-                            paginationContent.push(data.currentPage + '/' + data.maxPage);
-                            paginationContent.push('</span>')
-                            if (data.currentPage == data.maxPage) {
-                                paginationContent.push('<button class="btn btn-sm btn-outline-primary" disabled>');
-                                paginationContent.push('<span class="fa fa-fw fa-forward"></span></button>');
-                            } else {
-                                paginationContent.push('<button class="btn btn-sm btn-outline-primary"');
-                                paginationContent.push(' onclick="nextPage(' + false + ');">')
-                                paginationContent.push('<span class="fa fa-fw fa-forward"></span></button>');
-                            }
-                        }
 
-                        if (paginationContent.length > 0) {
-                            document.getElementById('pagination').classList.remove('d-none');
-                        }
-                        else {
+                            if (paginationContent.length > 0) {
+                                document.getElementById('pagination').classList.remove('d-none');
+                            }
+                            else {
+                                document.getElementById('pagination').classList.add('d-none');
+                            }
+                            document.getElementById('pagination').innerHTML = paginationContent.join('');
+                        } else {
+                            document.getElementById('searchResults').innerHTML = '<em>No staff members found.</em>';
                             document.getElementById('pagination').classList.add('d-none');
                         }
-                        document.getElementById('pagination').innerHTML = paginationContent.join('');
-                    } else {
-                        document.getElementById('searchResults').innerHTML = '<em>No staff members found.</em>';
-                        document.getElementById('pagination').classList.add('d-none');
-                    }
-                }).catch((error) => {
-                    console.log(error)
-                    alert("Staff lookup failed.");
-                }).then(() => {
-                    ResetSpinners();
-                });
-        }
+                    }).catch((error) => {
+                        console.log(error)
+                        alert("Staff lookup failed.");
+                    }).then(() => {
+                        ResetSpinners();
+                    });
+            }
 
-        async function performStaffSearch(searchText, page) {
-            const params = new URLSearchParams(staffSearchUrl.search);
-            params.append('searchText', searchText);
-            params.append('page', page);
+            async function performStaffSearch(searchText, page) {
+                const params = new URLSearchParams(staffSearchUrl.search);
+                params.append('searchText', searchText);
+                params.append('page', page);
 
-            return fetch(new URL(`${staffSearchUrl.origin}${staffSearchUrl.pathname}?${params}`),
-                {method: 'GET'});
-        }
+                return fetch(new URL(`${staffSearchUrl.origin}${staffSearchUrl.pathname}?${params}`),
+                    {method: 'GET'});
+            }
 
-        function nextPage() {
-            currentPage++;
-            volunteerMappingSearch();
-        }
+            function nextPage() {
+                currentPage++;
+                volunteerMappingSearch();
+            }
 
-        function prevPage() {
-            currentPage = Math.max(1, currentPage - 1);
-            volunteerMappingSearch();
-        }
-    </script>
+            function prevPage() {
+                currentPage = Math.max(1, currentPage - 1);
+                volunteerMappingSearch();
+            }
+        </script>
+    }
 }
