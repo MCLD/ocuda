@@ -12,15 +12,13 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class PostRepository : OpsRepository<OpsContext, Post, int>, IPostRepository
+    public class PostRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+        ILogger<PostRepository> logger)
+        : OpsRepository<OpsContext, Post, int>(repositoryFacade, logger), IPostRepository
     {
-        public PostRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
-            ILogger<PostRepository> logger) : base(repositoryFacade, logger)
+        public async Task AddPostCategoriesAsync(ICollection<int> categories, int postId)
         {
-        }
-
-        public async Task AddPostCategoriesAsync(List<int> categories, int postId)
-        {
+            ArgumentNullException.ThrowIfNull(categories);
             foreach (var category in categories)
             {
                 var postCategory = new PostCategory
@@ -34,8 +32,9 @@ namespace Ocuda.Ops.Data.Ops
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeletePostCategoriesAsync(List<int> categories, int postId)
+        public async Task DeletePostCategoriesAsync(ICollection<int> categories, int postId)
         {
+            ArgumentNullException.ThrowIfNull(categories);
             foreach (var category in categories)
             {
                 var postCategory = _context.PostCategories
@@ -85,7 +84,9 @@ namespace Ocuda.Ops.Data.Ops
             {
                 Count = await query.CountAsync(),
                 Data = await query
-                    .OrderByDescending(_ => _.PinnedUntil)
+                    .OrderByDescending(_ => _.PinnedUntil >= DateTime.Now
+                        ? _.PinnedUntil
+                        : DateTime.MinValue)
                     .ThenByDescending(_ => _.PublishedAt ?? DateTime.MaxValue)
                     .ApplyPagination(filter)
                     .ToListAsync()
@@ -100,7 +101,8 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public async Task<List<Post>> GetPostsBySectionCategoryIdAsync(int categoryId, int sectionId)
+        public async Task<List<Post>> GetPostsBySectionCategoryIdAsync(int categoryId,
+            int sectionId)
         {
             return await _context.PostCategories
                 .AsNoTracking()
