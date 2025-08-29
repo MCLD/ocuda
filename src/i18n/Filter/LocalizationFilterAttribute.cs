@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Ocuda.i18n.Filter
 {
@@ -125,8 +126,6 @@ namespace Ocuda.i18n.Filter
                     uriPathBuilder.Append(context.HttpContext.Request.QueryString);
                 }
 
-                var cultureList = new Dictionary<string, string>();
-
                 Uri builtPath;
                 try
                 {
@@ -148,12 +147,7 @@ namespace Ocuda.i18n.Filter
 
                 foreach (var culture in _l10nOptions.Value.SupportedCultures)
                 {
-                    var text = culture.Parent != null
-                        ? culture.Parent.NativeName
-                        : culture.NativeName;
-
                     builtPath = new Uri(uriBuilder.Uri, culture.Name + uriPath);
-                    cultureList.Add(text, builtPath.AbsoluteUri);
 
                     if (!cultureHrefLang.ContainsKey(culture.Name))
                     {
@@ -168,7 +162,17 @@ namespace Ocuda.i18n.Filter
                 }
 
                 context.HttpContext.Items[LocalizationItemKey.HrefLang] = cultureHrefLang;
-                context.HttpContext.Items[LocalizationItemKey.L10n] = cultureList;
+
+                var supportedCultures = new Dictionary<string, string>();
+
+                foreach(var culture in _l10nOptions.Value?.SupportedCultures)
+                {
+                    supportedCultures.Add(culture.Name, culture.Parent != null
+                        ? culture.Parent.NativeName
+                        : culture.NativeName);
+                }
+
+                context.HttpContext.Items[LocalizationItemKey.L10n] = supportedCultures;
             }
 
             await next();
