@@ -4,6 +4,7 @@
     var currentUiCulture = System.Globalization.CultureInfo.CurrentCulture;
     var footerImage = Context.Items[Ocuda.Promenade.Controllers.ItemKey.FooterImage] as string;
     var footerNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.FooterNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
+    var hrefLang = Context.Items[Ocuda.i18n.LocalizationItemKey.HrefLang] as IDictionary<string, string>;
     var googleAnalyticsTrackingCode = Context.Items[Ocuda.Promenade.Controllers.ItemKey.GoogleAnalyticsTrackingCode] as string;
     var l10nLinks = Context.Items[Ocuda.i18n.LocalizationItemKey.L10n] as IDictionary<string, string>;
     var middleNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.MiddleNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
@@ -16,12 +17,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData[Ocuda.Utility.Keys.ViewData.Title]</title>
     @RenderSection("metadata", required: false)
-    @if (Context.Items[Ocuda.i18n.LocalizationItemKey.HrefLang] != null)
+    @foreach (var lang in hrefLang)
     {
-        @foreach (var item in ((IDictionary<string, string>)Context.Items[Ocuda.i18n.LocalizationItemKey.HrefLang]))
-        {
-            <link rel="alternate" hreflang="@item.Key" href="@item.Value" />
-        }
+        <link rel="alternate" hreflang="@lang.Key" href="@lang.Value" />
     }
     @if (!string.IsNullOrEmpty(googleAnalyticsTrackingCode))
     {
@@ -78,43 +76,32 @@
                         }
                         if (topNavigation?.Navigations.Count() > 0)
                         {
-                            var currentLang = currentUiCulture.Parent.Name ?? currentUiCulture.Name;
-                            var languages = l10nLinks.ToArray();
-                            string currentL10 = languages.LastOrDefault().Value.Contains(currentLang)
-                            ? languages.LastOrDefault().Value
-                            : languages.FirstOrDefault().Value;
-
                             <ul class="@(l10nLinks?.Count() > 1 ? "col-sm-8" : "") mb-0 pe-sm-0 pe-md-3 d-flex justify-content-around justify-content-sm-end align-items-center prom-right-nav px-0">
                                 <li class="d-none d-sm-block p-0">
                                     <div class="btn-group btn-toggle border border-2 border-prom-primary rounded">
-                                        <a href="@languages[0].Value">
-                                            <div style="border-radius: 0 6px 6px 0" class="btn btn-md border-0 @(languages[0].Value == currentL10 ? "btn-primary bg-prom-primary active" : "bg-transparent")">
-                                                @languages[0].Key
-                                            </div>
-                                        </a>
-                                        <a href="@languages[1].Value">
-                                            <div style="border-radius: 6px 0 0 6px" class="btn btn-md border-0 @(languages[1].Value == currentL10 ? "btn-primary bg-prom-primary active" : "bg-transparent")">
-                                                @languages[1].Key
-                                            </div>
-                                        </a>
-
+                                        @foreach (var cultureName in l10nLinks.Keys)
+                                        {
+                                            <a href="@hrefLang[cultureName]">
+                                                <div class="btn btn-md border-0 @(currentUiCulture.Name == cultureName ? "btn-primary bg-prom-primary active" : "bg-transparent")"
+                                                     style="@(cultureName == l10nLinks.First().Key ? "border-radius: 0 6px 6px 0" : "border-radius: 6px 0 0 6px")">
+                                                    @l10nLinks[cultureName]
+                                                </div>
+                                            </a>
+                                        }
                                     </div>
                                 </li>
                                 <li class="d-sm-none nav-item prom-nav-top-button bg-prom-primary">
-                                    <a href="@(languages[0].Value == currentL10 ? languages[1].Value : languages[0].Value)"
+                                    <a href="@hrefLang[l10nLinks.FirstOrDefault(_ => _.Key != currentUiCulture.Name).Key]"
                                        class="nav-link d-flex align-items-center">
                                         <span class="fa-solid fa-comment prom-fa-space"></span>
-                                        <span class="">@currentUiCulture.Parent.DisplayName</span>
+                                        <span>@currentUiCulture.Parent.DisplayName</span>
                                     </a>
                                 </li>
-
                                 @foreach (var item in topNavigation.Navigations)
                                 {
 
                                     <li class="nav-item prom-nav-top-button ms-sm-2 ms-md-3">
-                                        @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                       && !string.IsNullOrEmpty(item.Icon)
-                                       && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                        @if (string.IsNullOrEmpty(item.NavigationText.Label) && !string.IsNullOrEmpty(item.Icon) && !string.IsNullOrEmpty(item.NavigationText.Title))
                                         {
                                             <a title="@item.NavigationText.Title"
                                                aria-label="@item.NavigationText.Title"
@@ -149,7 +136,14 @@
                     <div class="row">
                         <div class="d-flex prom-nav-middle-parent p-0 px-lg-2">
                             <div class="prom-nav-middle navbar navbar-dark navbar-expand-sm p-0 px-lg-2 d-print-none w-100" aria-label="bottom" role="navigation">
-                                <button class="navbar-toggler nav-link dropdown-toggle border-0 p-3 border-bottom border-top border-white w-100 py-3 text-center collapsed" style="box-shadow: none;" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                                <button class="navbar-toggler nav-link dropdown-toggle border-0 p-3 border-bottom border-top border-white w-100 py-3 text-center collapsed"
+                                        style="box-shadow: none;"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#navbarSupportedContent"
+                                        aria-controls="navbarSupportedContent"
+                                        aria-expanded="false"
+                                        aria-label="Toggle navigation">
                                     <span class="text-white nav-link-text">Menu</span>
                                     <span class="caret"></span>
                                 </button>
@@ -173,9 +167,7 @@
                                                         @foreach (var subItem in item.Navigations)
                                                         {
                                                             <li class="border border-1 border-white border-top-0">
-                                                                @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
-                                                               && !string.IsNullOrEmpty(subItem.Icon)
-                                                               && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                                                                @if (string.IsNullOrEmpty(subItem.NavigationText.Label) && !string.IsNullOrEmpty(subItem.Icon) && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                                 {
                                                                     <a href="@subItem.NavigationText.Link"
                                                                        target="@(item.TargetNewWindow ? "_blank" : null)"
@@ -364,8 +356,8 @@
                         {
                             <li class="mb-1">
                                 @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                               && !string.IsNullOrEmpty(item.Icon)
-                               && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                                        && !string.IsNullOrEmpty(item.Icon)
+                                                        && !string.IsNullOrEmpty(item.NavigationText.Title))
                                 {
                                     <a href="@item.NavigationText.Link"
                                        title="@item.NavigationText.Title"
