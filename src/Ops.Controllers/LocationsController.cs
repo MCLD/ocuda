@@ -14,6 +14,7 @@ using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Controllers.ServiceFacades;
 using Ocuda.Ops.Controllers.ViewModels.Locations;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -105,11 +106,10 @@ namespace Ocuda.Ops.Controllers
 
             if (locationFeature.SegmentId != null)
             {
-                return RedirectToAction(nameof(Areas.SiteManagement.SegmentsController.Detail),
-                    Areas.SiteManagement.SegmentsController.Name,
+                return RedirectToAction(nameof(SegmentsController.Detail), SegmentsController.Name,
                     new
                     {
-                        area = Areas.SiteManagement.SegmentsController.Area,
+                        area = SegmentsController.Area,
                         id = locationFeature.SegmentId
                     });
             }
@@ -543,6 +543,26 @@ namespace Ocuda.Ops.Controllers
                     .GetSegmentLanguagesByIdAsync(location.PreFeatureSegmentId.Value));
             }
 
+            if (location.ImageAltTextSegmentId.HasValue)
+            {
+                foreach (var language in await _languageService.GetActiveAsync())
+                {
+                    location.ImageAltTextSegmentTexts.Add(await _segmentService
+                        .GetBySegmentAndLanguageAsync(location.ImageAltTextSegmentId.Value,
+                            language.Id));
+                }
+            }
+
+            if (location.MapAltTextSegmentId.HasValue)
+            {
+                foreach (var language in await _languageService.GetActiveAsync())
+                {
+                    location.MapAltTextSegmentTexts.Add(await _segmentService
+                        .GetBySegmentAndLanguageAsync(location.MapAltTextSegmentId.Value,
+                            language.Id));
+                }
+            }
+
             viewModel.DescriptionLanguages.AddRange(await _segmentService
                 .GetSegmentLanguagesByIdAsync(location.DescriptionSegmentId));
             viewModel.AllLanguages.AddRange(await _languageService.GetActiveNamesAsync());
@@ -822,6 +842,31 @@ namespace Ocuda.Ops.Controllers
                 ShowAlertDanger("Location not found.");
                 return RedirectToAction(nameof(Index));
             }
+        }
+
+        [HttpPost("[action]")]
+        public async Task<JsonResult> UpdateAltText(UpdatedAltText newAltText)
+        {
+            ArgumentNullException.ThrowIfNull(newAltText);
+
+            var response = new JsonResponse();
+
+            try
+            {
+                await _locationService.UpdateAltTextAsync(newAltText.LocationId,
+                    newAltText.LanguageId,
+                    newAltText.Field,
+                    newAltText.Text?.Trim());
+                response.Success = true;
+                response.Message = newAltText.Text?.Trim();
+            }
+            catch (OcudaException oex)
+            {
+                response.Success = false;
+                response.Message = oex.Message;
+            }
+
+            return Json(response);
         }
 
         [HttpGet("[action]/{slug}")]

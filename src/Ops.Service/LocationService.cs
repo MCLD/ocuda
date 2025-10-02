@@ -38,6 +38,7 @@ namespace Ocuda.Ops.Service
         private readonly ILocationRepository _locationRepository;
         private readonly IRosterDivisionRepository _rosterDivisionRepository;
         private readonly IRosterLocationRepository _rosterLocationRepository;
+        private readonly ISegmentService _segmentService;
         private readonly ISiteSettingService _siteSettingService;
 
         public LocationService(IGoogleClient googleClient,
@@ -54,6 +55,7 @@ namespace Ocuda.Ops.Service
             ILogger<LocationService> logger,
             IRosterDivisionRepository rosterDivisionRepository,
             IRosterLocationRepository rosterLocationRepository,
+            ISegmentService segmentService,
             ISiteSettingService siteSettingService)
             : base(logger, httpContextAccessor)
         {
@@ -69,6 +71,7 @@ namespace Ocuda.Ops.Service
             ArgumentNullException.ThrowIfNull(locationRepository);
             ArgumentNullException.ThrowIfNull(rosterDivisionRepository);
             ArgumentNullException.ThrowIfNull(rosterLocationRepository);
+            ArgumentNullException.ThrowIfNull(segmentService);
             ArgumentNullException.ThrowIfNull(siteSettingService);
 
             _googleClient = googleClient;
@@ -83,6 +86,7 @@ namespace Ocuda.Ops.Service
             _locationRepository = locationRepository;
             _rosterDivisionRepository = rosterDivisionRepository;
             _rosterLocationRepository = rosterLocationRepository;
+            _segmentService = segmentService;
             _siteSettingService = siteSettingService;
 
             ExteriorImageHeight = 1024;
@@ -129,10 +133,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<Location> AddLocationAsync(Location location)
         {
-            if (location == null)
-            {
-                throw new ArgumentNullException(nameof(location));
-            }
+            ArgumentNullException.ThrowIfNull(location);
 
             location.AddressType = location.AddressType?.Trim();
             location.AdministrativeArea = location.AdministrativeArea?.Trim();
@@ -209,7 +210,8 @@ namespace Ocuda.Ops.Service
         public async Task DeleteInteriorImageAsync(int imageId)
         {
             var image = await _locationInteriorImageRepository.GetInteriorImageByIdAsync(imageId);
-            var imageAltTexts = await _imageAltTextRepository.GetAllLanguageImageAltTextsAsync(imageId);
+            var imageAltTexts = await _imageAltTextRepository
+                .GetAllLanguageImageAltTextsAsync(imageId);
 
             var locationId = image.LocationId;
 
@@ -234,10 +236,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<Location> EditAlwaysOpenAsync(Location location)
         {
-            if (location == null)
-            {
-                throw new ArgumentNullException(nameof(location));
-            }
+            ArgumentNullException.ThrowIfNull(location);
 
             var currentLocation = await _locationRepository.FindAsync(location.Id);
             currentLocation.IsAlwaysOpen = location.IsAlwaysOpen;
@@ -251,10 +250,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<Location> EditAsync(Location location)
         {
-            if (location == null)
-            {
-                throw new ArgumentNullException(nameof(location));
-            }
+            ArgumentNullException.ThrowIfNull(location);
 
             await ValidateAsync(location);
 
@@ -507,6 +503,108 @@ namespace Ocuda.Ops.Service
             location.IsDeleted = false;
             _locationRepository.Update(location);
             await _locationRepository.SaveAsync();
+        }
+
+        public async Task UpdateAltTextAsync(int locationId,
+            int languageId,
+            string imageFieldName,
+            string altText)
+        {
+            var location = await _locationRepository.FindAsync(locationId);
+            var segmentId = imageFieldName switch
+            {
+                nameof(Location.ImageAltTextSegmentId) => location.ImageAltTextSegmentId,
+                nameof(Location.MapAltTextSegmentId) => location.MapAltTextSegmentId,
+                _ => throw new OcudaException("Unable to determine which alt tag to update.")
+            };
+
+            if (!segmentId.HasValue)
+            {
+                var segment = await _segmentService.CreateAsync(new Segment
+                {
+                    IsActive = true,
+                    Name = $"Location {location.Name} alt text {imageFieldName}",
+                });
+
+                switch (imageFieldName)
+                {
+                    case nameof(Location.ImageAltTextSegmentId):
+                        location.ImageAltTextSegmentId = segment.Id;
+                        break;
+
+                    case nameof(Location.MapAltTextSegmentId):
+                        location.MapAltTextSegmentId = segment.Id;
+                        break;
+                }
+                _locationRepository.Update(location);
+                await _locationRepository.SaveAsync();
+
+                await _segmentService.CreateSegmentTextAsync(new SegmentText
+                {
+                    Header = null,
+                    LanguageId = languageId,
+                    SegmentId = segment.Id,
+                    Text = altText?.Trim()
+                });
+            }
+            else
+            {
+                var segmentText = await _segmentService
+                    .GetBySegmentAndLanguageAsync(segmentId.Value, languageId);
+
+                if (segmentText == null)
+                {
+                    await _segmentService.CreateSegmentTextAsync(new SegmentText
+                    {
+                        Header = null,
+                        LanguageId = languageId,
+                        SegmentId = segmentId.Value,
+                        Text = altText?.Trim()
+                    });
+                }
+                else
+                {
+                    if (altText?.Trim().Length > 0)
+                    {
+                        await _segmentService.EditSegmentTextAsync(new SegmentText
+                        {
+                            Header = null,
+                            LanguageId = languageId,
+                            SegmentId = segmentId.Value,
+                            Text = altText?.Trim()
+                        });
+                    }
+                    else
+                    {
+                        await _segmentService.DeleteSegmentTextAsync(segmentText);
+                        var segments = await _segmentService
+                            .GetSegmentLanguagesByIdAsync(segmentId.Value);
+                        if (segments.Count == 0)
+                        {
+                            switch (imageFieldName)
+                            {
+                                case nameof(Location.ImageAltTextSegmentId):
+                                    location.ImageAltTextSegmentId = null;
+                                    break;
+
+                                case nameof(Location.MapAltTextSegmentId):
+                                    location.MapAltTextSegmentId = null;
+                                    break;
+                            }
+                            _locationRepository.Update(location);
+                            await _locationRepository.SaveAsync();
+                            try
+                            {
+                                await _segmentService.DeleteAsync(segmentId.Value);
+                            }
+                            catch (OcudaException oex)
+                            {
+                                _logger.LogError(oex, "Error deleting segment");
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public async Task UpdateExteriorImageAsync(IFormFile imageFile,

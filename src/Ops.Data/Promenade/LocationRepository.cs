@@ -108,9 +108,11 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .Where(_ => !_.IsDeleted
                     && (_.DescriptionSegmentId == segmentId
+                    || _.HoursSegmentId == segmentId
+                    || _.ImageAltTextSegmentId == segmentId
+                    || _.MapAltTextSegmentId == segmentId
                     || _.PostFeatureSegmentId == segmentId
-                    || _.PreFeatureSegmentId == segmentId
-                    || _.HoursSegmentId == segmentId))
+                    || _.PreFeatureSegmentId == segmentId))
                 .ToListAsync();
         }
 

@@ -54,7 +54,7 @@ footer {
 }
 
     footer .prom-logo {
-        max-height: 90px;
+        max-height: 8rem;
     }
 
     footer.row-nowrap {
@@ -71,12 +71,19 @@ footer {
             text-decoration: underline;
         }
 
+    footer .prom-footer-link-text {
+        min-height: 24px;
+        min-width: 24px;
+        font-size: 1rem;
+        display: inline-block;
+    }
+
 .footer-navigation-list {
     list-style-type: none;
-    line-height: 1rem;
+    line-height: 1.2rem;
 }
 
-@media (min-width:576px) {
+@media (min-width: 576px) {
     .footer-navigation-list {
         -webkit-columns: 2;
         -moz-columns: 2;
@@ -166,7 +173,7 @@ footer {
 
         .prom-nav-top > .prom-right-nav > li > a {
             color: white;
-            padding: 0
+            padding: 0;
         }
 
 .prom-location .prom-features a:hover {
@@ -202,22 +209,16 @@ footer {
     padding-right: 0;
 }
 
-    .prom-footer-contact .footer-contact {
-        font-size: 1rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
     .prom-footer-contact a {
         font-size: 1rem;
         color: white;
     }
 
     .prom-footer-contact .footer-contact {
-        padding: 10px 0;
         color: white;
         font-weight: bold;
+        font-size: 1rem;
+        min-height: 3.2rem;
     }
 
         .prom-footer-contact .footer-contact:nth-child(even) {
