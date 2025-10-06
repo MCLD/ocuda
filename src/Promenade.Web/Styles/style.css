@@ -67,15 +67,15 @@ footer {
         text-decoration: none;
     }
 
-        footer a:hover .prom-footer-link-text {
-            text-decoration: underline;
-        }
-
     footer .prom-footer-link-text {
         min-height: 24px;
         min-width: 24px;
         font-size: 1rem;
         display: inline-block;
+    }
+
+    footer a:hover .prom-footer-link-text {
+        text-decoration: underline;
     }
 
 .footer-navigation-list {

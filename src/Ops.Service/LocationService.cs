@@ -526,16 +526,15 @@ namespace Ocuda.Ops.Service
                     Name = $"Location {location.Name} alt text {imageFieldName}",
                 });
 
-                switch (imageFieldName)
+                if (imageFieldName == nameof(Location.ImageAltTextSegmentId))
                 {
-                    case nameof(Location.ImageAltTextSegmentId):
-                        location.ImageAltTextSegmentId = segment.Id;
-                        break;
-
-                    case nameof(Location.MapAltTextSegmentId):
-                        location.MapAltTextSegmentId = segment.Id;
-                        break;
+                    location.ImageAltTextSegmentId = segment.Id;
                 }
+                else if (imageFieldName == nameof(Location.MapAltTextSegmentId))
+                {
+                    location.MapAltTextSegmentId = segment.Id;
+                }
+
                 _locationRepository.Update(location);
                 await _locationRepository.SaveAsync();
 
@@ -581,26 +580,17 @@ namespace Ocuda.Ops.Service
                             .GetSegmentLanguagesByIdAsync(segmentId.Value);
                         if (segments.Count == 0)
                         {
-                            switch (imageFieldName)
+                            if (imageFieldName == nameof(Location.ImageAltTextSegmentId))
                             {
-                                case nameof(Location.ImageAltTextSegmentId):
-                                    location.ImageAltTextSegmentId = null;
-                                    break;
-
-                                case nameof(Location.MapAltTextSegmentId):
-                                    location.MapAltTextSegmentId = null;
-                                    break;
+                                location.ImageAltTextSegmentId = null;
+                            }
+                            else if (imageFieldName == nameof(Location.MapAltTextSegmentId))
+                            {
+                                location.MapAltTextSegmentId = null;
                             }
                             _locationRepository.Update(location);
                             await _locationRepository.SaveAsync();
-                            try
-                            {
-                                await _segmentService.DeleteAsync(segmentId.Value);
-                            }
-                            catch (OcudaException oex)
-                            {
-                                _logger.LogError(oex, "Error deleting segment");
-                            }
+                            await _segmentService.DeleteAsync(segmentId.Value);
                         }
                     }
                 }
