@@ -39,7 +39,6 @@
            asp-action="@nameof(LocationsController.Index)">Back</a>
     </div>
 </div>
-
 <div class="row">
     <div class="col-md-6">
         <div class="card mb-2">
@@ -50,7 +49,6 @@
                 @Model.Location.Phone
             </div>
         </div>
-
         <div class="card mb-2">
             <div class="card-header">Description</div>
             <div class="card-body">
@@ -94,7 +92,6 @@
                 }
             </div>
         </div>
-
         <div class="card mb-2">
             <div class="card-header">Map</div>
             <div class="card-body">
@@ -104,11 +101,35 @@
                          src="@Url.Action(nameof(LocationsController.MapImage), new { slug = Model.Location.Stub })?@DetailsViewModel.Now">
                 </a>
             </div>
+            <ul class="list-group list-group-flush">
+                @foreach (var language in Model.AllLanguages)
+                {
+                    <li class="list-group-item d-flex">
+                        <div class="flex-grow-1 align-self-start">
+                            <strong>@System.Globalization.CultureInfo.GetCultureInfo(language.Value).EnglishName</strong>:
+                            <span id="@nameof(Location.MapAltTextSegmentId).@language.Key">
+                                @Model.Location.MapAltTextSegmentTexts.SingleOrDefault(_ => _?.LanguageId == language.Key)?.Text
+                            </span>
+                        </div>
+                        <div class="align-self-end">
+                            <button class="btn btn-sm btn-outline-primary ms-2"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#updateAltModal"
+                                    data-element="@nameof(Location.MapAltTextSegmentId)"
+                                    data-language="@language.Key"
+                                    data-languageName="@System.Globalization.CultureInfo.GetCultureInfo(language.Value).EnglishName"
+                                    type="button">
+                                <span class="fa-solid fa-pen-to-square fa-fw"></span>
+                            </button>
+                        </div>
+                    </li>
+                }
+            </ul>
             @if (Model.LocationManager)
             {
                 <div class="card-footer d-flex justify-content-end">
                     <div>
-                        <a class="btn btn-sm btn-outline-primary"
+                        <a class="btn btn-sm btn-outline-primary ms-2"
                            asp-action="@nameof(LocationsController.UpdateMapImage)"
                            asp-route-slug="@Model.Location.Stub">
                             <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
@@ -117,7 +138,6 @@
                 </div>
             }
         </div>
-
         <div class="card mb-2">
             <div class="card-header">Exterior photo</div>
             <div class="card-body">
@@ -127,11 +147,35 @@
                          src="@Url.Action(nameof(LocationsController.ExteriorImage), new { slug = Model.Location.Stub })?@DetailsViewModel.Now">
                 </a>
             </div>
+            <ul class="list-group list-group-flush">
+                @foreach (var language in Model.AllLanguages)
+                {
+                    <li class="list-group-item d-flex">
+                        <div class="flex-grow-1 align-self-start">
+                            <strong>@System.Globalization.CultureInfo.GetCultureInfo(language.Value).EnglishName</strong>:
+                            <span id="@nameof(Location.ImageAltTextSegmentId).@language.Key">
+                                @Model.Location.ImageAltTextSegmentTexts.SingleOrDefault(_ => _?.LanguageId == language.Key)?.Text
+                            </span>
+                        </div>
+                        <div class="align-self-end">
+                            <button class="btn btn-sm btn-outline-primary ms-2"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#updateAltModal"
+                                    data-element="@nameof(Location.ImageAltTextSegmentId)"
+                                    data-language="@language.Key"
+                                    data-languageName="@System.Globalization.CultureInfo.GetCultureInfo(language.Value).EnglishName"
+                                    type="button">
+                                <span class="fa-solid fa-pen-to-square fa-fw"></span>
+                            </button>
+                        </div>
+                    </li>
+                }
+            </ul>
             @if (Model.LocationManager)
             {
                 <div class="card-footer d-flex justify-content-end">
                     <div>
-                        <a class="btn btn-sm btn-outline-primary"
+                        <a class="btn btn-sm btn-outline-primary ms-2"
                            asp-action="@nameof(LocationsController.UpdateExteriorImage)"
                            asp-route-slug="@Model.Location.Stub">
                             <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
@@ -140,7 +184,6 @@
                 </div>
             }
         </div>
-
         <div class="card mb-2">
             <div class="card-header">Interior photos</div>
             <div class="card-body">
@@ -174,7 +217,6 @@
             }
         </div>
     </div>
-
     <div class="col">
         @if (Model.Location.PreFeatureSegmentId.HasValue)
         {
@@ -219,7 +261,6 @@
                 </div>
             </div>
         }
-
         @if (Model.Displays?.Any() == true)
         {
             <div class="card mb-2 border-primary">
@@ -254,7 +295,6 @@
                 </ul>
             </div>
         }
-
         @if (Model.VolunteerForms.Count > 0)
         {
             <div class="card mb-2">
@@ -363,7 +403,6 @@
                 </ul>
             </div>
         }
-
         <div class="card mb-2">
             <div class="card-header">At this location</div>
             <ul class="list-group list-group-flush">
@@ -433,44 +472,95 @@
     </div>
 </div>
 
-@if (Model.LocationManager && Model.SegmentEditor)
+@if (Model.LocationManager)
 {
-    <form asp-action="@nameof(LocationsController.RemoveLocationNotice)">
-        <input type="hidden" name="Id" value="@Model.Location.Id" />
-        <div aria-hidden="true"
-             aria-labelledby="deleteLocationNoticeLabel"
-             class="modal fade"
-             data-bs-backdrop="static"
-             data-bs-keyboard="false"
-             id="deleteLocationNotice"
-             tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5"
-                            id="deleteLocationNoticeLabel">
-                            Delete location notice
-                        </h1>
-                        <button aria-label="Close"
-                                class="btn-close"
-                                data-bs-dismiss="modal"
-                                type="button"></button>
+    <input type="hidden" id="whichAltToUpdate" />
+    <input type="hidden" id="whichLanguageId" />
+    <div aria-hidden="true"
+         aria-labelledby="altModalLabel"
+         class="modal fade"
+         data-bs-backdrop="static"
+         id="updateAltModal"
+         tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="altModalLabel">
+                        Update <span id="whichLanguageName"></span> alt text
+                    </h1>
+                    <button aria-label="Close"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Enter alt text for the specificed language.</p>
+                    <textarea class="form-control"
+                          id="updatedAltText"
+                          lines="3"
+                          maxlength="130"></textarea>
+                </div>
+                <div class="modal-footer d-flex">
+                    <div class="flex-grow-1">
+                        <span id="altTagCharacterCount"></span>
                     </div>
-                    <div class="modal-body">
-                        Are you sure you want to delete this location notice?
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-outline-secondary"
-                                data-bs-dismiss="modal"
+                    <div>
+                        <button data-bs-dismiss="modal"
+                                class="btn btn-outline-secondary"
                                 type="button">
                             Close
                         </button>
-                        <button class="btn btn-outline-danger" type="submit">Delete</button>
+                        <button class="btn btn-outline-primary ms-2"
+                                button-spinner
+                                id="saveAltUpdate"
+                                type="button">
+                            Save changes
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </form>
+    </div>
+
+    @if (Model.SegmentEditor)
+    {
+        <form asp-action="@nameof(LocationsController.RemoveLocationNotice)">
+            <input type="hidden" name="Id" value="@Model.Location.Id" />
+            <div aria-hidden="true"
+                 aria-labelledby="deleteLocationNoticeLabel"
+                 class="modal fade"
+                 data-bs-backdrop="static"
+                 data-bs-keyboard="false"
+                 id="deleteLocationNotice"
+                 tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5"
+                                id="deleteLocationNoticeLabel">
+                                Delete location notice
+                            </h1>
+                            <button aria-label="Close"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    type="button"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete this location notice?
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-outline-secondary"
+                                    data-bs-dismiss="modal"
+                                    type="button">
+                                Close
+                            </button>
+                            <button class="btn btn-outline-danger" type="submit">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    }
 }
 
 @section Scripts {
@@ -479,6 +569,15 @@
         <script>
             const mapCoordinatorUrl = new URL('@Url.Action(nameof(LocationsController.MapVolunteerCoordinator), LocationsController.Name, new { slug = Model.Location.Stub }, protocol: Context.Request.Scheme)');
             const staffSearchUrl = new URL('@Url.Action(nameof(StaffController.SearchJson), StaffController.Name, null, protocol: Context.Request.Scheme)');
+            const updateAltUrlPath = '@Url.Action(nameof(LocationsController.UpdateAltText))'
+            const locationId = @Model.Location.Id;
+
+            function updateAltCharCount() {
+                document.getElementById('altTagCharacterCount').innerText
+                    = document.getElementById('updatedAltText').value.length + "/130";
+            }
+
+            document.getElementById('updatedAltText').addEventListener('keyup', updateAltCharCount);
 
             document.getElementById('addStaffModal').addEventListener('show.bs.modal', (event) => {
                 currentFormTypeId = event.relatedTarget.dataset.formtypeid;
@@ -487,6 +586,54 @@
                 document.getElementById('searchResults').innerHTML = '';
                 document.getElementById('pagination').classList.add('d-none');
                 document.getElementById("staffSearchText").value = '';
+            });
+
+            document.getElementById('updateAltModal').addEventListener('show.bs.modal', (event) => {
+                const elementId = event.relatedTarget.dataset.element;
+                if(elementId) {
+                    const languageId = event.relatedTarget.dataset.language;
+                    document.getElementById('whichAltToUpdate').value = elementId;
+                    document.getElementById('whichLanguageName').textContent
+                        = event.relatedTarget.dataset.languagename
+                    document.getElementById('whichLanguageId').value = languageId;
+                    document.getElementById('updatedAltText').value
+                        = document.getElementById(`${elementId}.${languageId}`).textContent.trim();
+                    updateAltCharCount();
+                }
+            });
+
+            document.getElementById('saveAltUpdate').addEventListener('click', () => {
+                const fieldName = document.getElementById('whichAltToUpdate').value;
+                const formData = new FormData();
+                const languageId = document.getElementById('whichLanguageId').value;
+                formData.append("field", fieldName);
+                formData.append("text", document.getElementById('updatedAltText').value);
+                formData.append("languageId", languageId);
+                formData.append("locationId", locationId);
+                try {
+                 fetch(updateAltUrlPath, {method: 'POST', body: formData})
+                    .then((response) => {
+                        if(response && response.status === 200) {
+                            return response.json();
+                        }
+                        else
+                        {
+                            throw new Error(`Bad response from update: ${response.statusText}`);
+                        }
+                    })
+                    .then((data) => {
+                        if(data.success === true) {
+                            document.getElementById(`${fieldName}.${languageId}`).innerText = data.message;
+                        } else {
+                            throw new Error(`Update failed: ${data.message}`)
+                        }
+                    });
+                    ResetSpinners();
+                    bootstrap.Modal.getInstance(document.getElementById("updateAltModal")).hide();
+                } catch (er) {
+                    alert(er);
+                    ResetSpinners();
+                }
             });
 
             document.getElementById("staffSearchText").addEventListener('keyup', (e) => {

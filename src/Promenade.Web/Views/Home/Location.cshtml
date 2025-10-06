@@ -23,6 +23,7 @@
             <div class="d-flex flex-column flex-md-row col-lg-10 offset-lg-1 mx-auto d-block gap-1 px-0 pb-1 pt-sm-1 mb-4 bg-dark-subtle">
                 <div class="col-12 col-md-4 bg-white">
                     <img src="@Model.Location.ImagePath"
+                         alt="@Model.Location.ImageAltTextSegmentTexts?.FirstOrDefault()?.Text"
                          class="img-cover" />
                 </div>
                 <div class="col-12 col-md-8 d-flex flex-column flex-sm-row gap-1">

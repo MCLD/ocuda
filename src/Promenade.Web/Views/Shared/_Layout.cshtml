@@ -11,7 +11,7 @@
     var topNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.TopNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
 }
 <!DOCTYPE html>
-<html>
+<html lang="@currentUiCulture.TwoLetterISOLanguageName">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -247,93 +247,94 @@
         <footer class="row d-print-none" role="contentinfo">
             <div class="col-12 col-md-3 prom-footer-contact text-center">
                 <div class="row flex-md-column mx-auto w-100">
-                    <div class="col-12 col-sm-4 col-md-12 py-2 footer-contact">
-                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.ContactLink]?.ToString()))
-                        {
-                            <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.ContactLink]">
-                                @Localizer[Promenade.ContactUs]
-                            </a>
-                        }
-                        else
-                        {
-                            @:&nbsp;
-                        }
-                    </div>
-                    <div class="col-12 col-sm-4 col-md-12 py-2 footer-contact">
-                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.Telephone]?.ToString()))
-                        {
-                            <a href="tel:+1-@Context.Items[Ocuda.Promenade.Controllers.ItemKey.Telephone]">
-                                @Context.Items[Ocuda.Promenade.Controllers.ItemKey.Telephone]
-                            </a>
-                        }
-                        else
-                        {
-                            @:&nbsp;
-                        }
-                    </div>
-                    <div class="col-12 col-sm-4 col-md-12 py-2 footer-contact">
-                        <ul aria-label="@Localizer[Promenade.ConnectSocialMedia]"
-                            class="nav d-inline-flex justify-content-center prom-nav-footer-social">
-
-                            @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]?.ToString()))
+                    <div class="col-12 col-sm-4 col-md-12 d-flex flex-column flex-fill p-0">
+                        <div class="footer-contact d-flex align-items-center justify-content-center">
+                            @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.ContactLink]?.ToString()))
                             {
-                                <li>
-                                    <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]"
-                                       class="prom-leftnav-social-link"
-                                       target="_blank"
-                                       title="@Localizer[Promenade.ConnectSocialOn, "Facebook"]"
-                                       aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-facebook"></span></a>
-                                    <span>&nbsp;</span>
-                                </li>
+                                <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.ContactLink]">
+                                    @Localizer[Promenade.ContactUs]
+                                </a>
                             }
-                            @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]?.ToString()))
+                            else
                             {
-                                <li>
-                                    <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]"
-                                       class="prom-leftnav-social-link"
-                                       target="_blank"
-                                       title="@Localizer[Promenade.ConnectSocialOn, "Instagram"]"
-                                       aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-instagram"></span></a>
-                                    <span>&nbsp;</span>
-                                </li>
+                                @:&nbsp;
                             }
-                            @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTikTokUrl]?.ToString()))
+                        </div>
+                        <div class="footer-contact d-flex align-items-center justify-content-center">
+                            @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.Telephone]?.ToString()))
                             {
-                                <li>
-                                    <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTikTokUrl]"
-                                       class="prom-leftnav-social-link"
-                                       target="_blank"
-                                       title="@Localizer[Promenade.ConnectSocialOn, "TikTok"]"
-                                       aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-tiktok"></span></a>
-                                    <span>&nbsp;</span>
-                                </li>
+                                <a href="tel:+1-@Context.Items[Ocuda.Promenade.Controllers.ItemKey.Telephone]">
+                                    @Context.Items[Ocuda.Promenade.Controllers.ItemKey.Telephone]
+                                </a>
                             }
-                            @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]?.ToString()))
+                            else
                             {
-                                <li>
-                                    <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"
-                                       class="prom-leftnav-social-link"
-                                       target="_blank"
-                                       title="@Localizer[Promenade.ConnectSocialOn, "Twitter"]"
-                                       aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-x-twitter"></span></a>
-                                    <span>&nbsp;</span>
-                                </li>
+                                @:&nbsp;
                             }
-                            @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]?.ToString()))
-                            {
-                                <li>
-                                    <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]"
-                                       class="prom-leftnav-social-link"
-                                       target="_blank"
-                                       title="@Localizer[Promenade.ConnectSocialOn, "YouTube"]"
-                                       aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-youtube"></span></a>
-                                </li>
-                            }
-                        </ul>
+                        </div>
+                        <div class="footer-contact d-flex align-items-center justify-content-center">
+                            <ul aria-label="@Localizer[Promenade.ConnectSocialMedia]"
+                                class="nav d-inline-flex justify-content-center prom-nav-footer-social">
+                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]?.ToString()))
+                                {
+                                    <li>
+                                        <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]"
+                                           class="prom-leftnav-social-link"
+                                           target="_blank"
+                                           title="@Localizer[Promenade.ConnectSocialOn, "Facebook"]"
+                                           aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-facebook"></span></a>
+                                        <span>&nbsp;</span>
+                                    </li>
+                                }
+                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]?.ToString()))
+                                {
+                                    <li>
+                                        <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]"
+                                           class="prom-leftnav-social-link"
+                                           target="_blank"
+                                           title="@Localizer[Promenade.ConnectSocialOn, "Instagram"]"
+                                           aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-instagram"></span></a>
+                                        <span>&nbsp;</span>
+                                    </li>
+                                }
+                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTikTokUrl]?.ToString()))
+                                {
+                                    <li>
+                                        <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTikTokUrl]"
+                                           class="prom-leftnav-social-link"
+                                           target="_blank"
+                                           title="@Localizer[Promenade.ConnectSocialOn, "TikTok"]"
+                                           aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-tiktok"></span></a>
+                                        <span>&nbsp;</span>
+                                    </li>
+                                }
+                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]?.ToString()))
+                                {
+                                    <li>
+                                        <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"
+                                           class="prom-leftnav-social-link"
+                                           target="_blank"
+                                           title="@Localizer[Promenade.ConnectSocialOn, "Twitter"]"
+                                           aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-x-twitter"></span></a>
+                                        <span>&nbsp;</span>
+                                    </li>
+                                }
+                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]?.ToString()))
+                                {
+                                    <li>
+                                        <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]"
+                                           class="prom-leftnav-social-link"
+                                           target="_blank"
+                                           title="@Localizer[Promenade.ConnectSocialOn, "YouTube"]"
+                                           aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-youtube"></span></a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-md-9 d-flex mx-auto justify-content-between align-items-center g-0 py-2" style="max-width: 740px">
+            <div class="col-12 col-md-9 d-flex mx-auto justify-content-between align-items-center g-0 py-2">
                 <div class="col-6 col-sm-3 d-flex justify-content-center">
                     @if (!string.IsNullOrEmpty(footerImage))
                     {
@@ -351,13 +352,11 @@
                 </div>
                 @if (footerNavigation?.Navigations.Count() > 0)
                 {
-                    <ul class="col-6 col-sm-9 footer-navigation-list m-0 ps-3 px-sm-4 px-xl-5">
+                    <ul class="col-6 col-sm-9 footer-navigation-list m-0 py-2 px-sm-4 px-xl-5">
                         @foreach (var item in footerNavigation.Navigations)
                         {
                             <li class="mb-1">
-                                @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                                        && !string.IsNullOrEmpty(item.Icon)
-                                                        && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                @if (string.IsNullOrEmpty(item.NavigationText.Label) && !string.IsNullOrEmpty(item.Icon) && !string.IsNullOrEmpty(item.NavigationText.Title))
                                 {
                                     <a href="@item.NavigationText.Link"
                                        title="@item.NavigationText.Title"

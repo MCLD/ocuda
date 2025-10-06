@@ -7,6 +7,12 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class Location
     {
+        public Location()
+        {
+            ImageAltTextSegmentTexts = [];
+            MapAltTextSegmentTexts = [];
+        }
+
         [MaxLength(100)]
         public string Address { get; set; }
 
@@ -77,6 +83,12 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int Id { get; set; }
 
+        [MaxLength(130)]
+        public int? ImageAltTextSegmentId { get; set; }
+
+        [NotMapped]
+        public IList<SegmentText> ImageAltTextSegmentTexts { get; }
+
         [MaxLength(255)]
         public string ImagePath { get; set; }
 
@@ -103,6 +115,12 @@ namespace Ocuda.Promenade.Models.Entities
 
         [MaxLength(50)]
         public string LocatorNotes { get; set; }
+
+        [MaxLength(130)]
+        public int? MapAltTextSegmentId { get; set; }
+
+        [NotMapped]
+        public IList<SegmentText> MapAltTextSegmentTexts { get; }
 
         [MaxLength(100)]
         public string MapImagePath { get; set; }
