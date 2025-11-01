@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDisplays;
 using Ocuda.Ops.Controllers.Filters;
-using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
@@ -481,7 +478,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToAction(nameof(Assets));
             }
 
-            var asset = await UploadAssetInternalAsync(assetFile);
+            var asset = await _digitalDisplayService.UploadAssetAsync(assetFile);
 
             if (asset?.Id == null)
             {
@@ -491,117 +488,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             return RedirectToAction(nameof(AssetAssociations),
                 new { digitalDisplayAssetId = asset.Id });
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
-            "CA1031:Do not catch general exception types",
-            Justification = "Any error should return a valid JSON response")]
-        public async Task<IActionResult> UploadJob(SlideUploadJob job)
-        {
-            if (!await HasContentManagementRightsAsync())
-            {
-                return Json(ErrorJobResult("You do not have permission to upload an asset."));
-            }
-
-            // validate job
-            if (job == null)
-            {
-                return Json(ErrorJobResult("No job submitted."));
-            }
-
-            if (job.StartDate == default)
-            {
-                return Json(ErrorJobResult("No start date specified."));
-            }
-
-            if (job.EndDate == default)
-            {
-                return Json(ErrorJobResult("No end date specified."));
-            }
-
-            if (string.IsNullOrEmpty(job.Set))
-            {
-                return Json(ErrorJobResult("No job specified."));
-            }
-
-            var set = await _digitalDisplayService.GetSetAsync(job.Set.Trim());
-
-            if (set == null)
-            {
-                return Json(ErrorJobResult($"Could not find set: {job.Set}"));
-            }
-
-            DigitalDisplayAsset asset;
-
-            try
-            {
-                asset = await UploadAssetInternalAsync(job.File);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex,
-                    "Unable to add digital display asset for {Username}: {ErrorMessage}",
-                    CurrentUsername,
-                    ex.Message);
-                return Json(ErrorJobResult($"Error uploading image: {ex.Message}"));
-            }
-
-            try
-            {
-                var startDate = job.TimeZoneOffsetMinutes == default
-                    ? job.StartDate
-                    : job.StartDate.AddMinutes(job.TimeZoneOffsetMinutes * -1);
-
-                var endDate = job.TimeZoneOffsetMinutes == default
-                    ? job.EndDate
-                    : job.EndDate.AddMinutes(job.TimeZoneOffsetMinutes * -1);
-
-                await _digitalDisplayService
-                    .AddUpdateDigitalDisplayAssetSetAsync(new DigitalDisplayAssetSet
-                    {
-                        DigitalDisplayAssetId = asset.Id,
-                        DigitalDisplaySetId = set.Id,
-                        EndDate = endDate,
-                        StartDate = startDate,
-                        IsEnabled = true
-                    });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex,
-                    "Unable to add asset to digital display set for {Username}: {ErrorMessage}",
-                    CurrentUsername,
-                    ex.Message);
-                return Json(ErrorJobResult($"Error adding digital display asset: {ex.Message}"));
-            }
-
-            _logger.LogInformation("Added display asset for {Username}, asset {Asset} to set {Set}",
-                CurrentUsername,
-                asset.Name,
-                set.Name);
-
-            return Json(new JsonResponse
-            {
-                Url = Url.Action(nameof(AssetAssociations), new
-                {
-                    digitalDisplayAssetId = asset.Id
-                }),
-                Message = $"Added asset id {asset.Id} to set id {set.Id}",
-                ServerResponse = true,
-                Success = true
-            });
-        }
-
-        private static JsonResponse ErrorJobResult(string message)
-        {
-            return new JsonResponse
-            {
-                Message = message,
-                ServerResponse = true,
-                Success = false
-            };
         }
 
         private static List<SelectListItem> LocationDropDown(List<Location> locations)
@@ -623,44 +509,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
                 || await HasAppPermissionAsync(_permissionGroupService,
                     ApplicationPermission.DigitalDisplayContentManagement);
-        }
-
-        private async Task<DigitalDisplayAsset> UploadAssetInternalAsync(IFormFile assetFile)
-        {
-            var fullFilePath = _digitalDisplayService.GetAssetPath(assetFile.FileName);
-
-            int renameCounter = 1;
-            while (System.IO.File.Exists(fullFilePath))
-            {
-                fullFilePath = _digitalDisplayService.GetAssetPath(string.Format(
-                    CultureInfo.InvariantCulture,
-                    "{0}-{1}{2}",
-                    Path.GetFileNameWithoutExtension(assetFile.FileName),
-                    renameCounter++,
-                    Path.GetExtension(assetFile.FileName)));
-            }
-
-            await using var fileStream = new FileStream(fullFilePath, FileMode.Create);
-            await assetFile.CopyToAsync(fileStream);
-
-            using var sha = SHA256.Create();
-            byte[] checksum = await sha.ComputeHashAsync(assetFile.OpenReadStream());
-
-            var asset = await _digitalDisplayService.FindAssetByChecksumAsync(checksum);
-            if (asset != null)
-            {
-                ShowAlertWarning("That image is already present in digital display assets.");
-                fileStream.Close();
-                System.IO.File.Delete(fullFilePath);
-                return asset;
-            }
-
-            return await _digitalDisplayService.AddAssetAsync(new DigitalDisplayAsset
-            {
-                Name = assetFile.FileName,
-                Path = Path.GetFileName(fullFilePath),
-                Checksum = checksum
-            });
         }
     }
 }

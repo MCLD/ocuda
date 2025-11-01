@@ -1,0 +1,126 @@
+﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement
+@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Users.ApiKeysViewModel
+
+
+<div class="d-flex justify-content-between mb-2">
+    <h1>API Keys</h1>
+    <div>
+        <a asp-action="@nameof(UsersController.AddApiKey)"
+           asp-controller="@UsersController.Name"
+           class="btn btn-outline-success">
+            <span aria-hidden="true" class="fa-solid fa-fw fa-circle-plus"></span>
+            Add API Key
+        </a>
+        <a asp-action="@nameof(HomeController.Index)"
+           asp-controller="@HomeController.Name"
+           class="btn btn-outline-dark ms-2">Back</a>
+    </div>
+</div>
+
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Created At</th>
+            <th>Represents User</th>
+            <th>Identifier</th>
+            <th>Expires</th>
+            <th>Created By</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.ApiKeys?.Count > 0)
+        {
+            @foreach (var apiKey in Model.ApiKeys)
+            {
+                <tr>
+                    <td>@apiKey.CreatedAt</td>
+                    <td>
+                        <a asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                           asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                           asp-route-id="@apiKey.RepresentsUser.Username"
+                           target="_blank">@apiKey.RepresentsUser.Name</a>
+                    </td>
+                    <td><code>@apiKey.Identifier...</code></td>
+                    <td>
+                        @if (apiKey.EndDate.HasValue && apiKey.EndDate.Value != DateTime.MinValue)
+                        {
+                            @apiKey.EndDate
+                        }
+                        else
+                        {
+                            <em>never</em>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                           asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                           asp-route-id="@apiKey.CreatedByUser.Username"
+                           target="_blank">@apiKey.CreatedByUser.Name</a>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger"
+                                data-bs-target="#deleteModal"
+                                data-bs-toggle="modal"
+                                data-id="@apiKey.Id"
+                                data-identifier="@apiKey.Identifier">
+                            <span aria-hidden="true" class="fa-solid fa-circle-minus fa-fw"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr class="table-warning">
+                <td colspan="6">
+                    No API keys found.
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<form asp-action="@nameof(UsersController.DeleteApiKey)" method="post">
+    <input type="hidden" id="apiKeyId" name="apiKeyId" />
+    <div aria-hidden="true"
+         aria-labelledby="deleteModalLabel"
+         class="modal fade"
+         id="deleteModal"
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteModalLabel">Delete API Key</h1>
+                    <button aria-label="Close"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            type="button"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete the API key identified with
+                    <code id="deleteModalIdentifier"></code>?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal"
+                            type="button">
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-outline-danger">Delete API key</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        document.getElementById('deleteModal').addEventListener('show.bs.modal', _ => {
+            // and identifier
+            document.getElementById("apiKeyId").value =  _.relatedTarget.dataset.id;
+            document.getElementById("deleteModalIdentifier").innerText
+                = _.relatedTarget.dataset.identifier + "...";
+        });
+    </script>
+}

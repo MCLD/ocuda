@@ -9,12 +9,18 @@ namespace Ocuda.Ops.Models.Entities
     {
         public User()
         {
-            DirectReportDNs = new List<string>();
+            DirectReportDNs = [];
+            DistributionGroups = [];
+            Metadata = [];
+            SecurityGroups = [];
         }
 
         public int? AssociatedLocation { get; set; }
+
         public bool AssociatedLocationManuallySet { get; set; }
+
         public DateTime CreatedAt { get; set; }
+
         public int CreatedBy { get; set; }
 
         public DateTime? DeletedAt { get; set; }
@@ -31,10 +37,14 @@ namespace Ocuda.Ops.Models.Entities
         [NotMapped]
         public string DistinguishedName { get; set; }
 
+        [NotMapped]
+        public ICollection<string> DistributionGroups { get; }
+
         [MaxLength(255)]
         public string Email { get; set; }
 
         public int? EmployeeId { get; set; }
+
         public bool ExcludeFromRoster { get; set; }
 
         [NotMapped]
@@ -54,6 +64,7 @@ namespace Ocuda.Ops.Models.Entities
         public int Id { get; set; }
 
         public bool IsDeleted { get; set; }
+
         public bool? IsInLatestRoster { get; set; }
 
         public bool IsSysadmin { get; set; }
@@ -66,7 +77,7 @@ namespace Ocuda.Ops.Models.Entities
 
         public DateTime? LastSeen { get; set; }
 
-        public ICollection<UserMetadata> Metadata { get; set; }
+        public ICollection<UserMetadata> Metadata { get; }
 
         [MaxLength(255)]
         public string Mobile { get; set; }
@@ -110,6 +121,9 @@ namespace Ocuda.Ops.Models.Entities
         public DateTime? PriorVacateDate { get; set; }
 
         public bool ReauthenticateUser { get; set; }
+
+        [NotMapped]
+        public ICollection<string> SecurityGroups { get; }
 
         public DateTime? ServiceStartDate { get; set; }
 
