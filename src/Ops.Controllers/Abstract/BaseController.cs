@@ -77,24 +77,6 @@ namespace Ocuda.Ops.Controllers.Abstract
             }
         }
 
-        protected UriBuilder BaseUriBuilder
-        {
-            get
-            {
-                var builder = new UriBuilder
-                {
-                    Scheme = HttpContext.Request.Scheme,
-                    Host = HttpContext.Request.Host.Host
-                };
-                var port = HttpContext.Request.Host.Port;
-                if (port.HasValue && (port != 80 && port != 443))
-                {
-                    builder.Port = port.Value;
-                }
-                return builder;
-            }
-        }
-
         protected int CurrentUserId
         {
             get
@@ -125,8 +107,8 @@ namespace Ocuda.Ops.Controllers.Abstract
         public override async Task OnActionExecutionAsync(ActionExecutingContext context,
             ActionExecutionDelegate next)
         {
-            if (context == null) { throw new ArgumentNullException(nameof(context)); }
-            if (next == null) { throw new ArgumentNullException(nameof(next)); }
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(next);
 
             await base.OnActionExecutionAsync(context, next);
 
@@ -147,13 +129,38 @@ namespace Ocuda.Ops.Controllers.Abstract
             ViewData[Utility.Keys.ViewData.Title] = title.ToString();
         }
 
+        protected async Task<UriBuilder> GetBaseUriBuilderAsync()
+        {
+            var baseIntranetLink = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.UserInterface.BaseIntranetLink);
+
+            UriBuilder builder;
+
+            if (!string.IsNullOrEmpty(baseIntranetLink))
+            {
+                builder = new UriBuilder(baseIntranetLink);
+            }
+            else
+            {
+                builder = new UriBuilder
+                {
+                    Scheme = HttpContext.Request.Scheme,
+                    Host = HttpContext.Request.Host.Host
+                };
+                var port = HttpContext.Request.Host.Port;
+                if (port.HasValue && (port != 80 && port != 443))
+                {
+                    builder.Port = port.Value;
+                }
+            }
+
+            return builder;
+        }
+
         protected async Task<IDictionary<int, string>>
                     GetLocationsAsync(ILocationService locationService)
         {
-            if (locationService == null)
-            {
-                throw new ArgumentNullException(nameof(locationService));
-            }
+            ArgumentNullException.ThrowIfNull(locationService);
 
             return await locationService.GetAllLocationsIdNameAsync();
         }
@@ -185,10 +192,7 @@ namespace Ocuda.Ops.Controllers.Abstract
 
             if (permissionClaims.Count > 0)
             {
-                if (permissionGroupService == null)
-                {
-                    throw new ArgumentNullException(nameof(permissionGroupService));
-                }
+                ArgumentNullException.ThrowIfNull(permissionGroupService);
                 var needPermissionGroups = await permissionGroupService
                     .GetApplicationPermissionGroupsAsync(applicationPermission);
 
@@ -217,10 +221,7 @@ namespace Ocuda.Ops.Controllers.Abstract
                 var permissionClaims = UserClaims(ClaimType.PermissionId);
                 if (permissionClaims.Count > 0)
                 {
-                    if (permissionGroupService == null)
-                    {
-                        throw new ArgumentNullException(nameof(permissionGroupService));
-                    }
+                    ArgumentNullException.ThrowIfNull(permissionGroupService);
                     var permissionGroups = await permissionGroupService
                         .GetPermissionsAsync<TPermissonGroupMappingBase>(itemId);
                     var permissionGroupsStrings = permissionGroups
