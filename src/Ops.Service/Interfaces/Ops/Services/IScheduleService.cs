@@ -13,6 +13,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         public Task<IEnumerable<ScheduleLogCallDisposition>> GetCallDispositionsAsync();
         public Task<ScheduleClaim> ClaimAsync(int scheduleRequestId);
         public Task UnclaimAsync(int scheduleRequestId);
-        public Task CancelAsync(int scheduleRequestId);
+        public Task CancelAsync(ScheduleLog cancelLog);
     }
 }
