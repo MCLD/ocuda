@@ -72,8 +72,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
 
+            $(".modal-content-footer").text("");
             if (buttons.length > 0) {
-                $(".modal-content-footer").text("");
                 buttons.sort(function (a, b) {
                     return a.Sort - b.Sort;
                 });
