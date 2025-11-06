@@ -109,7 +109,7 @@ namespace Ocuda.Ops.Web
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability",
-                    "CA1506:Avoid excessive class coupling",
+            "CA1506:Avoid excessive class coupling",
             Justification = "Dependency injection")]
         public void ConfigureServices(IServiceCollection services)
         {
@@ -203,11 +203,8 @@ namespace Ocuda.Ops.Web
                     _.LoginPath = "/Authenticate";
                 });
 
-            services.AddAuthorization(_ =>
-            {
-                _.AddPolicy(nameof(ClaimType.SiteManager),
-                    policy => policy.RequireClaim(nameof(ClaimType.SiteManager)));
-            });
+            services.AddAuthorizationBuilder().AddPolicy(nameof(ClaimType.SiteManager),
+                _ => _.RequireClaim(nameof(ClaimType.SiteManager)));
 
             if (_isDevelopment)
             {
@@ -332,6 +329,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Utility.Email.Sender>();
 
             // repositories
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IApiKeyRepository,
+                Data.Ops.ApiKeyRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
                 Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
@@ -555,6 +554,7 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.VolunteerFormSubmissionRepository>();
 
             // services
+            services.AddScoped<IApiKeyService, ApiKeyService>();
             services.AddScoped<IAuthorizationService, AuthorizationService>();
             services.AddScoped<ICarouselService, CarouselService>();
             services.AddScoped<ICategoryService, CategoryService>();

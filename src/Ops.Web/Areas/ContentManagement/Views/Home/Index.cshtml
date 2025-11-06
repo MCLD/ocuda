@@ -69,6 +69,10 @@
                     {
                         <a asp-area="@UsersController.Area"
                            asp-controller="@UsersController.Name"
+                           asp-action="@nameof(UsersController.ApiKeys)"
+                           class="btn btn-outline-dark mt-1">API keys</a>
+                        <a asp-area="@UsersController.Area"
+                           asp-controller="@UsersController.Name"
                            asp-action="@nameof(UsersController.Metadata)"
                            class="btn btn-outline-dark mt-1">User Metadata Types</a>
                         <a asp-area="@UsersController.Area"

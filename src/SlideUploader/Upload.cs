@@ -16,11 +16,14 @@ namespace Ocuda.SlideUploader
         private readonly ILogger<Upload> _logger;
         private readonly OpsClient _opsClient;
 
-        public Upload(ILogger<Upload> logger,
-            OpsClient opsClient)
+        public Upload(ILogger<Upload> logger, OpsClient opsClient)
+
         {
-            _opsClient = opsClient ?? throw new ArgumentNullException(nameof(opsClient));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(opsClient);
+
+            _logger = logger;
+            _opsClient = opsClient;
         }
 
         internal async Task JobAsync(string jobFile, string jobResultFile)
@@ -29,19 +32,10 @@ namespace Ocuda.SlideUploader
             var jobResultFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
                 jobResultFile);
 
-            if (!System.IO.File.Exists(jobFilePath))
+            if (!File.Exists(jobFilePath))
             {
                 _logger.LogCritical("No {JobFile} job file found.", jobFile);
                 await JobFailureAsync(jobResultFilePath, $"No {jobFile} job file found.");
-                return;
-            }
-
-            var checkAuth = await _opsClient.IsAuthenticatedAsync();
-
-            if (string.IsNullOrEmpty(checkAuth))
-            {
-                _logger.LogCritical("Unable to continue upload, cannot authenticate");
-                await JobFailureAsync(jobResultFilePath, "Unable to upload: cannot authenticate.");
                 return;
             }
 
@@ -66,24 +60,22 @@ namespace Ocuda.SlideUploader
 
             if (jobResult.Success)
             {
-                _logger.LogInformation("Uploaded {FileName} as {Username} to set {Set}: {Message}",
+                _logger.LogInformation("Uploaded {FileName} to set {Set}: {Message}",
                     Path.GetFileName(job.Filepath),
-                    checkAuth,
                     job.Set,
                     jobResult.Message);
             }
             else
             {
-                _logger.LogError("Failure {ServerResponse} uploading {FileName} as {Username} to set {Set}: {Message}",
+                _logger.LogError(
+                    "Failure {ServerResponse} uploading {FileName} to set {Set}: {Message}",
                     jobResult.ServerResponse ? "from server" : "without server response",
                     Path.GetFileName(job.Filepath),
-                    checkAuth,
                     job.Set,
                     jobResult.Message);
             }
 
-            await System.IO.File.WriteAllTextAsync(jobResultFilePath,
-                JsonSerializer.Serialize(jobResult));
+            await File.WriteAllTextAsync(jobResultFilePath, JsonSerializer.Serialize(jobResult));
         }
 
         private static async Task JobFailureAsync(string jobResultFilePath, string message)
@@ -102,7 +94,7 @@ namespace Ocuda.SlideUploader
 
             try
             {
-                jobText = System.IO.File.ReadAllText(jobFile);
+                jobText = File.ReadAllText(jobFile);
             }
             catch (IOException ioex)
             {
