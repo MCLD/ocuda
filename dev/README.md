@@ -2,11 +2,9 @@
 
 ## Framework
 
-Ocuda targets the ASP.NET 6 framework. For that to work currently
-you must:
+Ocuda targets the ASP.NET framework. For that to work currently you must:
 
-- Install the [.NET 8
-SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- Install the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 
 ## Project layout
@@ -135,15 +133,15 @@ beginning of authenticated users (do not include the slash)
 write out http error logs in the same location but with the value of
 this setting in the filename
 - `Ops.Instance` - configure an instance name for more specific logging
-- `Ops.LDAPDN` - Distinguished name of an LDAP user for performing
-lookups, similar to "CN=Users Real Name,OU=Organizational
+- `Ops.LDAPUser` - LDAP user for performing lookups
 Unit,DC=domain,DC=tld"
-- `Ops.LDAPPassword` - Password for the LDAPDN user
-- `Ops.LDAPPort` - Port to connect to for LDAP, defaults to 389
+- `Ops.LDAPPassword` - Password for the LdapUser user
 - `Ops.LDAPSearchBase` - Search base for querying usernames, similar to
 "OU=Users,OU=Organizational Unit,DC=domain,DC=tld"
 - `Ops.LDAPServer` - LDAP server to query for information based on the
-user's username
+user's username, configured as a server name or a server name, a colon,
+and a port. Currently using ports in Linux do not work, it will begin
+to work [when the project transitions to ASP.NET 9](https://github.com/dotnet/runtime/issues/59701)
 - `Ops.RollingLogLocation` - path of where to write log files which
 rotate daily, if unset no rolling log is written
 - `Ops.SessionTimeoutMinutes` - defaults to 2 hours - amount of time in
