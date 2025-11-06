@@ -53,7 +53,7 @@ namespace Ocuda.Promenade.Controllers
                 originalPath = statusFeature.OriginalPath;
             }
 
-            if (id == (int)HttpStatusCode.NotFound)
+            if (id == (int)HttpStatusCode.NotFound || id == default)
             {
                 var redirect
                     = await _redirectService.GetUrlRedirectByPathAsync(originalPath);
@@ -88,7 +88,8 @@ namespace Ocuda.Promenade.Controllers
                 }
             }
 
-            using (LogContext.PushProperty("FormContent", HttpContext.Request.Form))
+            using (LogContext.PushProperty("FormContent", HttpContext.Request.HasFormContentType 
+                ? HttpContext.Request.Form : null))
             {
                 _logger.LogCritical(ErrorMessage,
                     HttpContext.Request.Method,
