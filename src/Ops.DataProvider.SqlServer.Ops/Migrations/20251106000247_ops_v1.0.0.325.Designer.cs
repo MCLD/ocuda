@@ -12,15 +12,15 @@ using Ocuda.Ops.DataProvider.SqlServer.Ops;
 namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20251028184404_ops_dev")]
-    partial class ops_dev
+    [Migration("20251106000247_ops_v1.0.0.325")]
+    partial class ops_v100325
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.20")
+                .HasAnnotation("ProductVersion", "8.0.21")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);

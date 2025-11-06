@@ -85,7 +85,6 @@ namespace Ocuda.SlideUploader
             {
                 Log.CloseAndFlush();
             }
-            Console.ReadLine();
         }
 
         private static void VerifyOptions(SlideUploaderOptions options)

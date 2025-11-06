@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 {
     /// <inheritdoc />
-    public partial class ops_dev : Migration
+    public partial class ops_v100325 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
