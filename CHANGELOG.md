@@ -53,6 +53,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Site manager permission not being listed if user belongs to other permission groups
 - Locations routing with empty feature stub
 - Carousel item footer not clearing when there are no buttons
+- Logging throwing exceptions
 
 ## 1.0.0
 ### Added
