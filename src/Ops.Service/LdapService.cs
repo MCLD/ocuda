@@ -366,6 +366,15 @@ namespace Ocuda.Ops.Service
                             }
                         }
                         break;
+
+                    case ADMailAlias:
+                        break;
+
+                    default:
+                        _logger.LogTrace("Unused LDAP property supplied: {Key} = {Value}",
+                            attributeEntry.Key,
+                            attribute[0]);
+                        break;
                 }
             }
         }
