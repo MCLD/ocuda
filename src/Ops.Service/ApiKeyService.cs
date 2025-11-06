@@ -38,7 +38,7 @@ namespace Ocuda.Ops.Service
         {
             var code = Guid.NewGuid();
 
-            await _apiKeyRepository.AddAsync(new ApiKey
+            var apiKey = new ApiKey
             {
                 CreatedAt = _dateTimeProvider.Now,
                 CreatedBy = GetCurrentUserId(),
@@ -47,8 +47,14 @@ namespace Ocuda.Ops.Service
                 Key = SHA256.HashData(code.ToByteArray()),
                 KeyType = keyType,
                 RepresentsUserId = representsUserId
-            });
+            };
+            await _apiKeyRepository.AddAsync(apiKey);
             await _apiKeyRepository.SaveAsync();
+            _logger.LogInformation("Created API key id {ApiKeyId} type {ApiKeyType} to act as user {RepresentsUserId} for user {UserId}",
+                apiKey.Id,
+                apiKey.KeyType,
+                apiKey.RepresentsUserId,
+                apiKey.CreatedBy);
             return code.ToString();
         }
 
@@ -57,6 +63,9 @@ namespace Ocuda.Ops.Service
             var apiKey = await _apiKeyRepository.FindAsync(apiKeyId);
             _apiKeyRepository.Remove(apiKey);
             await _apiKeyRepository.SaveAsync();
+            _logger.LogInformation("Deleted API key id {ApiKeyId} for user {UserId}",
+                apiKeyId,
+                GetCurrentUserId());
         }
 
         public async Task<ApiKey> FindAsync(string apiKey)

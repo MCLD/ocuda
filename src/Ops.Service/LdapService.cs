@@ -13,6 +13,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Keys;
+using Serilog.Context;
 
 namespace Ocuda.Ops.Service
 {
@@ -171,55 +172,46 @@ namespace Ocuda.Ops.Service
             {
                 foreach (var element in rdn.Components)
                 {
-                    switch (element.ComponentType.ToUpperInvariant())
+                    if (element.ComponentType.Equals("CN", StringComparison.OrdinalIgnoreCase))
                     {
-                        case "CN":
-                            adGroup.Names.Add(element.ComponentValue);
-                            break;
-
-                        case "OU":
-                            switch (ouCount)
+                        adGroup.Names.Add(element.ComponentValue);
+                    }
+                    else if (element.ComponentType.Equals("OU", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (ouCount == 0 && !element.ComponentValue.Equals(groupParent, StringComparison.OrdinalIgnoreCase))
+                        {
+                            throw new InvalidDataException($"Group does not have required parent group: {groupParent}");
+                        }
+                        else if (ouCount == 1)
+                        {
+                            if (element.ComponentValue.Equals(ADGroupDistributionGroup, StringComparison.OrdinalIgnoreCase))
                             {
-                                case 0:
-                                    if (!element.ComponentValue.Equals(groupParent,
-                                            StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        throw new InvalidDataException($"Group does not have required parent group: {groupParent}");
-                                    }
-                                    break;
-
-                                case 1:
-                                    switch (element.ComponentValue)
-                                    {
-                                        case ADGroupDistributionGroup:
-                                            if (adGroup.GroupType.HasValue)
-                                            {
-                                                throw new InvalidDataException("Invalid group: applies to multiple group types.");
-                                            }
-                                            else
-                                            {
-                                                adGroup.GroupType = AdGroupType.DistributionGroup;
-                                            }
-                                            break;
-
-                                        case ADGroupSecurityGroup:
-                                            if (adGroup.GroupType.HasValue)
-                                            {
-                                                throw new InvalidDataException("Invalid group: applies to multiple group types.");
-                                            }
-                                            else
-                                            {
-                                                adGroup.GroupType = AdGroupType.SecurityGroup;
-                                            }
-                                            break;
-
-                                        default:
-                                            throw new InvalidDataException($"Invalid group type found: {element.ComponentValue}");
-                                    }
-                                    break;
+                                if (adGroup.GroupType.HasValue)
+                                {
+                                    throw new InvalidDataException("Invalid group: applies to multiple group types.");
+                                }
+                                else
+                                {
+                                    adGroup.GroupType = AdGroupType.DistributionGroup;
+                                }
                             }
-                            ouCount++;
-                            break;
+                            else if (element.ComponentValue.Equals(ADGroupSecurityGroup, StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (adGroup.GroupType.HasValue)
+                                {
+                                    throw new InvalidDataException("Invalid group: applies to multiple group types.");
+                                }
+                                else
+                                {
+                                    adGroup.GroupType = AdGroupType.SecurityGroup;
+                                }
+                            }
+                            else
+                            {
+                                throw new InvalidDataException($"Invalid group type found: {element.ComponentValue}");
+                            }
+                        }
+                        ouCount++;
                     }
                 }
             }
@@ -346,22 +338,23 @@ namespace Ocuda.Ops.Service
                             {
                                 try
                                 {
-                                    var group = ExtractGroupDetails(attributeString, ADGroupParentOu);
-                                    switch (group.GroupType)
+                                    var group = ExtractGroupDetails(attributeString,
+                                        ADGroupParentOu);
+                                    if (group.GroupType == AdGroupType.DistributionGroup)
                                     {
-                                        case AdGroupType.DistributionGroup:
-                                            foreach (var groupName in group.Names)
-                                            {
-                                                user.DistributionGroups.Add($"{groupNamePrefix}{groupName}");
-                                            }
-                                            break;
-
-                                        case AdGroupType.SecurityGroup:
-                                            foreach (var groupName in group.Names)
-                                            {
-                                                user.SecurityGroups.Add($"{groupNamePrefix}{groupName}");
-                                            }
-                                            break;
+                                        foreach (var groupName in group.Names)
+                                        {
+                                            user.DistributionGroups
+                                                .Add($"{groupNamePrefix}{groupName}");
+                                        }
+                                    }
+                                    else if (group.GroupType == AdGroupType.SecurityGroup)
+                                    {
+                                        foreach (var groupName in group.Names)
+                                        {
+                                            user.SecurityGroups
+                                                .Add($"{groupNamePrefix}{groupName}");
+                                        }
                                     }
                                 }
                                 catch (InvalidDataException idex)
@@ -397,79 +390,95 @@ namespace Ocuda.Ops.Service
             var now = DateTime.Now;
             var users = new List<User>();
 
-            string domainName = _config[Configuration.OpsDomainName];
-            string ldapPassword = _config[Configuration.OpsLdapPassword];
-            string ldapSearchBase = _config[Configuration.OpsLdapSearchBase];
-            string ldapServer = _config[Configuration.OpsLdapServer];
-            string ldapUser = _config[Configuration.OpsLdapUser];
-
-            if (!string.IsNullOrEmpty(ldapServer)
-                && !string.IsNullOrEmpty(ldapUser)
-                && !string.IsNullOrEmpty(ldapPassword)
-                && !string.IsNullOrEmpty(ldapSearchBase))
+            using (LogContext.PushProperty("LdapFilter", filter))
+            using (LogContext.PushProperty("LdapRequestedAttributes", attributesToPopulate, true))
             {
-                int port = 389;
-                if (!string.IsNullOrEmpty(_config[Configuration.OpsLdapPort])
-                    && !int.TryParse(_config[Configuration.OpsLdapPort], out port))
+                string domainName = _config[Configuration.OpsDomainName];
+                string ldapPassword = _config[Configuration.OpsLdapPassword];
+                string ldapSearchBase = _config[Configuration.OpsLdapSearchBase];
+                string ldapServer = _config[Configuration.OpsLdapServer];
+                string ldapUser = _config[Configuration.OpsLdapUser];
+
+                if (!string.IsNullOrEmpty(ldapServer)
+                    && !string.IsNullOrEmpty(ldapUser)
+                    && !string.IsNullOrEmpty(ldapPassword)
+                    && !string.IsNullOrEmpty(ldapSearchBase))
                 {
-                    _logger.LogWarning("Invalid port specified: {InvalidPort}",
-                        _config[Configuration.OpsLdapPort]);
-                }
-
-                var endpoint = new LdapDirectoryIdentifier($"{ldapServer}:{port}");
-                var credential = new NetworkCredential(ldapUser, ldapPassword, domainName);
-
-                using var connection = new LdapConnection(endpoint, credential)
-                {
-                    AuthType = AuthType.Basic,
-                };
-
-                try
-                {
-                    connection.Bind();
-
-                    var searchRequest = new SearchRequest(ldapSearchBase,
-                        filter,
-                        SearchScope.Subtree,
-                        attributesToPopulate)
-                        ?? throw new OcudaException($"Unable to create LDAP Search request from LDAP base {ldapSearchBase} filter {filter} attributes {string.Join(',', attributesToPopulate)}");
-
-                    var searchResponse = (SearchResponse)connection.SendRequest(searchRequest);
-
-                    foreach (SearchResultEntry entry in searchResponse.Entries)
+                    int port = 389;
+                    if (!string.IsNullOrEmpty(_config[Configuration.OpsLdapPort])
+                        && !int.TryParse(_config[Configuration.OpsLdapPort], out port))
                     {
-                        user ??= new User();
-                        ApplyLdapAttributes(entry.Attributes, user, $"{domainName}\\");
-                        user.LastLdapCheck = now;
-                        users.Add(user);
-                        user = null;
+                        _logger.LogWarning("Invalid port specified: {InvalidPort}",
+                            _config[Configuration.OpsLdapPort]);
+                    }
+
+                    var endpoint = new LdapDirectoryIdentifier($"{ldapServer}:{port}");
+                    var credential = new NetworkCredential(ldapUser, ldapPassword, domainName);
+
+                    using var connection = new LdapConnection(endpoint, credential)
+                    {
+                        AuthType = AuthType.Basic,
+                    };
+
+                    try
+                    {
+                        connection.Bind();
+
+                        var searchRequest = new SearchRequest(ldapSearchBase,
+                            filter,
+                            SearchScope.Subtree,
+                            attributesToPopulate)
+                            ?? throw new OcudaException($"Unable to create LDAP Search request from LDAP base {ldapSearchBase} filter {filter} attributes {string.Join(',', attributesToPopulate)}");
+
+                        var searchResponse = (SearchResponse)connection.SendRequest(searchRequest);
+
+                        foreach (SearchResultEntry entry in searchResponse.Entries)
+                        {
+                            user ??= new User();
+                            ApplyLdapAttributes(entry.Attributes, user, $"{domainName}\\");
+                            user.LastLdapCheck = now;
+                            users.Add(user);
+                            user = null;
+                        }
+                    }
+                    catch (Exception ex) when (ex is InvalidOperationException
+                        || ex is LdapException
+                        || ex is NotSupportedException
+                        || ex is ObjectDisposedException)
+                    {
+                        _logger.LogError(ex,
+                            "Problem retreiving LDAP data from {LDAPServer}: {ErrorMessage}",
+                            ldapServer,
+                            ex.Message);
                     }
                 }
-                catch (Exception ex) when (ex is InvalidOperationException
-                    || ex is LdapException
-                    || ex is NotSupportedException
-                    || ex is ObjectDisposedException)
+                else
                 {
-                    _logger.LogError(ex,
-                        "Problem retreiving LDAP data from {LDAPServer}: {ErrorMessage}",
-                        ldapServer,
-                        ex.Message);
+                    _logger.LogError("Missing LDAP configuration values, please ensure {LdapServer}, {LdapUser}, {LdapPassword}, and {LdapSearchBase} are configured.",
+                        Configuration.OpsLdapServer,
+                        Configuration.OpsLdapUser,
+                        Configuration.OpsLdapPassword,
+                        Configuration.OpsLdapSearchBase);
                 }
-            }
-            else
-            {
-                _logger.LogError("Missing LDAP configuration values, please ensure {LdapServer}, {LdapUser}, {LdapPassword}, and {LdapSearchBase} are configured.",
-                    Configuration.OpsLdapServer,
-                    Configuration.OpsLdapUser,
-                    Configuration.OpsLdapPassword,
-                    Configuration.OpsLdapSearchBase);
-            }
-            stopwatch.Stop();
-            _logger.LogInformation("LDAP lookup found {ResultCount} result(s) in {ElapsedMs} ms",
-                users.Count,
-                stopwatch.ElapsedMilliseconds);
+                stopwatch.Stop();
 
-            return users;
+                if (users?.Count == 1)
+                {
+                    _logger.LogInformation("LDAP lookup found {ResultCount} result: user {User} with {SecurityGroups} security groups in {ElapsedMs} ms",
+                        users.Count,
+                        users.FirstOrDefault()?.Username,
+                        users.FirstOrDefault()?.SecurityGroups.Count,
+                        stopwatch.ElapsedMilliseconds);
+                }
+                else
+                {
+                    _logger.LogInformation("LDAP lookup found {ResultCount} result(s) in {ElapsedMs} ms",
+                        users.Count,
+                        stopwatch.ElapsedMilliseconds);
+                }
+
+                return users;
+            }
         }
 
         /// <summary>
