@@ -413,15 +413,7 @@ namespace Ocuda.Ops.Service
                     && !string.IsNullOrEmpty(ldapPassword)
                     && !string.IsNullOrEmpty(ldapSearchBase))
                 {
-                    int port = 389;
-                    if (!string.IsNullOrEmpty(_config[Configuration.OpsLdapPort])
-                        && !int.TryParse(_config[Configuration.OpsLdapPort], out port))
-                    {
-                        _logger.LogWarning("Invalid port specified: {InvalidPort}",
-                            _config[Configuration.OpsLdapPort]);
-                    }
-
-                    var endpoint = new LdapDirectoryIdentifier($"{ldapServer}:{port}");
+                    var endpoint = new LdapDirectoryIdentifier(ldapServer);
                     var credential = new NetworkCredential(ldapUser, ldapPassword, domainName);
 
                     using var connection = new LdapConnection(endpoint, credential)
