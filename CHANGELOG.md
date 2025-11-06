@@ -53,6 +53,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Empty site settings being set to a null value
 - Site manager permission not being listed if user belongs to other permission groups
 - Locations routing with empty feature stub
+- Carousel item footer not clearing when there are no buttons
+- Improve logging to not throw exceptions and log fewer invalid requests
 
 ## 1.0.0
 ### Added

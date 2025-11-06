@@ -227,32 +227,6 @@ namespace Ocuda.Ops.Controllers.Filters
                                 .ToString("O", CultureInfo.InvariantCulture))
                         };
 
-                        // loop through groups in the distributed cache from authentication
-                        // prime the loop
-                        int groupId = 1;
-                        var adGroupName
-                            = await Cache.GetStringFromCache(string
-                                .Format(CultureInfo.InvariantCulture,
-                                    Utility.Keys.Cache.OpsGroup,
-                                    id,
-                                    groupId));
-                        var adGroupNames = new List<string>();
-                        while (!string.IsNullOrEmpty(adGroupName))
-                        {
-                            adGroupNames.Add(adGroupName);
-                            // once it's in our list, remove it from the cache
-                            await Cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
-                                Utility.Keys.Cache.OpsGroup,
-                                id,
-                                groupId));
-                            groupId++;
-                            adGroupName = await Cache
-                                .GetStringFromCache(string.Format(CultureInfo.InvariantCulture,
-                                    Utility.Keys.Cache.OpsGroup,
-                                    id,
-                                    groupId));
-                        }
-
                         bool isSiteManager = false;
 
                         // pull lists of AD groups that should be site managers
@@ -265,7 +239,7 @@ namespace Ocuda.Ops.Controllers.Filters
 
                         // loop through group names and look up if each group provides claims
                         // claims can be provided via ClaimGroups
-                        foreach (string groupName in adGroupNames)
+                        foreach (string groupName in user.SecurityGroups)
                         {
                             claims.Add(new Claim(ClaimType.ADGroup, groupName));
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
@@ -80,5 +81,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         public Task UpdateDisplayAsync(DigitalDisplay display);
 
         public Task UpdateSetAsync(DigitalDisplaySet displaySet);
+
+        public Task<DigitalDisplayAsset> UploadAssetAsync(IFormFile assetFile, int userId);
+
+        public Task<DigitalDisplayAsset> UploadAssetAsync(IFormFile assetFile);
     }
 }

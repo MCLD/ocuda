@@ -133,8 +133,9 @@ namespace Ocuda.i18n.Filter
                 }
                 catch (UriFormatException ufex)
                 {
-                    _logger.LogCritical("Error composing URI from {URI} and {Path}: {ErrorMessage}",
-                        uriBuilder.Uri,
+                    _logger.LogCritical("Error composing URI from {Scheme}://{Host} and {Path}: {ErrorMessage}",
+                        context.HttpContext.Request.Scheme,
+                        context.HttpContext.Request.Host,
                         Culture.DefaultName + uriPath,
                         ufex.Message);
                     throw;

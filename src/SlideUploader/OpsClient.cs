@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Ocuda.Ops.Models;
 using Ocuda.Utility.Exceptions;
 
@@ -13,74 +14,55 @@ namespace Ocuda.SlideUploader
         Justification = "Class is instantiated via dependency injection")]
     internal class OpsClient
     {
-        private const string UploadJobPath = "ContentManagement/DigitalDisplays/UploadJob";
-        private const string WhoamiPath = "whoami";
+        private const string UploadJobPath = "/api/uploadjob";
         private readonly HttpClient _httpClient;
         private readonly ILogger<OpsClient> _logger;
+        private readonly IOptions<SlideUploaderOptions> _options;
 
-        public OpsClient(HttpClient httpClient, ILogger<OpsClient> logger)
+        public OpsClient(
+            IOptions<SlideUploaderOptions> options,
+            HttpClient httpClient,
+            ILogger<OpsClient> logger)
         {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+            ArgumentNullException.ThrowIfNull(httpClient);
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(options);
 
-        internal async Task<string> IsAuthenticatedAsync()
-        {
-            using var requestMessage = new HttpRequestMessage
+            _httpClient = httpClient;
+            _logger = logger;
+            _options = options;
+
+            JsonSerializerOptions = new JsonSerializerOptions
             {
-                RequestUri = new Uri(_httpClient.BaseAddress, WhoamiPath)
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
-            var response = await _httpClient.SendAsync(requestMessage,
-                HttpCompletionOption.ResponseHeadersRead);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogCritical("Could not authenticate to Ops: {StatusCode} - {ReasonPhrase}",
-                    response.StatusCode,
-                    response.ReasonPhrase);
-            }
-
-            try
-            {
-                var responseText = await response.Content.ReadAsStringAsync();
-                var responseObject = JsonSerializer.Deserialize<UserInformation>(responseText,
-                     new JsonSerializerOptions
-                     {
-                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                     });
-                if (responseObject.Authenticated)
-                {
-                    return responseObject.Username;
-                }
-            }
-            catch (JsonException)
-            {
-                return string.Empty;
-            }
-            return string.Empty;
         }
+
+        private JsonSerializerOptions JsonSerializerOptions { get; }
 
         internal async Task<JsonResponse> UploadJobAsync(SlideUploadJob job)
         {
             var fileContent = System.IO.File.ReadAllBytes(job.Filepath);
             System.IO.Path.GetFileName(job.Filepath);
 
-            using var startDate = new StringContent(job.StartDate.ToUniversalTime().ToString("O"));
+            using var apiKey = new StringContent(_options.Value.ApiKey);
             using var endDate = new StringContent(job.EndDate.ToUniversalTime().ToString("O"));
+            using var fileBytes = new ByteArrayContent(fileContent, 0, fileContent.Length);
             using var set = new StringContent(job.Set);
 
-            using var fileBytes = new ByteArrayContent(fileContent, 0, fileContent.Length);
+            using var startDate = new StringContent(job.StartDate.ToUniversalTime().ToString("O"));
 
             using var form = new MultipartFormDataContent
             {
-                { startDate , nameof(job.StartDate) },
+                { apiKey, nameof(job.ApiKey) },
                 { endDate, nameof(job.EndDate) },
-                { set, nameof(job.Set) },
                 {
                     fileBytes,
                     nameof(job.File),
                     System.IO.Path.GetFileName(job.Filepath)
-                }
+                },
+                { set, nameof(job.Set) },
+                { startDate , nameof(job.StartDate) },
             };
 
             using var requestMessage = new HttpRequestMessage
@@ -90,8 +72,7 @@ namespace Ocuda.SlideUploader
                 RequestUri = new Uri(_httpClient.BaseAddress, UploadJobPath)
             };
 
-            var response = await _httpClient.SendAsync(requestMessage,
-                HttpCompletionOption.ResponseHeadersRead);
+            var response = await _httpClient.SendAsync(requestMessage);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -103,20 +84,17 @@ namespace Ocuda.SlideUploader
             }
             else
             {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
+                await using var responseStream = await response.Content.ReadAsStreamAsync();
                 JsonResponse responseObject;
                 try
                 {
                     responseObject = await JsonSerializer
-                        .DeserializeAsync<JsonResponse>(responseStream,
-                            new JsonSerializerOptions
-                            {
-                                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                            });
+                        .DeserializeAsync<JsonResponse>(responseStream, JsonSerializerOptions);
                 }
                 catch (JsonException jex)
                 {
-                    throw new OcudaException($"Unable to decode JSON response from to {requestMessage.RequestUri}",
+                    throw new OcudaException(
+                        $"Unable to decode JSON response from to {requestMessage.RequestUri}",
                         jex);
                 }
 

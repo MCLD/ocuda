@@ -1,6 +1,6 @@
 ﻿namespace Ocuda.Utility.Keys
 {
-    public struct Configuration
+    public readonly struct Configuration
     {
         public static readonly string OcudaCookieName = "Ocuda.CookieName";
         public static readonly string OcudaErrorControllerName = "Ocuda.ErrorControllerName";
@@ -34,11 +34,10 @@
         public static readonly string OpsDomainName = "Ops.DomainName";
         public static readonly string OpsHttpErrorFileTag = "Ops.HttpErrorFileTag";
         public static readonly string OpsImageOptimizerUsername = "Ops.ImageOptimizerUsername";
-        public static readonly string OpsLdapDn = "Ops.LDAPDN";
         public static readonly string OpsLdapPassword = "Ops.LDAPPassword";
-        public static readonly string OpsLdapPort = "Ops.LDAPPort";
         public static readonly string OpsLdapSearchBase = "Ops.LDAPSearchBase";
         public static readonly string OpsLdapServer = "Ops.LDAPServer";
+        public static readonly string OpsLdapUser = "Ops.LDAPUser";
         public static readonly string OpsNavColumn = "Ops.NavColumn";
 
         public static readonly string OpsPublicSiteUrlSharedContent
