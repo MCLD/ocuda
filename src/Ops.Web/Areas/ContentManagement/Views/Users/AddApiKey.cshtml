@@ -70,7 +70,7 @@
 
 @section scripts {
     <script>
-        const staffSearchUrl = new URL('@Url.Action(nameof(Ocuda.Ops.Controllers.StaffController.SearchJson), Ocuda.Ops.Controllers.StaffController.Name, null, protocol: Context.Request.Scheme)');
+        const staffSearchUrl = new URL('@Model.JsonStaffSearchUri.AbsoluteUri');
 
         document.getElementById('addStaffModal').addEventListener('show.bs.modal', (event) => {
             currentPage = 1;

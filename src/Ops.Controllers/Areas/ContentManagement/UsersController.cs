@@ -57,9 +57,15 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         { get { return "Users"; } }
 
         [HttpGet("[action]")]
-        public IActionResult AddApiKey()
+        public async Task<IActionResult> AddApiKey()
         {
-            var viewModel = new AddApiKeyViewModel();
+            var baseUri = await GetBaseUriBuilderAsync();
+            baseUri.Path = Url.Action(nameof(StaffController.SearchJson), StaffController.Name);
+
+            var viewModel = new AddApiKeyViewModel
+            {
+                JsonStaffSearchUri = baseUri.Uri
+            };
 
             foreach (ApiKeyType apiKeyType in Enum.GetValues(typeof(ApiKeyType)))
             {
