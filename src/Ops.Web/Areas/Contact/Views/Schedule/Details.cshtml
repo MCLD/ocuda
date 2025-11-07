@@ -58,10 +58,20 @@
 					</div>
 					<div class="modal-body">
 						<p>Are you sure you want to cancel this schedule request and email the customer?</p>
-						<textarea id="cancellationNotes"
-								  asp-for="AddLog.Notes"
-								  data-val-required="Cancellation notes are required."
-								  formgroup></textarea>
+						<div class="mb-3">
+							<label asp-for="AddLog.Notes"
+								   for="cancellationNotes">
+								Staff notes (Not shown to customer)
+								<span class="fa-solid fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
+							</label>
+							<textarea asp-for="AddLog.Notes"
+									  id="cancellationNotes"
+									  class="form-control"
+									  data-val-required="Cancellation notes are required."></textarea>
+							<span asp-validation-for="AddLog.Notes"
+								  for="cancellationNotes"
+								  class="validation-message text-danger"></span>
+						</div>
 					</div>
 					<div class="modal-footer">
 						<input type="hidden"
@@ -236,7 +246,7 @@
 				<tbody>
 					@foreach (var log in Model.ScheduleLogs)
 					{
-						<tr class="@(log.IsComplete ? "table-success" : "")">
+						<tr class="@(log.IsComplete ? "table-success" : log.IsCancelled ? "table-danger" : "")">
 							<td>
 								@log.CreatedAt
 							</td>
