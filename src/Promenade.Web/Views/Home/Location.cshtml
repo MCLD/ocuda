@@ -397,7 +397,7 @@
                                     <a asp-action="@nameof(HomeController.Location)"
                                        asp-controller="@HomeController.Name"
                                        asp-route-culture=""
-                                       asp-route-locationStub="@locationGroup.Location.Stub">@locationGroup.Location.Name</a>
+                                       asp-route-locationSlug="@locationGroup.Location.Stub">@locationGroup.Location.Name</a>
                                 </td>
                                 @if (locationGroup.Location.HasEvents)
                                 {
