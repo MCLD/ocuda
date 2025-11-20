@@ -74,14 +74,17 @@ namespace Ocuda.Ops.Service
             });
         }
 
-        public async Task CancelAsync(int scheduleRequestId)
+        public async Task CancelAsync(ScheduleLog cancelLog)
         {
-            var request = await _scheduleRequestService.GetRequestAsync(scheduleRequestId);
+            ArgumentNullException.ThrowIfNull(cancelLog);
+
+            var request = await _scheduleRequestService
+                .GetRequestAsync(cancelLog.ScheduleRequestId);
 
             await AddLogAsync(new ScheduleLog
             {
-                Notes = "Schedule request cancelled.",
-                ScheduleRequestId = scheduleRequestId,
+                Notes = cancelLog.Notes,
+                ScheduleRequestId = request.Id,
                 IsCancelled = true
             });
 

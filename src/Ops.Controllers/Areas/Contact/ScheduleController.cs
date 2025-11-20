@@ -73,11 +73,18 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> Cancel(int requestId)
+        public async Task<IActionResult> Cancel(ScheduleDetailViewModel viewModel)
         {
-            await _scheduleService.CancelAsync(requestId);
+            ArgumentNullException.ThrowIfNull(viewModel);
+            if (string.IsNullOrWhiteSpace(viewModel.AddLog.Notes))
+            {
+                ShowAlertWarning("Could not cancel schedule request: cancellation notes are required.");
+                return RedirectToAction(nameof(Details), 
+                    new { requestId = viewModel.AddLog.ScheduleRequestId });
+            }
+            await _scheduleService.CancelAsync(viewModel.AddLog);
 
-            TempData[TempDataKey.AlertWarning] = $"Request #{requestId} has been cancelled.";
+            TempData[TempDataKey.AlertWarning] = $"Request #{viewModel.AddLog.ScheduleRequestId} has been cancelled.";
 
             var requestedDate = GetClearSavedIndexParameter();
 

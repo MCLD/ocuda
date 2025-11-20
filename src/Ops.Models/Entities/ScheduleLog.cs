@@ -33,6 +33,7 @@ namespace Ocuda.Ops.Models.Entities
             get
             {
                 return IsComplete
+                    || IsCancelled
                     || !string.IsNullOrEmpty(ScheduleLogCallDisposition?.Disposition)
                     || DurationMinutes != null;
             }
