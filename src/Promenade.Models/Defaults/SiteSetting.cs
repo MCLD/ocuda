@@ -8,6 +8,27 @@ namespace Ocuda.Promenade.Models.Defaults
     {
         public static IEnumerable<SiteSetting> Get { get; } = new[]
         {
+            #region Card
+            new SiteSetting 
+            {
+                Category = nameof(Keys.SiteSetting.Card),
+                Description = "Segment to show on the employee card request page",
+                Id = Keys.SiteSetting.Card.EmployeeCardSegment,
+                Name = "Employee card segment",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            new SiteSetting 
+            {
+                Category = nameof(Keys.SiteSetting.Card),
+                Description = "Thanks page to show after employee card request is submitted",
+                Id = Keys.SiteSetting.Card.EmployeeCardThanksPage,
+                Name = "Employee card thanks page",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            #endregion
+
             #region Contact
 
             new SiteSetting

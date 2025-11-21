@@ -5,6 +5,16 @@
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
             "CA1815:Override equals and operator equals on value types",
             Justification = "No reason to compare these site setting keys")]
+        public struct Card
+        {
+            public const string EmployeeCardSegment = "Card.EmployeeCardSegment";
+            public const string EmployeeCardThanksPage 
+                = "Card.EmployeeCardThanksPage";
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
+            "CA1815:Override equals and operator equals on value types",
+            Justification = "No reason to compare these site setting keys")]
         public struct Contact
         {
             public const string Link = "Contact.Link";

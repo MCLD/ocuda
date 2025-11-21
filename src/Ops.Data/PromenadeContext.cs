@@ -46,6 +46,8 @@ namespace Ocuda.Ops.Data
 
         public DbSet<EmediaText> EmediaTexts { get; set; }
 
+        public DbSet<EmployeeCardRequest> EmployeeCardRequests { get; }
+
         public DbSet<ExternalResource> ExternalResources { get; set; }
 
         public DbSet<Feature> Features { get; set; }

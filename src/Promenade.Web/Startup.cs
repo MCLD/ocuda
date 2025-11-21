@@ -420,6 +420,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.EmediaTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IExternalResourceRepository,
                 Data.Promenade.ExternalResourceRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IEmployeeCardRequestRepository,
+                Data.Promenade.EmployeeCardRequestRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IFeatureRepository,
                 Data.Promenade.FeatureRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IVolunteerFormRepository,
@@ -523,11 +525,12 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
                 Utility.Services.PathResolverService>();
 
-            // promenade servicews
+            // promenade services
             services.AddScoped<CarouselService>();
             services.AddScoped<CategoryService>();
             services.AddScoped<DeckService>();
             services.AddScoped<EmediaService>();
+            services.AddScoped<EmployeeCardService>();
             services.AddScoped<ExternalResourceService>();
             services.AddScoped<ImageFeatureService>();
             services.AddScoped<LanguageService>();
