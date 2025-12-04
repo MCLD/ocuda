@@ -22,5 +22,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Users
 
         [DisplayName("End date (optional)")]
         public DateTime? EndDate { get; set; }
+
+        public Uri JsonStaffSearchUri { get; set; }
     }
 }
