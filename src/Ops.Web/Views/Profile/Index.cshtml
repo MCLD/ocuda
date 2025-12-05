@@ -21,7 +21,7 @@
             override so the associated location is set automatically in the future?
         </div>
     </form>
-    
+
     <form asp-action="@(nameof(ProfileController.UpdateLocation))"
           method="post"
           role="form">
@@ -234,14 +234,18 @@
                                 <th class="align-middle">Authenticated at</th>
                                 <td class="align-middle">
                                     @Model.AuthenticatedAt
-                                    <form asp-action="Reauthenticate" class="d-inline">
-                                        <button type="submit"
-                                                class="float-end p-0 me-2 btn btn-link"
-                                                title="Reauthenticate">
-                                            <span class="fa-solid fa-xs fa-rotate-right"></span>
-                                        </button>
-                                    </form>
+                                    <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Authentication.HomeController.Logout)"
+                                       asp-area="@Ocuda.Ops.Controllers.Areas.Authentication.HomeController.Area"
+                                       asp-controller="@Ocuda.Ops.Controllers.Areas.Authentication.HomeController.Name"
+                                       class="float-end p-0 me-2 btn btn-link"
+                                       title="Reauthenticate">
+                                        <span class="fa-solid fa-xs fa-rotate-right"></span>
+                                    </a>
                                 </td>
+                            </tr>
+                            <tr>
+                                <th class="align-middle">Authentication information</th>
+                                <td class="align-middle">@Model.AuthenticationInformation</td>
                             </tr>
                         }
                         @if (Model.RelatedTitleClassifications?.Any() == true)
@@ -333,7 +337,7 @@
 </div>
 
 @section scripts
-    {
+{
     <script>
         $("#editModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);

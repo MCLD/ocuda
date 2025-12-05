@@ -3,70 +3,105 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
+using Serilog.Context;
 
 namespace Ocuda.Ops.Controllers.Filters
 {
     [AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
     public sealed class UserFilterAttribute : Attribute, IAsyncResourceFilter
     {
-        private readonly ILogger<UserFilterAttribute> _logger;
-        private readonly ISectionService _sectionService;
-        private readonly IUserService _userService;
-
         public UserFilterAttribute(ILogger<UserFilterAttribute> logger,
             ISectionService sectionService,
             IUserService userService)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _sectionService = sectionService
-                ?? throw new ArgumentNullException(nameof(sectionService));
-            _userService = userService
-                ?? throw new ArgumentNullException(nameof(userService));
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(sectionService);
+            ArgumentNullException.ThrowIfNull(userService);
+
+            Logger = logger;
+            SectionService = sectionService;
+            UserService = userService;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
-            "CA1031:Do not catch general exception types",
-            Justification = "Fail safe if we can't tell the user is a supervisor")]
+        public ILogger<UserFilterAttribute> Logger { get; }
+
+        public ISectionService SectionService { get; }
+
+        public IUserService UserService { get; }
+
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context,
             ResourceExecutionDelegate next)
         {
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(next);
+
+            User user = null;
             var usernameClaim = context.HttpContext.User
                 .Claims
                 .FirstOrDefault(_ => _.Type == ClaimType.Username);
 
+            // no claim = not authenticat4ed, redirect
+
             if (usernameClaim != default)
             {
-                var user = await _userService.LookupUserAsync(usernameClaim.Value);
+                user = await UserService.LookupUserAsync(usernameClaim.Value);
                 if (user != null)
                 {
                     context.HttpContext.Items[ItemKey.Nickname] = user.Nickname ?? user.Username;
-
-                    var sections = await _sectionService.GetAllAsync();
-                    if (sections?.Count > 0)
-                    {
-                        bool userIsSupervisor = false;
-                        try
-                        {
-                            userIsSupervisor = await _userService.IsSupervisor(user.Id);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError("Could not determine if userid {UserId} is a supervisor: {ErrorMessage}",
-                                user.Id,
-                                ex.Message);
-                        }
-                        if (!userIsSupervisor)
-                        {
-                            sections = sections.Where(_ => !_.SupervisorsOnly).ToList();
-                        }
-                    }
-                    context.HttpContext.Items[ItemKey.Sections] = sections;
                 }
             }
 
-            await next();
+            var sections = await SectionService.GetAllAsync();
+            if (sections?.Count > 0)
+            {
+                bool userIsSupervisor = false;
+                try
+                {
+                    userIsSupervisor = user != null && await UserService.IsSupervisor(user.Id);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("Could not determine if userid {UserId} is a supervisor: {ErrorMessage}",
+                        user.Id,
+                        ex.Message);
+                }
+                if (!userIsSupervisor)
+                {
+                    sections = sections.Where(_ => !_.SupervisorsOnly).ToList();
+                }
+            }
+            context.HttpContext.Items[ItemKey.Sections] = sections;
+
+            using (LogContext.PushProperty(Utility.Logging.Enrichment.HttpMethod,
+                context.HttpContext.Request.Method))
+            using (LogContext.PushProperty(Utility.Logging.Enrichment.HttpReferer,
+                context.HttpContext.Request.Headers.Referer))
+            using (LogContext.PushProperty(Utility.Logging.Enrichment.RouteAction,
+                context.RouteData?.Values["action"]))
+            using (LogContext.PushProperty(Utility.Logging.Enrichment.RouteArea,
+                context.RouteData?.Values["area"]))
+            using (LogContext.PushProperty(Utility.Logging.Enrichment.RouteController,
+                context.RouteData?.Values["controller"]))
+            using (LogContext.PushProperty(Utility.Logging.Enrichment.RouteId,
+                context.RouteData?.Values["id"]))
+            {
+                if (user != null)
+                {
+                    using (LogContext.PushProperty(Utility.Logging.Enrichment.UserId, user?.Id))
+                    using (LogContext.PushProperty(Utility.Logging.Enrichment.Username,
+                        user?.Username))
+                    {
+                        await next();
+                    }
+                }
+                else
+                {
+                    await next();
+                }
+            }
         }
     }
 }

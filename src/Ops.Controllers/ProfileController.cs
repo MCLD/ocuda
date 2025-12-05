@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -10,10 +9,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Profile;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers
@@ -49,6 +49,104 @@ namespace Ocuda.Ops.Controllers
 
         public static string Name
         { get { return "Profile"; } }
+
+        [HttpGet("[action]")]
+        public IActionResult BatchUploadPictures()
+        {
+            if (!IsSiteManager())
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var viewModel = new BatchUploadPicturesViewModel();
+            return View(viewModel);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> BatchUploadPictures(BatchUploadPicturesViewModel viewModel)
+        {
+            if (!IsSiteManager())
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Only users with site manager privileges can batch upload profile pictures"
+                });
+            }
+
+            if (viewModel != null)
+            {
+                Models.Entities.User user = null;
+
+                var allUsers = await _userService.GetAllUsersAsync();
+
+                var lastNameUsers = allUsers.Where(_ => NormalizeString(_.Name)
+                    .Contains(viewModel.LastName, StringComparison.OrdinalIgnoreCase));
+
+                if (lastNameUsers.Count() == 1)
+                {
+                    user = lastNameUsers.First();
+                }
+                else if (lastNameUsers.Count() > 1)
+                {
+                    var fullNameUsers = lastNameUsers.Where(_ => NormalizeString(_.Name)
+                        .Contains(viewModel.FirstName, StringComparison.OrdinalIgnoreCase));
+
+                    user = fullNameUsers.Count() == 1 ? fullNameUsers.First() : null;
+                }
+
+                if (user == null)
+                {
+                    try
+                    {
+                        var location = await _locationService
+                            .GetLocationByCodeAsync(viewModel.LocationCode);
+                        var locationUsers = lastNameUsers
+                            .Where(_ => _.AssociatedLocation == location?.Id);
+
+                        if (locationUsers.Count() == 1)
+                        {
+                            user = locationUsers.First();
+                        }
+                        else if (locationUsers.Count() > 1)
+                        {
+                            var fullNameLocation = locationUsers
+                                .Where(_ => _.Name.Contains(viewModel.FirstName,
+                                    StringComparison.OrdinalIgnoreCase));
+                            user = fullNameLocation.Count() == 1 ? fullNameLocation.First() : null;
+                        }
+                    }
+                    catch (OcudaException ex)
+                    {
+                        Console.WriteLine(ex.Message + " Location code: " + viewModel.LocationCode);
+                    }
+                }
+
+                if (user != null)
+                {
+                    try
+                    {
+                        await _userManagementService
+                            .UploadProfilePictureAsync(user, viewModel.ProfilePicture);
+                        return Json(new
+                        {
+                            success = true,
+                            message = "Picture uploaded successfully"
+                        });
+                    }
+                    catch (OcudaException oex)
+                    {
+                        ShowAlertDanger("Problem with upload: " + oex.Message);
+                    }
+                }
+            }
+
+            return Json(new
+            {
+                success = false,
+                message = $"The provided photo for {viewModel?.FirstName} {viewModel?.LastName} could not be matched with a user profile."
+            });
+        }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> EditNickname(IndexViewModel model)
@@ -123,7 +221,9 @@ namespace Ocuda.Ops.Controllers
                     await _userService.GetByIdAsync(viewModel.User.SupervisorId.Value);
             }
 
-            viewModel.DirectReports = await _userService.GetDirectReportsAsync(viewModel.User.Id);
+            viewModel
+                .DirectReports
+                .AddRange(await _userService.GetDirectReportsAsync(viewModel.User.Id));
 
             viewModel.CanEdit = viewModel.User.Id == CurrentUserId;
 
@@ -132,7 +232,20 @@ namespace Ocuda.Ops.Controllers
                 viewModel.AuthenticatedAt = DateTime.Parse(UserClaim(ClaimType.AuthenticatedAt),
                     CultureInfo.InvariantCulture);
 
-                viewModel.Permissions = new List<string>();
+                var idProviderType = UserClaims(ClaimType.IdentityProviderType);
+                var idProvider = UserClaims(ClaimType.IdentityProvider);
+
+                if (idProviderType.SingleOrDefault()
+                    == Enum.GetName(typeof(IdentityProviderType), IdentityProviderType.Form))
+                {
+                    viewModel.AuthenticationInformation = "Login form";
+                }
+                else
+                {
+                    viewModel.AuthenticationInformation = idProviderType.SingleOrDefault()
+                        + " via "
+                        + idProvider.SingleOrDefault();
+                }
 
                 if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
                 {
@@ -151,16 +264,14 @@ namespace Ocuda.Ops.Controllers
 
                     var permissionGroups = permissionLookup
                             .Select(_ => _.PermissionGroupName)
-                            .OrderBy(_ => _);
+                            .Order();
 
-                    viewModel.Permissions = viewModel.Permissions
-                        .Concat(permissionGroups)
-                        .ToList();
+                    viewModel.Permissions.AddRange([.. permissionGroups]);
                 }
             }
 
-            viewModel.RelatedTitleClassifications
-                = await _userService.GetRelatedTitleClassificationsAsync(viewModel.User.Id);
+            viewModel.RelatedTitleClassifications.AddRange(await _userService
+                .GetRelatedTitleClassificationsAsync(viewModel.User.Id));
 
             return View(viewModel);
         }
@@ -175,7 +286,7 @@ namespace Ocuda.Ops.Controllers
                 return StatusCode(StatusCodes.Status404NotFound);
             }
 
-            Response.Headers.Add("Content-Disposition", "inline; filename=" + picture.Filename);
+            Response.Headers.Append("Content-Disposition", "inline; filename=" + picture.Filename);
             return File(picture.FileData, picture.FileType);
         }
 
@@ -302,98 +413,15 @@ namespace Ocuda.Ops.Controllers
             return RedirectToAction(nameof(Index), new { id = user.Username });
         }
 
-        [HttpGet("[action]")]
-        public async Task<IActionResult> BatchUploadPictures()
-        {
-            if (!IsSiteManager())
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            
-            var viewModel = new BatchUploadPicturesViewModel();
-            return View(viewModel);
-        }
+        [GeneratedRegex("[^a-zA-Z]")]
+        private static partial Regex NonAlphaCharsRegex();
 
-        [HttpPost("[action]")]
-        public async Task<IActionResult> BatchUploadPictures(BatchUploadPicturesViewModel viewModel)
-        {
-            if (!IsSiteManager())
-            {
-                return Json(new { 
-                    success = false,
-                    message = "Only users with site manager privileges can batch upload profile pictures" 
-                });
-            }
-
-            if (viewModel != null)
-            {
-                Models.Entities.User user = null;
-
-                var allUsers = await _userService.GetAllUsersAsync();
-
-                var lastNameUsers = allUsers.Where(u => NormalizeString(u.Name).Contains(viewModel.LastName, StringComparison.OrdinalIgnoreCase));
-
-                if (lastNameUsers.Count() == 1)
-                {
-                    user = lastNameUsers.First();
-                } else if (lastNameUsers.Count() > 1)
-                {
-                    var fullNameUsers = lastNameUsers.Where(u => NormalizeString(u.Name).Contains(viewModel.FirstName, StringComparison.OrdinalIgnoreCase));
-
-                    user = fullNameUsers.Count() == 1 ? fullNameUsers.First() : null;
-                }
-
-                if (user == null)
-                {
-                    try
-                    {
-                        var location = await _locationService.GetLocationByCodeAsync(viewModel.LocationCode);
-                        var locationUsers = lastNameUsers.Where(u => u.AssociatedLocation == location?.Id);
-
-                        if (locationUsers.Count() == 1)
-                        {
-                            user = locationUsers.First();
-                        } else if (locationUsers.Count() > 1)
-                        {
-                            var fullNameLocation = locationUsers.Where(u => u.Name.Contains(viewModel.FirstName, StringComparison.OrdinalIgnoreCase));
-                            user = fullNameLocation.Count() == 1 ? fullNameLocation.First() : null;
-                        }
-                    } 
-                    catch (OcudaException ex) 
-                    {
-                        Console.WriteLine(ex.Message + " Location code: " + viewModel.LocationCode);
-                    }
-                    
-                }
-
-                if (user != null)
-                {
-                    try
-                    {
-                        await _userManagementService
-                            .UploadProfilePictureAsync(user, viewModel.ProfilePicture);
-                        return Json(new { success = true, message = "Picture uploaded successfully" });
-                    }
-                    catch (OcudaException oex)
-                    {
-                        ShowAlertDanger("Problem with upload: " + oex.Message);
-                    }
-                    
-                }
-            }
-
-            return Json(new { success = false, message = $"The provided photo for {viewModel?.FirstName} {viewModel?.LastName} could not be matched with a user profile." });
-        }
-
-        // For comparing photo filenames to database user names, remove apostrophes, accent marks, etc.
+        // For comparing photo filenames to database user names, remove apostrophes, accents, etc.
         private static string NormalizeString(string text)
         {
             return RemoveNonAlphaChars(RemoveDiacritics(text));
         }
-        private static string RemoveNonAlphaChars(string text)
-        {
-            return NonAlphaCharsRegex().Replace(text, "");
-        }
+
         private static string RemoveDiacritics(string text)
         {
             return string.Concat(
@@ -403,7 +431,9 @@ namespace Ocuda.Ops.Controllers
               ).Normalize(NormalizationForm.FormC);
         }
 
-        [GeneratedRegex("[^a-zA-Z]")]
-        private static partial Regex NonAlphaCharsRegex();
+        private static string RemoveNonAlphaChars(string text)
+        {
+            return NonAlphaCharsRegex().Replace(text, "");
+        }
     }
 }

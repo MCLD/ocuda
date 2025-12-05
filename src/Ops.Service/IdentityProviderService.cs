@@ -44,7 +44,7 @@ namespace Ocuda.Ops.Service
             ArgumentNullException.ThrowIfNull(certificate);
             ArgumentNullException.ThrowIfNull(provider);
 
-            provider.Active = true;
+            provider.IsActive = true;
             provider.CreatedAt = DateTime.Now;
             provider.EncryptedCertificate = null;
             provider.Id = default;
@@ -77,14 +77,28 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public async Task<DataWithCount<IEnumerable<IdentityProvider>>>
-            GetProvidersAsync(BaseFilter filter)
+        public async Task DeleteAsync(int providerId)
         {
-            return new DataWithCount<IEnumerable<IdentityProvider>>
-            {
-                Count = await _identityProviderRepository.CountAsync(filter),
-                Data = await _identityProviderRepository.PageAsync(filter)
-            };
+            var provider = await _identityProviderRepository.FindAsync(providerId)
+                ?? throw new OcudaException($"Unable to find provider id {providerId}");
+
+            _identityProviderRepository.Remove(provider.Id);
+            await _identityProviderRepository.SaveAsync();
+        }
+
+        public async Task<IdentityProvider> GetActiveAsync(string slug)
+        {
+            return await _identityProviderRepository.GetActiveAsync(slug);
+        }
+
+        public async Task<IEnumerable<IdentityProvider>> GetAllActiveAsync()
+        {
+            return await _identityProviderRepository.GetAllActiveAsync();
+        }
+
+        public async Task<DataWithCount<ICollection<IdentityProvider>>> PageAsync(BaseFilter filter)
+        {
+            return await _identityProviderRepository.PageAsync(filter);
         }
     }
 }

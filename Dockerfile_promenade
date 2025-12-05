@@ -17,7 +17,7 @@ WORKDIR /app/src/Promenade.Web
 RUN dotnet publish -v m /property:WarningLevel=0 -c Release --property:PublishDir=/app/publish/promenade
 
 # Get runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 as publish
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS publish
 
 WORKDIR /app
 

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ocuda.Ops.Models.Entities
+﻿namespace Ocuda.Ops.Models.Entities
 {
     public enum IdentityProviderType
     {
-        Saml2
+        Form,
+        SAML2
     }
 }

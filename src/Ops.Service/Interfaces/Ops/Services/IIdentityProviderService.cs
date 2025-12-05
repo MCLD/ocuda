@@ -10,6 +10,12 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
     {
         Task AddProviderAsync(IdentityProvider provider, string certificate);
 
-        Task<DataWithCount<IEnumerable<IdentityProvider>>> GetProvidersAsync(BaseFilter filter);
+        Task DeleteAsync(int providerId);
+
+        Task<IdentityProvider> GetActiveAsync(string slug);
+
+        Task<IEnumerable<IdentityProvider>> GetAllActiveAsync();
+
+        Task<DataWithCount<ICollection<IdentityProvider>>> PageAsync(BaseFilter filter);
     }
 }
