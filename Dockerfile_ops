@@ -17,7 +17,7 @@ WORKDIR /app/src/Ops.Web
 RUN dotnet publish -v m /property:WarningLevel=0 -c Release --property:PublishDir=/app/publish/ops
 
 # Get runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 as publish
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS publish
 
 WORKDIR /app
 
@@ -33,7 +33,7 @@ ARG IMAGE_REVISION=unknown
 ARG IMAGE_VERSION=unknown
 
 # Configure image labels
-LABEL branch=$branch \
+LABEL branch=$BRANCH \
     maintainer="Maricopa County Library District developers <development@mcldaz.org>" \
     org.opencontainers.image.authors="Maricopa County Library District developers <development@mcldaz.org>" \
     org.opencontainers.image.created=$IMAGE_CREATED \
