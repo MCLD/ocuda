@@ -45,7 +45,7 @@ namespace Ocuda.Ops.Service
 
                 var response = new Response(cert, samlResponse);
 
-                var identityResponse = new IdentityResponse()
+                var identityResponse = new IdentityResponse
                 {
                     IsValid = response.IsValid()
                 };

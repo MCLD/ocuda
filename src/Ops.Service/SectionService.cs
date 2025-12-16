@@ -53,7 +53,10 @@ namespace Ocuda.Ops.Service
             {
                 isSupervisor = await _userService.IsSupervisor(GetCurrentUserId());
             }
-            catch (InvalidOperationException) { }
+            catch (InvalidOperationException)
+            {
+                // user information couldn't be found so obviously not a supervisor!
+            }
 
             return isSupervisor
                 ? sections

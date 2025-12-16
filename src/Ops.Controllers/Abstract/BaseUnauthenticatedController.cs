@@ -152,12 +152,22 @@ namespace Ocuda.Ops.Controllers.Abstract
             _pageTitle = pageTitle?.Trim();
         }
 
-        protected void ShowAlertDanger(string message, string details = null)
+        protected void ShowAlertDanger(string message)
+        {
+            ShowAlertDanger(message, null);
+        }
+
+        protected void ShowAlertDanger(string message, string details)
         {
             AlertDanger = $"{Fa("exclamation-triangle")} {message}{details}";
         }
 
-        protected void ShowAlertInfo(string message, string faIconName = null)
+        protected void ShowAlertInfo(string message)
+        {
+            ShowAlertInfo(message, null);
+        }
+
+        protected void ShowAlertInfo(string message, string faIconName)
         {
             if (!string.IsNullOrEmpty(faIconName))
             {
@@ -169,7 +179,12 @@ namespace Ocuda.Ops.Controllers.Abstract
             }
         }
 
-        protected void ShowAlertSuccess(string message, string faIconName = null)
+        protected void ShowAlertSuccess(string message)
+        {
+            ShowAlertSuccess(message, null);
+        }
+
+        protected void ShowAlertSuccess(string message, string faIconName)
         {
             if (!string.IsNullOrEmpty(faIconName))
             {
@@ -181,7 +196,12 @@ namespace Ocuda.Ops.Controllers.Abstract
             }
         }
 
-        protected void ShowAlertWarning(string message, string details = null)
+        protected void ShowAlertWarning(string message)
+        {
+            ShowAlertWarning(message, null);
+        }
+
+        protected void ShowAlertWarning(string message, string details)
         {
             AlertWarning = $"{Fa("circle-exclamation")} {message}{details}";
         }
