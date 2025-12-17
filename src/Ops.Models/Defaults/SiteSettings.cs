@@ -298,20 +298,6 @@ namespace Ocuda.Ops.Models.Defaults
             },
 
             #endregion UserInterface
-
-            #region UserSync
-
-            new SiteSetting
-            {
-                Id = Keys.SiteSetting.UserSync.DisabledOu,
-                Name = "Group that disabled users are in",
-                Description = "An LDAP group that disabled users are placed in, disregarded during imports",
-                Category = "User Sync",
-                Value = "",
-                Type = SiteSettingType.StringNullable
-            },
-
-            #endregion UserSync
         };
     }
 }

@@ -39,15 +39,13 @@ namespace Ocuda.Ops.Controllers.Filters
             ArgumentNullException.ThrowIfNull(next);
 
             User user = null;
-            var usernameClaim = context.HttpContext.User
-                .Claims
-                .FirstOrDefault(_ => _.Type == ClaimType.Username);
+            var userName = context.HttpContext.User?.Identity?.Name;
 
             // no claim = not authenticat4ed, redirect
 
-            if (usernameClaim != default)
+            if (!string.IsNullOrEmpty(userName))
             {
-                user = await UserService.LookupUserAsync(usernameClaim.Value);
+                user = await UserService.LookupUserAsync(userName);
                 if (user != null)
                 {
                     context.HttpContext.Items[ItemKey.Nickname] = user.Nickname ?? user.Username;

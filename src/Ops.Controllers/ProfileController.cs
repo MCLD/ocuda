@@ -180,8 +180,7 @@ namespace Ocuda.Ops.Controllers
                 CanUpdatePicture = IsSiteManager(),
                 CanViewLastSeen = IsSiteManager(),
                 Locations = await GetLocationsDropdownAsync(_locationService),
-                UserViewingSelf = string.IsNullOrEmpty(id)
-                    || id == UserClaim(ClaimType.Username)
+                UserViewingSelf = string.IsNullOrEmpty(id) || id == HttpContext.User?.Identity?.Name
             };
 
             if (!viewModel.CanUpdatePicture)
@@ -212,7 +211,7 @@ namespace Ocuda.Ops.Controllers
             if (!string.IsNullOrEmpty(viewModel.User.PictureFilename))
             {
                 viewModel.PicturePath = Url.Action(nameof(Picture),
-                    new { id = id ?? UserClaim(ClaimType.Username) });
+                    new { id = id ?? HttpContext.User?.Identity?.Name });
             }
 
             if (viewModel.User.SupervisorId.HasValue)

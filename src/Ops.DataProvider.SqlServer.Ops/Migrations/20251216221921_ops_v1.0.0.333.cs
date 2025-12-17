@@ -58,6 +58,9 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                 name: "IX_IdentityProviders_UpdatedBy",
                 table: "IdentityProviders",
                 column: "UpdatedBy");
+
+            // this setting has been moved to configuration
+            migrationBuilder.Sql("DELETE FROM [SiteSettings] WHERE [Id] = 'UserSync.DisabledOu'");
         }
 
         /// <inheritdoc />

@@ -18,6 +18,7 @@ using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Keys;
 using Serilog.Context;
 
@@ -70,19 +71,16 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication
         [HttpGet("[action]")]
         public IActionResult Direct()
         {
-            HttpContext.Session.Set(Session.SkipAutoIdentityProvider, BitConverter.GetBytes(true));
+            HttpContext.Session.SetBoolean(Session.SkipAutoIdentityProvider, true);
             return RedirectToAction(nameof(Index));
         }
 
         [HttpGet("")]
         public async Task<IActionResult> Index(string returnUrl)
         {
-            var usernameClaim = HttpContext
-                .User
-                .Claims
-                .FirstOrDefault(_ => _.Type == ClaimType.Username);
+            var userName = HttpContext.User?.Identity?.Name;
 
-            if (usernameClaim != null)
+            if (userName != null)
             {
                 return RedirectToAction(nameof(Logout));
             }
@@ -90,15 +88,16 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication
             // if there's a default provider configured we'll automatically try that
             var activeProviders = await _identityProviderService.GetAllActiveAsync();
 
-            var sessionSkipDefault = HttpContext.Session.Get(Session.SkipAutoIdentityProvider);
-            if (sessionSkipDefault != BitConverter.GetBytes(true))
+            // session value is populated with a 1 in the first byte then skip default provider
+            var skipProvider = HttpContext.Session.GetBoolean(Session.SkipAutoIdentityProvider);
+
+            if (!skipProvider)
             {
                 var defaultProvider = activeProviders?.FirstOrDefault(_ => _.IsDefault);
                 if (defaultProvider != null)
                 {
                     // set the skip default in case something goes wrong externally
-                    HttpContext.Session.Set(Session.SkipAutoIdentityProvider,
-                        BitConverter.GetBytes(true));
+                    HttpContext.Session.SetBoolean(Session.SkipAutoIdentityProvider, true);
                     return Redirect(ISamlService.GenerateRedirectLink(defaultProvider, returnUrl));
                 }
             }
@@ -126,13 +125,8 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication
         [HttpGet("[action]")]
         public async Task<IActionResult> JustLogout()
         {
-            var usernameClaim = HttpContext
-                .User
-                .Claims
-                .FirstOrDefault(_ => _.Type == ClaimType.Username);
-
             _logger.LogInformation("Logging out user {Username}",
-                usernameClaim?.Value ?? "unauthenticated user");
+                HttpContext.User?.Identity?.Name ?? "unauthenticated user");
 
             await Request.HttpContext.SignOutAsync();
             return Ok();
@@ -170,7 +164,7 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication
             }
 
             // if a form submit failed, do not redirect to a SAML provider
-            HttpContext.Session.Set(Session.SkipAutoIdentityProvider, BitConverter.GetBytes(true));
+            HttpContext.Session.SetBoolean(Session.SkipAutoIdentityProvider, true);
 
             ShowAlertWarning("Login failed.");
             return RedirectToAction(nameof(Index));
@@ -179,13 +173,8 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication
         [HttpGet("[action]")]
         public async Task<RedirectToActionResult> Logout()
         {
-            var usernameClaim = HttpContext
-                .User
-                .Claims
-                .FirstOrDefault(_ => _.Type == ClaimType.Username);
-
             _logger.LogInformation("Logging out user {Username}",
-                usernameClaim?.Value ?? "unauthenticated user");
+                HttpContext.User?.Identity?.Name ?? "unauthenticated user");
 
             await Request.HttpContext.SignOutAsync();
             return RedirectToAction(nameof(Index));
@@ -297,7 +286,7 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication
             _logger.LogInformation("SAML authentication failure, telling user {Message} and skipping SAML on next attempt",
                 failureMessage);
             ShowAlertWarning(failureMessage);
-            HttpContext.Session.Set(Session.SkipAutoIdentityProvider, BitConverter.GetBytes(true));
+            HttpContext.Session.SetBoolean(Session.SkipAutoIdentityProvider, true);
             return RedirectToAction(nameof(Index));
         }
 
@@ -357,22 +346,21 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication
 
             // start creating the user's claims with their username
             var claims = new HashSet<Claim>
-                        {
-                            new(ClaimType.AuthenticatedAt, now.ToString("O",
-                                CultureInfo.InvariantCulture)),
-                            new(ClaimType.IdentityProvider, providerName),
-                            new(ClaimType.IdentityProviderType,
-                                Enum.GetName(typeof(IdentityProviderType), providerType)),
-                            new(ClaimType.UserId, userId),
-                            new(ClaimType.Username, username)
-                        };
+            {
+                new(ClaimType.AuthenticatedAt, now.ToString("O",CultureInfo.InvariantCulture)),
+                new(ClaimType.IdentityProvider, providerName),
+                new(ClaimType.IdentityProviderType,
+                    Enum.GetName(typeof(IdentityProviderType),
+                    providerType)),
+                new(ClaimType.UserId, userId),
+                new(ClaimTypes.Name, username)
+            };
 
             bool isSiteManager = false;
 
             // pull lists of AD groups that should be site managers
             var claimGroups = await _authorizationService.GetClaimGroupsAsync();
-            var permissionGroups
-                = await _authorizationService.GetPermissionGroupsAsync();
+            var permissionGroups = await _authorizationService.GetPermissionGroupsAsync();
 
             var claimantOf = new Dictionary<string, string>();
             var inPermissionGroup = new List<int>();
@@ -452,7 +440,7 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication
             // TODO: probably change the role claim type to our roles and not AD groups
             var identity = new ClaimsIdentity(claims,
                 CookieAuthenticationDefaults.AuthenticationScheme,
-                ClaimType.Username,
+                ClaimTypes.Name,
                 ClaimType.ADGroup);
 
             await Request.HttpContext.SignInAsync(new ClaimsPrincipal(identity));

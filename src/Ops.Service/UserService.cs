@@ -116,7 +116,7 @@ namespace Ocuda.Ops.Service
             }
             else
             {
-                _logger.LogError("Missing profile picture for user {Username}: {FilePath}",
+                _logger.LogWarning("Missing profile picture for user {Username}: {FilePath}",
                     username,
                     filePath);
                 return null;

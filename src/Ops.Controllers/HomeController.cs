@@ -177,8 +177,8 @@ namespace Ocuda.Ops.Controllers
         {
             return Json(new UserInformation
             {
-                Username = UserClaim(ClaimType.Username),
-                Authenticated = !string.IsNullOrEmpty(UserClaim(ClaimType.Username)),
+                Username = HttpContext.User?.Identity?.Name,
+                Authenticated = HttpContext.User?.Identity.IsAuthenticated == true,
                 AuthenticatedAt = UserClaim(ClaimType.AuthenticatedAt) != null
                     ? DateTime.Parse(UserClaim(ClaimType.AuthenticatedAt),
                         CultureInfo.InvariantCulture)

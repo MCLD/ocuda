@@ -11,6 +11,5 @@
         public static readonly string PermissionId = nameof(PermissionId);
         public static readonly string SiteManager = nameof(SiteManager);
         public static readonly string UserId = nameof(UserId);
-        public static readonly string Username = nameof(Username);
     }
 }
