@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Utility.Keys;
 using Serilog.Context;
 
 namespace Ocuda.Ops.Controllers.Filters
@@ -39,39 +38,32 @@ namespace Ocuda.Ops.Controllers.Filters
             ArgumentNullException.ThrowIfNull(next);
 
             User user = null;
-            var userName = context.HttpContext.User?.Identity?.Name;
 
-            // no claim = not authenticat4ed, redirect
-
-            if (!string.IsNullOrEmpty(userName))
+            if (context.HttpContext.User?.Identity?.IsAuthenticated == true)
             {
-                user = await UserService.LookupUserAsync(userName);
+                var userName = context.HttpContext.User?.Identity?.Name;
+
+                if (!string.IsNullOrEmpty(userName))
+                {
+                    user = await UserService.LookupUserAsync(userName);
+                }
+
                 if (user != null)
                 {
                     context.HttpContext.Items[ItemKey.Nickname] = user.Nickname ?? user.Username;
                 }
-            }
 
-            var sections = await SectionService.GetAllAsync();
-            if (sections?.Count > 0)
-            {
-                bool userIsSupervisor = false;
-                try
+                var sections = await SectionService.GetAllAsync();
+                if (sections?.Count > 0)
                 {
-                    userIsSupervisor = user != null && await UserService.IsSupervisor(user.Id);
+                    bool userIsSupervisor = user != null && await UserService.IsSupervisor(user.Id);
+                    if (!userIsSupervisor)
+                    {
+                        sections = [.. sections.Where(_ => !_.SupervisorsOnly)];
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Logger.LogError("Could not determine if userid {UserId} is a supervisor: {ErrorMessage}",
-                        user.Id,
-                        ex.Message);
-                }
-                if (!userIsSupervisor)
-                {
-                    sections = sections.Where(_ => !_.SupervisorsOnly).ToList();
-                }
+                context.HttpContext.Items[ItemKey.Sections] = sections;
             }
-            context.HttpContext.Items[ItemKey.Sections] = sections;
 
             using (LogContext.PushProperty(Utility.Logging.Enrichment.HttpMethod,
                 context.HttpContext.Request.Method))

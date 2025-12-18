@@ -165,10 +165,17 @@ namespace Ocuda.Ops.Service
         public async Task<bool> IsSupervisor(int userId)
         {
             // TODO add caching
-            return await _userRepository.IsSupervisor(userId);
+            try
+            {
+                return await _userRepository.IsSupervisor(userId);
+            }
+            catch (InvalidOperationException)
+            {
+                return false;
+            }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
             "CA1308:Normalize strings to uppercase",
             Justification = "Normalize username to lowercase.")]
         public async Task<User> LookupUserAsync(string username)

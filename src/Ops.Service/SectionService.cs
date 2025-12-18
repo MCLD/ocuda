@@ -48,19 +48,9 @@ namespace Ocuda.Ops.Service
                 await _cache.SaveToCacheAsync(Utility.Keys.Cache.OpsSections, sections, 1);
             }
 
-            bool isSupervisor = false;
-            try
-            {
-                isSupervisor = await _userService.IsSupervisor(GetCurrentUserId());
-            }
-            catch (InvalidOperationException)
-            {
-                // user information couldn't be found so obviously not a supervisor!
-            }
-
-            return isSupervisor
+            return await _userService.IsSupervisor(GetCurrentUserId())
                 ? sections
-                : sections.Where(_ => !_.SupervisorsOnly).ToList();
+                : [.. sections.Where(_ => !_.SupervisorsOnly)];
         }
 
         public async Task<Section> GetByIdAsync(int id)
