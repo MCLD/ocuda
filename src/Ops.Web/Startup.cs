@@ -94,12 +94,12 @@ namespace Ocuda.Ops.Web
                 RequestPath = new PathString(contentUrl)
             });
 
-            app.UseSession();
-
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSession();
 
             app.UseEndpoints(_ =>
             {
@@ -192,6 +192,7 @@ namespace Ocuda.Ops.Web
             {
                 _.IdleTimeout = sessionTimeout;
                 _.Cookie.HttpOnly = true;
+                _.Cookie.IsEssential = true;
             });
 
             _config[Configuration.OcudaRuntimeSessionTimeout] = sessionTimeout.ToString();
@@ -200,7 +201,8 @@ namespace Ocuda.Ops.Web
                 .AddCookie(_ =>
                 {
                     _.AccessDeniedPath = "/Unauthorized";
-                    _.LoginPath = "/Authenticate";
+                    _.LoginPath = "/Authentication";
+                    _.LogoutPath = "/Authentication/Logout";
                 });
 
             services.AddAuthorizationBuilder().AddPolicy(nameof(ClaimType.SiteManager),
@@ -319,10 +321,9 @@ namespace Ocuda.Ops.Web
             services.AddScoped(typeof(Data.ServiceFacade.Repository<>));
 
             // filters
-            services.AddScoped<Controllers.Filters.AuthenticationFilterAttribute>();
+            services.AddScoped<Controllers.Filters.UserFilterAttribute>();
             services.AddScoped<Controllers.Filters.ExternalResourceFilterAttribute>();
             services.AddScoped<Controllers.Filters.NavigationFilterAttribute>();
-            services.AddScoped<Controllers.Filters.UserFilterAttribute>();
 
             // helpers
             services.AddScoped<Utility.Helpers.WebHelper>();
@@ -369,6 +370,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.VolunteerUserMappingRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IHistoricalIncidentRepository,
                 Data.Ops.HistoricalIncidentRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IIdentityProviderRepository,
+                Data.Ops.IdentityProviderRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IIncidentFollowupRepository,
                 Data.Ops.IncidentFollowupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IIncidentParticipantRepository,
@@ -572,6 +575,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IFileTypeService, FileTypeService>();
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IHistoricalIncidentService, HistoricalIncidentService>();
+            services.AddScoped<IIdentityProviderService, IdentityProviderService>();
             services.AddScoped<IImageFeatureService, ImageFeatureService>();
             services.AddScoped<IImageService, ImageService>();
             services.AddScoped<IIncidentService, IncidentService>();
@@ -597,6 +601,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IPermissionGroupService, PermissionGroupService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IRosterService, RosterService>();
+            services.AddScoped<ISamlService, SamlService>();
             services.AddScoped<IScheduleNotificationService, ScheduleNotificationService>();
             services.AddScoped<IScheduleService, ScheduleService>();
             services.AddScoped<IScheduleRequestLimitService,

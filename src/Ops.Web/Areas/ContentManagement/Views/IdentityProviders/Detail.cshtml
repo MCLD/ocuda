@@ -1,0 +1,51 @@
+﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement
+@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.IdentityProviders.DetailViewModel
+
+<div class="d-flex justify-content-between mb-2">
+    <h1>
+        Identity Provider
+        <small class="text-muted">@Model?.Name</small>
+    </h1>
+    <div>
+        <a asp-action="@nameof(IdentityProvidersController.Index)"
+           asp-controller="@IdentityProvidersController.Name"
+           class="btn btn-outline-dark ms-2">Back</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <form asp-action="@nameof(IdentityProvidersController.Add)"
+              method="post">
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Slug" class="form-label"></label>
+                <input asp-for="Slug" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="AssertionConsumerLink" class="form-label"></label>
+                <input asp-for="AssertionConsumerLink" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="EndpointLink" class="form-label"></label>
+                <input asp-for="EndpointLink" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="EntityId" class="form-label"></label>
+                <input asp-for="EntityId" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Certificate" class="form-label"></label>
+                <textarea asp-for="Certificate" class="form-control"></textarea>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-outline-primary">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -38,6 +38,7 @@ namespace Ocuda.Ops.Data
         public DbSet<File> Files { get; set; }
         public DbSet<FileType> FileTypes { get; set; }
         public DbSet<HistoricalIncident> HistoricalIncidents { get; set; }
+        public DbSet<IdentityProvider> IdentityProviders { get; set; }
         public DbSet<IncidentFollowup> IncidentFollowups { get; set; }
         public DbSet<IncidentParticipant> IncidentParticipants { get; set; }
         public DbSet<IncidentRelationship> IncidentRelationships { get; set; }

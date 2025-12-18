@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using CPI.DirectoryServices;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
@@ -14,12 +16,14 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
 {
     public class UserSyncService : BaseService<UserSyncService>, IUserSyncService
     {
+        private readonly IConfiguration _config;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILdapService _ldapService;
         private readonly ILocationService _locationService;
@@ -31,31 +35,34 @@ namespace Ocuda.Ops.Service
 
         public UserSyncService(ILogger<UserSyncService> logger,
             IHttpContextAccessor httpContextAccessor,
+            IConfiguration config,
             IDateTimeProvider dateTimeProvider,
             ILdapService ldapService,
             ILocationService locationService,
             ISiteSettingService siteSettingService,
-            IUserRepository userRepository,
             IUserManagementService userManagementService,
+            IUserRepository userRepository,
             IUserSyncHistoryRepository userSyncHistoryRepository,
             IUserSyncLocationRepository userSyncLocationRepository)
             : base(logger, httpContextAccessor)
         {
+            ArgumentNullException.ThrowIfNull(config);
             ArgumentNullException.ThrowIfNull(dateTimeProvider);
             ArgumentNullException.ThrowIfNull(ldapService);
             ArgumentNullException.ThrowIfNull(locationService);
             ArgumentNullException.ThrowIfNull(siteSettingService);
-            ArgumentNullException.ThrowIfNull(userRepository);
             ArgumentNullException.ThrowIfNull(userManagementService);
+            ArgumentNullException.ThrowIfNull(userRepository);
             ArgumentNullException.ThrowIfNull(userSyncHistoryRepository);
             ArgumentNullException.ThrowIfNull(userSyncLocationRepository);
 
+            _config = config;
             _dateTimeProvider = dateTimeProvider;
             _ldapService = ldapService;
             _locationService = locationService;
             _siteSettingService = siteSettingService;
-            _userRepository = userRepository;
             _userManagementService = userManagementService;
+            _userRepository = userRepository;
             _userSyncHistoryRepository = userSyncHistoryRepository;
             _userSyncLocationRepository = userSyncLocationRepository;
         }
@@ -185,8 +192,12 @@ namespace Ocuda.Ops.Service
                 _logger.LogInformation("Scanning AD for user changes and *not* applying them");
             }
 
-            var disabledOu = await _siteSettingService
-                .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.UserSync.DisabledOu);
+            DN dnDisabledUsersGroup = null;
+            var disabledUsersGroup = _config[Configuration.OpsLdapDisabledUsers];
+            if (!string.IsNullOrEmpty(disabledUsersGroup))
+            {
+                dnDisabledUsersGroup = new DN(disabledUsersGroup);
+            }
 
             foreach (var ldapUser in ldapUsers)
             {
@@ -419,8 +430,7 @@ namespace Ocuda.Ops.Service
 
                     if (staffUsername == null)
                     {
-                        if (!string.IsNullOrEmpty(disabledOu)
-                            && directReportDn.IndexOf($"OU={disabledOu}") > -1)
+                        if (dnDisabledUsersGroup?.Contains(new DN(directReportDn)) == true)
                         {
                             continue;
                         }

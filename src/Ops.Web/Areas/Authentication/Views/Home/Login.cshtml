@@ -1,0 +1,70 @@
+﻿@using Ocuda.Ops.Controllers.Areas.Authentication.ViewModels
+@model LoginViewModel
+
+<form asp-action="@nameof(HomeController.Login)"
+      asp-area="@HomeController.Area"
+      asp-controller="@HomeController.Name"
+      method="post">
+    <input type="hidden" asp-for="ReturnUrl" />
+    @if (Model.IdentityProviders?.Count() > 0)
+    {
+        <div class="row mt-3">
+            <div class="col-md-4 offset-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        Single Sign-On Providers
+                    </div>
+                    <div class="card-body">
+                        @foreach (var identityProvider in Model.IdentityProviders)
+                        {
+                            <a class="btn btn-outline-primary me-2"
+                               href="@identityProvider.EndpointLink">@identityProvider.Name</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+    <div class="row mt-3">
+        <div class="col-md-4 offset-md-4">
+            <div class="card">
+                <div class="card-header">
+                    Log in
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label"></label>
+                        <input aria-required="true"
+                               asp-for="Username"
+                               autocomplete="username"
+                               class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input aria-required="true"
+                               asp-for="Password"
+                               autocomplete="off"
+                               class="form-control"
+                               type="password" />
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-end">
+                    <button type="submit" class="btn btn-outline-primary ms-2">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-1">
+        <div class="col-md-4 offset-md-4 d-flex justify-content-center">
+            <em>
+                <small>
+                    Difficulty with access?
+                    <a href="@Model.AdminEmail">
+                        Contact an administrator.
+                    </a>
+                </small>
+            </em>
+        </div>
+    </div>
+</form>

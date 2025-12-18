@@ -1,0 +1,113 @@
+﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement
+@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.IdentityProviders.IndexViewModel
+
+<div class="d-flex justify-content-between mb-2">
+    <h1>Identity Providers</h1>
+    <div class="pt-2">
+        <a asp-action="@nameof(IdentityProvidersController.Add)"
+           class="btn btn-outline-success">
+            <span aria-hidden="true" class="fa-solid fa-fw fa-circle-plus"></span>
+            Add Provider
+        </a>
+        <a asp-area="@HomeController.Area"
+           asp-controller="@HomeController.Name"
+           asp-action="@nameof(HomeController.Index)"
+           class="btn btn-outline-dark ms-2">Back</a>
+    </div>
+</div>
+
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Slug</th>
+            <th>Entity Id</th>
+            <th>Created At</th>
+            <th>Created By</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Providers?.Count() > 0)
+        {
+            @foreach (var provider in Model.Providers)
+            {
+                <tr>
+                    <td>@provider.Name</td>
+                    <td>@provider.Slug</td>
+                    <td>@provider.IsActive</td>
+                    <td>@provider.EntityId</td>
+                    <td>@provider.CreatedAt</td>
+                    <td>
+                        <a asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                           asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                           asp-route-id="@provider.CreatedByUser.Username"
+                           target="_blank">@provider.CreatedByUser.Name</a>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger"
+                                data-bs-target="#deleteModal"
+                                data-bs-toggle="modal"
+                                data-id="@provider.Id"
+                                data-identifier="@provider.Id">
+                            <span aria-hidden="true" class="fa-solid fa-circle-minus fa-fw"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr class="table-warning">
+                <td colspan="7">
+                    No providers found.
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<form asp-action="@nameof(IdentityProvidersController.Delete)"
+      method="post">
+    <input type="hidden" id="providerId" name="providerId" />
+    <div aria-hidden="true"
+         aria-labelledby="deleteModalLabel"
+         class="modal fade"
+         id="deleteModal"
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteModalLabel">Delete API Key</h1>
+                    <button aria-label="Close"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            type="button"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete provider:
+                    <code id="deleteModalIdentifier"></code>?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal"
+                            type="button">
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-outline-danger">Delete provider</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        document.getElementById('deleteModal').addEventListener('show.bs.modal', _ => {
+            document.getElementById("providerId").value =  _.relatedTarget.dataset.id;
+            document.getElementById("deleteModalIdentifier").innerText
+                = _.relatedTarget.dataset.identifier;
+        });
+    </script>
+}
