@@ -6,7 +6,7 @@
       asp-controller="@HomeController.Name"
       method="post">
     <input type="hidden" asp-for="ReturnUrl" />
-    @if (Model.IdentityProviders?.Count() > 0)
+    @if (Model.ProviderLinks?.Count() > 0)
     {
         <div class="row mt-3">
             <div class="col-md-4 offset-md-4">
@@ -15,10 +15,10 @@
                         Single Sign-On Providers
                     </div>
                     <div class="card-body">
-                        @foreach (var identityProvider in Model.IdentityProviders)
+                        @foreach (var identityProvider in Model.ProviderLinks)
                         {
                             <a class="btn btn-outline-primary me-2"
-                               href="@identityProvider.EndpointLink">@identityProvider.Name</a>
+                               href="@identityProvider.Value">@identityProvider.Key</a>
                         }
                     </div>
                 </div>

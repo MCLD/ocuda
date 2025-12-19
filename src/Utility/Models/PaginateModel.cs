@@ -3,58 +3,24 @@
     public class PaginateModel
     {
         public int CurrentPage { get; set; }
-        public int ItemCount { get; set; }
-        public int ItemsPerPage { get; set; }
-
-        public int? NextPage
-        {
-            get
-            {
-                if (CurrentPage < LastPage)
-                {
-                    return CurrentPage + 1;
-                }
-                return null;
-            }
-        }
-
-        public int? PreviousPage
-        {
-            get
-            {
-                if (CurrentPage > 1)
-                {
-                    return CurrentPage - 1;
-                }
-                return null;
-            }
-        }
 
         public int? FirstPage
         {
             get
             {
-                if (CurrentPage > 1)
-                {
-                    return 1;
-                }
-                return null;
+                return CurrentPage > 1 ? 1 : null;
             }
         }
+
+        public int ItemCount { get; set; }
+
+        public int ItemsPerPage { get; set; }
 
         public int? LastPage
         {
             get
             {
-                if (ItemCount > ItemsPerPage)
-                {
-                    int last = MaxPage;
-                    if (CurrentPage != last)
-                    {
-                        return last;
-                    }
-                }
-                return null;
+                return ItemCount > ItemsPerPage && CurrentPage != MaxPage ? MaxPage : null;
             }
         }
 
@@ -75,12 +41,35 @@
             }
         }
 
+        public int? NextPage
+        {
+            get
+            {
+                return CurrentPage < LastPage ? CurrentPage + 1 : null;
+            }
+        }
+
         public bool PastMaxPage
         {
             get
             {
                 return MaxPage > 0 && CurrentPage > MaxPage;
             }
+        }
+
+        public int? PreviousPage
+        {
+            get
+            {
+                return CurrentPage > 1 ? CurrentPage - 1 : null;
+            }
+        }
+
+        public static string BoolIconClass(bool value)
+        {
+            return value
+                ? "fa-regular fa-circle-check text-success"
+                : "fa-regular fa-circle-xmark text-danger";
         }
     }
 }
