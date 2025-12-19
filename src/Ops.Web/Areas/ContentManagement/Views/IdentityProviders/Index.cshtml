@@ -1,5 +1,5 @@
-﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement
-@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.IdentityProviders.IndexViewModel
+﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.IdentityProviders
+@model IndexViewModel
 
 <div class="d-flex justify-content-between mb-2">
     <h1>Identity Providers</h1>
@@ -20,8 +20,9 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th>Status</th>
             <th>Slug</th>
+            <th>Default</th>
+            <th>Status</th>
             <th>Entity Id</th>
             <th>Created At</th>
             <th>Created By</th>
@@ -36,7 +37,12 @@
                 <tr>
                     <td>@provider.Name</td>
                     <td>@provider.Slug</td>
-                    <td>@provider.IsActive</td>
+                    <td class="text-center">
+                        <span class="@IndexViewModel.BoolIconClass(provider.IsDefault)"></span>
+                    </td>
+                    <td class="text-center">
+                        <span class="@IndexViewModel.BoolIconClass(provider.IsActive)"></span>
+                    </td>
                     <td>@provider.EntityId</td>
                     <td>@provider.CreatedAt</td>
                     <td>

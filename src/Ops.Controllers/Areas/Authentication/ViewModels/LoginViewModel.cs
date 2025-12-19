@@ -1,17 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Controllers.Areas.Authentication.ViewModels
 {
     public class LoginViewModel
     {
+        public LoginViewModel()
+        {
+            ProviderLinks = new Dictionary<string, string>();
+        }
+
         public string AdminEmail { get; set; }
-        public IEnumerable<IdentityProvider> IdentityProviders { get; set; }
 
         [Required]
         public string Password { get; set; }
 
+        public IDictionary<string, string> ProviderLinks { get; }
         public string ReturnUrl { get; set; }
 
         [Required]

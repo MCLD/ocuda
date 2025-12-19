@@ -114,12 +114,19 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication
                     + Uri.EscapeDataString("I am experiencing difficulty authenticating to the intranet: ");
             }
 
-            return View("Login", new LoginViewModel
+            var viewModel = new LoginViewModel
             {
                 AdminEmail = mailLink,
-                IdentityProviders = activeProviders,
                 ReturnUrl = returnUrl
-            });
+            };
+
+            foreach (var activeProvider in activeProviders)
+            {
+                viewModel.ProviderLinks.Add(activeProvider.Name,
+                    ISamlService.GenerateRedirectLink(activeProvider, returnUrl));
+            }
+
+            return View("Login", viewModel);
         }
 
         [HttpGet("[action]")]
