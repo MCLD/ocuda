@@ -28,6 +28,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location
         public string PreFeatureSegmentName { get; set; }
 
         public string SocialCardName { get; set; }
+        public string StaffSearchLink { get; set; }
 
         public List<LocationVolunteerFormViewModel> VolunteerForms { get; set; }
     }

@@ -994,11 +994,13 @@
     }
 
     <script>
+        const adultTextInput = $('#staffSearchText');
+        const adultSearchBody = $('#searchResults');
+        const paginationAdult = $('#pagination');
+        const searchJsonUrl = '@Model.StaffSearchLink';
+
         var currentPage = 1;
         var users = [];
-        var adultTextInput = $('#staffSearchText');
-        var adultSearchBody = $('#searchResults');
-        var paginationAdult = $('#pagination');
         var currentFormTypeId;
 
         function FormatStub(object) {
@@ -1287,9 +1289,7 @@
         }
 
         async function performStaffSearch(searchText, page) {
-            let searchJsonUrl = '@Url.Action(nameof(Ocuda.Ops.Controllers.StaffController.SearchJson), Ocuda.Ops.Controllers.StaffController.Name, null, protocol: "http")';
-            let searchParams = { searchText: searchText, page: page }
-            return await OcudaFetch(searchJsonUrl, searchParams);
+            return await OcudaFetch(searchJsonUrl,  { searchText: searchText, page: page });
         }
 
         function nextPage(isTeen) {
