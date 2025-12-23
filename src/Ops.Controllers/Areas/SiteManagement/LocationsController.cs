@@ -946,6 +946,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .GetLocationByStubAsync(locationStub);
                 location.IsNewLocation = false;
 
+                var intranetUri = await GetBaseUriAsync(_siteSettingService);
+
+                var staffSearchLink = Url.Action(nameof(StaffController.SearchJson),
+                    StaffController.Name,
+                    null,
+                    intranetUri.Scheme);
+
                 var viewModel = new LocationViewModel
                 {
                     Location = location,
@@ -953,7 +960,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     LocationStub = location.Stub,
                     LocationGroups = await _locationGroupService
                         .GetLocationGroupsByLocationAsync(location),
-                    Action = nameof(LocationsController.EditLocation)
+                    Action = nameof(EditLocation),
+                    StaffSearchLink = staffSearchLink
                 };
 
                 var volunteerFeature = await _featureService

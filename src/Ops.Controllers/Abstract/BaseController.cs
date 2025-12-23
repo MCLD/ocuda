@@ -39,15 +39,8 @@ namespace Ocuda.Ops.Controllers.Abstract
                 var userIdString = HttpContext.User.Claims
                     .FirstOrDefault(_ => _.Type == ClaimType.UserId)?
                     .Value;
-                if (int.TryParse(userIdString, out int userId))
-                {
-                    return userId;
-                }
-                else
-                {
-                    // TODO is this the right approach here?
-                    return -1;
-                }
+                // TODO is this the right approach here? possibly throw
+                return int.TryParse(userIdString, out int userId) ? userId : -1;
             }
         }
 
@@ -57,6 +50,13 @@ namespace Ocuda.Ops.Controllers.Abstract
             {
                 return HttpContext.User.Identity.Name;
             }
+        }
+
+        protected async Task<Uri> GetBaseUriAsync(ISiteSettingService siteSettingService)
+        {
+            ArgumentNullException.ThrowIfNull(siteSettingService);
+            return new Uri(await siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.UserInterface.BaseIntranetLink));
         }
 
         protected async Task<bool> HasAppPermissionAsync(
@@ -92,7 +92,7 @@ namespace Ocuda.Ops.Controllers.Abstract
         }
 
         protected async Task<bool> HasPermissionAsync<TPermissonGroupMappingBase>(
-                    IPermissionGroupService permissionGroupService,
+            IPermissionGroupService permissionGroupService,
             int itemId) where TPermissonGroupMappingBase : PermissionGroupMappingBase
         {
             if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
