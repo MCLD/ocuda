@@ -26,12 +26,15 @@ namespace Ocuda.Ops.Service
             ISectionRepository sectionRepository,
             IUserService userService) : base(logger, httpContextAccessor)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
-            _sectionRepository = sectionRepository
-                ?? throw new ArgumentNullException(nameof(sectionRepository));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+            ArgumentNullException.ThrowIfNull(sectionRepository);
+            ArgumentNullException.ThrowIfNull(userService);
+
+            _cache = cache;
+            _permissionGroupService = permissionGroupService;
+            _sectionRepository = sectionRepository;
+            _userService = userService;
         }
 
         public async Task<ICollection<Section>> GetAllAsync()
@@ -45,11 +48,9 @@ namespace Ocuda.Ops.Service
                 await _cache.SaveToCacheAsync(Utility.Keys.Cache.OpsSections, sections, 1);
             }
 
-            var isSupervisor = await _userService.IsSupervisor(GetCurrentUserId());
-
-            return isSupervisor
+            return await _userService.IsSupervisor(GetCurrentUserId())
                 ? sections
-                : sections.Where(_ => !_.SupervisorsOnly).ToList();
+                : [.. sections.Where(_ => !_.SupervisorsOnly)];
         }
 
         public async Task<Section> GetByIdAsync(int id)
@@ -67,8 +68,8 @@ namespace Ocuda.Ops.Service
         public async Task<Section> GetBySlugAsync(string slug)
         {
             var sections = await GetAllAsync();
-            return sections
-                .SingleOrDefault(_ => _.Slug.ToUpperInvariant() == slug.ToUpperInvariant());
+            return sections.SingleOrDefault(_ => _.Slug.Equals(slug,
+                StringComparison.InvariantCultureIgnoreCase));
         }
 
         public async Task<int> GetHomeSectionIdAsync()

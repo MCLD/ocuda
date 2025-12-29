@@ -41,22 +41,25 @@ namespace Ocuda.Promenade.Service
             IPathResolverService pathResolver)
             : base(logger, dateTimeProvider)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-            _httpContextAccessor = httpContextAccessor
-                ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            _pathResolver = pathResolver
-                ?? throw new ArgumentNullException(nameof(pathResolver));
-            _imageFeatureItemRepository = imageFeatureItemRepository
-                ?? throw new ArgumentNullException(nameof(imageFeatureItemRepository));
-            _imageFeatureItemTextRepository = imageFeatureItemTextRepository
-                ?? throw new ArgumentNullException(nameof(imageFeatureItemTextRepository));
-            _imageFeatureRepository = imageFeatureRepository
-                ?? throw new ArgumentNullException(nameof(imageFeatureRepository));
-            _imageFeatureTemplateRepository = imageFeatureTemplateRepository
-                ?? throw new ArgumentNullException(nameof(imageFeatureTemplateRepository));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(config);
+            ArgumentNullException.ThrowIfNull(httpContextAccessor);
+            ArgumentNullException.ThrowIfNull(imageFeatureItemRepository);
+            ArgumentNullException.ThrowIfNull(imageFeatureItemTextRepository);
+            ArgumentNullException.ThrowIfNull(imageFeatureRepository);
+            ArgumentNullException.ThrowIfNull(imageFeatureTemplateRepository);
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(pathResolver);
+
+            _cache = cache;
+            _config = config;
+            _httpContextAccessor = httpContextAccessor;
+            _imageFeatureItemRepository = imageFeatureItemRepository;
+            _imageFeatureItemTextRepository = imageFeatureItemTextRepository;
+            _imageFeatureRepository = imageFeatureRepository;
+            _imageFeatureTemplateRepository = imageFeatureTemplateRepository;
+            _languageService = languageService;
+            _pathResolver = pathResolver;
         }
 
         public async Task<ImageFeature> GetByIdAsync(int imageFeatureId, bool forceReload)
@@ -72,7 +75,8 @@ namespace Ocuda.Promenade.Service
 
             if (cachePageSpan.HasValue && !forceReload)
             {
-                imageFeature = await _cache.GetObjectFromCacheAsync<ImageFeature>(imageFeatureCacheKey);
+                imageFeature = await _cache
+                    .GetObjectFromCacheAsync<ImageFeature>(imageFeatureCacheKey);
             }
 
             if (imageFeature == null)
@@ -124,7 +128,7 @@ namespace Ocuda.Promenade.Service
                     var expire = cachePageSpan;
                     if (cachePageSpan.HasValue && item.EndDate.HasValue)
                     {
-                        expire = GetCacheDuration(cachePageSpan.Value, item.EndDate.Value);
+                        expire = GetCacheDuration(cachePageSpan.Value, [item.EndDate.Value]);
                     }
 
                     if (currentLanguageId.HasValue)
@@ -157,11 +161,11 @@ namespace Ocuda.Promenade.Service
                                     .Filepath
                                     .EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    var path = _pathResolver
-                                        .GetPublicContentFilePath(item.ImageFeatureItemText.Filename,
-                                            ImagesFilePath,
-                                            languageName,
-                                            FeaturesFilePath);
+                                    var path = _pathResolver.GetPublicContentFilePath(
+                                        item.ImageFeatureItemText.Filename,
+                                        ImagesFilePath,
+                                        languageName,
+                                        FeaturesFilePath);
                                     if (System.IO.File.Exists(path))
                                     {
                                         item.ImageFeatureItemText.FileContent =
@@ -237,7 +241,7 @@ namespace Ocuda.Promenade.Service
 
                     if (earliestExpiration.HasValue)
                     {
-                        expire = GetCacheDuration(cachePageSpan.Value, earliestExpiration.Value);
+                        expire = GetCacheDuration(cachePageSpan.Value, [earliestExpiration.Value]);
                         if (expire != cachePageSpan.Value)
                         {
                             _logger.LogInformation("Shortening webslide {Name} ({ItemId}) cache to {CacheForTime}, due to item expiration at {EndDate}",

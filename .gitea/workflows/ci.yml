@@ -1,4 +1,5 @@
-name: "Build - action"
+name: ci
+run-name: ${{ github.actor }} is running ci
 
 on: [push, pull_request]
 
@@ -13,6 +14,7 @@ jobs:
       - name: "Ops Docker"
         env:
           BLD_DOCKER_IMAGE: ops
+          CR_HOST: ${{secrets.CR_HOST}}
           CR_OWNER: ${{secrets.CR_OWNER}}
           CR_PASSWORD: ${{secrets.CR_PASSWORD}}
           CR_USER: ${{secrets.CR_USER}}
@@ -31,6 +33,7 @@ jobs:
       - name: "Promenade Docker"
         env:
           BLD_DOCKER_IMAGE: promenade
+          CR_HOST: ${{secrets.CR_HOST}}
           CR_OWNER: ${{secrets.CR_OWNER}}
           CR_PASSWORD: ${{secrets.CR_PASSWORD}}
           CR_USER: ${{secrets.CR_USER}}

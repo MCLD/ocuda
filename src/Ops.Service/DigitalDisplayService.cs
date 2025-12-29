@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -112,7 +114,7 @@ namespace Ocuda.Ops.Service
 
             var set = await _digitalDisplaySetRepository
                 .FindAsync(assetSet.DigitalDisplaySetId);
-            set.LastContentUpdate = DateTime.Now;
+            set.LastContentUpdate = _dateTimeProvider.Now;
             _digitalDisplaySetRepository.Update(set);
 
             await _digitalDisplayAssetSetRepository.SaveAsync();
@@ -120,8 +122,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<IEnumerable<int>> AssignSetAsync(int displayId, int setId)
         {
-            var sets = await _digitalDisplayDisplaySetRepository
-                .GetByDisplayIdsAsync(new[] { displayId });
+            var sets = await _digitalDisplayDisplaySetRepository.GetByDisplayIdsAsync([displayId]);
             var hasValue = sets.SingleOrDefault(_ => _.DigitalDisplaySetId == setId);
             if (hasValue != null)
             {
@@ -137,8 +138,7 @@ namespace Ocuda.Ops.Service
             }
             await _digitalDisplayDisplaySetRepository.SaveAsync();
 
-            sets = await _digitalDisplayDisplaySetRepository
-                .GetByDisplayIdsAsync(new[] { displayId });
+            sets = await _digitalDisplayDisplaySetRepository.GetByDisplayIdsAsync([displayId]);
 
             return sets.Select(_ => _.DigitalDisplaySetId);
         }
@@ -310,7 +310,7 @@ namespace Ocuda.Ops.Service
         public async Task<int> GetNonExpiredAssetCountAsync(int displayId)
         {
             var displaySets = await _digitalDisplayDisplaySetRepository
-                .GetByDisplayIdsAsync(new[] { displayId });
+                .GetByDisplayIdsAsync([displayId]);
 
             var setIds = displaySets.Select(_ => _.DigitalDisplaySetId).Distinct();
 
@@ -322,7 +322,7 @@ namespace Ocuda.Ops.Service
         public async Task<IEnumerable<DigitalDisplayCurrentAsset>> GetNonExpiredAssetsAsync(int displayId)
         {
             var displaySets = await _digitalDisplayDisplaySetRepository
-                .GetByDisplayIdsAsync(new[] { displayId });
+                .GetByDisplayIdsAsync([displayId]);
 
             var setIds = displaySets.Select(_ => _.DigitalDisplaySetId).Distinct();
 
@@ -421,7 +421,7 @@ namespace Ocuda.Ops.Service
             else
             {
                 await _cache.SaveToCacheAsync(statusKey, status, 24);
-                await _cache.SaveToCacheAsync(statusAtKey, DateTime.Now.Ticks, 24);
+                await _cache.SaveToCacheAsync(statusAtKey, _dateTimeProvider.Now.Ticks, 24);
             }
         }
 
@@ -440,7 +440,7 @@ namespace Ocuda.Ops.Service
             updateDisplay.CreatedBy = databaseDisplay.CreatedBy;
             updateDisplay.CreatedAt = databaseDisplay.CreatedAt;
             updateDisplay.UpdatedBy = GetCurrentUserId();
-            updateDisplay.UpdatedAt = DateTime.Now;
+            updateDisplay.UpdatedAt = _dateTimeProvider.Now;
 
             _digitalDisplayRepository.Update(updateDisplay);
             await _digitalDisplayRepository.SaveAsync();
@@ -454,17 +454,26 @@ namespace Ocuda.Ops.Service
                 ?? throw new OcudaException($"Unable to find digital display set id {displaySet.Id}");
 
             databaseSet.Name = updateSet.Name;
-            databaseSet.UpdatedAt = DateTime.Now;
+            databaseSet.UpdatedAt = _dateTimeProvider.Now;
             databaseSet.UpdatedBy = GetCurrentUserId();
 
             _digitalDisplaySetRepository.Update(databaseSet);
             await _digitalDisplayRepository.SaveAsync();
         }
 
+        public async Task<DigitalDisplayAsset> UploadAssetAsync(IFormFile assetFile)
+        {
+            return await UploadAssetInternalAsync(assetFile, null);
+        }
+
+        public async Task<DigitalDisplayAsset> UploadAssetAsync(IFormFile assetFile, int userId)
+        {
+            return await UploadAssetInternalAsync(assetFile, userId);
+        }
+
         private async Task<DigitalDisplayAsset> AddAssetInternalAsync(DigitalDisplayAsset asset)
         {
-            asset.CreatedBy = GetCurrentUserId();
-            asset.CreatedAt = DateTime.Now;
+            asset.CreatedAt = _dateTimeProvider.Now;
 
             await _digitalDisplayAssetRepository.AddAsync(asset);
             await _digitalDisplayAssetRepository.SaveAsync();
@@ -475,7 +484,7 @@ namespace Ocuda.Ops.Service
         private async Task AddDisplayInternalAsync(DigitalDisplay display)
         {
             display.CreatedBy = GetCurrentUserId();
-            display.CreatedAt = DateTime.Now;
+            display.CreatedAt = _dateTimeProvider.Now;
 
             await _digitalDisplayRepository.AddAsync(display);
             await _digitalDisplayRepository.SaveAsync();
@@ -485,10 +494,50 @@ namespace Ocuda.Ops.Service
         private async Task AddSetInternalAsync(DigitalDisplaySet digitalDisplaySet)
         {
             digitalDisplaySet.CreatedBy = GetCurrentUserId();
-            digitalDisplaySet.CreatedAt = DateTime.Now;
+            digitalDisplaySet.CreatedAt = _dateTimeProvider.Now;
 
             await _digitalDisplaySetRepository.AddAsync(digitalDisplaySet);
             await _digitalDisplaySetRepository.SaveAsync();
+        }
+
+        private async Task<DigitalDisplayAsset> UploadAssetInternalAsync(IFormFile assetFile,
+                                    int? userId)
+        {
+            ArgumentNullException.ThrowIfNull(assetFile);
+
+            var fullFilePath = GetAssetPath(assetFile.FileName);
+
+            int renameCounter = 1;
+            while (System.IO.File.Exists(fullFilePath))
+            {
+                fullFilePath = GetAssetPath(string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0}-{1}{2}",
+                    Path.GetFileNameWithoutExtension(assetFile.FileName),
+                    renameCounter++,
+                    Path.GetExtension(assetFile.FileName)));
+            }
+
+            await using var fileStream = new FileStream(fullFilePath, FileMode.Create);
+            await assetFile.CopyToAsync(fileStream);
+
+            var checksum = await SHA256.HashDataAsync(assetFile.OpenReadStream());
+
+            var asset = await FindAssetByChecksumAsync(checksum);
+            if (asset != null)
+            {
+                fileStream.Close();
+                System.IO.File.Delete(fullFilePath);
+                return asset;
+            }
+
+            return await AddAssetAsync(new DigitalDisplayAsset
+            {
+                Checksum = checksum,
+                CreatedBy = userId ?? GetCurrentUserId(),
+                Name = assetFile.FileName,
+                Path = Path.GetFileName(fullFilePath)
+            });
         }
     }
 }

@@ -23,7 +23,8 @@ Available options:
 -h, --help         Print this help and exit
 -v, --verbose      Print script debug info
 -df, --dockerfile  Use the specified Dockerfile
--p, --publish      Run the release-publish.bash script in the container (if it's present)
+--no-color         Do not use color codes in script output
+-p, --publish      Run release-prep.bash and (in container) release-publish.bash (if present)
 
 Environment variables:
 
@@ -38,7 +39,7 @@ Environment variables:
 - GHCR_PAT - optional - GitHub Container Registry Personal Access Token
 - GHCR_USER - optional - username to log in to the GitHub Container Registry
 
-Version 1.3.0 released 2023-06-21
+Version 1.3.3 released 2025-10-09
 EOF
     exit
 }
@@ -116,7 +117,7 @@ readonly SYSARCH
 
 if [[ ${SYSARCH} = "i386" ]]; then
     readonly ARCH="x86_32"
-    elif [[ ${SYSARCH} = "aarch64" ]]; then
+elif [[ ${SYSARCH} = "aarch64" ]]; then
     readonly ARCH="armv7"
 else
     readonly ARCH=${SYSARCH}
@@ -162,12 +163,11 @@ fi
 if [[ $BLD_BRANCH = "develop"
         || $BLD_BRANCH = "main"
         || $BLD_BRANCH = "master"
-        || $BLD_BRANCH = "staging"
         || $BLD_BRANCH = "test" ]]; then
     BLD_DOCKER_TAG=$BLD_BRANCH
     BLD_VERSION=${BLD_BRANCH}-${BLD_VERSION_DATE}
     BLD_PUSH=true
-    elif [[ "$BLD_BRANCH" =~ release/([0-9]+\.[0-9]+\.[0-9]+.*) ]]; then
+elif [[ "$BLD_BRANCH" =~ release/([0-9]+\.[0-9]+\.[0-9]+.*) ]]; then
     BLD_RELEASE_VERSION=${BASH_REMATCH[1]}
     BLD_DOCKER_TAG=v${BLD_RELEASE_VERSION}
     BLD_VERSION=v${BLD_RELEASE_VERSION}
@@ -200,7 +200,7 @@ if [[ -z ${BLD_DOCKER_IMAGE-} ]]; then
 fi
 
 # Perform release prep if necessary and script is present
-if [[ $BLD_RELEASE = "true" && -f "release-prep.bash" ]]; then
+if [[ $BLD_RELEASE = "true" && -x "release-prep.bash" ]]; then
     msg "${BLUE}===${NOFORMAT} Running release preparation for version $BLD_RELEASE_VERSION"
     #shellcheck disable=SC1091
     source release-prep.bash
@@ -303,7 +303,7 @@ if [[ $BLD_PUSH = true ]]; then
     
     # Perform release publish in the Docker machine if configuration is present
     
-    if [[ $BLD_RELEASE = "true" && -f "release-publish.bash" && publish -eq 1 ]]; then
+    if [[ $BLD_RELEASE = "true" && -x "release-publish.bash" && publish -eq 1 ]]; then
         msg "${BLUE}===${NOFORMAT} Publishing release package for $BLD_RELEASE_VERSION"
         mkdir -p publish
         if [[ -f "release.env" ]]; then

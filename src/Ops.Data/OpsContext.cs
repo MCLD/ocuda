@@ -15,6 +15,7 @@ namespace Ocuda.Ops.Data
         {
         }
 
+        public DbSet<ApiKey> ApiKeys { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ClaimGroup> ClaimGroups { get; set; }
         public DbSet<BooksByMailComment> BooksByMailComments { get; set; }
@@ -39,6 +40,7 @@ namespace Ocuda.Ops.Data
         public DbSet<File> Files { get; set; }
         public DbSet<FileType> FileTypes { get; set; }
         public DbSet<HistoricalIncident> HistoricalIncidents { get; set; }
+        public DbSet<IdentityProvider> IdentityProviders { get; set; }
         public DbSet<IncidentFollowup> IncidentFollowups { get; set; }
         public DbSet<IncidentParticipant> IncidentParticipants { get; set; }
         public DbSet<IncidentRelationship> IncidentRelationships { get; set; }

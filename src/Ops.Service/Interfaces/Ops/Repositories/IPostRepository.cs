@@ -8,12 +8,18 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface IPostRepository : IOpsRepository<Post, int>
     {
-        Task<List<Post>> GetPostsBySectionCategoryIdAsync(int categoryId, int sectionId);
-        Task<Post> GetSectionPostBySlugAsync(string stub, int sectionId);
+        Task AddPostCategoriesAsync(ICollection<int> categories, int postId);
+
+        Task DeletePostCategoriesAsync(ICollection<int> categories, int postId);
+
         Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BlogFilter filter);
-        Task<List<Post>> GetTopSectionPostsAsync(int sectionId, int count);
+
         Task<List<PostCategory>> GetPostCategoriesAsync(int id);
-        Task AddPostCategoriesAsync(List<int> categories, int postId);
-        Task DeletePostCategoriesAsync(List<int> categories, int postId);
+
+        Task<List<Post>> GetPostsBySectionCategoryIdAsync(int categoryId, int sectionId);
+
+        Task<Post> GetSectionPostBySlugAsync(string slug, int sectionId);
+
+        Task<List<Post>> GetTopSectionPostsAsync(int sectionId, int count);
     }
 }

@@ -1,40 +1,90 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.DirectoryServices.Protocols;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Novell.Directory.Ldap;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Keys;
+using Serilog.Context;
 
 namespace Ocuda.Ops.Service
 {
     public class LdapService : ILdapService
     {
-        private const string ADAllEnabledUserFilter = "(&(objectCategory=person)(objectClass=user)(!(memberOf:1.2.840.113556.1.4.1941:=OU=DisabledUsers,DC=library,DC=local))(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
         private const string ADDepartment = "department";
+
         private const string ADDescription = "description";
-        private const string ADDirectReports = "directReports";
-        private const string ADDisplayName = "displayName";
-        private const string ADDistinguishedName = "distinguishedName";
-        private const string ADEmployeeNumber = "employeeNumber";
-        private const string ADExtensionDate = "extensionAttribute1";
-        private const string ADGivenName = "givenName";
+
+        private const string ADDirectReports = "directreports";
+
+        private const string ADDisplayName = "displayname";
+
+        private const string ADDistinguishedName = "distinguishedname";
+
+        private const string ADEmployeeNumber = "employeenumber";
+
+        private const string ADExtensionDate = "extensionattribute1";
+
+        private const string ADFilterMail = "(&(|({0}={1})({2}=smtp:{3}))(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))";
+
+        private const string ADGivenName = "givenname";
+
+        /// <summary>
+        /// The name of "Distribution Groups" in LDAP
+        /// </summary>
+        private const string ADGroupDistributionGroup = "Distribution Groups";
+
+        /// <summary>
+        /// The parent AD Group which contains the Distribution Groups and Security Groups
+        /// </summary>
+        private const string ADGroupParentOu = "Groups";
+
+        /// <summary>
+        /// The name of "Security Groups" in LDAP
+        /// </summary>
+        private const string ADGroupSecurityGroup = "Security Groups";
+
         private const string ADMail = "mail";
-        private const string ADMailAlias = "proxyAddresses";
+
+        private const string ADMailAlias = "proxyaddresses";
+
+        private const string ADMemberOf = "memberof";
+
         private const string ADMobileNumber = "mobile";
-        private const string ADPhysicalDeliveryOfficeName = "physicalDeliveryOfficeName";
-        private const string ADsAMAccountName = "sAMAccountName";
-        private const string ADTelephoneNumber = "telephoneNumber";
+
+        private const string ADPhysicalDeliveryOfficeName = "physicaldeliveryofficename";
+
+        private const string ADsAMAccountName = "samaccountname";
+
+        private const string ADTelephoneNumber = "telephonenumber";
+
         private const string ADTitle = "title";
-        private const int LDAPSearchResponse = 4;
+
+        /// <summary>
+        /// Filter basis for all enabled users, will have Ops.LDAPDisabledUsers and (&...) applied
+        /// </summary>
+        private const string BaseADFilterEnabledAllUsers = "(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2))";
+
+        /// <summary>
+        /// Filter basis for username lookup, will have Ops.LDAPDisabledUsers and (&...) applied
+        /// </summary>
+        private const string BaseADFilterEnabledUsername = "({0}={1})(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2))";
+
         private readonly IConfiguration _config;
         private readonly ILogger _logger;
 
-        private readonly string[] AttributesToReturn = {
+        /// <summary>
+        /// Default set of attributes to return on an LDAP query
+        /// </summary>
+        private readonly string[] AttributesToReturn = [
             ADDepartment,
             ADDescription,
             ADDirectReports,
@@ -45,68 +95,280 @@ namespace Ocuda.Ops.Service
             ADGivenName,
             ADMail,
             ADMailAlias,
+            ADMemberOf,
             ADMobileNumber,
             ADPhysicalDeliveryOfficeName,
             ADsAMAccountName,
             ADTelephoneNumber,
-            "memberOf",
             ADTitle
-        };
+        ];
 
-        public LdapService(ILogger<LdapService> logger,
-            IConfiguration config)
+        private readonly string[] LoginAttributesToReturn = [ADsAMAccountName];
+
+        public LdapService(ILogger<LdapService> logger, IConfiguration config)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            ArgumentNullException.ThrowIfNull(config);
+            ArgumentNullException.ThrowIfNull(logger);
+
+            _config = config;
+            _logger = logger;
         }
 
-        public static void ApplyLdapAttributes(LdapAttributeSet ldapAttributes, User user)
+        /// <summary>
+        /// The kinds of AD groups we want to potentially carry back to users
+        /// </summary>
+        private enum AdGroupType
+
         {
-            if (ldapAttributes == null)
+            DistributionGroup,
+            SecurityGroup
+        }
+
+        /// <summary>
+        /// Return a distinct list of all physicalDeliveryOfficeName LDAP data points. Note that
+        /// this list is acquired by querying all users which may not be the most efficient
+        /// means.
+        /// </summary>
+        /// <returns>A string <see cref=">IEnumberable"/> of physicalDeliveryOfficeNames.</returns>
+        public IEnumerable<string> GetAllLocations()
+        {
+            string ldapUser = _config[Configuration.OpsLdapUser];
+            string ldapPassword = _config[Configuration.OpsLdapPassword];
+
+            var users = LdapUserLookup(GetFilterApplyDisabledUsers(BaseADFilterEnabledAllUsers),
+                null,
+                [ADPhysicalDeliveryOfficeName],
+                ldapUser,
+                ldapPassword);
+            return users.Where(_ => !string.IsNullOrEmpty(_.PhysicalDeliveryOfficeName)).
+                Select(_ => _.PhysicalDeliveryOfficeName)
+                .Distinct();
+        }
+
+        /// <summary>
+        /// Return a list of all enabled AD users with all available attributes.
+        /// </summary>
+        /// <returns>An <see cref="IEnumerable"/> of <see cref="User"/> items populated with
+        /// LDAP information.</returns>
+        public IEnumerable<User> GetAllUsers()
+        {
+            string ldapUser = _config[Configuration.OpsLdapUser];
+            string ldapPassword = _config[Configuration.OpsLdapPassword];
+
+            return LdapUserLookup(GetFilterApplyDisabledUsers(BaseADFilterEnabledAllUsers),
+                null,
+                AttributesToReturn,
+                ldapUser,
+                ldapPassword);
+        }
+
+        /// <summary>
+        /// Look up a particular user by their email address (as specified in the user object which
+        /// is provided). This will error if multiple users are returned from this query.
+        /// </summary>
+        /// <param name="user">A <see cref="User"/> with the email address populated.</param>
+        /// <returns>The <see cref="User"/> with LDAP information added.</returns>
+        public User LookupByEmail(User user)
+        {
+            ArgumentNullException.ThrowIfNull(user);
+            string ldapUser = _config[Configuration.OpsLdapUser];
+            string ldapPassword = _config[Configuration.OpsLdapPassword];
+
+            var filter = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                ADFilterMail,
+                ADMail,
+                user.Email,
+                ADMailAlias,
+                user.Email);
+            return LdapUserLookup(filter,
+                user,
+                AttributesToReturn,
+                ldapUser,
+                ldapPassword).SingleOrDefault();
+        }
+
+        /// <summary>
+        /// Look up a particular user by their username (as specified in the user object which is
+        /// provided). This will error if multiple users are returned from this query.
+        /// </summary>
+        /// <param name="user">A <see cref="User"/> with a populated Username.</param>
+        /// <returns>The <see cref="User"/> with LDAP information added.</returns>
+        public User LookupByUsername(User user)
+        {
+            ArgumentNullException.ThrowIfNull(user);
+            string ldapUser = _config[Configuration.OpsLdapUser];
+            string ldapPassword = _config[Configuration.OpsLdapPassword];
+
+            var filter = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                GetFilterApplyDisabledUsers(BaseADFilterEnabledUsername),
+                ADsAMAccountName,
+                user.Username);
+            return LdapUserLookup(filter,
+                user,
+                AttributesToReturn,
+                ldapUser,
+                ldapPassword).SingleOrDefault();
+        }
+
+        /// <summary>
+        /// Use the provided username and password to look up the user in LDAP and return the
+        /// <see cref="User"/> object populated with just the username detail.
+        /// </summary>
+        /// <param name="username">LDAP username</param>
+        /// <param name="password">LDAP password</param>
+        /// <returns>Null if the authentication or lookup failed, otherwise a populated
+        /// <see cref="User"/></returns>
+        public User VerifyCredentials(string username, string password)
+        {
+            ArgumentNullException.ThrowIfNull(username);
+            ArgumentNullException.ThrowIfNull(password);
+
+            var filter = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                GetFilterApplyDisabledUsers(BaseADFilterEnabledUsername),
+                ADsAMAccountName,
+                username);
+            var users = LdapUserLookup(filter, null, LoginAttributesToReturn, username, password);
+
+            var user = users.SingleOrDefault();
+
+            return users?.Count == 1
+                && username.Equals(user?.Username, StringComparison.OrdinalIgnoreCase)
+                    ? user
+                    : null;
+        }
+
+        /// <summary>
+        /// When provided with an LDAP DN (as as string), establish if it belongs in the top level
+        /// specified parent group and return all Common Names along with the type of group that it
+        /// is.
+        /// </summary>
+        /// <param name="attributeString">The LDAP DN as a string</param>
+        /// <param name="groupParent">The parent OU of Distirbution Groups and
+        /// Security Groups</param>
+        /// <returns>An <see cref="AdGroup"/> with the group information</returns>
+        /// <exception cref="InvalidDataException">Thrown when bad group data comes back, usually
+        /// meaning that the group has the wrong parent group or is not an known group type.
+        /// </exception>
+        private static AdGroup ExtractGroupDetails(string attributeString, string groupParent)
+        {
+            var adGroup = new AdGroup();
+
+            int ouCount = 0;
+
+            foreach (var rdn in new CPI.DirectoryServices.DN(attributeString).RDNs.Reverse())
             {
-                throw new ArgumentNullException(nameof(ldapAttributes));
-            }
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
+                foreach (var element in rdn.Components)
+                {
+                    if (element.ComponentType.Equals("CN", StringComparison.OrdinalIgnoreCase))
+                    {
+                        adGroup.Names.Add(element.ComponentValue);
+                    }
+                    else if (element.ComponentType.Equals("OU", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (ouCount == 0 && !element.ComponentValue.Equals(groupParent, StringComparison.OrdinalIgnoreCase))
+                        {
+                            throw new InvalidDataException($"Invalid group: does not have required parent group: {groupParent}");
+                        }
+                        else if (ouCount == 1)
+                        {
+                            if (element.ComponentValue.Equals(ADGroupDistributionGroup, StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (adGroup.GroupType.HasValue)
+                                {
+                                    throw new InvalidDataException("Invalid group: applies to multiple group types.");
+                                }
+                                else
+                                {
+                                    adGroup.GroupType = AdGroupType.DistributionGroup;
+                                }
+                            }
+                            else if (element.ComponentValue.Equals(ADGroupSecurityGroup, StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (adGroup.GroupType.HasValue)
+                                {
+                                    throw new InvalidDataException("Invalid group: applies to multiple group types.");
+                                }
+                                else
+                                {
+                                    adGroup.GroupType = AdGroupType.SecurityGroup;
+                                }
+                            }
+                            else
+                            {
+                                throw new InvalidDataException($"Invalid group type found: {element.ComponentValue}");
+                            }
+                        }
+                        ouCount++;
+                    }
+                }
             }
 
-            foreach (var attribute in ldapAttributes)
+            return adGroup;
+        }
+
+        /// <summary>
+        /// Apply LDAP attributes to the provided <see cref="User"/> object.
+        /// </summary>
+        /// <param name="attributes">LDAP attributes retreived from a query</param>
+        /// <param name="user">A <see cref=">User"/> populated with non-LDAP application
+        /// information</param>
+        /// <param name="groupNamePrefix">A prefix to preprend to group names (typically for
+        /// Active Directory this is the domain name)</param>
+        private void ApplyLdapAttributes(SearchResultAttributeCollection attributes,
+            User user,
+            string groupNamePrefix)
+        {
+            ArgumentNullException.ThrowIfNull(attributes);
+            ArgumentNullException.ThrowIfNull(user);
+
+            foreach (System.Collections.DictionaryEntry attributeEntry in attributes)
             {
-                switch (attribute.Name)
+                if (attributeEntry.Value is not DirectoryAttribute attribute)
+                {
+                    _logger.LogError("Unable to view LDAP attribute {AttributeKey}",
+                        attributeEntry.Key);
+                    continue;
+                }
+
+                switch (attributeEntry.Key)
                 {
                     case ADDepartment:
-                        user.Department = attribute.StringValue.TruncateTo(255)?.Trim();
+                        user.Department = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
                         break;
 
                     case ADDescription:
-                        user.Description = attribute.StringValue.TruncateTo(255)?.Trim();
+                        user.Description = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
                         break;
 
                     case ADDirectReports:
-                        foreach (var item in attribute.StringValueArray)
+                        for (int i = 0; i < attribute.Count; i++)
                         {
-                            user.DirectReportDNs.Add(item);
+                            user.DirectReportDNs.Add(attribute[i]?
+                                .ToString()?
+                                .Trim()?
+                                .TruncateTo(255));
                         }
                         break;
 
                     case ADDisplayName:
-                        user.Name = attribute.StringValue.TruncateTo(255)?.Trim();
+                        user.Name = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
                         break;
 
                     case ADDistinguishedName:
-                        user.DistinguishedName = attribute.StringValue;
+                        user.DistinguishedName = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
                         break;
 
                     case ADEmployeeNumber:
-                        if (int.TryParse(attribute.StringValue, out var employeeNumber))
+                        if (int.TryParse(attribute[0]?.ToString()?.Trim()?.TruncateTo(255),
+                                out var employeeNumber))
                         {
                             user.EmployeeId = employeeNumber;
                         }
                         break;
 
                     case ADExtensionDate:
-                        if (DateTime.TryParse(attribute.StringValue, out var dateValue))
+                        if (DateTime.TryParse(attribute[0]?.ToString()?.Trim()?.TruncateTo(255),
+                                out var dateValue))
                         {
                             user.ServiceStartDate = dateValue;
                         }
@@ -115,209 +377,234 @@ namespace Ocuda.Ops.Service
                     case ADGivenName:
                         if (string.IsNullOrWhiteSpace(user.Nickname))
                         {
-                            user.Nickname = attribute.StringValue.TruncateTo(255)?.Trim();
+                            user.Nickname = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
                         }
                         break;
 
                     case ADMail:
-                        user.Email = attribute.StringValue.TruncateTo(255)?.Trim();
+                        user.Email = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
                         break;
 
                     case ADMobileNumber:
-                        user.Mobile = attribute.StringValue.TruncateTo(255)?.Trim();
+                        user.Mobile = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
                         break;
 
                     case ADPhysicalDeliveryOfficeName:
-                        user.PhysicalDeliveryOfficeName
-                            = attribute.StringValue.TruncateTo(255)?.Trim();
+                        user.PhysicalDeliveryOfficeName = attribute[0]?
+                            .ToString()?
+                            .Trim()?
+                            .TruncateTo(255);
                         break;
 
                     case ADsAMAccountName:
                         if (string.IsNullOrEmpty(user.Username))
                         {
-                            user.Username = attribute.StringValue.TruncateTo(255)?.Trim();
+                            user.Username = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
                         }
                         break;
 
                     case ADTelephoneNumber:
-                        user.Phone = attribute.StringValue.TruncateTo(255)?.Trim();
+                        user.Phone = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
                         break;
 
                     case ADTitle:
-                        user.Title = attribute.StringValue.TruncateTo(255)?.Trim();
+                        user.Title = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
+                        break;
+
+                    case ADMemberOf:
+                        for (int i = 0; i < attribute.Count; i++)
+                        {
+                            var attributeString = attribute[i] as string;
+
+                            if (string.IsNullOrEmpty(attributeString))
+                            {
+                                _logger.LogWarning("Group name {GroupName} could not be converted to a string, ignoring",
+                                    Encoding.ASCII.GetString((byte[])attribute[i]));
+                            }
+                            else
+                            {
+                                using (LogContext.PushProperty("AttributeString", attributeString))
+                                {
+                                    try
+                                    {
+                                        var group = ExtractGroupDetails(attributeString,
+                                            ADGroupParentOu);
+                                        if (group.GroupType == AdGroupType.DistributionGroup)
+                                        {
+                                            foreach (var groupName in group.Names)
+                                            {
+                                                user.DistributionGroups
+                                                    .Add($"{groupNamePrefix}{groupName}");
+                                            }
+                                        }
+                                        else if (group.GroupType == AdGroupType.SecurityGroup)
+                                        {
+                                            foreach (var groupName in group.Names)
+                                            {
+                                                user.SecurityGroups
+                                                    .Add($"{groupNamePrefix}{groupName}");
+                                            }
+                                        }
+                                    }
+                                    catch (InvalidDataException idex)
+                                    {
+                                        _logger.LogError(idex,
+                                            "Invalid data extracting group info: {ErrorMessage}",
+                                            idex.Message);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+
+                    case ADMailAlias:
+                        break;
+
+                    default:
+                        _logger.LogTrace("Unused LDAP property supplied: {Key} = {Value}",
+                            attributeEntry.Key,
+                            attribute[0]);
                         break;
                 }
             }
         }
 
-        public IEnumerable<string> GetAllLocations()
+        private string GetFilterApplyDisabledUsers(string baseFilter)
         {
-            var stopwatch = Stopwatch.StartNew();
-            var locations = new List<string>();
+            ArgumentNullException.ThrowIfNull(baseFilter);
 
-            string ldapServer = _config[Configuration.OpsLdapServer];
-            string ldapDn = _config[Configuration.OpsLdapDn];
-            string ldapPassword = _config[Configuration.OpsLdapPassword];
-            string ldapSearchBase = _config[Configuration.OpsLdapSearchBase];
+            var ldapDisabledUsers = _config[Configuration.OpsLdapDisabledUsers];
 
-            if (!string.IsNullOrEmpty(ldapServer)
-                && !string.IsNullOrEmpty(ldapDn)
-                && !string.IsNullOrEmpty(ldapPassword)
-                && !string.IsNullOrEmpty(ldapSearchBase))
-            {
-                int port = 389;
-                if (!string.IsNullOrEmpty(_config[Configuration.OpsLdapPort])
-                    && !int.TryParse(_config[Configuration.OpsLdapPort], out port))
-                {
-                    _logger.LogWarning("Invalid port specified: {InvalidPort}",
-                        _config[Configuration.OpsLdapPort]);
-                }
-                using var cn = new LdapConnection();
-                try
-                {
-                    cn.Connect(ldapServer, port);
-                    cn.Bind(ldapDn, ldapPassword);
-
-                    var queue = cn.Search(ldapSearchBase,
-                        LdapConnection.ScopeSub,
-                        ADAllEnabledUserFilter,
-                        new[] { ADPhysicalDeliveryOfficeName },
-                        false,
-                        null,
-                        null);
-
-                    LdapMessage message = queue.GetResponse();
-                    while (message.Type == LDAPSearchResponse)
-                    {
-                        var entry = ((LdapSearchResult)message).Entry;
-                        try
-                        {
-                            var attribute = entry.GetAttribute(ADPhysicalDeliveryOfficeName);
-                            if (!string.IsNullOrEmpty(attribute.StringValue)
-                                && !locations.Contains(attribute.StringValue.Trim()))
-                            {
-                                locations.Add(attribute.StringValue.Trim());
-                            }
-                        }
-                        catch (KeyNotFoundException knfex)
-                        {
-                            _logger.LogError("Could not find {Key} in record {Entry}: {ErrorMessage}",
-                                ADPhysicalDeliveryOfficeName,
-                                entry.Dn,
-                                knfex.Message);
-                        }
-                        message = queue.GetResponse();
-                    }
-                    cn.Disconnect();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex,
-                        "Problem connecting to LDAP server {LDAPServer}: {Message}",
-                        ldapServer,
-                        ex.Message);
-                }
-            }
-            stopwatch.Stop();
-            _logger.LogInformation("LDAP lookup found {ResultCount} distinct results in {ElapsedMs} ms",
-                locations.Count,
-                stopwatch.ElapsedMilliseconds);
-
-            return locations;
+            return string.IsNullOrEmpty(ldapDisabledUsers)
+                ? $"(&{baseFilter})"
+                : $"(&{baseFilter}(!(memberOf:1.2.840.113556.1.4.1941:={ldapDisabledUsers})))";
         }
 
-        public IEnumerable<User> GetAllUsers()
-        {
-            return GetUsers(ADAllEnabledUserFilter, null);
-        }
-
-        public User LookupByEmail(User user)
-        {
-            // Lookup non-disabled account by email
-            var filter = $"(&(|({ADMail}={user.Email})({ADMailAlias}=smtp:{user.Email}))(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))";
-            return Lookup(user, filter);
-        }
-
-        public User LookupByUsername(User user)
-        {
-            // Lookup non-disabled account by username
-            var filter = $"(&({ADsAMAccountName}={user.Username})(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))";
-            return Lookup(user, filter);
-        }
-
-        private IEnumerable<User> GetUsers(string filter, User user)
+        /// <summary>
+        /// Using the supplied LDAP Filter, look up one or more users and either apply the supplied
+        /// LDAP attributes to the provided <see cref="User"/> or return an
+        /// <see cref="IEnumerable"/> of all that match.
+        /// </summary>
+        /// <param name="filter">LDAP filter to limit user selection</param>
+        /// <param name="user">A <see cref=">User"/> object to start with if this is a single
+        /// user lookup, otherwise this can be null</param>
+        /// <param name="attributesToPopulate">Which LDAP attributes to populate. Limit this to
+        /// limit the data returned from the LDAP server</param>
+        /// <returns>An <see cref="List"/> of <see cref="User"/> objects macthing the filter
+        /// and populated with LDAP data</returns>
+        private List<User> LdapUserLookup(string filter,
+            User user,
+            string[] attributesToPopulate,
+            string ldapUser,
+            string ldapPassword)
         {
             var stopwatch = Stopwatch.StartNew();
             var now = DateTime.Now;
             var users = new List<User>();
 
-            string ldapServer = _config[Configuration.OpsLdapServer];
-            string ldapDn = _config[Configuration.OpsLdapDn];
-            string ldapPassword = _config[Configuration.OpsLdapPassword];
-            string ldapSearchBase = _config[Configuration.OpsLdapSearchBase];
-
-            if (!string.IsNullOrEmpty(ldapServer)
-                && !string.IsNullOrEmpty(ldapDn)
-                && !string.IsNullOrEmpty(ldapPassword)
-                && !string.IsNullOrEmpty(ldapSearchBase))
+            using (LogContext.PushProperty("LdapFilter", filter))
+            using (LogContext.PushProperty("LdapRequestedAttributes", attributesToPopulate, true))
             {
-                int port = 389;
-                if (!string.IsNullOrEmpty(_config[Configuration.OpsLdapPort])
-                    && !int.TryParse(_config[Configuration.OpsLdapPort], out port))
+                string domainName = _config[Configuration.OpsDomainName];
+                string ldapSearchBase = _config[Configuration.OpsLdapSearchBase];
+                string ldapServer = _config[Configuration.OpsLdapServer];
+
+                if (!string.IsNullOrEmpty(ldapServer)
+                    && !string.IsNullOrEmpty(ldapUser)
+                    && !string.IsNullOrEmpty(ldapPassword)
+                    && !string.IsNullOrEmpty(ldapSearchBase))
                 {
-                    _logger.LogWarning("Invalid port specified: {InvalidPort}",
-                        _config[Configuration.OpsLdapPort]);
-                }
-                using var cn = new LdapConnection();
-                try
-                {
-                    var constraints = user != null
-                        ? new LdapSearchConstraints { MaxResults = 1 }
-                        : null;
+                    var endpoint = new LdapDirectoryIdentifier(ldapServer);
+                    var credential = new NetworkCredential(ldapUser, ldapPassword, domainName);
 
-                    cn.Connect(ldapServer, port);
-                    cn.Bind(ldapDn, ldapPassword);
-
-                    var queue = cn.Search(ldapSearchBase,
-                        LdapConnection.ScopeSub,
-                        filter,
-                        AttributesToReturn,
-                        false,
-                        null,
-                        constraints);
-
-                    LdapMessage message = queue.GetResponse();
-                    while (message.Type == LDAPSearchResponse)
+                    using var connection = new LdapConnection(endpoint, credential)
                     {
-                        user ??= new User();
-                        var entry = ((LdapSearchResult)message).Entry;
-                        ApplyLdapAttributes(entry.GetAttributeSet(), user);
-                        user.LastLdapCheck = now;
-                        users.Add(user);
-                        user = null;
-                        message = queue.GetResponse();
-                    }
-                    cn.Disconnect();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex,
-                        "Problem connecting to LDAP server {LDAPServer}: {Message}",
-                        ldapServer,
-                        ex.Message);
-                }
-            }
-            stopwatch.Stop();
-            _logger.LogInformation("LDAP lookup found {ResultCount} results in {ElapsedMs} ms",
-                users.Count,
-                stopwatch.ElapsedMilliseconds);
+                        AuthType = AuthType.Basic,
+                    };
 
-            return users;
+                    try
+                    {
+                        connection.Bind();
+
+                        var searchRequest = new SearchRequest(ldapSearchBase,
+                            filter,
+                            SearchScope.Subtree,
+                            attributesToPopulate)
+                            ?? throw new OcudaException($"Unable to create LDAP Search request from LDAP base {ldapSearchBase} filter {filter} attributes {string.Join(',', attributesToPopulate)}");
+
+                        var searchResponse = (SearchResponse)connection.SendRequest(searchRequest);
+
+                        foreach (SearchResultEntry entry in searchResponse.Entries)
+                        {
+                            user ??= new User();
+                            ApplyLdapAttributes(entry.Attributes, user, $"{domainName}\\");
+                            user.LastLdapCheck = now;
+                            users.Add(user);
+                            user = null;
+                        }
+                    }
+                    catch (Exception ex) when (ex is InvalidOperationException
+                        || ex is LdapException
+                        || ex is NotSupportedException
+                        || ex is ObjectDisposedException)
+                    {
+                        _logger.LogError(ex,
+                            "Problem retreiving LDAP data from {LDAPServer}: {ErrorMessage}",
+                            ldapServer,
+                            ex.Message);
+                    }
+                }
+                else
+                {
+                    _logger.LogError("Missing LDAP configuration values, please ensure {LdapServer}, {LdapUser}, {LdapPassword}, and {LdapSearchBase} are configured.",
+                        Configuration.OpsLdapServer,
+                        Configuration.OpsLdapUser,
+                        Configuration.OpsLdapPassword,
+                        Configuration.OpsLdapSearchBase);
+                }
+                stopwatch.Stop();
+
+                if (users?.Count == 1)
+                {
+                    if (attributesToPopulate.Contains(ADMemberOf))
+                    {
+                        _logger.LogInformation("LDAP lookup found {ResultCount} result: user {User} with {SecurityGroups} security groups in {ElapsedMs} ms",
+                            users.Count,
+                            users.FirstOrDefault()?.Username,
+                            users.FirstOrDefault()?.SecurityGroups.Count,
+                            stopwatch.ElapsedMilliseconds);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("LDAP lookup found {ResultCount} result: user {User} in {ElapsedMs} ms",
+                            users.Count,
+                            users.FirstOrDefault()?.Username,
+                            stopwatch.ElapsedMilliseconds);
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("LDAP lookup found {ResultCount} result(s) in {ElapsedMs} ms",
+                        users.Count,
+                        stopwatch.ElapsedMilliseconds);
+                }
+
+                return users;
+            }
         }
 
-        private User Lookup(User user, string filter)
+        /// <summary>
+        /// Object representing an Active Directory Group that we've looked up.
+        /// </summary>
+        private class AdGroup
         {
-            return GetUsers(filter, user).SingleOrDefault();
+            public AdGroup()
+            {
+                Names = [];
+            }
+
+            public AdGroupType? GroupType { get; set; }
+            public IList<string> Names { get; }
         }
     }
 }

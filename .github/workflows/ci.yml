@@ -1,0 +1,43 @@
+name: ci
+run-name: ${{ github.actor }} is running ci
+
+on: [push, pull_request]
+
+jobs:
+  ops:
+    name: "Ops Docker"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Ops Docker"
+        env:
+          BLD_DOCKER_IMAGE: ops
+          CR_HOST: ${{secrets.CR_HOST}}
+          CR_OWNER: ${{secrets.CR_OWNER}}
+          CR_PASSWORD: ${{secrets.CR_PASSWORD}}
+          CR_USER: ${{secrets.CR_USER}}
+          GHCR_OWNER: ${{secrets.GHCR_OWNER}}
+          GHCR_PAT: ${{secrets.GHCR_PAT}}
+          GHCR_USER: ${{secrets.GHCR_USER}}
+        run: ./build.bash -df Dockerfile_ops
+
+  promenade:
+    name: "Promenade Docker"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Promenade Docker"
+        env:
+          BLD_DOCKER_IMAGE: promenade
+          CR_HOST: ${{secrets.CR_HOST}}
+          CR_OWNER: ${{secrets.CR_OWNER}}
+          CR_PASSWORD: ${{secrets.CR_PASSWORD}}
+          CR_USER: ${{secrets.CR_USER}}
+          GHCR_OWNER: ${{secrets.GHCR_OWNER}}
+          GHCR_PAT: ${{secrets.GHCR_PAT}}
+          GHCR_USER: ${{secrets.GHCR_USER}}
+        run: ./build.bash -df Dockerfile_promenade

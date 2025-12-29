@@ -152,7 +152,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                         IncidentParticipantType.Witness);
                 }
 
-                var baseUri = BaseUriBuilder;
+                var baseUri = await GetBaseUriBuilderAsync();
                 baseUri.Path = Url.Action(nameof(Details), new { id = 0 });
 
                 int? incidentId = null;

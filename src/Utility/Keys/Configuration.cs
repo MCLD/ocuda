@@ -1,6 +1,6 @@
 ﻿namespace Ocuda.Utility.Keys
 {
-    public struct Configuration
+    public readonly struct Configuration
     {
         public static readonly string OcudaCookieName = "Ocuda.CookieName";
         public static readonly string OcudaErrorControllerName = "Ocuda.ErrorControllerName";
@@ -8,8 +8,6 @@
         public static readonly string OcudaGoogleAPI = "Ocuda.API.Google";
         public static readonly string OcudaInstance = "Ocuda.Instance";
         public static readonly string OcudaJobSleepSeconds = "Ocuda.JobSleepSeconds";
-        public static readonly string OcudaLoggingRollingFile = "Ocuda.LoggingRollingFile";
-        public static readonly string OcudaLoggingRollingHttpFile = "Ocuda.LoggingRollingHttpFile";
         public static readonly string OcudaProxyAddress = "Ocuda.ProxyAddress";
 
         public static readonly string OcudaRuntimeRedisCacheConfiguration
@@ -19,8 +17,6 @@
             = "Ocuda.Runtime.RedisCacheInstance";
 
         public static readonly string OcudaRuntimeSessionTimeout = "Ocuda.Runtime.SessionTimeout";
-        public static readonly string OcudaSeqAPI = "Ocuda.API.Seq";
-        public static readonly string OcudaSeqEndpoint = "Ocuda.SeqEndpoint";
         public static readonly string OcudaUrlSharedContent = "Ocuda.UrlSharedContent";
         public static readonly string OpsAuthBlankRequestRedirect = "Ops.AuthBlankRequestRedirect";
         public static readonly string OpsAuthRedirect = "Ops.AuthRedirect";
@@ -38,11 +34,11 @@
         public static readonly string OpsDomainName = "Ops.DomainName";
         public static readonly string OpsHttpErrorFileTag = "Ops.HttpErrorFileTag";
         public static readonly string OpsImageOptimizerUsername = "Ops.ImageOptimizerUsername";
-        public static readonly string OpsLdapDn = "Ops.LDAPDN";
+        public static readonly string OpsLdapDisabledUsers = "Ops.LDAPDisabledUsers";
         public static readonly string OpsLdapPassword = "Ops.LDAPPassword";
-        public static readonly string OpsLdapPort = "Ops.LDAPPort";
         public static readonly string OpsLdapSearchBase = "Ops.LDAPSearchBase";
         public static readonly string OpsLdapServer = "Ops.LDAPServer";
+        public static readonly string OpsLdapUser = "Ops.LDAPUser";
         public static readonly string OpsNavColumn = "Ops.NavColumn";
 
         public static readonly string OpsPublicSiteUrlSharedContent

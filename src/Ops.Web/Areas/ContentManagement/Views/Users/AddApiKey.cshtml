@@ -1,0 +1,191 @@
+﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement
+@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Users.AddApiKeyViewModel
+
+<div class="d-flex justify-content-between mb-2">
+    <h1>Add API Key</h1>
+    <div>
+        <a asp-action="@nameof(HomeController.Index)"
+           asp-controller="@HomeController.Name"
+           class="btn btn-outline-dark ms-2">Back</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <form asp-action="@nameof(UsersController.AddApiKey)"
+              asp-controller="@UsersController.Name"
+              method="post">
+            <input type="hidden" id="ActAsUserId" asp-for="ActAsUserId" />
+            <div class="mb-3">
+                <label asp-for="ApiKeyType" class="form-label"></label>
+                <select asp-for="ApiKeyType"
+                        asp-items="Model.ApiKeyTypesSelectList"
+                        class="form-select"></select>
+            </div>
+            <div class="input-group mb-3">
+                <button type="button"
+                        class="btn btn-outline-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addStaffModal">
+                    <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
+                    Select staff
+                </button>
+                <input type="text" class="form-control" disabled="disabled" id="SelectedUserName" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="EndDate" class="form-label"></label>
+                <input asp-for="EndDate" class="form-control" type="datetime-local" />
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-outline-primary">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div modal
+     id="addStaffModal"
+     name="Staff Member"
+     type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
+     suppress-footer="true"
+     data-backdrop="static">
+    <div class="form-group mb-3">
+        <label for="staffSearchText">Search</label>
+        <div class="input-group">
+            <input type="text"
+                   id="staffSearchText"
+                   class="form-control"
+                   aria-label="Search text" />
+            <button class="btn btn-outline-success"
+                    id="staffSearchGo"
+                    button-spinner
+                    type="submit">
+                Go
+            </button>
+        </div>
+    </div>
+    <div id="searchResults"></div>
+    <div id="pagination" class="d-none mt-3"></div>
+</div>
+
+@section scripts {
+    <script>
+        const staffSearchUrl = new URL('@Model.JsonStaffSearchUri.AbsoluteUri');
+
+        document.getElementById('addStaffModal').addEventListener('show.bs.modal', (event) => {
+            currentPage = 1;
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('pagination').classList.add('d-none');
+            document.getElementById("staffSearchText").value = '';
+        });
+
+        document.getElementById("staffSearchText").addEventListener('keyup', (e) => {
+            if(e.key == 'Enter' || e.keyCode == 13) {
+                document.getElementById('staffSearchGo').click();
+            }
+        });
+
+        document.getElementById("staffSearchGo").addEventListener('click', () => {
+            currentPage = 1;
+            staffSearchGo();
+        });
+
+        function selectUser(id, name) {
+            document.getElementById("ActAsUserId").value = id;
+            document.getElementById("SelectedUserName").value = name;
+            bootstrap.Modal.getInstance("#addStaffModal").hide();
+        }
+
+        async function staffSearchGo() {
+            await performStaffSearch(document.getElementById("staffSearchText").value, currentPage)
+                .then((response) => {
+                    return response.json();
+                }).then((data) => {
+                    if (data && data.itemCount > 0) {
+                        document.getElementById('searchResults').innerHTML = '';
+                        currentPage = data.currentPage;
+                        $.each(data.users, function (index, value) {
+                            const buttonDiv = document.createElement('div');
+                            buttonDiv.classList.add('me-2');
+
+                            const submitButton = document.createElement('button');
+                            submitButton.classList.add('btn', 'btn-sm', 'btn-outline-success');
+                            submitButton.setAttribute('onclick',
+                                `selectUser(${value.id}, '${value.name}')`);
+                            const span = document.createElement('span');
+                            span.classList.add('fa-solid', 'fa-circle-plus', 'fa-fw');
+                            submitButton.appendChild(span);
+                            buttonDiv.appendChild(submitButton);
+
+                            const nameDiv = document.createElement('div');
+                            nameDiv.classList.add('flex-grow-1');
+                            nameDiv.textContent = value.name
+
+                            const row = document.createElement('div');
+                            row.classList.add('d-flex', 'align-content-center', 'my-2');
+                            row.appendChild(buttonDiv);
+                            row.appendChild(nameDiv);
+                            document.getElementById('searchResults').append(row);
+                        })
+                        const paginationContent = [];
+                        if (data.maxPage > 1) {
+                            if (data.currentPage == 1) {
+                                paginationContent.push('<button class="btn btn-sm btn-outline-primary" disabled>');
+                                paginationContent.push('<span class="fa fa-fw fa-backward"></span></button>');
+                            } else {
+                                paginationContent.push('<button class="btn btn-sm btn-outline-primary"');
+                                paginationContent.push(' onclick="prevPage(' + false + ');">');
+                                paginationContent.push('<span class="fa fa-fw fa-backward"></span></button>');
+                            }
+                            paginationContent.push('<span class="d-inline-block mx-2">')
+                            paginationContent.push(data.currentPage + '/' + data.maxPage);
+                            paginationContent.push('</span>')
+                            if (data.currentPage == data.maxPage) {
+                                paginationContent.push('<button class="btn btn-sm btn-outline-primary" disabled>');
+                                paginationContent.push('<span class="fa fa-fw fa-forward"></span></button>');
+                            } else {
+                                paginationContent.push('<button class="btn btn-sm btn-outline-primary"');
+                                paginationContent.push(' onclick="nextPage(' + false + ');">')
+                                paginationContent.push('<span class="fa fa-fw fa-forward"></span></button>');
+                            }
+                        }
+
+                        if (paginationContent.length > 0) {
+                            document.getElementById('pagination').classList.remove('d-none');
+                        }
+                        else {
+                            document.getElementById('pagination').classList.add('d-none');
+                        }
+                        document.getElementById('pagination').innerHTML = paginationContent.join('');
+                    } else {
+                        document.getElementById('searchResults').innerHTML = '<em>No staff members found.</em>';
+                        document.getElementById('pagination').classList.add('d-none');
+                    }
+                }).catch((error) => {
+                    console.log(error)
+                    alert("Staff lookup failed.");
+                }).then(() => {
+                    ResetSpinners();
+                });
+        }
+
+        async function performStaffSearch(searchText, page) {
+            const params = new URLSearchParams(staffSearchUrl.search);
+            params.append('searchText', searchText);
+            params.append('page', page);
+
+            return fetch(new URL(`${staffSearchUrl.origin}${staffSearchUrl.pathname}?${params}`),
+                {method: 'GET'});
+        }
+
+        function nextPage() {
+            currentPage++;
+            staffSearchGo();
+        }
+
+        function prevPage() {
+            currentPage = Math.max(1, currentPage - 1);
+            staffSearchGo();
+        }
+    </script>
+}

@@ -295,7 +295,7 @@ namespace Ocuda.Ops.Models.Defaults
                 Category = "User Interface",
                 Value = "",
                 Type = SiteSettingType.StringNullable
-            }
+            },
 
             #endregion UserInterface
         };

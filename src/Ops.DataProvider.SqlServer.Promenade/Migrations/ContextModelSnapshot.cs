@@ -17,7 +17,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.14")
+                .HasAnnotation("ProductVersion", "8.0.20")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -763,6 +763,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<int?>("HoursSegmentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ImageAltTextSegmentId")
+                        .HasMaxLength(130)
+                        .HasColumnType("int");
+
                     b.Property<string>("ImagePath")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -786,6 +790,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<string>("LocatorNotes")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("MapAltTextSegmentId")
+                        .HasMaxLength(130)
+                        .HasColumnType("int");
 
                     b.Property<string>("MapImagePath")
                         .HasMaxLength(100)

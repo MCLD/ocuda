@@ -486,6 +486,20 @@ namespace Ocuda.Promenade.Service
                         forceReload);
             }
 
+            if (location.ImageAltTextSegmentId.HasValue)
+            {
+                location.ImageAltTextSegmentTexts.Add(await _segmentService
+                    .GetSegmentTextBySegmentIdAsync(location.ImageAltTextSegmentId.Value,
+                        forceReload));
+            }
+
+            if (location.MapAltTextSegmentId.HasValue)
+            {
+                location.MapAltTextSegmentTexts.Add(await _segmentService
+                    .GetSegmentTextBySegmentIdAsync(location.MapAltTextSegmentId.Value,
+                        forceReload));
+            }
+
             location.CurrentStatus = await GetCurrentStatusAsync(location, forceReload);
 
             return location;

@@ -51,21 +51,6 @@ namespace Ocuda.Ops.Controllers
         public static string Name
         { get { return "Home"; } }
 
-        [HttpGet("[action]")]
-        public IActionResult Authenticate(Uri returnUrl)
-        {
-            // by the time we get here the user is probably authenticated - if so we can take them
-            // back to their initial destination
-            if (HttpContext.Items[ItemKey.Nickname] != null)
-            {
-                return Redirect(returnUrl?.ToString() ?? nameof(Index));
-            }
-
-            TempData[TempDataKey.AlertWarning]
-                = $"Could not authenticate you for access to {returnUrl}.";
-            return RedirectToAction(nameof(Index));
-        }
-
         [HttpGet]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability",
             "CA2000:Dispose objects before losing scope",
@@ -169,10 +154,14 @@ namespace Ocuda.Ops.Controllers
             string mailLink = null;
             if (!string.IsNullOrEmpty(adminEmail) && returnUrl != null)
             {
+                string username = !string.IsNullOrEmpty(CurrentUsername)
+                    ? $"({CurrentUsername}) "
+                    : null;
+
                 mailLink = $"mailto:{adminEmail}?subject="
                     + Uri.EscapeDataString("Requesting intranet access")
                     + "&body="
-                    + Uri.EscapeDataString($"I ({CurrentUsername}) request access to: {returnUrl}");
+                    + Uri.EscapeDataString($"I {username}request access to: {returnUrl}");
             }
 
             return View(new UnauthorizedViewModel
@@ -188,10 +177,11 @@ namespace Ocuda.Ops.Controllers
         {
             return Json(new UserInformation
             {
-                Username = UserClaim(ClaimType.Username),
-                Authenticated = !string.IsNullOrEmpty(UserClaim(ClaimType.Username)),
+                Username = HttpContext.User?.Identity?.Name,
+                Authenticated = HttpContext.User?.Identity.IsAuthenticated == true,
                 AuthenticatedAt = UserClaim(ClaimType.AuthenticatedAt) != null
-                    ? DateTime.Parse(UserClaim(ClaimType.AuthenticatedAt), CultureInfo.InvariantCulture)
+                    ? DateTime.Parse(UserClaim(ClaimType.AuthenticatedAt),
+                        CultureInfo.InvariantCulture)
                     : null
             });
         }

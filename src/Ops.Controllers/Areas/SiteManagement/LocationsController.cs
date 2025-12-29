@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ImageOptimApi;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
@@ -22,6 +18,7 @@ using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
@@ -31,6 +28,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class LocationsController : BaseController<LocationsController>
     {
         private readonly string _apiKey;
+        private readonly IOcudaCache _cache;
         private readonly IFeatureService _featureService;
         private readonly IGroupService _groupService;
         private readonly IImageService _imageService;
@@ -42,25 +40,27 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ISegmentService _segmentService;
         private readonly ISocialCardService _socialCardService;
         private readonly IVolunteerFormService _volunteerFormService;
-        private readonly string MapFilePath = "maps";
 
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
             IConfiguration config,
             IFeatureService featureService,
             IGroupService groupService,
+            IImageService imageService,
             ILanguageService languageService,
             ILocationFeatureService locationFeatureService,
             ILocationGroupService locationGroupService,
             ILocationHoursService locationHoursService,
             ILocationService locationService,
+            IOcudaCache cache,
             ISegmentService segmentService,
             ISocialCardService socialCardService,
-            IVolunteerFormService volunteerFormService,
-            IImageService imageService) : base(context)
+            IVolunteerFormService volunteerFormService) : base(context)
         {
+            ArgumentNullException.ThrowIfNull(cache);
             ArgumentNullException.ThrowIfNull(config);
             ArgumentNullException.ThrowIfNull(featureService);
             ArgumentNullException.ThrowIfNull(groupService);
+            ArgumentNullException.ThrowIfNull(imageService);
             ArgumentNullException.ThrowIfNull(languageService);
             ArgumentNullException.ThrowIfNull(locationFeatureService);
             ArgumentNullException.ThrowIfNull(locationGroupService);
@@ -69,10 +69,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ArgumentNullException.ThrowIfNull(segmentService);
             ArgumentNullException.ThrowIfNull(socialCardService);
             ArgumentNullException.ThrowIfNull(volunteerFormService);
-            ArgumentNullException.ThrowIfNull(imageService);
 
+            _cache = cache;
             _featureService = featureService;
             _groupService = groupService;
+            _imageService = imageService;
             _languageService = languageService;
             _locationFeatureService = locationFeatureService;
             _locationGroupService = locationGroupService;
@@ -81,7 +82,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             _segmentService = segmentService;
             _socialCardService = socialCardService;
             _volunteerFormService = volunteerFormService;
-            _imageService = imageService;
 
             _apiKey = config[Configuration.OcudaGoogleAPI];
         }
@@ -270,6 +270,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         };
                         await _locationHoursService.AddLocationHoursAsync(locationHours);
                     }
+                    await _cache.RemoveAsync(Cache.OpsLocationList);
                     ShowAlertSuccess($"Added Location: {location.Name}");
                     location.IsNewLocation = true;
                     return RedirectToAction(nameof(LocationsController.Location),
@@ -375,6 +376,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             try
             {
                 await _locationService.DeleteAsync(location.Id);
+                await _cache.RemoveAsync(Cache.OpsLocationList);
                 ShowAlertSuccess($"Deleted Location: {location.Name}");
             }
             catch (OcudaException ex)
@@ -944,6 +946,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .GetLocationByStubAsync(locationStub);
                 location.IsNewLocation = false;
 
+                var intranetUri = await GetBaseUriAsync(_siteSettingService);
+
+                var staffSearchLink = Url.Action(nameof(StaffController.SearchJson),
+                    StaffController.Name,
+                    null,
+                    intranetUri.Scheme);
+
                 var viewModel = new LocationViewModel
                 {
                     Location = location,
@@ -951,7 +960,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     LocationStub = location.Stub,
                     LocationGroups = await _locationGroupService
                         .GetLocationGroupsByLocationAsync(location),
-                    Action = nameof(LocationsController.EditLocation)
+                    Action = nameof(EditLocation),
+                    StaffSearchLink = staffSearchLink
                 };
 
                 var volunteerFeature = await _featureService
@@ -959,17 +969,20 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 if (volunteerFeature != null)
                 {
                     var forms = await _volunteerFormService.GetVolunteerFormsAsync();
-                    if (forms.Any())
+                    if (forms.Count != 0)
                     {
                         var formsViewModel = new List<LocationVolunteerFormViewModel>();
                         foreach (var form in forms)
                         {
-                            var mappings = await _volunteerFormService.GetFormUserMappingsAsync(form.Id, location.Id);
+                            var mappings = await _volunteerFormService
+                                .GetFormUserMappingsAsync(form.Id, location.Id);
                             var newForm = new LocationVolunteerFormViewModel
                             {
                                 TypeId = (int)form.VolunteerFormType,
                                 TypeName = form.VolunteerFormType.ToString(),
-                                FormMappings = mappings.ToList().ConvertAll(_ => new LocationVolunteerMappingViewModel(_)),
+                                FormMappings = mappings
+                                    .ToList(
+                                    ).ConvertAll(_ => new LocationVolunteerMappingViewModel(_)),
                                 IsDisabled = form.IsDisabled
                             };
                             if (form.IsDisabled)
@@ -981,13 +994,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                         var locationFeature = await _locationFeatureService
                             .GetByFeatureIdLocationIdAsync(volunteerFeature.Id, location.Id);
-                        var hasForms = formsViewModel.Any(_ => _.FormMappings.Any() && !_.IsDisabled);
+                        var hasForms = formsViewModel
+                            .Any(_ => _.FormMappings.Count != 0 && !_.IsDisabled);
                         var hasLocationFeature = locationFeature != null;
 
                         if (hasForms && !hasLocationFeature)
                         {
                             await _volunteerFormService
-                            .AddVolunteerLocationFeature(volunteerFeature.Id, location.Id, location.Stub);
+                                .AddVolunteerLocationFeature(volunteerFeature.Id,
+                                    location.Id,
+                                    location.Stub);
                         }
                         else if (!hasForms && hasLocationFeature)
                         {
@@ -1054,12 +1070,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("{locationStub}/[action]")]
-        public async Task<IActionResult> MapVolunteerCoordinator(string locationStub, int type, int userId)
+        public async Task<IActionResult> MapVolunteerCoordinator(string locationStub,
+            int type,
+            int userId)
         {
             var location = await _locationService.GetLocationByStubAsync(locationStub);
             try
             {
-                await _volunteerFormService.AddFormUserMapping(location.Id, (VolunteerFormType)type, userId);
+                await _volunteerFormService
+                    .AddFormUserMapping(location.Id, (VolunteerFormType)type, userId);
                 ShowAlertSuccess("User successfully added.");
             }
             catch (OcudaException oex)
@@ -1071,12 +1090,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("{locationStub}/[action]")]
-        public async Task<IActionResult> RemoveFormUserMapping(string locationStub, int userId, int type)
+        public async Task<IActionResult> RemoveFormUserMapping(string locationStub,
+            int userId,
+            int type)
         {
             var location = await _locationService.GetLocationByStubAsync(locationStub);
             try
             {
-                await _volunteerFormService.RemoveFormUserMapping(location.Id, userId, (VolunteerFormType)type);
+                await _volunteerFormService
+                    .RemoveFormUserMapping(location.Id, userId, (VolunteerFormType)type);
                 ShowAlertSuccess("User successfully removed.");
             }
             catch (OcudaException oex)
@@ -1319,7 +1341,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpGet]
         [Route("{locationStub}/[action]")]
-        public async Task<IActionResult> VolunteerFormSubmissionDetails(string locationStub, int sid)
+        public async Task<IActionResult> VolunteerFormSubmissionDetails(string locationStub,
+            int sid)
         {
             var location = await _locationService
                 .GetLocationByStubAsync(locationStub);
@@ -1329,7 +1352,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var formSubmission = await _volunteerFormService
                     .GetVolunteerFormSubmissionAsync(sid);
                 var viewModel = new VolunteerFormSubmissionDetailsViewModel(formSubmission);
-                var form = await _volunteerFormService.GetFormByIdAsync(formSubmission.VolunteerFormId);
+                var form = await _volunteerFormService
+                    .GetFormByIdAsync(formSubmission.VolunteerFormId);
                 viewModel.LocationStub = location.Stub;
                 viewModel.IsTeen = form.VolunteerFormType == VolunteerFormType.Teen;
                 return View(viewModel);

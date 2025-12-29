@@ -53,6 +53,14 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
                 return null;
             }
 
+            if (request.IsCancelled || 
+                (request.RequestedTime.AddHours(-1) < DateTime.Now
+                && request?.IsClaimed != true
+                && !request.IsUnderway))
+            {
+                return "table-danger";
+            }
+
             var claim = Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id);
 
             if (claim?.IsComplete == true)
@@ -70,13 +78,6 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
             if (request?.IsClaimed == true)
             {
                 return "table-info";
-            }
-
-            if (request.RequestedTime.AddHours(-1) < DateTime.Now
-                && request?.IsClaimed != true
-                && !request.IsUnderway)
-            {
-                return "table-danger";
             }
 
             return null;

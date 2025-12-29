@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using CPI.DirectoryServices;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
@@ -14,15 +16,18 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
 {
     public class UserSyncService : BaseService<UserSyncService>, IUserSyncService
     {
+        private readonly IConfiguration _config;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILdapService _ldapService;
         private readonly ILocationService _locationService;
+        private readonly ISiteSettingService _siteSettingService;
         private readonly IUserManagementService _userManagementService;
         private readonly IUserRepository _userRepository;
         private readonly IUserSyncHistoryRepository _userSyncHistoryRepository;
@@ -30,28 +35,34 @@ namespace Ocuda.Ops.Service
 
         public UserSyncService(ILogger<UserSyncService> logger,
             IHttpContextAccessor httpContextAccessor,
+            IConfiguration config,
             IDateTimeProvider dateTimeProvider,
             ILdapService ldapService,
             ILocationService locationService,
-            IUserRepository userRepository,
+            ISiteSettingService siteSettingService,
             IUserManagementService userManagementService,
+            IUserRepository userRepository,
             IUserSyncHistoryRepository userSyncHistoryRepository,
             IUserSyncLocationRepository userSyncLocationRepository)
             : base(logger, httpContextAccessor)
         {
+            ArgumentNullException.ThrowIfNull(config);
             ArgumentNullException.ThrowIfNull(dateTimeProvider);
             ArgumentNullException.ThrowIfNull(ldapService);
             ArgumentNullException.ThrowIfNull(locationService);
-            ArgumentNullException.ThrowIfNull(userRepository);
+            ArgumentNullException.ThrowIfNull(siteSettingService);
             ArgumentNullException.ThrowIfNull(userManagementService);
+            ArgumentNullException.ThrowIfNull(userRepository);
             ArgumentNullException.ThrowIfNull(userSyncHistoryRepository);
             ArgumentNullException.ThrowIfNull(userSyncLocationRepository);
 
+            _config = config;
             _dateTimeProvider = dateTimeProvider;
             _ldapService = ldapService;
             _locationService = locationService;
-            _userRepository = userRepository;
+            _siteSettingService = siteSettingService;
             _userManagementService = userManagementService;
+            _userRepository = userRepository;
             _userSyncHistoryRepository = userSyncHistoryRepository;
             _userSyncLocationRepository = userSyncLocationRepository;
         }
@@ -117,7 +128,7 @@ namespace Ocuda.Ops.Service
 
             try
             {
-                return System.Text.Json.JsonSerializer.Deserialize<StatusReport>(detail.Log);
+                return JsonSerializer.Deserialize<StatusReport>(detail.Log);
             }
             catch (JsonException jex)
             {
@@ -130,7 +141,8 @@ namespace Ocuda.Ops.Service
             return await _userSyncLocationRepository.GetAllAsync();
         }
 
-        public async Task<CollectionWithCount<UserSyncHistory>> GetPaginatedHeadersAsync(BaseFilter filter)
+        public async Task<CollectionWithCount<UserSyncHistory>>
+            GetPaginatedHeadersAsync(BaseFilter filter)
         {
             return await _userSyncHistoryRepository.GetPaginatedAsync(filter);
         }
@@ -150,7 +162,8 @@ namespace Ocuda.Ops.Service
 
             int timerCount = 1;
             long lastStop = timer.ElapsedMilliseconds;
-            result.StatusCounts.Add($"Timer {timerCount++}: completed LDAP query (ms)", (int)lastStop);
+            result.StatusCounts.Add($"Timer {timerCount++}: completed LDAP query (ms)",
+                (int)lastStop);
 
             var opsUsers = await _userRepository.GetAllAsync();
             result.StatusCounts.Add($"Timer {timerCount++}: Initial all-staff query (ms)",
@@ -177,6 +190,13 @@ namespace Ocuda.Ops.Service
             else
             {
                 _logger.LogInformation("Scanning AD for user changes and *not* applying them");
+            }
+
+            DN dnDisabledUsersGroup = null;
+            var disabledUsersGroup = _config[Configuration.OpsLdapDisabledUsers];
+            if (!string.IsNullOrEmpty(disabledUsersGroup))
+            {
+                dnDisabledUsersGroup = new DN(disabledUsersGroup);
             }
 
             foreach (var ldapUser in ldapUsers)
@@ -410,6 +430,10 @@ namespace Ocuda.Ops.Service
 
                     if (staffUsername == null)
                     {
+                        if (dnDisabledUsersGroup?.Contains(new DN(directReportDn)) == true)
+                        {
+                            continue;
+                        }
                         result.AddStatus(directReportDn,
                             "Unable to find staff to attach supervisor for this DN, possibly disabled?",
                             LogLevel.Error);

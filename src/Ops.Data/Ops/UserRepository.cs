@@ -13,13 +13,11 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class UserRepository : OpsRepository<OpsContext, User, int>, IUserRepository
+    public class UserRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+        ILogger<UserRepository> logger)
+            : OpsRepository<OpsContext, User, int>(repositoryFacade, logger),
+            IUserRepository
     {
-        public UserRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
-            ILogger<UserRepository> logger) : base(repositoryFacade, logger)
-        {
-        }
-
         public override async Task<User> FindAsync(int id)
         {
             return await DbSet
@@ -191,13 +189,20 @@ namespace Ocuda.Ops.Data.Ops
             if (!string.IsNullOrEmpty(searchFilter.SearchText))
             {
                 query = query.Where(_ => _.Name.Contains(searchFilter.SearchText)
-                || _.Email.Contains(searchFilter.SearchText)
-                || _.Username.Contains(searchFilter.SearchText));
+                    || _.Email.Contains(searchFilter.SearchText)
+                    || _.Username.Contains(searchFilter.SearchText));
             }
+
             if (searchFilter.AssociatedLocation > 0)
             {
                 query = query.Where(_ => _.AssociatedLocation == searchFilter.AssociatedLocation);
             }
+
+            if (searchFilter.MustHaveName)
+            {
+                query = query.Where(_ => !string.IsNullOrWhiteSpace(_.Name));
+            }
+
             return new CollectionWithCount<User>
             {
                 Count = await query.CountAsync(),

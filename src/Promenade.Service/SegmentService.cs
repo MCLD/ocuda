@@ -34,18 +34,21 @@ namespace Ocuda.Promenade.Service
             LanguageService languageService)
             : base(logger, dateTimeProvider)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-            _httpContextAccessor = httpContextAccessor
-                ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            _segmentRepository = segmentRepository
-                ?? throw new ArgumentNullException(nameof(segmentRepository));
-            _segmentTextRepository = segmentTextRepository
-                ?? throw new ArgumentNullException(nameof(segmentTextRepository));
-            _segmentWrapRepository = segmentWrapRepository
-                 ?? throw new ArgumentNullException(nameof(segmentWrapRepository));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(config);
+            ArgumentNullException.ThrowIfNull(httpContextAccessor);
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(segmentRepository);
+            ArgumentNullException.ThrowIfNull(segmentTextRepository);
+            ArgumentNullException.ThrowIfNull(segmentWrapRepository);
+
+            _cache = cache;
+            _config = config;
+            _httpContextAccessor = httpContextAccessor;
+            _languageService = languageService;
+            _segmentRepository = segmentRepository;
+            _segmentTextRepository = segmentTextRepository;
+            _segmentWrapRepository = segmentWrapRepository;
         }
 
         public async Task<SegmentText> GetSegmentTextBySegmentIdAsync(int segmentId,
@@ -68,20 +71,14 @@ namespace Ocuda.Promenade.Service
             {
                 segment = await _segmentRepository.GetActiveAsync(segmentId);
 
-                bool cached = false;
-                if (segment.EndDate.HasValue)
+                if (segment != null)
                 {
-                    var timeFromNow = segment.EndDate.Value - DateTime.Now;
-                    if (timeFromNow < TimeSpan.FromHours(cachePagesInHours))
-                    {
-                        await _cache.SaveToCacheAsync(segmentCacheKey, segment, timeFromNow);
-                        cached = true;
-                    }
-                }
-
-                if (!cached)
-                {
-                    await _cache.SaveToCacheAsync(segmentCacheKey, segment, cachePagesInHours);
+                    // it is likely that StartDate is empty here ase GetActiveAsync() will not
+                    // return segments which haven't started running yet
+                    await _cache.SaveToCacheAsync(segmentCacheKey,
+                        segment,
+                        GetCacheDuration(TimeSpan.FromHours(cachePagesInHours),
+                            [segment.StartDate, segment.EndDate]));
                 }
             }
 
@@ -98,12 +95,12 @@ namespace Ocuda.Promenade.Service
                 string segmentTextCacheKey;
                 if (!string.IsNullOrWhiteSpace(currentCultureName))
                 {
-                    var currentLangaugeId = await _languageService
+                    var currentLanguageId = await _languageService
                         .GetLanguageIdAsync(currentCultureName);
 
                     segmentTextCacheKey = string.Format(CultureInfo.InvariantCulture,
                         Utility.Keys.Cache.PromSegmentText,
-                        currentLangaugeId,
+                        currentLanguageId,
                         segmentId);
 
                     if (cachePagesInHours > 0 && !forceReload)
@@ -115,7 +112,7 @@ namespace Ocuda.Promenade.Service
                     if (segmentText == null)
                     {
                         segmentText = await _segmentTextRepository
-                            .GetByIdsAsync(currentLangaugeId, segmentId);
+                            .GetByIdsAsync(currentLanguageId, segmentId);
 
                         if (segmentText != null)
                         {
@@ -155,7 +152,7 @@ namespace Ocuda.Promenade.Service
 
             SegmentWrap segmentWrap = null;
 
-            if (segment.SegmentWrapId.HasValue)
+            if (segment?.SegmentWrapId.HasValue == true)
             {
                 string segmentWrapCacheId = string.Format(CultureInfo.InvariantCulture,
                     Utility.Keys.Cache.PromSegmentWrap,

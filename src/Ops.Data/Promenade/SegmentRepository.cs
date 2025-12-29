@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,8 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class SegmentRepository : GenericRepository<PromenadeContext, Segment>, ISegmentRepository
+    public class SegmentRepository : GenericRepository<PromenadeContext, Segment>,
+        ISegmentRepository
     {
         public SegmentRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<SegmentRepository> logger) : base(repositoryFacade, logger)
@@ -89,14 +91,6 @@ namespace Ocuda.Ops.Data.Promenade
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
-        }
-
-        public async Task UpdateWrapAsync(int segmentId, int? segmentWrapId)
-        {
-            var segment = await DbSet.FindAsync(segmentId);
-            segment.SegmentWrapId = segmentWrapId;
-            DbSet.Update(segment);
-            await _context.SaveChangesAsync();
         }
     }
 }

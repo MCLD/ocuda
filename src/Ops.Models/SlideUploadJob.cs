@@ -6,6 +6,7 @@ namespace Ocuda.Ops.Models
     [Serializable]
     public class SlideUploadJob
     {
+        public string ApiKey { get; set; }
         public DateTime EndDate { get; set; }
         public IFormFile File { get; set; }
         public string Filepath { get; set; }

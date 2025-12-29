@@ -9,17 +9,9 @@ namespace Ocuda.Utility.Logging
 {
     public static class Configuration
     {
-        private const string DefaultErrorControllerName = "Controllers.ErrorController";
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
-            "CA1305:Specify IFormatProvider",
-            Justification = "Logging details do not need to be localized.")]
         public static LoggerConfiguration Build(IConfiguration config)
         {
-            if (config == null)
-            {
-                throw new System.ArgumentNullException(nameof(config));
-            }
+            System.ArgumentNullException.ThrowIfNull(config);
 
             LoggerConfiguration loggerConfig = new LoggerConfiguration()
                 .ReadFrom.Configuration(config)
@@ -28,57 +20,13 @@ namespace Ocuda.Utility.Logging
                 .Enrich.WithProperty(Enrichment.Version, Assembly.GetEntryAssembly()
                     .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                     .InformationalVersion)
-                .Enrich.FromLogContext()
-                .WriteTo.Console();
+                .Enrich.FromLogContext();
 
             string instance = config[Keys.Configuration.OcudaInstance];
 
             if (!string.IsNullOrEmpty(instance))
             {
                 loggerConfig.Enrich.WithProperty(Enrichment.Instance, instance);
-            }
-
-            string errorControllerName = config[Keys.Configuration.OcudaErrorControllerName]
-                ?? DefaultErrorControllerName;
-
-            if (!string.IsNullOrEmpty(config[Keys.Configuration.OcudaLoggingRollingFile]))
-            {
-                string rollingLogLocation
-                    = Path.Combine("shared", config[Keys.Configuration.OcudaLoggingRollingFile]);
-
-                string rollingLogFile = !string.IsNullOrEmpty(instance)
-                    ? Path.Combine(rollingLogLocation, $"log-{instance}-{{Date}}.txt")
-                    : Path.Combine(rollingLogLocation, "log-{Date}.txt");
-
-                loggerConfig.WriteTo.Logger(_ => _
-                    .Filter.ByExcluding(Matching.FromSource(errorControllerName))
-                    .WriteTo.RollingFile(rollingLogFile));
-
-                string httpErrorFileTag = config[Keys.Configuration.OcudaLoggingRollingHttpFile];
-                if (!string.IsNullOrEmpty(httpErrorFileTag))
-                {
-                    string httpLogFile = !string.IsNullOrEmpty(instance)
-                        ? Path.Combine(rollingLogLocation,
-                            $"{httpErrorFileTag}-{instance}-{{Date}}.txt")
-                        : Path.Combine(rollingLogLocation + $"{httpErrorFileTag}-{{Date}}.txt");
-
-                    loggerConfig.WriteTo.Logger(_ => _
-                        .Filter.ByIncludingOnly(Matching.FromSource(errorControllerName))
-                        .WriteTo.RollingFile(httpLogFile));
-                }
-            }
-
-            string seqEndpoint = config[Keys.Configuration.OcudaSeqEndpoint];
-            if (!string.IsNullOrEmpty(seqEndpoint))
-            {
-                var levelSwitch = new LoggingLevelSwitch();
-
-                loggerConfig
-                    .WriteTo.Logger(_ => _
-                        .Filter.ByExcluding(Matching.FromSource(errorControllerName))
-                        .WriteTo.Seq(seqEndpoint,
-                            apiKey: config[Keys.Configuration.OcudaSeqAPI],
-                            controlLevelSwitch: levelSwitch));
             }
 
             return loggerConfig;

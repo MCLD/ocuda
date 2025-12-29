@@ -1,14 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Users;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
@@ -19,25 +24,30 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
     [Route("[area]/[controller]")]
     public class UsersController : BaseController<UsersController>
     {
+        private readonly IApiKeyService _apiKeyService;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly ITitleClassService _titleClassService;
         private readonly IUserMetadataTypeService _userMetadataTypeService;
         private readonly IUserService _userService;
 
         public UsersController(ServiceFacades.Controller<UsersController> context,
+            IApiKeyService apiKeyService,
             IPermissionGroupService permissionGroupService,
             ITitleClassService titleClassService,
             IUserMetadataTypeService userMetadataTypeService,
             IUserService userService) : base(context)
         {
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
-            _titleClassService = titleClassService
-                ?? throw new ArgumentNullException(nameof(titleClassService));
-            _userMetadataTypeService = userMetadataTypeService
-                ?? throw new ArgumentNullException(nameof(userMetadataTypeService));
-            _userService = userService
-                ?? throw new ArgumentNullException(nameof(userService));
+            ArgumentNullException.ThrowIfNull(apiKeyService);
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+            ArgumentNullException.ThrowIfNull(titleClassService);
+            ArgumentNullException.ThrowIfNull(userMetadataTypeService);
+            ArgumentNullException.ThrowIfNull(userService);
+
+            _apiKeyService = apiKeyService;
+            _permissionGroupService = permissionGroupService;
+            _titleClassService = titleClassService;
+            _userMetadataTypeService = userMetadataTypeService;
+            _userService = userService;
         }
 
         public static string Area
@@ -45,6 +55,61 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         public static string Name
         { get { return "Users"; } }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> AddApiKey()
+        {
+            var baseUri = await GetBaseUriBuilderAsync();
+            baseUri.Path = Url.Action(nameof(StaffController.SearchJson), StaffController.Name);
+
+            var viewModel = new AddApiKeyViewModel
+            {
+                JsonStaffSearchUri = baseUri.Uri
+            };
+
+            foreach (ApiKeyType apiKeyType in Enum.GetValues(typeof(ApiKeyType)))
+            {
+                viewModel.ApiKeyTypesSelectList.Add(new SelectListItem(
+                    $"{apiKeyType} - {apiKeyType.GetDescriptionAttributeText()}",
+                    apiKeyType.ToString()));
+            }
+
+            return View(viewModel);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> AddApiKey(AddApiKeyViewModel viewModel)
+        {
+            ArgumentNullException.ThrowIfNull(viewModel);
+
+            string apiKey = null;
+
+            try
+            {
+                apiKey = await _apiKeyService.CreateAsync(viewModel.ApiKeyType,
+                    viewModel.ActAsUserId,
+                    viewModel.EndDate);
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogError(oex,
+                    "Unable to create API key for {UserId}: {ErrorMessage}",
+                    CurrentUsername,
+                    oex.Message);
+            }
+
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                ShowAlertDanger("Unable to create API key");
+            }
+            else
+            {
+                var userInfo = await _userService.GetByIdAsync(viewModel.ActAsUserId);
+                ShowAlertWarning($"API Key generated to act as user <strong>{userInfo.Name} ({userInfo.Username})</strong>. Please note this API key, it will not be displayed again: <strong>{apiKey}</strong>");
+            }
+
+            return RedirectToAction(nameof(ApiKeys));
+        }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> AddTitle(int titleClassId,
@@ -97,6 +162,32 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return RedirectToAction(nameof(TitleClassDetails), new { titleClassId });
         }
 
+        [HttpGet("[action]")]
+        public async Task<IActionResult> ApiKeys(int page)
+        {
+            int currentPage = page < 2 ? 1 : page;
+
+            var filter = new BaseFilter(currentPage);
+
+            var apiKeys = await _apiKeyService.PageAsync(filter);
+
+            var viewModel = new ApiKeysViewModel
+            {
+                CurrentPage = currentPage,
+                ItemCount = apiKeys.Count,
+                ItemsPerPage = filter.Take.Value
+            };
+
+            ((List<ApiKey>)viewModel.ApiKeys).AddRange(apiKeys.Data);
+
+            if (viewModel.PastMaxPage)
+            {
+                viewModel.CurrentPage = viewModel.MaxPage;
+            }
+
+            return View(viewModel);
+        }
+
         [HttpPost]
         [Route("[action]")]
         public async Task<JsonResult> CreateMetadataType(UserMetadataType metadataType)
@@ -147,6 +238,25 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
 
             return Json(new { success, message });
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> DeleteApiKey(int apiKeyId)
+        {
+            try
+            {
+                await _apiKeyService.DeleteAsync(apiKeyId);
+                ShowAlertInfo("API key deleted.");
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogError(oex,
+                    "Unable to delete API key: {ErrorMessage}",
+                    oex.Message);
+                ShowAlertDanger("Unable to delete API key.");
+            }
+
+            return RedirectToAction(nameof(ApiKeys));
         }
 
         [HttpPost]

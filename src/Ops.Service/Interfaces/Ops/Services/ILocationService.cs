@@ -79,16 +79,12 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<IDictionary<string, string>> GetSlugNameAsync();
 
-        //Task<string> SaveImageToServerAsync(byte[] imageBytes,
-        //    string requestedFilename,
-        //    bool overwrite,
-        //    string subDirectory);
-
-        //Task<string> SaveImageToServerAsync(byte[] imageBytes,
-        //    string requestedFilename,
-        //    bool overwrite);
-
         Task UndeleteAsync(int id);
+
+        Task UpdateAltTextAsync(int locationId,
+            int languageId,
+            string imageFieldName,
+            string altText);
 
         Task UpdateExteriorImageAsync(IFormFile imageFile, string filename, string locationStub);
 
