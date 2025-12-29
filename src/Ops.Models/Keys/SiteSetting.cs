@@ -2,6 +2,15 @@
 {
     namespace SiteSetting
     {
+        public static class CardRenewal
+        {
+            public static readonly string AcceptedCounty = "CardRenewal.AcceptedCounty";
+            public static readonly string AddressLookupUrl = "CardRenewal.AddressLookupUrl";
+            public static readonly string AssessorLookupUrl = "CardRenewal.AssessorLookupUrl";
+            public static readonly string JuvenilePatronCodes = "CardRenewal.JuvenilePatronCodes";
+            public static readonly string LeapPatronUrl = "CardRenewal.LeapPatronUrl";
+        }
+
         public static class Carousel
         {
             public static readonly string ImageRestrictToDomains = "Carousel.ImageRestricToDomains";

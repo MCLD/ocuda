@@ -11,6 +11,7 @@ namespace Ocuda.Promenade.Data
         }
 
         public DbSet<CardDetail> CardDetails { get; }
+        public DbSet<CardRenewalRequest> CardRenewalRequests { get; set; }
         public DbSet<Card> Cards { get; }
         public DbSet<CarouselButtonLabel> CarouselButtonLabels { get; }
         public DbSet<CarouselButtonLabelText> CarouselButtonLabelTexts { get; }

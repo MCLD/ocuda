@@ -3,6 +3,11 @@
     public static class Cache
     {
         /// <summary>
+        /// Cached Polaris patron codes
+        /// </summary>
+        public static readonly string PolarisPatronCodes = "patroncodes";
+
+        /// <summary>
         /// Date and time of last expired slide purge
         /// </summary>
         public static readonly string OpsCleanupSlides = "cleanupslides";

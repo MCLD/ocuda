@@ -1,0 +1,128 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.CardRenewal.ResponseViewModel
+
+<div class="d-flex justify-content-between">
+	<h1>
+		Card Renewal Response
+		<small class="text-muted">@Model.Response.Name</small>
+	</h1>
+	<div>
+		<a asp-action="@(nameof(CardRenewalController.Responses))"
+		   class="btn btn-outline-dark">Back</a>
+	</div>
+</div>
+
+<div class="row pt-3">
+	<div class="col-12">
+		<input asp-for="Response.Type" disabled formgroup hide-required />
+	</div>
+</div>
+
+<div class="row pb-3">
+	<div class="col-12 col-md-9 offset-md-3">
+		<hr />
+	</div>
+</div>
+
+<form asp-controller="@CardRenewalController.Name"
+	  asp-action="@nameof(CardRenewalController.Response)"
+	  method="post"
+	  role="form">
+	<input asp-for="Response.Id" type="hidden" />
+
+	<input asp-for="Response.Name" formgroup />
+	<select asp-for="Response.EmailSetupId" asp-items="Model.EmailSetups" formgroup>
+		<option></option>
+	</select>
+
+	<div class="row">
+		<div class="offset-md-3 col-md-9">
+			<button type="submit"
+					class="btn btn-outline-success btn-lg"
+					buttonspinner>
+				<span class="fa-regular fa-floppy-disk"></span>
+				Save
+			</button>
+		</div>
+	</div>
+</form>
+
+<div class="row">
+	<div class="col-12 col-md-9 offset-md-3">
+		<hr />
+	</div>
+</div>
+
+<div class="row pb-3">
+	<div class="col-12 col-md-9 offset-md-3">
+		<h3>
+			Email Text Preview
+			<small class="text-muted"><span id="emailSpinner" class="fa-solid fa-spinner fa-pulse d-none"></span></small>
+		</h3>
+		<div>
+			@foreach (var language in Model.Languages)
+			{
+				<button type="button"
+						class="languageSelector btn btn-sm btn-outline-info mt-1 @(language.Id == Model.Languages.First().Id ? "active" : null)"
+						data-name="@language.Name">
+					@language.Description
+				</button>
+			}
+		</div>
+	</div>
+</div>
+
+<input asp-for="EmailSetupText.Subject" formgroup readonly />
+<input asp-for="EmailSetupText.Preview" formgroup readonly />
+<textarea asp-for="EmailSetupText.BodyText" formgroup readonly rows="15"></textarea>
+
+<div class="row">
+	<div class="col-12 col-md-9 offset-md-3">
+		<strong>Replacement Keys</strong> &ndash; {{@Ocuda.Ops.Service.Keys.CardRenewal.CustomerBarcode}}, {{@Ocuda.Ops.Service.Keys.CardRenewal.CustomerName}}
+	</div>
+</div>
+
+
+@section Scripts {
+	<script>
+		$('#Response_EmailSetupId').on('change', function() {
+			UpdateEmailSetupText();
+		});
+
+		$('.languageSelector').on('click', function()
+		{
+			if (!$(this).hasClass('active')){
+				$('.languageSelector').removeClass('active');
+				$(this).addClass('active');
+				UpdateEmailSetupText();
+			}
+
+		});
+
+		function UpdateEmailSetupText() {
+			$('#emailSpinner').removeClass('d-none');
+			$('#Response_EmailSetupId').attr('disabled', 'disabled');
+			$('.languageSelector').attr('disabled', 'disabled');
+
+			let emailSetupId = $('#Response_EmailSetupId').val();
+			let languageName = $('.languageSelector.active').data('name');
+
+			$.get('@Url.Action(nameof(CardRenewalController.GetEmailSetupText))',
+				{ emailSetupId, languageName})
+				.done(function(response) {
+					if (response.success == true) {
+						$('#EmailSetupText_Subject').val(response.subject);
+						$('#EmailSetupText_Preview').val(response.preview);
+						$('#EmailSetupText_BodyText').val(response.bodyText);
+					}
+					else {
+						alert(response.message);
+					}
+			})
+			.always(function() {
+				$('#emailSpinner').addClass('d-none');
+				$('#Response_EmailSetupId').removeAttr('disabled');
+				$('.languageSelector').removeAttr('disabled');
+			});
+		}
+	</script>
+}

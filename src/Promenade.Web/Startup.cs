@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Clc.Polaris.Api.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -20,6 +21,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Ocuda.i18n;
 using Ocuda.i18n.RouteConstraint;
+using Ocuda.PolarisHelper;
 using Ocuda.Promenade.Controllers;
 using Ocuda.Promenade.Data;
 using Ocuda.Promenade.Service;
@@ -373,6 +375,8 @@ namespace Ocuda.Promenade.Web
                 _.LowercaseUrls = true;
             });
 
+            services.Configure<PapiSettings>(_config.GetSection(PapiSettings.SECTION_NAME));
+
             // service facades
             services.AddScoped(typeof(Controllers.ServiceFacades.Controller<>));
             services.AddScoped(typeof(Controllers.ServiceFacades.PageController));
@@ -382,6 +386,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
             services.AddScoped<Utility.Services.Interfaces.IOcudaCache,
                 Utility.Services.OcudaCache>();
+            services.AddScoped<IPolarisHelper, PolarisHelper.PolarisHelper>();
 
             services.AddHttpClient<IGoogleClient, GoogleClient>();
 
@@ -392,6 +397,8 @@ namespace Ocuda.Promenade.Web
             // repositories
             services.AddScoped<Service.Interfaces.Repositories.ICardDetailRepository,
                 Data.Promenade.CardDetailRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ICardRenewalRequestRepository,
+                Data.Promenade.CardRenewalRequestRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ICardRepository,
                 Data.Promenade.CardRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ICarouselButtonLabelTextRepository,
@@ -526,6 +533,7 @@ namespace Ocuda.Promenade.Web
                 Utility.Services.PathResolverService>();
 
             // promenade services
+            services.AddScoped<CardRenewalService>();
             services.AddScoped<CarouselService>();
             services.AddScoped<CategoryService>();
             services.AddScoped<DeckService>();

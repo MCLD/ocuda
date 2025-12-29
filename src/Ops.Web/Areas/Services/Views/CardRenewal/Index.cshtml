@@ -1,0 +1,96 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Services.ViewModels.CardRenewal.IndexViewModel
+
+<div class="row">
+	<div class="col-12 col-md-6 mb-2">
+		<h1>
+			Card Renewal Requests
+			<small class="text-muted d-print-block">@(Model.IsProcessed ? "Processed" : "Pending")</small>
+		</h1>
+
+	</div>
+</div>
+
+<div class="row mb-2">
+	<div class="col-12">
+		<div class="d-inline-block">
+			<ul class="nav nav-pills">
+				<li class="nav-item">
+					<a asp-action="@nameof(CardRenewalController.Index)"
+					   asp-route-Processed=""
+					   class="nav-link"
+					   ActiveBy routeKey="processed" value=",false">
+						Pending
+						<span class="badge text-bg-secondary">@Model.PendingCount</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a asp-action="@nameof(EmployeeCardController.Index)"
+					   asp-route-Processed="true"
+					   class="nav-link"
+					   ActiveBy routeKey="processed"
+					   value="@true">
+						Processed
+						<span class="badge text-bg-secondary">@Model.ProcessedCount</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<table class="table table-sm table-bordered table-striped">
+	<thead>
+		<tr>
+			<th>@(Model.IsProcessed ? "Processed" : "Submitted")</th>
+			<th>Barcode</th>
+			<th>Same Address?</th>
+			@if (Model.IsProcessed)
+			{
+				<th>Accepted?</th>
+			}
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model.ItemCount == 0)
+		{
+			<tr>
+				<td colspan="4">
+					No requests found.
+				</td>
+			</tr>
+		}
+		else
+		{
+			@foreach (var request in Model.CardRequests)
+			{
+				<tr>
+					<td>
+						<a asp-action="@(nameof(CardRenewalController.Details))"
+						   asp-route-id="@request.Id">
+							@(Model.IsProcessed? request.ProcessedAt: request.SubmittedAt)
+						</a>
+					</td>
+					<td>@request.Barcode</td>
+					<td class="@(request.SameAddress ? "table-success" : "table-danger")">@(request.SameAddress ? "Yes" : "No")</td>
+					@if (Model.IsProcessed)
+					{
+						/*
+						<td>
+							@if (request.Accepted == true)
+							{
+								<span class="fa-solid fa-check fa-fw"></span>
+							}
+							else
+							{
+								<span class="fa-solid fa-xmark fa-fw"></span>
+							}
+						</td>
+						*/
+					}
+				</tr>
+			}
+		}
+	</tbody>
+</table>
+
+<nav paginate="@Model"></nav>

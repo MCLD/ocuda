@@ -41,7 +41,7 @@ namespace Ocuda.Ops.Data.Promenade
         }
 
         public async Task<CollectionWithCount<EmployeeCardRequest>> GetPaginatedAsync(
-            EmployeeCardFilter filter)
+            RequestFilter filter)
         {
             var query = DbSet.AsNoTracking();
 

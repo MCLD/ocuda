@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Ops.Models.Entities
 {
@@ -20,6 +21,7 @@ namespace Ocuda.Ops.Models.Entities
         [MaxLength(255)]
         public string Preview { get; set; }
 
+        [DisplayName("Text")]
         public string BodyText { get; set; }
         public string BodyHtml { get; set; }
 

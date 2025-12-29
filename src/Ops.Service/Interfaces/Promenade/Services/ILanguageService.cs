@@ -13,5 +13,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<IDictionary<int, string>> GetActiveNamesAsync();
 
         Task<int> GetDefaultLanguageId();
+
+        Task<string> GetDefaultLanguageNameAsync();
     }
 }

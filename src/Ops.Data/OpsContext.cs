@@ -16,6 +16,8 @@ namespace Ocuda.Ops.Data
         }
 
         public DbSet<ApiKey> ApiKeys { get; set; }
+        public DbSet<CardRenewalResponse> CardRenewalResponses { get; set; }
+        public DbSet<CardRenewalResult> CardRenewalResults { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ClaimGroup> ClaimGroups { get; set; }
         public DbSet<CoverIssueDetail> CoverIssueDetails { get; set; }

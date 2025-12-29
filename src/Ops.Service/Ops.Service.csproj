@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ops.Models\Ops.Models.csproj" />
+    <ProjectReference Include="..\PolarisHelper\PolarisHelper.csproj" />
     <ProjectReference Include="..\Promenade.Models\Promenade.Models.csproj" />
     <ProjectReference Include="..\Promenade.Service\Promenade.Service.csproj" />
     <ProjectReference Include="..\Utility\Utility.csproj" />

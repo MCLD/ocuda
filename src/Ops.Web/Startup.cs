@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Clc.Polaris.Api.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -22,6 +23,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Ops.Web.JobScheduling;
 using Ocuda.Ops.Web.StartupHelper;
+using Ocuda.PolarisHelper;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
@@ -122,6 +124,8 @@ namespace Ocuda.Ops.Web
                 _.DefaultRequestCulture
                     = new Microsoft.AspNetCore.Localization.RequestCulture(culture);
             });
+
+            services.Configure<PapiSettings>(_config.GetSection(PapiSettings.SECTION_NAME));
 
             services.AddHealthChecks();
 
@@ -327,10 +331,15 @@ namespace Ocuda.Ops.Web
             // helpers
             services.AddScoped<Utility.Helpers.WebHelper>();
             services.AddScoped<Utility.Email.Sender>();
+            services.AddScoped<IPolarisHelper, PolarisHelper.PolarisHelper>();
 
             // repositories
             services.AddScoped<Service.Interfaces.Ops.Repositories.IApiKeyRepository,
                 Data.Ops.ApiKeyRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ICardRenewalResponseRepository,
+                Data.Ops.CardRenewalResponseRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ICardRenewalResultRepository,
+                Data.Ops.CardRenewalResultRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
                 Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
@@ -353,6 +362,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.DigitalDisplaySetRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailRecordRepository,
                 Data.Ops.EmailRecordRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailSetupRepository,
+                Data.Ops.EmailSetupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailSetupTextRepository,
                 Data.Ops.EmailSetupTextRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailTemplateTextRepository,
@@ -436,6 +447,8 @@ namespace Ocuda.Ops.Web
 
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardDetailRepository,
                 Data.Promenade.CardDetailRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardRenewalRequestRepository,
+                Data.Promenade.CardRenewalRequestRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardRepository,
                 Data.Promenade.CardRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselButtonLabelRepository,
@@ -558,6 +571,8 @@ namespace Ocuda.Ops.Web
             // services
             services.AddScoped<IApiKeyService, ApiKeyService>();
             services.AddScoped<IAuthorizationService, AuthorizationService>();
+            services.AddScoped<ICardRenewalRequestService, CardRenewalRequestService>();
+            services.AddScoped<ICardRenewalService, CardRenewalService>();
             services.AddScoped<ICarouselService, CarouselService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ICoverIssueService, CoverIssueService>();

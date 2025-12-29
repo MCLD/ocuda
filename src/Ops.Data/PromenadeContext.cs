@@ -14,6 +14,7 @@ namespace Ocuda.Ops.Data
         }
 
         public DbSet<CardDetail> CardDetails { get; set; }
+        public DbSet<CardRenewalRequest> CardRenewalRequests { get; set; }
         public DbSet<Card> Cards { get; set; }
         public DbSet<CarouselButtonLabel> CarouselButtonLabels { get; set; }
 

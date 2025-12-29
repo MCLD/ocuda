@@ -9,7 +9,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
     {
         Task<EmployeeCardRequest> GetRequestAsync(int requestId);
         Task<int> GetRequestCountAsync(bool? isProcessed);
-        Task<CollectionWithCount<EmployeeCardRequest>> GetRequestsAsync(EmployeeCardFilter filter);
+        Task<CollectionWithCount<EmployeeCardRequest>> GetRequestsAsync(RequestFilter filter);
         Task UpdateNotesAsync(EmployeeCardRequest cardRequest);
     }
 }

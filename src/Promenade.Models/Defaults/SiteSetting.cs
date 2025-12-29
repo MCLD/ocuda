@@ -9,6 +9,23 @@ namespace Ocuda.Promenade.Models.Defaults
         public static IEnumerable<SiteSetting> Get { get; } = new[]
         {
             #region Card
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Card),
+                Description = "Accepted counties for card renewal addresses, comma delimited",
+                Id = Keys.SiteSetting.Card.AcceptedCounties,
+                Name = "Accepted counties",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting 
+            {
+                Category = nameof(Keys.SiteSetting.Card),
+                Description = "Segment to show on the card renewal page",
+                Id = Keys.SiteSetting.Card.CardRenewalSegment,
+                Name = "Card renewal segment",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
             new SiteSetting 
             {
                 Category = nameof(Keys.SiteSetting.Card),
@@ -24,6 +41,58 @@ namespace Ocuda.Promenade.Models.Defaults
                 Description = "Thanks page to show after employee card request is submitted",
                 Id = Keys.SiteSetting.Card.EmployeeCardThanksPage,
                 Name = "Employee card thanks page",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Card),
+                Description = "Number of days before a cards expiration that it's eligible for online renewal",
+                Id = Keys.SiteSetting.Card.ExpirationCutoffDays,
+                Name = "Card renewal expiration cutoff days",
+                Type= SiteSettingType.Int,
+                Value = "-1"
+            },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Card),
+                Description = "Link for 'Forgot Password' on card renewal page",
+                Id = Keys.SiteSetting.Card.ForgotPasswordLink,
+                Name = "Forgot Password link",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Card),
+                Description = "Juvenile patron code ids, comma delimited",
+                Id = Keys.SiteSetting.Card.JuvenilePatronCodes,
+                Name = "Juvenile patron codes",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Card),
+                Description = "Segment to show on the verify address page when there's no valid addresses",
+                Id = Keys.SiteSetting.Card.NoAddressSegment,
+                Name = "No address segment",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Card),
+                Description = "Segment to show on the verify address page header",
+                Id = Keys.SiteSetting.Card.SubmittedSegment,
+                Name = "Submitted segment",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            new SiteSetting 
+            {
+                Category = nameof(Keys.SiteSetting.Card),
+                Description = "Segment to show on the submitted page",
+                Id = Keys.SiteSetting.Card.VerifyAddressSegment,
+                Name = "Verify address segment",
                 Type = SiteSettingType.Int,
                 Value = "-1"
             },

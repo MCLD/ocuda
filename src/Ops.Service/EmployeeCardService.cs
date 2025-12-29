@@ -42,7 +42,7 @@ namespace Ocuda.Ops.Service
         }
 
         public async Task<CollectionWithCount<EmployeeCardRequest>> GetRequestsAsync(
-            EmployeeCardFilter filter)
+            RequestFilter filter)
         {
             return await _employeeCardRequestRepository.GetPaginatedAsync(filter);
         }

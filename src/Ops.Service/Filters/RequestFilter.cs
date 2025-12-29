@@ -1,8 +1,8 @@
 ﻿namespace Ocuda.Ops.Service.Filters
 {
-    public class EmployeeCardFilter : BaseFilter
+    public class RequestFilter : BaseFilter
     {
-        public EmployeeCardFilter(int page) : base(page)
+        public RequestFilter(int page) : base(page)
         {
         }
 

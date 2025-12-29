@@ -131,6 +131,13 @@
 								Book a Librarian
 							</a>
 							<a class="dropdown-item"
+							   asp-controller="@Ocuda.Ops.Controllers.Areas.Services.CardRenewalController.Name"
+							   asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Services))"
+							   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Services.CardRenewalController.Index))">
+								<span class="fa-solid fa-credit-card fa-fw"></span>
+								Card Renewal
+							</a>
+							<a class="dropdown-item"
 							   asp-controller="@Ocuda.Ops.Controllers.Areas.Services.EmployeeCardController.Name"
 							   asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Services))"
 							   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Services.EmployeeCardController.Index))">

@@ -29,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\PolarisHelper\PolarisHelper.csproj" />
     <ProjectReference Include="..\Ops.Service\Ops.Service.csproj" />
+    <ProjectReference Include="..\PolarisHelper\PolarisHelper.csproj" />
     <ProjectReference Include="..\Utility\Utility.csproj" />
   </ItemGroup>
 

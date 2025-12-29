@@ -9,6 +9,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     {
         Task<EmployeeCardRequest> GetByIdAsync(int Id);
         Task<int> GetCountAsync(bool? isProcessed);
-        Task<CollectionWithCount<EmployeeCardRequest>> GetPaginatedAsync(EmployeeCardFilter filter);
+        Task<CollectionWithCount<EmployeeCardRequest>> GetPaginatedAsync(RequestFilter filter);
     }
 }

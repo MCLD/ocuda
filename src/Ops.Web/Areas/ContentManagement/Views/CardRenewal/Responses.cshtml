@@ -1,0 +1,170 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.CardRenewal.ResponsesViewModel
+
+<div class="d-flex justify-content-between">
+	<h1>
+		Card Renewal Responses
+	</h1>
+	<div>
+		<button type="button"
+				class="btn btn-outline-secondary"
+				data-bs-toggle="modal"
+				data-bs-target="#addModal">
+			Create
+		</button>
+	</div>
+</div>
+
+<table class="table table-sm table-bordered table-striped">
+	<thead>
+		<tr>
+			<th>Type</th>
+			<th>Name</th>
+			<th>Email</th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model.Responses.Count() == 0)
+		{
+			<tr>
+				<td colspan="4">
+					No responses found.
+				</td>
+			</tr>
+		}
+		else
+		{
+			@foreach (var response in Model.Responses)
+			{
+				<tr>
+					<td>@response.Type</td>
+					<td>
+						<a asp-action="@nameof(CardRenewalController.Response)"
+						   asp-route-id="@response.Id">
+							@response.Name
+						</a>
+					</td>
+					<td>@response.EmailSetup?.Description</td>
+					<td align="center">
+						<button type="button"
+								class="btn btn-outline-primary changeSort decreaseSortButton"
+								data-id="@response.Id"
+								data-increase="false"
+								disabled="@(response.Id == Model.Responses.First().Id ? "disabled" : null)">
+							<span class="fa-solid fa-arrow-up" aria-hidden="true"></span>
+						</button>
+						<button class="btn btn-outline-primary changeSort increaseSortButton"
+								data-id="@response.Id"
+								data-increase="true"
+								disabled="@(response.Id == Model.Responses.Last().Id ? "disabled" : null)">
+							<span class="fa-solid fa-arrow-down" aria-hidden="true"></span>
+						</button>
+						<button type="button"
+								class="btn btn-outline-danger"
+								data-bs-toggle="modal"
+								data-bs-target="#deleteModal"
+								data-id="@response.Id"
+								data-name="@response.Name">
+							<span class="fa-solid fa-circle-minus" aria-hidden="true"></span>
+						</button>
+					</td>
+				</tr>
+			}
+		}
+	</tbody>
+</table>
+
+<form asp-controller="@CardRenewalController.Name"
+	  asp-action="@nameof(CardRenewalController.CreateResponse)"
+	  method="post"
+	  role="form">
+	<div modal id="addModal" name="Response" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+		<input asp-for="Response.Name" formgroup />
+		<select asp-for="Response.Type" formgroup>
+			<option></option>
+			@foreach (var result in Enum.GetValues(typeof(CardRenewalResponse.ResponseType)))
+			{
+				<option value="@result">@result</option>
+			}
+		</select>
+	</div>
+</form>
+
+<form asp-controller="@CardRenewalController.Name"
+	  asp-action="@nameof(CardRenewalController.DeleteResponse)"
+	  method="post"
+	  role="form">
+	<input id="deleteId" asp-for="Response.Id" type="hidden" />
+	<input id="deleteName" asp-for="Response.Name" type="hidden" />
+
+	<div modal 
+		id="deleteModal" 
+		name="Response" 
+		type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
+	</div>
+</form>
+
+@section Scripts {
+	<script>
+			$('.changeSort').on('click', function () {
+			let button = $(this);
+			let id = button.data('id');
+			let increase = button.data('increase');
+			let icon = button.children('span');
+			if (icon.hasClass('fa-spinner') == false) {
+				icon.removeClass('fa-arrow-up fa-arrow-down').addClass('fa-spinner fa-pulse');
+				$.post('@Url.Action(nameof(CardRenewalController.ChangeResponseSort))',
+					{ id, increase },
+					function (response) {
+						icon.removeClass('fa-spinner fa-pulse');
+						if (increase) {
+							icon.addClass('fa-arrow-down');
+						}
+						else {
+							icon.addClass('fa-arrow-up');
+						}
+						if (response.success) {
+							var row = button.closest('tr');
+							if (increase) {
+								var nextRow = row.next();
+								row.insertAfter(nextRow);
+								row.find('.decreaseSortButton').removeAttr('disabled');
+								if (row.next().length == 0) {
+									row.find('.increaseSortButton').attr('disabled', 'disabled');
+								}
+								nextRow.find('.increaseSortButton').removeAttr('disabled');
+								if (nextRow.prev().length == 0) {
+									nextRow.find('.decreaseSortButton').attr('disabled', 'disabled');
+								}
+							}
+							else {
+								var prevRow = row.prev();
+								row.insertBefore(prevRow);
+								row.find('.increaseSortButton').removeAttr('disabled');
+								if (row.prev().length == 0) {
+									row.find('.decreaseSortButton').attr('disabled', 'disabled');
+								}
+								prevRow.find('.decreaseSortButton').removeAttr('disabled');
+								if (prevRow.next().length == 0) {
+									prevRow.find('.increaseSortButton').attr('disabled', 'disabled');
+								}
+							}
+						}
+						else {
+							alert(response.message);
+						}
+					});
+			}
+		});
+		
+		$('#deleteModal').on('show.bs.modal', function (e) {
+			let button = $(e.relatedTarget);
+			let id = button.data('id');
+			let name = button.data('name');
+
+			$('#deleteId').val(id);
+			$('#deleteName').val(name);
+			$(this).find('.modal-text').text('Are you sure you want to delete the response' + ' \'' + name + '\'?');
+		});
+	</script>
+}

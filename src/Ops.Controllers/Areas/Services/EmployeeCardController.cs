@@ -24,7 +24,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
             _employeeCardService = employeeCardService;
         }
 
-        public static String Name
+        public static string Name
         { get { return "EmployeeCard"; } }
 
         [HttpGet("[action]/{id}")]
@@ -67,7 +67,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
         {
             page ??= 1;
 
-            var filter = new EmployeeCardFilter(page.Value)
+            var filter = new RequestFilter(page.Value)
             {
                 IsProcessed = processed
             };

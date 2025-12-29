@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using CommonMark;
 using Microsoft.AspNetCore.Http;
@@ -21,6 +22,7 @@ namespace Ocuda.Ops.Service
 
         private readonly IOcudaCache _cache;
         private readonly IEmailRecordRepository _emailRecordRepository;
+        private readonly IEmailSetupRepository _emailSetupRepository;
         private readonly IEmailSetupTextRepository _emailSetupTextRepository;
         private readonly IEmailTemplateTextRepository _emailTemplateTextRepository;
         private readonly Utility.Email.Sender _sender;
@@ -28,6 +30,7 @@ namespace Ocuda.Ops.Service
 
         public EmailService(ILogger<EmailService> logger,
             IEmailRecordRepository emailRecordRepository,
+            IEmailSetupRepository emailSetupRepository,
             IEmailSetupTextRepository emailSetupTextRepository,
             IEmailTemplateTextRepository emailTemplateTextRepository,
             IHttpContextAccessor httpContextAccessor,
@@ -38,6 +41,7 @@ namespace Ocuda.Ops.Service
         {
             ArgumentNullException.ThrowIfNull(cache);
             ArgumentNullException.ThrowIfNull(emailRecordRepository);
+            ArgumentNullException.ThrowIfNull(emailSetupRepository);
             ArgumentNullException.ThrowIfNull(emailSetupTextRepository);
             ArgumentNullException.ThrowIfNull(emailTemplateTextRepository);
             ArgumentNullException.ThrowIfNull(sender);
@@ -45,6 +49,7 @@ namespace Ocuda.Ops.Service
 
             _cache = cache;
             _emailRecordRepository = emailRecordRepository;
+            _emailSetupRepository = emailSetupRepository;
             _emailSetupTextRepository = emailSetupTextRepository;
             _emailTemplateTextRepository = emailTemplateTextRepository;
             _sender = sender;
@@ -53,10 +58,17 @@ namespace Ocuda.Ops.Service
 
         public async Task<Utility.Email.Details> GetDetailsAsync(int emailSetupId,
              string languageName,
-             IDictionary<string, string> tags)
+             IDictionary<string, string> tags,
+             string overrideText = null)
         {
             var emailSetupText = await GetEmailSetupAsync(emailSetupId, languageName)
                 ?? throw new OcudaEmailException($"Unable to find email setup {emailSetupId} in the requested or default language.");
+
+            if (!string.IsNullOrWhiteSpace(overrideText))
+            {
+                emailSetupText.BodyHtml = null;
+                emailSetupText.BodyText = overrideText;
+            }
 
             var emailTemplateText
                 = await GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId,
@@ -69,7 +81,8 @@ namespace Ocuda.Ops.Service
             {
                 try
                 {
-                    emailSetupText.BodyHtml = CommonMarkConverter.Convert(emailSetupText.BodyText);
+                    emailSetupText.BodyHtml = CommonMarkConverter.Convert(overrideText 
+                        ?? emailSetupText.BodyText);
                 }
                 catch (CommonMarkException cmex)
                 {
@@ -98,6 +111,18 @@ namespace Ocuda.Ops.Service
                 UrlParameters = emailSetupText.UrlParameters,
                 Username = settings.OutgoingLogin
             };
+        }
+
+        public async Task<Dictionary<int, string>> GetEmailSetupsAsync()
+        {
+            var emailSetups = await _emailSetupRepository.GetAllAsync();
+            return emailSetups.ToDictionary(_ => _.Id, _ => _.Description);
+        }
+
+        public async Task<EmailSetupText> GetSetupTextByLanguageAsync(int emailSetupId, 
+            string languageName)
+        {
+            return await _emailSetupTextRepository.GetByIdLanguageAsync(emailSetupId, languageName);
         }
 
         public async Task<EmailRecord> SendAsync(Utility.Email.Details emailDetails)

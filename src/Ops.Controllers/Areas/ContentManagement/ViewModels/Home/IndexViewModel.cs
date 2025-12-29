@@ -13,6 +13,7 @@
             }
         }
 
+        public bool HasCardRenewalPermissions { get; set; }
         public bool HasRosterPermissions { get; set; }
         public bool HasSectionManagerPermissions { get; set; }
         public bool HasUserSyncPermissions { get; set; }

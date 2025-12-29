@@ -7,9 +7,17 @@
             Justification = "No reason to compare these site setting keys")]
         public struct Card
         {
+            public const string AcceptedCounties = "Card.AcceptedCounties";
+            public const string CardRenewalSegment = "Card.CardRenewalSegment";
             public const string EmployeeCardSegment = "Card.EmployeeCardSegment";
             public const string EmployeeCardThanksPage 
                 = "Card.EmployeeCardThanksPage";
+            public const string ExpirationCutoffDays = "Card.ExpirationCutoffDays";
+            public const string ForgotPasswordLink = "Card.ForgotPasswordLink";
+            public const string JuvenilePatronCodes = "Card.JuvenilePatronCodes";
+            public const string NoAddressSegment = "Card.NoAddressSegment";
+            public const string SubmittedSegment = "Card.SubmittedSegment";
+            public const string VerifyAddressSegment = "Card.VerifyAddressSegment";
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",

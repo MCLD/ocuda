@@ -8,6 +8,56 @@ namespace Ocuda.Ops.Models.Defaults
     {
         public static IEnumerable<SiteSetting> Get { get; } = new[]
         {
+            #region CardRenewal
+
+            new SiteSetting 
+            {
+                Id = Keys.SiteSetting.CardRenewal.AcceptedCounty,
+                Name = "Accepted county",
+                Description = "Accepted county for card renewal addresses",
+                Category = "CardRenewal",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.CardRenewal.AddressLookupUrl,
+                Name = "Address lookup url",
+                Description = "Address lookup url with scheme, host and path",
+                Category = "CardRenewal",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.CardRenewal.AssessorLookupUrl,
+                Name = "Assessor lookup url",
+                Description = "Assessor lookup with scheme, host and path",
+                Category = "CardRenewal",
+                Value = "",
+                Type= SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.CardRenewal.JuvenilePatronCodes,
+                Name = "Juvenile patron codes",
+                Description = "Juvenile patron code ids, comma delimited",
+                Category = "CardRenewal",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.CardRenewal.LeapPatronUrl,
+                Name = "Leap patron record url",
+                Description = "Leap patron record url with scheme, host and path",
+                Category = "CardRenewal",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+
+            #endregion CardRenwal
+
             #region Carousel
 
             new SiteSetting
