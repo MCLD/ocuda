@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
 using Ocuda.Ops.Models;
-using Ocuda.Utility.Models;
 
-namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home
+namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels
 {
-    public class IndexViewModel : PaginateModel
+    public class IndexViewModel : BooksByMailViewModelBase
     {
         public ICollection<CustomerLookup> CustomerLookup { get; set; }
         public int OrderBy { get; set; }
         public bool OrderDesc { get; set; }
-        public string Search { get; set; }
         public int? SearchCount { get; set; }
     }
 }

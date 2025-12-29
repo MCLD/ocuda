@@ -8,35 +8,21 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class BooksByMailCustomerRepository : OpsRepository<OpsContext, BooksByMailCustomer, int>, IBooksByMailRepository
+    public class BooksByMailCustomerRepository :
+        OpsRepository<OpsContext, BooksByMailCustomer, int>,
+        IBooksByMailCustomerRepository
     {
         public BooksByMailCustomerRepository(Repository<OpsContext> repositoryFacade,
             ILogger<BooksByMailCustomerRepository> logger) : base(repositoryFacade, logger)
         {
         }
 
-        public async Task<BooksByMailCustomer> GetByCustomerLookupIdAsync(int customerLookupId)
+        public async Task<BooksByMailCustomer> GetCustomerAsync(int customerLookupId)
         {
-            var booksByMailCustomer = await _context.BooksByMailCustomers
+            return await DbSet
                 .AsNoTracking()
-                .Include(_ => _.Comments)
-                .Where(_ => _.CustomerLookupID == customerLookupId)
-                .FirstOrDefaultAsync();
-
-            if (booksByMailCustomer?.Comments != null)
-            {
-                booksByMailCustomer.Comments = booksByMailCustomer.Comments.OrderByDescending(_ => _.CreatedAt).ToList();
-            }
-
-            return booksByMailCustomer;
-        }
-
-        public async Task<BooksByMailComment> AddCommentAsync(BooksByMailComment comment)
-        {
-            await _context.BooksByMailComments.AddAsync(comment);
-            await _context.SaveChangesAsync();
-
-            return comment;
+                .Where(_ => _.ExternalCustomerId == customerLookupId)
+                .SingleOrDefaultAsync();
         }
     }
 }

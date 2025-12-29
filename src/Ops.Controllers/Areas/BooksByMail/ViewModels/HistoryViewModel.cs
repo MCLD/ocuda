@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using Ocuda.Ops.Models;
-using Ocuda.Utility.Models;
 
-namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home
+namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels
 {
-    public class HistoryViewModel
+    public class HistoryViewModel : BooksByMailViewModelBase
     {
         public ICollection<Material> Items { get; set; }
-        public PaginateModel PaginateModel { get; set; }
         public int OrderBy { get; set; }
         public bool OrderDesc { get; set; }
     }

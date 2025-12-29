@@ -2,16 +2,15 @@
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 
-namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home
+namespace Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels
 {
-    public class BooksByMailCustomerViewModel
+    public class BooksByMailCustomerViewModel : BooksByMailViewModelBase
     {
-        public BooksByMailCustomer BooksByMailCustomer { get; set; }
         public BooksByMailComment BooksByMailComment { get; set; }
+        public BooksByMailCustomer BooksByMailCustomer { get; set; }
         public CustomerLookup CustomerLookup { get; set; }
         public IList<Material> CustomerLookupCheckouts { get; set; }
-        public IList<Material> CustomerLookupHolds { get; set; }
-        public string Search { get; set; }
         public int CustomerLookupHistoryCount { get; set; }
+        public IList<Material> CustomerLookupHolds { get; set; }
     }
 }

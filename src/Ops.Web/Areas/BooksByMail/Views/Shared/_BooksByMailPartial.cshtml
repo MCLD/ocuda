@@ -1,0 +1,31 @@
+﻿@model Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.BooksByMailViewModelBase
+
+<div class="d-flex justify-content-between mb-2">
+    <h1 class="flex-grow-1">
+        @Model.Heading
+        @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
+        {
+            <small class="text-muted">@Model.SecondaryHeading</small>
+        }
+    </h1>
+    <form asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)"
+          asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+          role="form">
+        <div class="input-group">
+
+            <input type="search"
+                   id="search"
+                   name="search"
+                   class="form-control"
+                   placeholder="Name/Barcode"
+                   value="@Model.Search" />
+            <input type="submit" value="Search" class="btn btn-outline-info" />
+        </div>
+    </form>
+    <div class="ms-2">
+        <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)"
+           asp-area=""
+           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+           class="btn btn-outline-dark">Back</a>
+    </div>
+</div>

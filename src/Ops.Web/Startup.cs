@@ -36,8 +36,7 @@ namespace Ocuda.Ops.Web
         private readonly IConfiguration _config;
         private readonly bool _isDevelopment;
 
-        public Startup(IConfiguration configuration,
-            IWebHostEnvironment env)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             ArgumentNullException.ThrowIfNull(configuration);
 
@@ -332,7 +331,9 @@ namespace Ocuda.Ops.Web
             // repositories
             services.AddScoped<Service.Interfaces.Ops.Repositories.IApiKeyRepository,
                 Data.Ops.ApiKeyRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IBooksByMailRepository,
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IBooksByMailCommentRepository,
+                Data.Ops.BooksByMailCommentRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IBooksByMailCustomerRepository,
                 Data.Ops.BooksByMailCustomerRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
                 Data.Ops.CategoryRepository>();

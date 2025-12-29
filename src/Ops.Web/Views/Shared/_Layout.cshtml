@@ -69,7 +69,7 @@
                                        asp-area=""
                                        asp-route-slug="@opsSection.Slug"
                                        asp-controller="@HomeController.Name"
-                                       asp-action="@(nameof(HomeController.SectionIndex))">
+                                       asp-action="@nameof(HomeController.SectionIndex)">
                                         @if (!string.IsNullOrEmpty(opsSection.Icon))
                                         {
                                             <span class="@opsSection.Icon fa-fw"></span>
@@ -146,29 +146,29 @@
                                  aria-labelledby="navbarPeopleDropdown">
                                 <a class="dropdown-item"
                                    asp-controller="@Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Name"
-                                   asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Contact))"
-                                   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Index))">
+                                   asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Contact)"
+                                   asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Index)">
                                     <span class="fa-regular fa-clock fa-fw"></span>
                                     Book a Librarian
-                                </a
+                                </a>
                                 <a class="dropdown-item"
-                                   asp-controller="Home"
-                                   asp-area="BooksByMail"
-                                   asp-action="Index">
-                                    <span class="fa-solid fa-book fa-fw"></span>
+                                   asp-area="@Ocuda.Ops.Controllers.Areas.BooksByMail.HomeController.Area"
+                                   asp-action="@nameof(Ocuda.Ops.Controllers.Areas.BooksByMail.HomeController.Index)"
+                                   asp-controller="@Ocuda.Ops.Controllers.Areas.BooksByMail.HomeController.Name">
+                                    <span class="fa-solid fa-envelopes-bulk fa-fw"></span>
                                     Books By Mail
                                 </a>
                                 <a class="dropdown-item"
                                    asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
-                                   asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Incident))"
-                                   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine))">
+                                   asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
+                                   asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine)">
                                     <span class="fa-solid fa-user-injured fa-fw"></span>
                                     Incident Reports
                                 </a>
                                 <a class="dropdown-item"
                                    asp-controller="@Ocuda.Ops.Controllers.Areas.VolunteerSubmissions.HomeController.Name"
-                                   asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.VolunteerSubmissions))"
-                                   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.VolunteerSubmissions.HomeController.All))">
+                                   asp-area="@nameof(Ocuda.Ops.Controllers.Areas.VolunteerSubmissions)"
+                                   asp-action="@nameof(Ocuda.Ops.Controllers.Areas.VolunteerSubmissions.HomeController.All)">
                                     <span class="fa-solid fa-hands-helping fa-fw"></span>
                                     Volunteer Submissions
                                 </a>
@@ -192,8 +192,8 @@
                                  aria-labelledby="navbarMaterialsDropdown">
                                 <a class="dropdown-item"
                                    asp-controller="@Ocuda.Ops.Controllers.Areas.CoverIssue.HomeController.Name"
-                                   asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.CoverIssue))"
-                                   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.CoverIssue.HomeController.Index))">
+                                   asp-area="@nameof(Ocuda.Ops.Controllers.Areas.CoverIssue)"
+                                   asp-action="@nameof(Ocuda.Ops.Controllers.Areas.CoverIssue.HomeController.Index)">
                                     <span class="fa-solid fa-book-skull fa-fw"></span>
                                     Cover Issues
                                 </a>
@@ -219,8 +219,8 @@
                                  aria-labelledby="navbarManagementDropdown">
                                 <a class="dropdown-item"
                                    asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
-                                   asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement))"
-                                   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">
+                                   asp-area="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement)"
+                                   asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index)">
                                     <span class="fa-solid fa-network-wired fa-fw"></span>
                                     Intranet Management
                                 </a>
@@ -228,8 +228,8 @@
                                 {
                                     <a class="dropdown-item"
                                        asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
-                                       asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement))"
-                                       asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">
+                                       asp-area="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement)"
+                                       asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index)">
                                         <span class="fa-solid fa-earth-americas fa-fw"></span>
                                         Web Site Management
                                     </a>
@@ -250,7 +250,7 @@
                             <li class="nav-item" ActiveBy routeKey="Controller" value="Profile">
                                 <a class="nav-link text-white"
                                    asp-controller="Profile"
-                                   asp-action="@(nameof(ProfileController.Index))"
+                                   asp-action="@nameof(ProfileController.Index)"
                                    asp-route-section=""
                                    asp-route-area=""
                                    asp-route-id="">

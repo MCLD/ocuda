@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.Home.HistoryViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.BooksByMail.ViewModels.HistoryViewModel
 
 @if (Model.Items.Count == 0)
 {
@@ -11,30 +11,36 @@ else
             <thead>
                 <tr>
                     <th>
-                        <div class="sortable-column" data-orderBy="0" data-OrderDesc="@(Model.OrderBy == 0 && Model.OrderDesc == false ? "true" : "false")">
+                        <div class="sortable-column"
+                             data-orderBy="0"
+                             data-OrderDesc="@(Model.OrderBy == 0 && Model.OrderDesc == false ? "true" : "false")">
                             Title
                             @if (Model.OrderBy == 0)
                             {
-                                <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
+                                <span class="fa-solid fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
                             }
                         </div>
                     </th>
                     <th>
-                        <div class="sortable-column" data-orderBy="1" data-OrderDesc="@(Model.OrderBy == 1 && Model.OrderDesc == false ? "true" : "false")">
+                        <div class="sortable-column"
+                             data-orderBy="1"
+                             data-OrderDesc="@(Model.OrderBy == 1 && Model.OrderDesc == false ? "true" : "false")">
                             Author
                             @if (Model.OrderBy == 1)
                             {
-                                <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
+                                <span class="fa-solid fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
                             }
                         </div>
                     </th>
                     <th>Category</th>
                     <th>
-                        <div class="sortable-column" data-orderBy="2" data-OrderDesc="@(Model.OrderBy == 2 && Model.OrderDesc == false ? "true" : "false")">
+                        <div class="sortable-column"
+                             data-orderBy="2"
+                             data-OrderDesc="@(Model.OrderBy == 2 && Model.OrderDesc == false ? "true" : "false")">
                             Date
                             @if (Model.OrderBy == 2)
                             {
-                                <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
+                                <span class="fa-solid fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
                             }
                         </div>
                     </th>
@@ -53,12 +59,12 @@ else
             </tbody>
         </table>
     </div>
-    @if (Model.PaginateModel.MaxPage > 1)
+    @if (Model.MaxPage > 1)
     {
-        <paginate paginateModel="@Model.PaginateModel" asButtons="true"></paginate>
+        <paginate paginateModel="@Model" asButtons="true"></paginate>
     }
 }
 
 <script>
-    var historySearchCount = @Model.PaginateModel.ItemCount;
+    var historySearchCount = @Model.ItemCount;
 </script>

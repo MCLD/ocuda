@@ -6,8 +6,7 @@ namespace Ocuda.Ops.Models.Entities
 {
     public class BooksByMailComment : BaseEntity
     {
-        public int CustomerId { get; set; }
-        public BooksByMailCustomer Customer { get; set; }
+        public int BooksByMailCustomerId { get; set; }
 
         [Required]
         [DisplayName("Comment")]

@@ -6,54 +6,77 @@ using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Abstract;
 
 namespace Ocuda.Ops.Service
 {
     public class BooksByMailService : BaseService<BooksByMailService>, IBooksByMailService
     {
-        private readonly IBooksByMailRepository _booksByMailRepository;
+        private readonly IBooksByMailCommentRepository _booksByMailCommentRepository;
+        private readonly IBooksByMailCustomerRepository _booksByMailCustomerRepository;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
         public BooksByMailService(ILogger<BooksByMailService> logger,
             IHttpContextAccessor httpContextAccessor,
-            IBooksByMailRepository booksByMailRepository)
+            IBooksByMailCommentRepository booksByMailCommentRepository,
+            IBooksByMailCustomerRepository booksByMailCustomerRepository,
+            IDateTimeProvider dateTimeProvider)
             : base(logger, httpContextAccessor)
         {
-            _booksByMailRepository = booksByMailRepository
-                ?? throw new ArgumentNullException(nameof(booksByMailRepository));
-        }
+            ArgumentNullException.ThrowIfNull(booksByMailCommentRepository);
+            ArgumentNullException.ThrowIfNull(booksByMailCustomerRepository);
+            ArgumentNullException.ThrowIfNull(dateTimeProvider);
 
-        public Task<BooksByMailCustomer> FindAsync(int id)
-        {
-            return _booksByMailRepository.FindAsync(id);
-        }
-
-        public Task<BooksByMailCustomer> GetByCustomerLookupIdAsync(int customerLookupId)
-        {
-            return _booksByMailRepository.GetByCustomerLookupIdAsync(customerLookupId);
+            _booksByMailCommentRepository = booksByMailCommentRepository;
+            _booksByMailCustomerRepository = booksByMailCustomerRepository;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<BooksByMailCustomer> AddAsync(BooksByMailCustomer customer)
         {
-            if (customer == null) throw new ArgumentNullException(nameof(customer));
+            ArgumentNullException.ThrowIfNull(customer);
 
-            await _booksByMailRepository.AddAsync(customer);
-            await _booksByMailRepository.SaveAsync();
+            customer.CreatedAt = _dateTimeProvider.Now;
+            customer.CreatedBy = GetCurrentUserId();
+
+            await _booksByMailCustomerRepository.AddAsync(customer);
+            await _booksByMailCustomerRepository.SaveAsync();
 
             return customer;
         }
 
-        public async Task<BooksByMailCustomer> UpdateCustomer(BooksByMailCustomer customer)
+        public async Task<BooksByMailComment> AddCommentAsync(BooksByMailComment comment)
         {
-            _booksByMailRepository.Update(customer);
-            await _booksByMailRepository.SaveAsync();
+            ArgumentNullException.ThrowIfNull(comment);
 
-            return customer;
+            comment.CreatedAt = _dateTimeProvider.Now;
+            comment.CreatedBy = GetCurrentUserId();
 
+            await _booksByMailCommentRepository.AddAsync(comment);
+            return comment;
         }
 
-        public Task<BooksByMailComment> AddCommentAsync(BooksByMailComment comment)
+        public async Task<BooksByMailCustomer> GetAsync(int booksByMailCustomerId)
         {
-            return _booksByMailRepository.AddCommentAsync(comment);
+            var customer = await _booksByMailCustomerRepository.FindAsync(booksByMailCustomerId);
+
+            customer.Comments = await _booksByMailCommentRepository
+                .GetAllAsync(booksByMailCustomerId);
+
+            return customer;
+        }
+
+        public async Task<BooksByMailCustomer> UpdateCustomerAsync(BooksByMailCustomer customer)
+        {
+            ArgumentNullException.ThrowIfNull(customer);
+
+            customer.UpdatedAt = _dateTimeProvider.Now;
+            customer.UpdatedBy = GetCurrentUserId();
+
+            _booksByMailCustomerRepository.Update(customer);
+            await _booksByMailCustomerRepository.SaveAsync();
+
+            return customer;
         }
     }
 }
