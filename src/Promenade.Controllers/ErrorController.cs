@@ -60,9 +60,15 @@ namespace Ocuda.Promenade.Controllers
 
                 if (redirect != null)
                 {
+                    // append query string if present and if it isn't just a question mark
+                    var qs = statusFeature?.OriginalQueryString?.Length > 0
+                        && statusFeature.OriginalQueryString != "?"
+                            ? statusFeature.OriginalQueryString
+                            : null;
+
                     return redirect.IsPermanent
-                        ? RedirectPermanent(redirect.Url + statusFeature?.OriginalQueryString)
-                        : Redirect(redirect.Url + statusFeature?.OriginalQueryString);
+                        ? RedirectPermanent(redirect.Url + qs)
+                        : Redirect(redirect.Url + qs);
                 }
 
                 _logger.LogWarning(ErrorMessage,
@@ -88,7 +94,7 @@ namespace Ocuda.Promenade.Controllers
                 }
             }
 
-            using (LogContext.PushProperty("FormContent", HttpContext.Request.HasFormContentType 
+            using (LogContext.PushProperty("FormContent", HttpContext.Request.HasFormContentType
                 ? HttpContext.Request.Form : null))
             {
                 _logger.LogCritical(ErrorMessage,

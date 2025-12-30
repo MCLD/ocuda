@@ -12,5 +12,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         User LookupByEmail(User user);
 
         User LookupByUsername(User user);
+
+        User VerifyCredentials(string username, string password);
     }
 }

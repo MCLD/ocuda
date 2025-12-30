@@ -10,7 +10,10 @@
         </div>
 
         <div class="card-body">
-            <p>User: @Model.Username</p>
+            @if (!string.IsNullOrEmpty(Model.Username))
+            {
+                <p>User: @Model.Username</p>
+            }
             @if (!string.IsNullOrEmpty(Model.ReturnUrl))
             {
                 <p>Link: @Model.ReturnUrl</p>

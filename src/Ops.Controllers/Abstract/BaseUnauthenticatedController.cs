@@ -1,0 +1,230 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Controllers.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
+
+namespace Ocuda.Ops.Controllers.Abstract
+{
+    [ServiceFilter(typeof(UserFilterAttribute))]
+    [ServiceFilter(typeof(ExternalResourceFilterAttribute))]
+    [ServiceFilter(typeof(NavigationFilterAttribute))]
+    public abstract class BaseUnauthenticatedController<T> : Controller
+    {
+        protected readonly ILogger _logger;
+        protected readonly ISiteSettingService _siteSettingService;
+        private string _pageTitle;
+
+        protected BaseUnauthenticatedController(ServiceFacades.Controller<T> context)
+        {
+            ArgumentNullException.ThrowIfNull(context);
+            _logger = context.Logger;
+            _siteSettingService = context.SiteSettingService;
+        }
+
+        protected string AlertDanger
+        {
+            set
+            {
+                TempData[TempDataKey.AlertDanger] = value;
+            }
+        }
+
+        protected string AlertInfo
+        {
+            set
+            {
+                TempData[TempDataKey.AlertInfo] = value;
+            }
+        }
+
+        protected string AlertSuccess
+        {
+            set
+            {
+                TempData[TempDataKey.AlertSuccess] = value;
+            }
+        }
+
+        protected string AlertWarning
+        {
+            set
+            {
+                TempData[TempDataKey.AlertWarning] = value;
+            }
+        }
+
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context,
+            ActionExecutionDelegate next)
+        {
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(next);
+
+            await base.OnActionExecutionAsync(context, next);
+
+            var titleBase = await _siteSettingService.GetSettingStringAsync(Models
+                .Keys.SiteSetting.UserInterface.PageTitleBase);
+
+            var title = new System.Text.StringBuilder(titleBase?.Trim());
+
+            if (title.Length > 0 && !string.IsNullOrEmpty(_pageTitle))
+            {
+                title.Append(" - ");
+            }
+            if (!string.IsNullOrEmpty(_pageTitle))
+            {
+                title.Append(_pageTitle);
+            }
+
+            ViewData[Utility.Keys.ViewData.Title] = title.ToString();
+        }
+
+        protected async Task<UriBuilder> GetBaseUriBuilderAsync()
+        {
+            var baseIntranetLink = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.UserInterface.BaseIntranetLink);
+
+            UriBuilder builder;
+
+            if (!string.IsNullOrEmpty(baseIntranetLink))
+            {
+                builder = new UriBuilder(baseIntranetLink);
+            }
+            else
+            {
+                builder = new UriBuilder
+                {
+                    Scheme = HttpContext.Request.Scheme,
+                    Host = HttpContext.Request.Host.Host
+                };
+                var port = HttpContext.Request.Host.Port;
+                if (port.HasValue && (port != 80 && port != 443))
+                {
+                    builder.Port = port.Value;
+                }
+            }
+
+            return builder;
+        }
+
+        protected async Task<IDictionary<int, string>>
+            GetLocationsAsync(ILocationService locationService)
+        {
+            ArgumentNullException.ThrowIfNull(locationService);
+
+            return await locationService.GetAllLocationsIdNameAsync();
+        }
+
+        protected async Task<IEnumerable<SelectListItem>>
+            GetLocationsDropdownAsync(ILocationService locationService)
+        {
+            var locations = await GetLocationsAsync(locationService);
+            return locations.Select(_ => new SelectListItem
+            {
+                Value = _.Key.ToString(CultureInfo.InvariantCulture),
+                Text = _.Value
+            });
+        }
+
+        protected IActionResult RedirectToHome()
+        {
+            return RedirectToAction(nameof(HomeController.Index),
+               HomeController.Name,
+               new { area = "" });
+        }
+
+        protected IActionResult RedirectToUnauthorized()
+        {
+            return RedirectToAction(nameof(HomeController.Unauthorized),
+               HomeController.Name,
+               new { area = "", returnUrl = new Uri(Request.GetDisplayUrl()) });
+        }
+
+        protected void SetPageTitle(string pageTitle)
+        {
+            _pageTitle = pageTitle?.Trim();
+        }
+
+        protected void ShowAlertDanger(string message)
+        {
+            ShowAlertDanger(message, null);
+        }
+
+        protected void ShowAlertDanger(string message, string details)
+        {
+            AlertDanger = $"{Fa("exclamation-triangle")} {message}{details}";
+        }
+
+        protected void ShowAlertInfo(string message)
+        {
+            ShowAlertInfo(message, null);
+        }
+
+        protected void ShowAlertInfo(string message, string faIconName)
+        {
+            if (!string.IsNullOrEmpty(faIconName))
+            {
+                AlertInfo = $"{Fa(faIconName)} {message}";
+            }
+            else
+            {
+                AlertInfo = $"{Fa("check-circle")} {message}";
+            }
+        }
+
+        protected void ShowAlertSuccess(string message)
+        {
+            ShowAlertSuccess(message, null);
+        }
+
+        protected void ShowAlertSuccess(string message, string faIconName)
+        {
+            if (!string.IsNullOrEmpty(faIconName))
+            {
+                AlertSuccess = $"{Fa(faIconName)} {message}";
+            }
+            else
+            {
+                AlertSuccess = $"{Fa("thumbs-up", "fa-regular")} {message}";
+            }
+        }
+
+        protected void ShowAlertWarning(string message)
+        {
+            ShowAlertWarning(message, null);
+        }
+
+        protected void ShowAlertWarning(string message, string details)
+        {
+            AlertWarning = $"{Fa("circle-exclamation")} {message}{details}";
+        }
+
+        /// <summary>
+        /// Shorthand method to output an icon from FontAwesome, also outputs the fa-solid tag.
+        /// </summary>
+        /// <param name="iconName">The icon name with the fa- prefix left out</param>
+        /// <returns>A proper span tag to display the icon in the fa-solid style</returns>
+        private static string Fa(string iconName)
+        {
+            return Fa(iconName, "fa-solid");
+        }
+
+        /// <summary>
+        /// Shorthand method to output an icon from FontAwesome
+        /// </summary>
+        /// <param name="iconName">The icon name with the "fa-" prefix left out</param>
+        /// <param name="iconStyle">The full icon style text, must include the "fa-" prefix</param>
+        /// <returns>A proper span tag to display the icon</returns>
+        private static string Fa(string iconName, string iconStyle)
+        {
+            return $"<span class=\"{iconStyle} fa-{iconName}\" aria-hidden=\"true\"></span>";
+        }
+    }
+}

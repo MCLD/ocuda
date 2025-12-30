@@ -34,6 +34,7 @@
         public static readonly string OpsDomainName = "Ops.DomainName";
         public static readonly string OpsHttpErrorFileTag = "Ops.HttpErrorFileTag";
         public static readonly string OpsImageOptimizerUsername = "Ops.ImageOptimizerUsername";
+        public static readonly string OpsLdapDisabledUsers = "Ops.LDAPDisabledUsers";
         public static readonly string OpsLdapPassword = "Ops.LDAPPassword";
         public static readonly string OpsLdapSearchBase = "Ops.LDAPSearchBase";
         public static readonly string OpsLdapServer = "Ops.LDAPServer";

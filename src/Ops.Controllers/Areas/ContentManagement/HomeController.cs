@@ -12,7 +12,7 @@ using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 {
-    [Area("ContentManagement")]
+    [Area(nameof(ContentManagement))]
     [Route("[area]")]
     public class HomeController : BaseController<HomeController>
     {
@@ -22,8 +22,17 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             IPermissionGroupService permissionGroupService)
             : base(context)
         {
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+
+            _permissionGroupService = permissionGroupService;
+        }
+
+        public static string Area
+        {
+            get
+            {
+                return nameof(ContentManagement);
+            }
         }
 
         public static string Name

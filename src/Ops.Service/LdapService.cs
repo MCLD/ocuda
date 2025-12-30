@@ -19,18 +19,22 @@ namespace Ocuda.Ops.Service
 {
     public class LdapService : ILdapService
     {
-        /// <summary>
-        /// The LDAP filter to return all enabled users. Exclsued members of the DisabledUsers OU
-        /// </summary>
-        private const string ADAllEnabledUserFilter = "(&(objectCategory=person)(objectClass=user)(!(memberOf:1.2.840.113556.1.4.1941:=OU=DisabledUsers,DC=library,DC=local))(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
-
         private const string ADDepartment = "department";
+
         private const string ADDescription = "description";
+
         private const string ADDirectReports = "directreports";
+
         private const string ADDisplayName = "displayname";
+
         private const string ADDistinguishedName = "distinguishedname";
+
         private const string ADEmployeeNumber = "employeenumber";
+
         private const string ADExtensionDate = "extensionattribute1";
+
+        private const string ADFilterMail = "(&(|({0}={1})({2}=smtp:{3}))(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))";
+
         private const string ADGivenName = "givenname";
 
         /// <summary>
@@ -49,13 +53,31 @@ namespace Ocuda.Ops.Service
         private const string ADGroupSecurityGroup = "Security Groups";
 
         private const string ADMail = "mail";
+
         private const string ADMailAlias = "proxyaddresses";
+
         private const string ADMemberOf = "memberof";
+
         private const string ADMobileNumber = "mobile";
+
         private const string ADPhysicalDeliveryOfficeName = "physicaldeliveryofficename";
+
         private const string ADsAMAccountName = "samaccountname";
+
         private const string ADTelephoneNumber = "telephonenumber";
+
         private const string ADTitle = "title";
+
+        /// <summary>
+        /// Filter basis for all enabled users, will have Ops.LDAPDisabledUsers and (&...) applied
+        /// </summary>
+        private const string BaseADFilterEnabledAllUsers = "(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2))";
+
+        /// <summary>
+        /// Filter basis for username lookup, will have Ops.LDAPDisabledUsers and (&...) applied
+        /// </summary>
+        private const string BaseADFilterEnabledUsername = "({0}={1})(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2))";
+
         private readonly IConfiguration _config;
         private readonly ILogger _logger;
 
@@ -80,6 +102,8 @@ namespace Ocuda.Ops.Service
             ADTelephoneNumber,
             ADTitle
         ];
+
+        private readonly string[] LoginAttributesToReturn = [ADsAMAccountName];
 
         public LdapService(ILogger<LdapService> logger, IConfiguration config)
         {
@@ -108,7 +132,14 @@ namespace Ocuda.Ops.Service
         /// <returns>A string <see cref=">IEnumberable"/> of physicalDeliveryOfficeNames.</returns>
         public IEnumerable<string> GetAllLocations()
         {
-            var users = LdapUserLookup(ADAllEnabledUserFilter, null, [ADPhysicalDeliveryOfficeName]);
+            string ldapUser = _config[Configuration.OpsLdapUser];
+            string ldapPassword = _config[Configuration.OpsLdapPassword];
+
+            var users = LdapUserLookup(GetFilterApplyDisabledUsers(BaseADFilterEnabledAllUsers),
+                null,
+                [ADPhysicalDeliveryOfficeName],
+                ldapUser,
+                ldapPassword);
             return users.Where(_ => !string.IsNullOrEmpty(_.PhysicalDeliveryOfficeName)).
                 Select(_ => _.PhysicalDeliveryOfficeName)
                 .Distinct();
@@ -121,7 +152,14 @@ namespace Ocuda.Ops.Service
         /// LDAP information.</returns>
         public IEnumerable<User> GetAllUsers()
         {
-            return LdapUserLookup(ADAllEnabledUserFilter, null, AttributesToReturn);
+            string ldapUser = _config[Configuration.OpsLdapUser];
+            string ldapPassword = _config[Configuration.OpsLdapPassword];
+
+            return LdapUserLookup(GetFilterApplyDisabledUsers(BaseADFilterEnabledAllUsers),
+                null,
+                AttributesToReturn,
+                ldapUser,
+                ldapPassword);
         }
 
         /// <summary>
@@ -133,8 +171,20 @@ namespace Ocuda.Ops.Service
         public User LookupByEmail(User user)
         {
             ArgumentNullException.ThrowIfNull(user);
-            var filter = $"(&(|({ADMail}={user.Email})({ADMailAlias}=smtp:{user.Email}))(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))";
-            return LdapUserLookup(filter, user, AttributesToReturn).SingleOrDefault();
+            string ldapUser = _config[Configuration.OpsLdapUser];
+            string ldapPassword = _config[Configuration.OpsLdapPassword];
+
+            var filter = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                ADFilterMail,
+                ADMail,
+                user.Email,
+                ADMailAlias,
+                user.Email);
+            return LdapUserLookup(filter,
+                user,
+                AttributesToReturn,
+                ldapUser,
+                ldapPassword).SingleOrDefault();
         }
 
         /// <summary>
@@ -146,8 +196,45 @@ namespace Ocuda.Ops.Service
         public User LookupByUsername(User user)
         {
             ArgumentNullException.ThrowIfNull(user);
-            var filter = $"(&({ADsAMAccountName}={user.Username})(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))";
-            return LdapUserLookup(filter, user, AttributesToReturn).SingleOrDefault();
+            string ldapUser = _config[Configuration.OpsLdapUser];
+            string ldapPassword = _config[Configuration.OpsLdapPassword];
+
+            var filter = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                GetFilterApplyDisabledUsers(BaseADFilterEnabledUsername),
+                ADsAMAccountName,
+                user.Username);
+            return LdapUserLookup(filter,
+                user,
+                AttributesToReturn,
+                ldapUser,
+                ldapPassword).SingleOrDefault();
+        }
+
+        /// <summary>
+        /// Use the provided username and password to look up the user in LDAP and return the
+        /// <see cref="User"/> object populated with just the username detail.
+        /// </summary>
+        /// <param name="username">LDAP username</param>
+        /// <param name="password">LDAP password</param>
+        /// <returns>Null if the authentication or lookup failed, otherwise a populated
+        /// <see cref="User"/></returns>
+        public User VerifyCredentials(string username, string password)
+        {
+            ArgumentNullException.ThrowIfNull(username);
+            ArgumentNullException.ThrowIfNull(password);
+
+            var filter = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                GetFilterApplyDisabledUsers(BaseADFilterEnabledUsername),
+                ADsAMAccountName,
+                username);
+            var users = LdapUserLookup(filter, null, LoginAttributesToReturn, username, password);
+
+            var user = users.SingleOrDefault();
+
+            return users?.Count == 1
+                && username.Equals(user?.Username, StringComparison.OrdinalIgnoreCase)
+                    ? user
+                    : null;
         }
 
         /// <summary>
@@ -180,7 +267,7 @@ namespace Ocuda.Ops.Service
                     {
                         if (ouCount == 0 && !element.ComponentValue.Equals(groupParent, StringComparison.OrdinalIgnoreCase))
                         {
-                            throw new InvalidDataException($"Group does not have required parent group: {groupParent}");
+                            throw new InvalidDataException($"Invalid group: does not have required parent group: {groupParent}");
                         }
                         else if (ouCount == 1)
                         {
@@ -336,32 +423,35 @@ namespace Ocuda.Ops.Service
                             }
                             else
                             {
-                                try
+                                using (LogContext.PushProperty("AttributeString", attributeString))
                                 {
-                                    var group = ExtractGroupDetails(attributeString,
-                                        ADGroupParentOu);
-                                    if (group.GroupType == AdGroupType.DistributionGroup)
+                                    try
                                     {
-                                        foreach (var groupName in group.Names)
+                                        var group = ExtractGroupDetails(attributeString,
+                                            ADGroupParentOu);
+                                        if (group.GroupType == AdGroupType.DistributionGroup)
                                         {
-                                            user.DistributionGroups
-                                                .Add($"{groupNamePrefix}{groupName}");
+                                            foreach (var groupName in group.Names)
+                                            {
+                                                user.DistributionGroups
+                                                    .Add($"{groupNamePrefix}{groupName}");
+                                            }
+                                        }
+                                        else if (group.GroupType == AdGroupType.SecurityGroup)
+                                        {
+                                            foreach (var groupName in group.Names)
+                                            {
+                                                user.SecurityGroups
+                                                    .Add($"{groupNamePrefix}{groupName}");
+                                            }
                                         }
                                     }
-                                    else if (group.GroupType == AdGroupType.SecurityGroup)
+                                    catch (InvalidDataException idex)
                                     {
-                                        foreach (var groupName in group.Names)
-                                        {
-                                            user.SecurityGroups
-                                                .Add($"{groupNamePrefix}{groupName}");
-                                        }
+                                        _logger.LogError(idex,
+                                            "Invalid data extracting group info: {ErrorMessage}",
+                                            idex.Message);
                                     }
-                                }
-                                catch (InvalidDataException idex)
-                                {
-                                    _logger.LogError(idex,
-                                        "Invalid data extracting group info: {ErrorMessage}",
-                                        idex.Message);
                                 }
                             }
                         }
@@ -379,6 +469,17 @@ namespace Ocuda.Ops.Service
             }
         }
 
+        private string GetFilterApplyDisabledUsers(string baseFilter)
+        {
+            ArgumentNullException.ThrowIfNull(baseFilter);
+
+            var ldapDisabledUsers = _config[Configuration.OpsLdapDisabledUsers];
+
+            return string.IsNullOrEmpty(ldapDisabledUsers)
+                ? $"(&{baseFilter})"
+                : $"(&{baseFilter}(!(memberOf:1.2.840.113556.1.4.1941:={ldapDisabledUsers})))";
+        }
+
         /// <summary>
         /// Using the supplied LDAP Filter, look up one or more users and either apply the supplied
         /// LDAP attributes to the provided <see cref="User"/> or return an
@@ -393,7 +494,9 @@ namespace Ocuda.Ops.Service
         /// and populated with LDAP data</returns>
         private List<User> LdapUserLookup(string filter,
             User user,
-            string[] attributesToPopulate)
+            string[] attributesToPopulate,
+            string ldapUser,
+            string ldapPassword)
         {
             var stopwatch = Stopwatch.StartNew();
             var now = DateTime.Now;
@@ -403,10 +506,8 @@ namespace Ocuda.Ops.Service
             using (LogContext.PushProperty("LdapRequestedAttributes", attributesToPopulate, true))
             {
                 string domainName = _config[Configuration.OpsDomainName];
-                string ldapPassword = _config[Configuration.OpsLdapPassword];
                 string ldapSearchBase = _config[Configuration.OpsLdapSearchBase];
                 string ldapServer = _config[Configuration.OpsLdapServer];
-                string ldapUser = _config[Configuration.OpsLdapUser];
 
                 if (!string.IsNullOrEmpty(ldapServer)
                     && !string.IsNullOrEmpty(ldapUser)
@@ -465,11 +566,21 @@ namespace Ocuda.Ops.Service
 
                 if (users?.Count == 1)
                 {
-                    _logger.LogInformation("LDAP lookup found {ResultCount} result: user {User} with {SecurityGroups} security groups in {ElapsedMs} ms",
-                        users.Count,
-                        users.FirstOrDefault()?.Username,
-                        users.FirstOrDefault()?.SecurityGroups.Count,
-                        stopwatch.ElapsedMilliseconds);
+                    if (attributesToPopulate.Contains(ADMemberOf))
+                    {
+                        _logger.LogInformation("LDAP lookup found {ResultCount} result: user {User} with {SecurityGroups} security groups in {ElapsedMs} ms",
+                            users.Count,
+                            users.FirstOrDefault()?.Username,
+                            users.FirstOrDefault()?.SecurityGroups.Count,
+                            stopwatch.ElapsedMilliseconds);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("LDAP lookup found {ResultCount} result: user {User} in {ElapsedMs} ms",
+                            users.Count,
+                            users.FirstOrDefault()?.Username,
+                            stopwatch.ElapsedMilliseconds);
+                    }
                 }
                 else
                 {
