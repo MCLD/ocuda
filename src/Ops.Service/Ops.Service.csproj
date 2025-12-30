@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNetSaml" Version="2.1.3" />
+    <PackageReference Include="AspNetSaml" Version="2.1.4" />
     <PackageReference Include="CommonMark.NET" Version="0.15.1" />
     <PackageReference Include="DNParser" Version="1.3.5" />
     <PackageReference Include="ExcelDataReader" Version="3.8.0" />
