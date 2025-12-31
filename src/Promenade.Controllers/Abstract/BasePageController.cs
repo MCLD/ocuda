@@ -2,10 +2,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using CommonMark;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Controllers.ViewModels.Shared;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Promenade.Controllers.Abstract
 {
@@ -81,7 +83,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
                         stub,
                         previewId);
                 }
-                return NotFound();
+                return StatusCode(StatusCodes.Status405MethodNotAllowed);
             }
 
             if (pageHeader.IsLayoutPage)
@@ -141,8 +143,21 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 forceReload = true;
             }
 
-            var pageLayout = await PageContext.PageService
-                .GetLayoutPageByHeaderAsync(headerId, forceReload, previewId);
+            PageLayout pageLayout = null;
+
+            try
+            {
+                pageLayout = await PageContext.PageService
+                    .GetLayoutPageByHeaderAsync(headerId, forceReload, previewId);
+            }
+            catch (OcudaException oex)
+            {
+                var httpStatus = oex.Data[nameof(StatusCodes)] as int?;
+                if (httpStatus.HasValue)
+                {
+                    return StatusCode(httpStatus.Value);
+                }
+            }
 
             if (pageLayout == null)
             {

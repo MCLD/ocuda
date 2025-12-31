@@ -1,10 +1,7 @@
-﻿using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Ocuda.Promenade.Controllers.Abstract
 {
@@ -23,47 +20,35 @@ namespace Ocuda.Promenade.Controllers.Abstract
         {
         }
 
-        [HttpGet("{stub?}/item/{id}")]
-        public async Task<IActionResult> CarouselItem(string stub, int id)
+        [HttpGet("{slug?}/item/{id}")]
+        public async Task<IActionResult> CarouselItem(string slug, int id)
         {
-            return await ReturnCarouselItemAsync(stub, id);
+            return await ReturnCarouselItemAsync(slug, id);
         }
 
-        [HttpGet("{stub?}")]
-        public async Task<IActionResult> Page(string stub)
+        [HttpGet("{slug?}")]
+        public async Task<IActionResult> Page(string slug)
         {
-            return await ReturnPageAsync(stub);
+            return await ReturnPageAsync(slug);
         }
 
-        [HttpPost("{stub?}")]
-        public async Task<IActionResult> PagePreview(string stub)
+        [HttpPost("{slug?}")]
+        public async Task<IActionResult> PagePreview(string slug)
         {
-            if (string.IsNullOrEmpty(stub))
+            if (string.IsNullOrEmpty(slug)
+                || HttpContext.Request.ContentType != "application/x-www-form-urlencoded")
             {
-                return NotFound();
+                return StatusCode(StatusCodes.Status405MethodNotAllowed);
             }
-            if (HttpContext.Request.ContentType == "application/x-www-form-urlencoded")
-            {
-                return await ReturnPageAsync(stub,
-                    HttpContext.Request.Form["PreviewId"].FirstOrDefault());
-            }
-            else
-            {
-                if (!HttpContext.Request.Body.CanSeek)
-                {
-                    HttpContext.Request.EnableBuffering();
-                }
-                HttpContext.Request.Body.Position = 0;
-                using var reader = new StreamReader(HttpContext.Request.Body, Encoding.UTF8);
-                var body = await reader.ReadToEndAsync();
-                HttpContext.Request.Body.Position = 0;
 
-                _logger.LogWarning("Bad preview submission to {Slug} as {ContentType}: {Data}",
-                    stub,
-                    HttpContext.Request.ContentType,
-                    body);
-                return NotFound();
+            var previewId = HttpContext.Request.Form["PreviewId"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(previewId))
+            {
+                return StatusCode(StatusCodes.Status405MethodNotAllowed);
             }
+
+            return await ReturnPageAsync(slug, previewId);
         }
     }
 }
