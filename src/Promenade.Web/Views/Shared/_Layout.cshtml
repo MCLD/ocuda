@@ -148,11 +148,11 @@
                                     <span class="caret"></span>
                                 </button>
                                 <div class="collapse navbar-collapse px-lg-2" id="navbarSupportedContent">
-                                    <ul class="flex-column flex-sm-row align-items-stretch nav nav-pills px-lg-1 col-12 col-lg-10 offset-lg-1">
+                                    <ul class="flex-column flex-sm-row align-items-stretch nav nav-pills px-lg-1 col-12 col-lg-10 offset-lg-1"
+                                        role="presentation">
                                         @foreach (var item in middleNavigation.Navigations)
                                         {
-                                            <li role="presentation"
-                                                class="nav-item prom-nav-link col-12 col-sm-2 @(item.Navigations.Count() > 0 ? "dropdown" : "")">
+                                            <li class="nav-item prom-nav-link col-12 col-sm-2 @(item.Navigations.Count() > 0 ? "dropdown" : "")">
                                                 @if (item.Navigations.Count() > 0)
                                                 {
                                                     <a class="nav-link middle-nav-dropdown col-12 p-3 p-sm-1 @(item.Navigations.Count() > 0 ? "dropdown-toggle" : "")"
