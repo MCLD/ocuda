@@ -82,8 +82,9 @@ namespace Ocuda.Promenade.Controllers.Abstract
                     _logger.LogError("Preview requested for {Slug} but that page was not found (preview id {PreviewId})",
                         stub,
                         previewId);
+                    return StatusCode(StatusCodes.Status405MethodNotAllowed);
                 }
-                return StatusCode(StatusCodes.Status405MethodNotAllowed);
+                return NotFound();
             }
 
             if (pageHeader.IsLayoutPage)
