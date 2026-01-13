@@ -3,17 +3,28 @@
 <div class="row">
     <div class="col-12 col-lg-10 offset-lg-1">
         <div class="card mb-3">
-            <div class="card-header">@(Model.Item.CarouselItemText?.Title ?? Model.Item.CarouselItemText?.Label)</div>
+            <div class="card-header">
+                @(Model.Item.CarouselItemText?.Title ?? Model.Item.CarouselItemText?.Label)
+            </div>
             <div class="card-body">
-                <img src="@Model.Item.CarouselItemText?.ImageUrl" class="mx-auto d-block mb-4" />
-                <p class="modal-content-description mx-4 mb-1">@Model.Item.CarouselItemText?.Description</p>
+                @if (!string.IsNullOrEmpty(Model.Item.CarouselItemText?.ImageUrl))
+                {
+                    <img alt="@Model.Item.CarouselItemText?.AltText"
+                         class="mx-auto d-block mb-4"
+                         src="@Model.Item.CarouselItemText?.ImageUrl" />
+                }
+                <p class="modal-content-description mx-4 mb-1">
+                    @Model.Item.CarouselItemText?.Description
+                </p>
             </div>
             @if (Model.Item.Buttons.Count > 0)
             {
                 <div class="card-footer text-center">
                     @foreach (var button in Model.Item.Buttons)
                     {
-                        <a href="@button.Url" target="_blank" class="btn btn-outline-primary m-1">@button.LabelText.Text</a>
+                        <a class="btn btn-outline-primary m-1"
+                           href="@button.Url"
+                           target="_blank">@button.LabelText.Text</a>
                     }
                 </div>
             }

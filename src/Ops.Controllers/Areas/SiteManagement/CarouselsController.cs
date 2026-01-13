@@ -39,16 +39,18 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             IPermissionGroupService permissionGroupService)
             : base(context)
         {
-            _carouselService = carouselService
-                ?? throw new ArgumentNullException(nameof(carouselService));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
+            ArgumentNullException.ThrowIfNull(carouselService);
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+
+            _carouselService = carouselService;
+            _languageService = languageService;
+            _permissionGroupService = permissionGroupService;
         }
 
         public static string Area
         { get { return "SiteManagement"; } }
+
         public static string Name
         { get { return "Carousels"; } }
 
@@ -56,6 +58,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> AddCarouselItem(DetailViewModel model)
         {
+            if (model == null)
+            {
+                return Json(new JsonResponse { Message = "Invalid Request", Success = false });
+            }
+
             JsonResponse response;
 
             if (await HasCarouselPermissionAsync(model.CarouselItem.CarouselId))
@@ -120,6 +127,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> AddItemButton(DetailViewModel model)
         {
+            if (model == null)
+            {
+                return Json(new JsonResponse { Message = "Invalid Request", Success = false });
+            }
+
             JsonResponse response;
 
             var carouselItem = await _carouselService
@@ -189,15 +201,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            int carouselId;
-            if (item)
-            {
-                carouselId = (await _carouselService.GetItemByIdAsync(id)).CarouselId;
-            }
-            else
-            {
-                carouselId = await _carouselService.GetCarouselIdForButtonAsync(id);
-            }
+            int carouselId = item
+                ? (await _carouselService.GetItemByIdAsync(id)).CarouselId
+                : await _carouselService.GetCarouselIdForButtonAsync(id);
 
             if (await HasCarouselPermissionAsync(carouselId))
             {
@@ -242,6 +248,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> Create(IndexViewModel model)
         {
+            if (model == null)
+            {
+                return Json(new JsonResponse { Message = "Invalid Request", Success = false });
+            }
+
             JsonResponse response;
 
             if (ModelState.IsValid)
@@ -286,12 +297,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> Delete(IndexViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             try
             {
                 await _carouselService.DeleteAsync(model.Carousel.Id);
                 ShowAlertSuccess($"Deleted carousel: {model.Carousel.Name}");
             }
-            catch (Exception ex)
+            catch (OcudaException ex)
             {
                 _logger.LogError(ex, "Error deleting carousel: {Message}", ex.Message);
                 ShowAlertDanger($"Error deleting carousel: {model.Carousel.Name}");
@@ -304,6 +317,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteCarouselItem(DetailViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             var carouselItem = await _carouselService.GetItemByIdAsync(model.CarouselItem.Id);
 
             if (!await HasCarouselPermissionAsync(carouselItem.CarouselId))
@@ -316,7 +331,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 await _carouselService.DeleteItemAsync(model.CarouselItem.Id);
                 ShowAlertSuccess($"Deleted item: {model.CarouselItem.Name}");
             }
-            catch (Exception ex)
+            catch (OcudaException ex)
             {
                 _logger.LogError(ex, "Error deleting carousel item: {Message}", ex.Message);
                 ShowAlertDanger($"Error deleting item: {model.CarouselItem.Name}");
@@ -335,6 +350,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteItemButton(DetailViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             var carouselId = await _carouselService
                 .GetCarouselIdForButtonAsync(model.CarouselButton.Id);
 
@@ -349,7 +366,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                 ShowAlertSuccess("Deleted button");
             }
-            catch (Exception ex)
+            catch (OcudaException ex)
             {
                 _logger.LogError(ex, "Error deleting carousel button: {Message}", ex.Message);
                 ShowAlertDanger("Error deleting button.");
@@ -402,7 +419,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     nameof(CarouselButtonLabel.Id), nameof(CarouselButtonLabel.Name)),
                 AllowedImageDomains = (await _siteSettingService.GetSettingStringAsync(
                     Models.Keys.SiteSetting.Carousel.ImageRestrictToDomains))
-                    .Replace(",", ", "),
+                    .Replace(",", ", ", StringComparison.InvariantCulture),
                 PageLayoutId = await _carouselService.GetPageLayoutIdForCarouselAsync(carousel.Id)
             };
 
@@ -421,7 +438,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 var AllowedLinkDomains = (await _siteSettingService.GetSettingStringAsync(
                     Models.Keys.SiteSetting.Carousel.LinkRestrictToDomains))
-                    .Replace(",", ", ");
+                    .Replace(",", ", ", StringComparison.InvariantCulture);
 
                 if (!string.IsNullOrWhiteSpace(AllowedLinkDomains))
                 {
@@ -437,6 +454,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> EditCarouselItemText(DetailViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             var carouselItem = await _carouselService
                 .GetItemByIdAsync(model.CarouselItemText.CarouselItemId);
 
@@ -474,6 +493,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState(Key = DetailModelStateKey)]
         public async Task<IActionResult> EditCarouselText(DetailViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             if (!await HasCarouselPermissionAsync(model.CarouselText.CarouselId))
             {
                 return RedirectToUnauthorized();
@@ -498,6 +519,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> EditItemButton(DetailViewModel model)
         {
+            if (model == null)
+            {
+                return Json(new JsonResponse { Message = "Invalid Request", Success = false });
+            }
+
             JsonResponse response;
 
             var carouselId = await _carouselService
@@ -563,25 +589,24 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [Route("")]
         [Route("[action]/{page}")]
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page)
         {
-            var filter = new BaseFilter(page);
+            var currentPage = page < 1 ? 1 : page;
+
+            var filter = new BaseFilter(currentPage);
 
             var carouselList = await _carouselService.GetPaginatedListAsync(filter);
 
             var paginateModel = new PaginateModel
             {
                 ItemCount = carouselList.Count,
-                CurrentPage = page,
+                CurrentPage = currentPage,
                 ItemsPerPage = filter.Take.Value
             };
+
             if (paginateModel.PastMaxPage)
             {
-                return RedirectToRoute(
-                    new
-                    {
-                        page = paginateModel.LastPage ?? 1
-                    });
+                return RedirectToRoute(new { page = paginateModel.LastPage ?? 1 });
             }
 
             foreach (var carousel in carouselList.Data)
