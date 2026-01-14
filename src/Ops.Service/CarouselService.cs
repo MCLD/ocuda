@@ -110,6 +110,7 @@ namespace Ocuda.Ops.Service
                 {
                     await _carouselItemTextRepository.AddAsync(new CarouselItemText
                     {
+                        AltText = itemText.AltText,
                         CarouselItemId = newItem.Id,
                         Description = itemText.Description,
                         ImageUrl = itemText.ImageUrl,
@@ -203,6 +204,7 @@ namespace Ocuda.Ops.Service
             var imageUrl = itemText.ImageUrl?.Trim();
             await ValidateItemImageUrl(imageUrl);
 
+            itemText.AltText = itemText.AltText?.Trim();
             itemText.LanguageId = await _languageRepository.GetDefaultLanguageId();
             itemText.CarouselItem = carouselItem;
             itemText.Description = itemText.Description?.Trim();
@@ -470,6 +472,7 @@ namespace Ocuda.Ops.Service
 
             if (currentText == null)
             {
+                itemText.AltText = itemText.AltText?.Trim();
                 itemText.Description = itemText.Description?.Trim();
                 itemText.ImageUrl = imageUrl;
                 itemText.Label = itemText.Label?.Trim();
@@ -481,6 +484,7 @@ namespace Ocuda.Ops.Service
             }
             else
             {
+                currentText.AltText = itemText.AltText?.Trim();
                 currentText.Description = itemText.Description?.Trim();
                 currentText.ImageUrl = imageUrl;
                 currentText.Label = itemText.Label?.Trim();

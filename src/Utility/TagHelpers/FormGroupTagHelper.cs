@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Localization;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.TagHelpers.Extensions;
 
 namespace Ocuda.Utility.TagHelpers
@@ -204,6 +205,12 @@ namespace Ocuda.Utility.TagHelpers
 
             labelOutput.Attributes.Add(
                 new TagHelperAttribute("class", combinedLabelClass));
+
+            if (string.IsNullOrEmpty(InfoTooltip)
+                && !string.IsNullOrEmpty(For.Metadata.Description))
+            {
+                InfoTooltip = For.Metadata.Description.Trim();
+            }
 
             if (!string.IsNullOrEmpty(InfoTooltip))
             {
