@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
@@ -12,6 +11,7 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Services.ViewModels.CardRenewal;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -24,22 +24,28 @@ namespace Ocuda.Ops.Controllers.Areas.Services
     [Route("[area]/[controller]")]
     public class CardRenewalController : BaseController<CardRenewalController>
     {
+        private const string leapPatronRecordsPath = "/records";
+
         private readonly ICardRenewalRequestService _cardRenewalRequestService;
         private readonly ICardRenewalService _cardRenewalService;
+        private readonly ILanguageService _languageService;
         private readonly IPolarisHelper _polarisHelper;
 
         public CardRenewalController(ServiceFacades.Controller<CardRenewalController> context,
             ICardRenewalRequestService cardRenewalRequestService,
             ICardRenewalService cardRenewalService,
+            ILanguageService languageService,
             IPolarisHelper polarisHelper)
             : base(context)
         {
             ArgumentNullException.ThrowIfNull(cardRenewalRequestService);
             ArgumentNullException.ThrowIfNull(cardRenewalService);
+            ArgumentNullException.ThrowIfNull(languageService);
             ArgumentNullException.ThrowIfNull(polarisHelper);
 
             _cardRenewalRequestService = cardRenewalRequestService;
             _cardRenewalService = cardRenewalService;
+            _languageService = languageService;
             _polarisHelper = polarisHelper;
         }
 
@@ -50,6 +56,11 @@ namespace Ocuda.Ops.Controllers.Areas.Services
         [RestoreModelState]
         public async Task<IActionResult> Details(int id)
         {
+            if (!_polarisHelper.IsConfigured)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             var request = await _cardRenewalRequestService.GetRequestAsync(id);
 
             if (request == null)
@@ -57,27 +68,31 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 return RedirectToAction(nameof(Index));
             }
 
-            var patronData = _polarisHelper.GetPatronDataOverride(request.Barcode);
+            request.Language = await _languageService.GetActiveByIdAsync(request.LanguageId);
+
+            var customer = _polarisHelper.GetCustomerDataOverride(request.Barcode);
 
             var viewModel = new DetailsViewModel
             {
-                AddressLookupPath = await _siteSettingService.GetSettingStringAsync(Models
-                    .Keys
-                    .SiteSetting
-                    .CardRenewal
-                    .AddressLookupUrl),
-                AssessorLookupPath = await _siteSettingService.GetSettingStringAsync(Models
+                AddressLookupUrlSet = !string.IsNullOrWhiteSpace(
+                    await _siteSettingService.GetSettingStringAsync(Models
+                        .Keys
+                        .SiteSetting
+                        .CardRenewal
+                        .AddressLookupUrl)),
+                AssessorLookupUrl = await _siteSettingService.GetSettingStringAsync(Models
                     .Keys
                     .SiteSetting
                     .CardRenewal
                     .AssessorLookupUrl),
-                PatronCode = await _polarisHelper.GetPatronCodeNameAsync(patronData.PatronCodeID),
-                PatronData = patronData,
-                PatronName = $"{patronData.NameFirst} {patronData.NameLast}",
+                Customer = customer,
+                CustomerCode = await _polarisHelper
+                    .GetCustomerCodeNameAsync(customer.CustomerCodeId),
+                CustomerName = $"{customer.NameFirst} {customer.NameLast}",
                 Request = request
             };
 
-            if (!viewModel.Request.ProcessedAt.HasValue)
+            if (!request.ProcessedAt.HasValue)
             {
                 var responses = await _cardRenewalService.GetAvailableResponsesAsync();
                 viewModel.ResponseList = responses.Select(_ => new SelectListItem
@@ -88,8 +103,40 @@ namespace Ocuda.Ops.Controllers.Areas.Services
             }
             else
             {
-                viewModel.Result = await _cardRenewalService
-                    .GetResultForRequestAsync(request.Id);
+                var result = await _cardRenewalService.GetResultForRequestAsync(request.Id);
+                result.ResponseText = CommonMark.CommonMarkConverter.Convert(result.ResponseText);
+                viewModel.Result = result;
+            }
+
+            var blocks = await _polarisHelper.GetCustomerBlocksAsync(customer.Id);
+            if (blocks.Count > 0)
+            {
+                var ignoredBlocks = await _siteSettingService.GetSettingStringAsync(Models
+                   .Keys
+                   .SiteSetting
+                   .CardRenewal
+                   .IgnoredBlockIds);
+                if (!string.IsNullOrWhiteSpace(ignoredBlocks))
+                {
+                    var ignoredBlockIdList = ignoredBlocks
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries
+                            | StringSplitOptions.TrimEntries)
+                        .ToList();
+
+                    foreach (var ignoredBlock in ignoredBlockIdList)
+                    {
+                        if (int.TryParse(ignoredBlock, out int ignoredBlockId))
+                        {
+                            blocks.RemoveAll(_ => _.BlockId == ignoredBlockId);
+                        }
+                        else
+                        {
+                            _logger.LogError($"Invalid ignored block id '{ignoredBlock}'");
+                        }
+                    }
+                }
+
+                viewModel.CustomerBlocks = blocks;
             }
 
             var acceptedCounty = await _siteSettingService.GetSettingStringAsync(Models
@@ -97,55 +144,34 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 .SiteSetting
                 .CardRenewal
                 .AcceptedCounty);
-
             if (!string.IsNullOrWhiteSpace(acceptedCounty))
             {
                 viewModel.AcceptedCounty = acceptedCounty;
-                viewModel.InCounty = patronData.PatronAddresses.Any(_ =>
+                viewModel.InCounty = customer.Addresses.Any(_ =>
                     string.Equals(_.County, acceptedCounty, StringComparison.OrdinalIgnoreCase));
             }
 
-            var juvenilePatronCodes = await _siteSettingService.GetSettingStringAsync(Models
+            var chargeLimit = await _siteSettingService.GetSettingDoubleAsync(Models
                 .Keys
                 .SiteSetting
                 .CardRenewal
-                .JuvenilePatronCodes);
-
-            if (!string.IsNullOrWhiteSpace(juvenilePatronCodes))
+                .ChargesLimit);
+            if (chargeLimit >= 0 && customer.ChargeBalance >= chargeLimit)
             {
-                var patronCodeList = juvenilePatronCodes
-                            .Split(",", StringSplitOptions.RemoveEmptyEntries
-                                | StringSplitOptions.TrimEntries)
-                            .ToList();
 
-                foreach (var patronCode in patronCodeList)
+                viewModel.OverChargesLimit = true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.GuardianName) && customer.BirthDate.HasValue
+                && customer.BirthDate.Value != DateTime.MinValue)
+            {
+                DateTime today = DateTime.Today;
+                var age = today.Year - customer.BirthDate.Value.Year;
+                if (customer.BirthDate.Value > today.AddYears(-age))
                 {
-                    int patronCodeId;
-
-                    if (int.TryParse(patronCode, out patronCodeId))
-                    {
-                        if (patronData.PatronCodeID == patronCodeId)
-                        {
-                            viewModel.IsJuvenile = true;
-
-                            if (patronData.BirthDate.HasValue
-                                && patronData.BirthDate.Value != DateTime.MinValue)
-                            {
-                                DateTime today = DateTime.Today;
-                                var age = today.Year - patronData.BirthDate.Value.Year;
-                                if (patronData.BirthDate.Value > today.AddYears(-age))
-                                {
-                                    age--;
-                                }
-                                viewModel.PatronAge = age;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        _logger.LogError($"Invalid juvenile patron code id '{patronCode}'");
-                    }
+                    age--;
                 }
+                viewModel.CustomerAge = age;
             }
 
             var leapPatronUrl = await _siteSettingService.GetSettingStringAsync(Models
@@ -153,46 +179,63 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 .SiteSetting
                 .CardRenewal
                 .LeapPatronUrl);
-
             if (!string.IsNullOrWhiteSpace(leapPatronUrl))
             {
-                viewModel.LeapPath = leapPatronUrl + request.PatronId;
+                viewModel.LeapPath = leapPatronUrl + request.CustomerId + leapPatronRecordsPath;
             }
 
             return View(viewModel);
         }
 
         [HttpPost("[action]/{id}")]
+        [SaveModelState]
         public async Task<IActionResult> Details(DetailsViewModel viewModel)
         {
             ArgumentNullException.ThrowIfNull(viewModel);
+
+            if (!_polarisHelper.IsConfigured)
+            {
+                return RedirectToAction(nameof(Index));
+            }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var request = await _cardRenewalRequestService
-                        .GetRequestAsync(viewModel.RequestId);
-
-                    if (request.ProcessedAt.HasValue) 
-                    {
-                        _logger.LogError($"Attempted to process request {request.Id} which has already been processed.");
-                    }
-
-
-                    var result = _polarisHelper.RenewPatronRegistration(
-                        request.Barcode,
-                        request.Email);
-
-                    await _cardRenewalService.ProcessRequestAsync(
-                        request.Id,
+                    var processResult = await _cardRenewalService.ProcessRequestAsync(
+                        viewModel.RequestId,
                         viewModel.ResponseId.Value,
                         viewModel.ResponseText,
-                        viewModel.PatronName);
+                        viewModel.CustomerName);
+
+                    if (!processResult.EmailSent)
+                    {
+                        ShowAlertDanger($"There was an error sending the email for request {viewModel.RequestId}");
+                    }
+
+                    if (processResult.Type == CardRenewalResponse.ResponseType.Accept)
+                    {
+                        ShowAlertSuccess($"Request {viewModel.RequestId} has been successfully processed and the record has been updated in Polaris!");
+
+                        if (processResult.EmailNotUpdated)
+                        {
+                            ShowAlertWarning("Email was not able to be updated");
+                            return RedirectToAction(nameof(Details), new { viewModel.RequestId });
+                        }
+                    }
+                    else if (processResult.Type == CardRenewalResponse.ResponseType.Partial)
+                    {
+                        ShowAlertSuccess($"Request {viewModel.RequestId} has been successfully processed, be sure to update the record in Polaris!");
+                    }
+                    else
+                    {
+                        ShowAlertSuccess($"Request {viewModel.RequestId} has been successfully processed");
+                    }
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (OcudaException ex)
                 {
-
+                    ShowAlertDanger($"Unable to process card renewal request: {ex.Message}");
                 }
             }
 
@@ -203,17 +246,17 @@ namespace Ocuda.Ops.Controllers.Areas.Services
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Discard(int id)
+        public async Task<IActionResult> Discard(int requestId)
         {
             try
             {
-                await _cardRenewalService.DiscardRequestAsync(id);
-                ShowAlertSuccess($"Request {id} has been discarded");
+                await _cardRenewalService.DiscardRequestAsync(requestId);
+                ShowAlertSuccess($"Request {requestId} has been discarded");
             }
             catch (OcudaException ex)
             {
                 ShowAlertDanger($"Unable to discard request: {ex.Message}");
-                return RedirectToAction(nameof(Details), new { id });
+                return RedirectToAction(nameof(Details), new { requestId });
             }
 
             return RedirectToAction(nameof(Index));
@@ -259,6 +302,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
 
             var viewModel = new IndexViewModel
             {
+                APIConfigured = _polarisHelper.IsConfigured,
                 CardRequests = requests.Data,
                 CurrentPage = page.Value,
                 IsProcessed = processed,
@@ -270,6 +314,11 @@ namespace Ocuda.Ops.Controllers.Areas.Services
             {
                 viewModel.PendingCount = await _cardRenewalRequestService.GetRequestCountAsync(false);
                 viewModel.ProcessedCount = viewModel.ItemCount;
+
+                foreach (var request in viewModel.CardRequests)
+                {
+                    request.Accepted = await _cardRenewalService.IsRequestAccepted(request.Id);
+                }
             }
             else
             {

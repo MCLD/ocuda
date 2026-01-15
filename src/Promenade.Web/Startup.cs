@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Clc.Polaris.Api.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -374,8 +373,6 @@ namespace Ocuda.Promenade.Web
                 _.AppendTrailingSlash = true;
                 _.LowercaseUrls = true;
             });
-
-            services.Configure<PapiSettings>(_config.GetSection(PapiSettings.SECTION_NAME));
 
             // service facades
             services.AddScoped(typeof(Controllers.ServiceFacades.Controller<>));

@@ -6,14 +6,11 @@
 	{
 		<h1 class="prom-title">@Model.SegmentText.Header</h1>
 	}
-	if (!string.IsNullOrEmpty(Model.SegmentText.Text))
-	{
-		<div class="mb-3">@Html.Raw(Model.SegmentText.Text)</div>
-	}
+	@Html.Raw(Model.SegmentText.Text)
 }
 else
 {
-	<h1 class="prom-title">@Localizer[Promenade.RenewYourCard]</h1>
+	<h1 class="prom-title">@Localizer[Promenade.RenewYourLibraryCard]</h1>
 }
 
 @if (ViewData.ModelState[nameof(Model.Invalid)]?.ValidationState
@@ -48,7 +45,7 @@ else
 					@if (!string.IsNullOrWhiteSpace(Model.ForgotPasswordLink))
 					{
 						<div>
-							<a href="@Model.ForgotPasswordLink" target="_blank">@Localizer[Promenade.RenewCardForgotPassword]</a>
+							<a href="@Model.ForgotPasswordLink" target="_blank">@Localizer[Promenade.ForgotPassword]</a>
 						</div>
 					}
 				</div>

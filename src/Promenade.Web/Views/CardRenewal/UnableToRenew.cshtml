@@ -1,5 +1,4 @@
 ﻿@model Ocuda.Promenade.Models.Entities.SegmentText
-
 @if (Model != null)
 {
 	if (!string.IsNullOrEmpty(Model.Header))
@@ -11,5 +10,5 @@
 else
 {
 	<h1 class="prom-title">@Localizer[Promenade.RenewYourLibraryCard]</h1>
-	<p>@Localizer[Promenade.CardRenewalSubmitted]</p>
+	<p>@HtmlLocalizer[Promenade.CardRenewalUnableToRenew, Url.Action(nameof(LocationsController.Find), LocationsController.Name)]</p>
 }

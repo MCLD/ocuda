@@ -1,5 +1,19 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.CardRenewal.JuvenileViewModel
 
+@if (Model?.SegmentText != null)
+{
+	if (!string.IsNullOrEmpty(Model.SegmentText.Header))
+	{
+		<h1 class="prom-title">@Model.SegmentText.Header</h1>
+	}
+	@Html.Raw(Model.SegmentText.Text)
+}
+else
+{
+	<h1 class="prom-title">@Localizer[Promenade.RenewYourLibraryCard]</h1>
+	<p>@Localizer[Promenade.CardRenewalJuvenile]</p>
+}
+
 <div class="row">
 	<div class="col-12">
 		<form method="post"

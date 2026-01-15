@@ -39,9 +39,18 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
-                Id = Keys.SiteSetting.CardRenewal.JuvenilePatronCodes,
-                Name = "Juvenile patron codes",
-                Description = "Juvenile patron code ids, comma delimited",
+                Id = Keys.SiteSetting.CardRenewal.ChargesLimit,
+                Name = "Charges Limit",
+                Description = "Charges amount when a warning starts being shown",
+                Category = "CardRenewal",
+                Value = "-1",
+                Type = SiteSettingType.Double
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.CardRenewal.IgnoredBlockIds,
+                Name = "Ignored block ids",
+                Description = "Ids of blocks that won't be included, comma delimited",
                 Category = "CardRenewal",
                 Value = "",
                 Type = SiteSettingType.StringNullable
@@ -49,12 +58,13 @@ namespace Ocuda.Ops.Models.Defaults
             new SiteSetting
             {
                 Id = Keys.SiteSetting.CardRenewal.LeapPatronUrl,
-                Name = "Leap patron record url",
-                Description = "Leap patron record url with scheme, host and path",
+                Name = "Leap patron records url",
+                Description = "Leap patron records url with scheme, host and path",
                 Category = "CardRenewal",
                 Value = "",
                 Type = SiteSettingType.StringNullable
             },
+            
 
             #endregion CardRenwal
 
@@ -229,7 +239,7 @@ namespace Ocuda.Ops.Models.Defaults
                 Name = "Email template id",
                 Description = "Email template id to use when sending a notificaton about a new incident report, 0 is disabled",
                 Category = "Incident",
-                Value = "0",
+                Value = "-1",
                 Type = SiteSettingType.Int
             },
             new SiteSetting

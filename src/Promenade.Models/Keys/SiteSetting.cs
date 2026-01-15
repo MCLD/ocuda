@@ -7,17 +7,30 @@
             Justification = "No reason to compare these site setting keys")]
         public struct Card
         {
-            public const string AcceptedCounties = "Card.AcceptedCounties";
-            public const string CardRenewalSegment = "Card.CardRenewalSegment";
             public const string EmployeeCardSegment = "Card.EmployeeCardSegment";
             public const string EmployeeCardThanksPage 
                 = "Card.EmployeeCardThanksPage";
-            public const string ExpirationCutoffDays = "Card.ExpirationCutoffDays";
-            public const string ForgotPasswordLink = "Card.ForgotPasswordLink";
-            public const string JuvenilePatronCodes = "Card.JuvenilePatronCodes";
-            public const string NoAddressSegment = "Card.NoAddressSegment";
-            public const string SubmittedSegment = "Card.SubmittedSegment";
-            public const string VerifyAddressSegment = "Card.VerifyAddressSegment";
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
+            "CA1815:Override equals and operator equals on value types",
+            Justification = "No reason to compare these site setting keys")]
+        public struct CardRenewal
+        {
+            public const string AcceptedCounties = "CardRenewal.AcceptedCounties";
+            public const string AgeCheckCustomerCodes = "CardRenewal.AgeCheckCustomerCodes";
+            public const string AgeCheckSegment = "CardRenewal.AgeCheckSegment";
+            public const string HomeSegment = "CardRenewal.HomeSegment";
+            public const string ExpirationCutoffDays = "CardRenewal.ExpirationCutoffDays";
+            public const string JuvenileCustomerCodes = "CardRenewal.JuvenileCustomerCodes";
+            public const string JuvenileSegment = "CardRenewal.JuvenileSegment";
+            public const string NoAddressSegment = "CardRenewal.NoAddressSegment";
+            public const string NonresidentCustomerCodes = "CardRenewal.NonresidentCustomerCodes";
+            public const string NonresidentSegment = "CardRenewal.NonresidentSegment";
+            public const string NotConfiguredSegment = "CardRenewal.NotConfiguredSegment";
+            public const string StaffCustomerCodes = "CardRenewal.StaffCustomerCodes";
+            public const string SubmittedSegment = "CardRenewal.SubmittedSegment";
+            public const string VerifyAddressSegment = "CardRenewal.VerifyAddressSegment";
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
@@ -55,6 +68,7 @@
             public const string CatalogSearchLink = "Site.CatalogSearchLink";
             public const string FooterImage = "Site.FooterImage";
             public const string FooterImageAlt = "Site.FooterImageAlt";
+            public const string ForgotPasswordLink = "Site.ForgotPasswordLink";
             public const string GoogleTrackingCode = "Site.GoogleTrackingCode";
             public const string IsTLS = "Site.IsTLS";
             public const string NavigationIdFooter = "Site.NavigationIdFooter";

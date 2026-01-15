@@ -15,12 +15,17 @@
         public const string ButtonUseMyLocation = "Use my location";
         public const string CardRenewalInvalidCutoff = "Thanks for your submission! Your card has more than {0} days until it expires, please come back to renew it any time after {1}";
         public const string CardRenewalInvalidLogin = "You have entered an invalid card number or password";
+        public const string CardRenewalInvalidStaff = "It appears that the barcode you've entered belongs to a staff account. Please speak to your branch manager or supervisor for instructions on how to renew your account.";
+        public const string CardRenewalJuvenile = "It looks like you're trying to renew a juvenile account, please have a parent or guardian complete the rest of the process.";
         public const string CardRenewalNoAddress = "With no valid address on file your renewal request may not be eligible for a full renewal.";
+        public const string CardRenewalNotConfigured = "Please contact <a href=\"{0}\">your library</a> to renew your library card.";
+        public const string CardRenewalPendingRequest = "It looks like we are still working on a request you submitted on {0} at {1}. You'll be hearing from us soon.";
         public const string CardRenewalSameAddress = "Do you still live at an address listed below?";
         public const string CardRenewalSameAddressNo = "No, I have moved";
         public const string CardRenewalSameAddressYes = "Yes, this is my address";
         public const string CardRenewalSessionTimeout = "Unfortunately your session has timed out. Please resubmit your barcode and password.";
-        public const string CardRenewalSubmitted = "Renewal request submitted";
+        public const string CardRenewalSubmitted = "Thank you for using our online renewal service!";
+        public const string CardRenewalUnableToRenew = "We are unable to renew your card at this time. Please contact <a href=\"{0}\">your library</a> to renew your library card.";
         public const string ConnectSocialMedia = "Connect with us on social media!";
         public const string ConnectSocialOn = "Connect with us on {0}";
         public const string ContactInformation = "Contact Information";
@@ -52,6 +57,7 @@
         public const string ErrorVolunteerNotAcceptingAdult = "This location is not accepting adult volunteer applications at this time.";
         public const string ErrorVolunteerNotAcceptingTeen = "This location is not accepting teen volunteer applications at this time.";
         public const string ErrorZipCode = "Please enter a 5 digit numeric ZIP code.";
+        public const string ForgotPassword = "Forgot your password?";
         public const string HelpItem = "{0} help";
         public const string HowCanWeHelp = "How can we help?";
         public const string KeywordsItem = "Keywords: {0}";
@@ -127,8 +133,7 @@
         public const string PromptVolunteerRegularity = "Are you interested in regular volunteer work or certain number of hours?";
         public const string PromptWeeklyAvailability = "Weekly Availability";
         public const string PromptZipCode = "Zip Code";
-        public const string RenewCardForgotPassword = "Forgot your password?";
-        public const string RenewYourCard = "Renew your card";
+        public const string RenewYourLibraryCard = "Renew your library card";
         public const string RequiredField = "You must supply a value for: {0}";
         public const string RequiredFieldItem = "The {0} field is required.";
         public const string ScheduleAppointmentDetails = "Here are the details of your appointment:";
@@ -147,7 +152,6 @@
         public const string SignUpForEmailNewsletter = "Sign up for our email newsletter";
         public const string SpecialHours = "Special Hours";
         public const string TodaysHours = "Today's Hours: {0}";
-        public const string VerifyYourAddress = "Verify your address";
         public const string ViewShowNotes = "View show notes";
         public const string VisitHomePage = "Visit home page";
         public const string VolunteerPageTitle = "Volunteer";

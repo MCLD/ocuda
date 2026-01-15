@@ -25,7 +25,8 @@ namespace Ocuda.Ops.Models.Entities
         public enum ResponseType
         {
             Accept,
-            Deny
+            Deny,
+            Partial
         }
     }
 }

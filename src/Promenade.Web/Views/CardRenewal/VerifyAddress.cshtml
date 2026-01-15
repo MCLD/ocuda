@@ -6,14 +6,11 @@
 	{
 		<h1 class="prom-title">@Model.HeaderSegmentText.Header</h1>
 	}
-	if (!string.IsNullOrEmpty(Model.HeaderSegmentText.Text))
-	{
-		<div class="mb-3">@Html.Raw(Model.HeaderSegmentText.Text)</div>
-	}
+	@Html.Raw(Model.HeaderSegmentText.Text)
 }
 else
 {
-	<h1 class="prom-title">@Localizer[Promenade.VerifyYourAddress]</h1>
+	<h1 class="prom-title">@Localizer[Promenade.RenewYourLibraryCard]</h1>
 }
 
 <div class="row">
@@ -26,17 +23,17 @@ else
 			<input asp-for="Email" formgroup />
 			<div class="row">
 				<div class="col-md-9 offset-md-3">
-					@if (Model.Addresses.Count > 0)
+					@if (Model.Addresses.Any())
 					{
 						<div class="row fs-6">
 							<strong class="mb-2">@Localizer[Promenade.CardRenewalSameAddress]</strong>
 							@foreach (var address in Model.Addresses)
 							{
 								<div class="form-group mb-3">
-									<div>@address.StreetOne</div>
-									@if (!string.IsNullOrWhiteSpace(address.StreetTwo))
+									<div>@address.StreetAddressOne</div>
+									@if (!string.IsNullOrWhiteSpace(address.StreetAddressTwo))
 									{
-										<div>@address.StreetTwo</div>
+										<div>@address.StreetAddressTwo</div>
 									}
 									<span>@address.City</span>
 									<span>@address.PostalCode</span>
@@ -63,13 +60,13 @@ else
 					}
 					else
 					{
-						@if (Model?.HeaderSegmentText != null)
+						@if (Model?.NoAddressSegmentText != null)
 						{
-							<strong class="fs-6">@Html.Raw(Model.NoAddressSegmentText.Text)</strong>
+							@Html.Raw(Model.NoAddressSegmentText.Text)
 						}
 						else
 						{
-							<strong class="fs-6">@Localizer[Promenade.CardRenewalNoAddress]</strong>
+							<p>@Localizer[Promenade.CardRenewalNoAddress]</p>
 						}
 						<div>
 							<button type="submit"

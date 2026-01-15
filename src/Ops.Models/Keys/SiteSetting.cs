@@ -7,7 +7,8 @@
             public static readonly string AcceptedCounty = "CardRenewal.AcceptedCounty";
             public static readonly string AddressLookupUrl = "CardRenewal.AddressLookupUrl";
             public static readonly string AssessorLookupUrl = "CardRenewal.AssessorLookupUrl";
-            public static readonly string JuvenilePatronCodes = "CardRenewal.JuvenilePatronCodes";
+            public static readonly string ChargesLimit = "CardRenewal.ChargesLimit";
+            public static readonly string IgnoredBlockIds = "CardRenewal.IgnoredBlockIds";
             public static readonly string LeapPatronUrl = "CardRenewal.LeapPatronUrl";
         }
 

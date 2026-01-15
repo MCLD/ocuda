@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ocuda.Ops.Service.Keys
+﻿namespace Ocuda.Ops.Service.Keys
 {
     public class CardRenewal
     {

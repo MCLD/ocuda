@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Clc.Polaris.Api.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -125,8 +124,6 @@ namespace Ocuda.Ops.Web
                     = new Microsoft.AspNetCore.Localization.RequestCulture(culture);
             });
 
-            services.Configure<PapiSettings>(_config.GetSection(PapiSettings.SECTION_NAME));
-
             services.AddHealthChecks();
 
             switch (_config[Configuration.OpsDistributedCache])
@@ -167,6 +164,8 @@ namespace Ocuda.Ops.Web
             string promCs = _config.GetConnectionString("Promenade")
                 ?? throw new OcudaException("ConnectionString:Promenade not configured.");
 
+            string polarisCs = _config.GetConnectionString("Polaris");
+
             var provider = _config[Configuration.OpsDatabaseProvider];
             switch (provider)
             {
@@ -175,6 +174,9 @@ namespace Ocuda.Ops.Web
                         DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
                     services.AddDbContextPool<PromenadeContext,
                         DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+
+                    services.AddDbContextPool<PolarisContext>(_ => _.UseSqlServer(polarisCs));
+
                     services.AddHealthChecks();
                     break;
 

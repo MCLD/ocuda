@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Clc.Polaris.Api.Models;
+using Ocuda.Models;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility;
 
@@ -9,7 +9,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.CardRenewal
 {
     public class VerifyAddressViewModel
     {
-        public List<PatronAddress> Addresses { get; set; }
+        public IEnumerable<CustomerAddress> Addresses { get; set; }
 
         [Required(ErrorMessage = ErrorMessage.FieldRequired)]
         [DisplayName(i18n.Keys.Promenade.PromptEmail)]

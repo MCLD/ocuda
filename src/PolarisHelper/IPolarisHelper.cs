@@ -1,15 +1,18 @@
-﻿using System.Threading.Tasks;
-using Clc.Polaris.Api.Models;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Ocuda.Models;
 using Ocuda.PolarisHelper.Models;
 
 namespace Ocuda.PolarisHelper
 {
     public interface IPolarisHelper
     {
-        PatronValidateResult AuthenticatePatron(string barcode, string password);
-        Task<string> GetPatronCodeNameAsync(int patronCodeId);
-        PatronData GetPatronData(string barcode, string password);
-        PatronData GetPatronDataOverride(string barcode);
-        RenewRegistrationResult RenewPatronRegistration(string barcode, string email);
+        bool IsConfigured { get; }
+        bool AuthenticateCustomer(string barcode, string password);
+        Task<List<CustomerBlock>> GetCustomerBlocksAsync(int customerId);
+        Task<string> GetCustomerCodeNameAsync(int customerCodeId);
+        Customer GetCustomerData(string barcode, string password);
+        Customer GetCustomerDataOverride(string barcode);
+        RenewRegistrationResult RenewCustomerRegistration(string barcode, string email);
     }
 }

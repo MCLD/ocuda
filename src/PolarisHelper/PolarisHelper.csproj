@@ -15,10 +15,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Clc.Polaris.Api" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Models\Models.csproj" />
     <ProjectReference Include="..\Utility\Utility.csproj" />
   </ItemGroup>
 

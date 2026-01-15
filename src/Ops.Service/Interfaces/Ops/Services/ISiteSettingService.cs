@@ -9,6 +9,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task EnsureSiteSettingsExistAsync(int sysadminId);
         Task<ICollection<SiteSetting>> GetAllAsync();
         Task<bool> GetSettingBoolAsync(string key);
+        Task<double> GetSettingDoubleAsync(string key);
         Task<int> GetSettingIntAsync(string key);
         Task<string> GetSettingStringAsync(string key);
         Task<SiteSetting> UpdateAsync(string key, string value);

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Clc.Polaris.Api.Models;
+using CommonMark;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Ocuda.Models;
 using Ocuda.PolarisHelper;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.Filters;
@@ -20,11 +21,11 @@ namespace Ocuda.Promenade.Controllers
     [Route("{culture:cultureConstraint?}/[Controller]")]
     public class CardRenewalController : BaseController<CardRenewalController>
     {
-        private const string TempDataAddresses = "TempData.Addresses";
-        private const string TempDataEmail = "TempData.Email";
-        private const string TempDataJuvenile = "TempData.Juvenile";
+        private const int AgeOfMajority = 18;
+
         private const string TempDataRequest = "TempData.Request";
         private const string TempDataTimeout = "TempData.Timeout";
+        private const string TempDataUnableToRenew = "TempData.UnableToRenew";
 
         private readonly CardRenewalService _cardRenewalService;
         private readonly IDateTimeProvider _dateTimeProvider;
@@ -56,6 +57,36 @@ namespace Ocuda.Promenade.Controllers
         [RestoreModelState]
         public async Task<IActionResult> Index(string cardNumber)
         {
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+            if (!_polarisHelper.IsConfigured)
+            {
+                _logger.LogError("Card renewal API settings are not configured");
+
+                var notConfiguredSegmentId = await _siteSettingService.GetSettingIntAsync(
+                    Models.Keys.SiteSetting.CardRenewal.NotConfiguredSegment,
+                    forceReload);
+
+                SegmentText notConfiguredSegmentText = null;
+                if (notConfiguredSegmentId > 0)
+                {
+                    notConfiguredSegmentText = await _segmentService.GetSegmentTextBySegmentIdAsync(
+                        notConfiguredSegmentId,
+                        forceReload);
+                    if (notConfiguredSegmentText == null)
+                    {
+                        _logger.LogError($"Card renewal 'Not configured' segment id '{notConfiguredSegmentId}' not found");
+                    }
+                    else if (!string.IsNullOrWhiteSpace(notConfiguredSegmentText.Text))
+                    {
+                        notConfiguredSegmentText.Text = CommonMarkConverter.Convert(
+                            notConfiguredSegmentText.Text);
+                    }
+                }
+
+                return View("NotConfigured", notConfiguredSegmentText);
+            }
+
             if (TempData.ContainsKey(TempDataTimeout))
             {
                 ModelState.AddModelError(nameof(IndexViewModel.Invalid),
@@ -66,16 +97,28 @@ namespace Ocuda.Promenade.Controllers
             var viewModel = new IndexViewModel()
             {
                 Barcode = cardNumber,
-                ForgotPasswordLink = await _siteSettingService
-                    .GetSettingStringAsync(Models.Keys.SiteSetting.Card.ForgotPasswordLink)
+                ForgotPasswordLink = await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.Site.ForgotPasswordLink,
+                    forceReload)
             };
 
-            var cardRenewalSegmentId = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.Card.CardRenewalSegment);
+            var cardRenewalSegmentId = await _siteSettingService.GetSettingIntAsync(
+                Models.Keys.SiteSetting.CardRenewal.HomeSegment,
+                forceReload);
             if (cardRenewalSegmentId > 0)
             {
-                viewModel.SegmentText = await _segmentService
-                    .GetSegmentTextBySegmentIdAsync(cardRenewalSegmentId, false);
+                viewModel.SegmentText = await _segmentService.GetSegmentTextBySegmentIdAsync(
+                    cardRenewalSegmentId,
+                    forceReload);
+                if (viewModel.SegmentText == null)
+                {
+                    _logger.LogError($"Card renewal 'Home' segment id '{cardRenewalSegmentId}' not found");
+                }
+                else if (!string.IsNullOrWhiteSpace(viewModel.SegmentText.Text))
+                {
+                    viewModel.SegmentText.Text = CommonMarkConverter.Convert(
+                        viewModel.SegmentText.Text);
+                }
             }
 
             return View(viewModel);
@@ -87,136 +130,285 @@ namespace Ocuda.Promenade.Controllers
         {
             ArgumentNullException.ThrowIfNull(viewModel);
 
+            if (!_polarisHelper.IsConfigured)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             if (ModelState.IsValid)
             {
-                var barcode = viewModel.Barcode.Trim()
-                    .Replace(" ", "", StringComparison.OrdinalIgnoreCase);
+                var barcode = string.Concat(viewModel.Barcode.Where(_ => !char.IsWhiteSpace(_)));
                 var password = viewModel.Password.Trim();
 
-                var patronValidateResult = _polarisHelper.AuthenticatePatron(barcode, password);
+                var validateResult = _polarisHelper.AuthenticateCustomer(barcode, password);
 
-                if (patronValidateResult == null)
+                if (!validateResult)
                 {
                     _logger.LogInformation($"Invalid card number or password for Barcode '{barcode}'");
                     ModelState.AddModelError(nameof(viewModel.Invalid),
                         _localizer[i18n.Keys.Promenade.CardRenewalInvalidLogin]);
+                    return RedirectToAction(nameof(Index));
                 }
-                else
+
+                var customer = _polarisHelper.GetCustomerData(barcode, password);
+
+                // Handle accounts with a pending request
+                var pendingRequest = await _cardRenewalService
+                    .GetPendingRequestAsync(customer.Id);
+                if (pendingRequest != null)
                 {
-                    var pendingRequest = await _cardRenewalService
-                        .GetPendingRequestAsync(patronValidateResult.PatronID);
-                    if (pendingRequest != null)
-                    {
-                        // TODO
-                        // Send to Pending page
-                    }
-
-                    var cutoffDays = await _siteSettingService
-                        .GetSettingIntAsync(Models.Keys.SiteSetting.Card.ExpirationCutoffDays);
-                    if (cutoffDays > -1)
-                    {
-                        var renewalAllowedDate = patronValidateResult
-                            .ExpirationDate.Value.AddDays(-cutoffDays).Date;
-                        if (renewalAllowedDate > _dateTimeProvider.Now.Date)
-                        {
-                            ModelState.AddModelError(nameof(viewModel.Invalid),
-                                _localizer[i18n.Keys.Promenade.CardRenewalInvalidCutoff,
-                                    cutoffDays,
-                                    renewalAllowedDate.ToShortDateString()]);
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
-
-                    // TODO
-                    // Check patron code for staff ids
-
-                    // TODO
-                    // Check patron code for non resident
-
-                    // TODO?
-                    // Check patron code for juvenile restricted
-
-                    var patronData = _polarisHelper.GetPatronData(barcode, password);
-
-                    IEnumerable<PatronAddress> addresses = patronData.PatronAddresses;
-
-                    var acceptedCounties = await _siteSettingService
-                        .GetSettingStringAsync(Models.Keys.SiteSetting.Card.AcceptedCounties);
-                    if (!string.IsNullOrWhiteSpace(acceptedCounties))
-                    {
-                        var counties = acceptedCounties.Split(",",
-                            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                        addresses = addresses.Where(_ => counties.Contains(_.County,
-                            StringComparer.OrdinalIgnoreCase));
-                    }
-                    addresses = addresses
-                        .DistinctBy(_ => new { _.StreetOne, _.StreetTwo, _.City, _.PostalCode });
-
-                    var request = new CardRenewalRequest
-                    {
-                        Barcode = barcode,
-                        PatronId = patronData.PatronID
-                    };
-
-                    TempData[TempDataAddresses] = JsonSerializer.Serialize(addresses);
-                    TempData[TempDataEmail] = patronData.EmailAddress;
-                    TempData[TempDataRequest] = JsonSerializer.Serialize(request);
-
-                    var juvenilePatronCodes = await _siteSettingService
-                        .GetSettingStringAsync(Models.Keys.SiteSetting.Card.JuvenilePatronCodes,true);
-                    if (!string.IsNullOrWhiteSpace(juvenilePatronCodes))
-                    {
-                        var patronCodeList = juvenilePatronCodes
-                            .Split(",", StringSplitOptions.RemoveEmptyEntries
-                                | StringSplitOptions.TrimEntries)
-                            .ToList();
-
-                        foreach (var patronCode in patronCodeList)
-                        {
-                            int patronCodeId;
-
-                            if (int.TryParse(patronCode, out patronCodeId))
-                            {
-                                if (patronValidateResult.PatronCodeID == patronCodeId)
-                                {
-                                    TempData[TempDataJuvenile] = true;
-                                    return RedirectToAction(nameof(Juvenile));
-                                }
-                            }
-                            else
-                            {
-                                _logger.LogError($"Invalid juvenile patron code id '{patronCode}'");
-                            }
-                        }
-                    }
-
-                    // TODO
-                    // Check for unpaid fines
-
-                    // TODO
-                    // Check for juvenile turned adult
-
-                    // TODO?
-                    // Check for student turned adult
-
-
-
-                    return RedirectToAction(nameof(VerifyAddress));
+                    ModelState.AddModelError(nameof(viewModel.Invalid),
+                        _localizer[i18n.Keys.Promenade.CardRenewalPendingRequest,
+                        pendingRequest.SubmittedAt.ToString("d", CultureInfo.CurrentCulture),
+                        pendingRequest.SubmittedAt.ToString("t", CultureInfo.CurrentCulture)]);
+                    return RedirectToAction(nameof(Index));
                 }
+
+                // Handle accounts that aren't expiring soon
+                var cutoffDays = await _siteSettingService.GetSettingIntAsync(
+                    Models.Keys.SiteSetting.CardRenewal.ExpirationCutoffDays);
+                if (cutoffDays > -1)
+                {
+                    var renewalAllowedDate = customer
+                        .ExpirationDate.Value.AddDays(-cutoffDays).Date;
+                    if (renewalAllowedDate > _dateTimeProvider.Now.Date)
+                    {
+                        ModelState.AddModelError(nameof(viewModel.Invalid),
+                            _localizer[i18n.Keys.Promenade.CardRenewalInvalidCutoff,
+                                cutoffDays,
+                                renewalAllowedDate.ToShortDateString()]);
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+
+                // Handle accounts belonging to staff
+                var staffCustomerCodes = await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.CardRenewal.StaffCustomerCodes);
+                if (!string.IsNullOrWhiteSpace(staffCustomerCodes))
+                {
+                    var customerCodeList = staffCustomerCodes
+                        .Split(",", StringSplitOptions.RemoveEmptyEntries
+                            | StringSplitOptions.TrimEntries)
+                        .ToList();
+
+                    foreach (var customerCode in customerCodeList)
+                    {
+                        if (int.TryParse(customerCode, out int customerCodeId))
+                        {
+                            if (customer.CustomerCodeId == customerCodeId)
+                            {
+                                ModelState.AddModelError(nameof(viewModel.Invalid),
+                                    _localizer[i18n.Keys.Promenade.CardRenewalInvalidStaff]);
+                                return RedirectToAction(nameof(Index));
+                            }
+                        }
+                        else
+                        {
+                            _logger.LogError($"Invalid staff customer code id '{customerCode}'");
+                        }
+                    }
+                }
+
+                // Handle accounts belonging to nonresidents 
+                var nonresidentCustomerCodes = await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.CardRenewal.NonresidentCustomerCodes);
+                if (!string.IsNullOrWhiteSpace(nonresidentCustomerCodes))
+                {
+                    var customerCodeList = nonresidentCustomerCodes
+                        .Split(",", StringSplitOptions.RemoveEmptyEntries
+                            | StringSplitOptions.TrimEntries)
+                        .ToList();
+
+                    foreach (var customerCode in customerCodeList)
+                    {
+                        if (int.TryParse(customerCode, out int customerCodeId))
+                        {
+                            if (customer.CustomerCodeId == customerCodeId)
+                            {
+                                var nonresidentSegmentId = await _siteSettingService
+                                    .GetSettingIntAsync(Models.Keys.SiteSetting.CardRenewal
+                                        .NonresidentSegment);
+                                if (nonresidentSegmentId <= 0)
+                                {
+                                    _logger.LogError("'Nonresident' segment not set for card renewal");
+                                }
+
+                                TempData[TempDataUnableToRenew] = nonresidentSegmentId;
+
+                                return RedirectToAction(nameof(UnableToRenew));
+                            }
+                        }
+                        else
+                        {
+                            _logger.LogError($"Invalid nonresident customer code id '{customerCode}'");
+                        }
+                    }
+                }
+
+                // Handle accounts that have aged out of their code
+                var ageCheckCustomerCodes = await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.CardRenewal.AgeCheckCustomerCodes);
+                if (!string.IsNullOrWhiteSpace(ageCheckCustomerCodes))
+                {
+                    var customerCodeList = ageCheckCustomerCodes
+                        .Split(",", StringSplitOptions.RemoveEmptyEntries
+                            | StringSplitOptions.TrimEntries)
+                        .ToList();
+
+                    foreach (var customerCode in customerCodeList)
+                    {
+                        if (int.TryParse(customerCode, out int customerCodeId))
+                        {
+                            if (customer.CustomerCodeId == customerCodeId)
+                            {
+                                if (customer.BirthDate.HasValue
+                                    && customer.BirthDate.Value != DateTime.MinValue)
+                                {
+                                    DateTime today = DateTime.Today;
+                                    var age = today.Year - customer.BirthDate.Value.Year;
+                                    if (customer.BirthDate.Value > today.AddYears(-age))
+                                    {
+                                        age--;
+                                    }
+
+                                    if (age >= AgeOfMajority)
+                                    {
+                                        var ageCheckSegmentId = await _siteSettingService
+                                            .GetSettingIntAsync(Models.Keys.SiteSetting.CardRenewal
+                                                .AgeCheckSegment);
+                                        if (ageCheckSegmentId <= 0)
+                                        {
+                                            _logger.LogError("'Age check' segment not set for card renewal");
+                                        }
+
+                                        TempData[TempDataUnableToRenew] = ageCheckSegmentId;
+
+                                        return RedirectToAction(nameof(UnableToRenew));
+                                    }
+                                }
+
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            _logger.LogError($"Invalid age check customer code id '{customerCode}'");
+                        }
+                    }
+                }
+
+                IEnumerable<CustomerAddress> addresses = customer.Addresses;
+
+                var acceptedCounties = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.CardRenewal.AcceptedCounties);
+                if (!string.IsNullOrWhiteSpace(acceptedCounties))
+                {
+                    var counties = acceptedCounties.Split(",",
+                        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    addresses = addresses.Where(_ => counties.Contains(_.County,
+                        StringComparer.OrdinalIgnoreCase));
+                }
+                addresses = addresses
+                    .DistinctBy(_ => new
+                    {
+                        _.StreetAddressOne,
+                        _.StreetAddressTwo,
+                        _.City,
+                        _.PostalCode
+                    });
+
+                var request = new CardRenewalRequest
+                {
+                    Addresses = addresses,
+                    Barcode = barcode,
+                    CustomerId = customer.Id,
+                    Email = customer.EmailAddress?.Trim()
+                };
+
+                var juvenileCustomerCodes = await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.CardRenewal.JuvenileCustomerCodes);
+                if (!string.IsNullOrWhiteSpace(juvenileCustomerCodes))
+                {
+                    var customerCodeList = juvenileCustomerCodes
+                        .Split(",", StringSplitOptions.RemoveEmptyEntries
+                            | StringSplitOptions.TrimEntries)
+                        .ToList();
+
+                    foreach (var customerCode in customerCodeList)
+                    {
+                        if (int.TryParse(customerCode, out int customerCodeId))
+                        {
+                            if (customer.CustomerCodeId == customerCodeId)
+                            {
+                                request.IsJuvenile = true;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            _logger.LogError($"Invalid juvenile customer code id '{customerCode}'");
+                        }
+                    }
+                }
+
+                TempData[TempDataRequest] = JsonSerializer.Serialize(request);
+
+                if (request.IsJuvenile)
+                {
+                    return RedirectToAction(nameof(Juvenile));
+                }
+
+                return RedirectToAction(nameof(VerifyAddress));
             }
             return RedirectToAction(nameof(Index));
         }
 
         [HttpGet("[action]")]
         [RestoreModelState]
-        public IActionResult Juvenile()
+        public async Task<IActionResult> Juvenile()
         {
-            if (!TempData.ContainsKey(TempDataJuvenile))
+            if (!TempData.ContainsKey(TempDataRequest) || !_polarisHelper.IsConfigured)
             {
+                if (!TempData.ContainsKey(TempDataRequest))
+                {
+                    TempData[TempDataTimeout] = true;
+                }
                 return RedirectToAction(nameof(Index));
             }
 
-            return View();
+            var request = JsonSerializer.Deserialize<CardRenewalRequest>(
+                (string)TempData.Peek(TempDataRequest));
+
+            if (!request.IsJuvenile)
+            {
+                return RedirectToAction(nameof(VerifyAddress));
+            }
+
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+            var viewModel = new JuvenileViewModel();
+
+            var segmentId = await _siteSettingService.GetSettingIntAsync(
+                Models.Keys.SiteSetting.CardRenewal.JuvenileSegment,
+                forceReload);
+
+            if (segmentId > 0)
+            {
+                viewModel.SegmentText = await _segmentService.GetSegmentTextBySegmentIdAsync(
+                    segmentId,
+                    forceReload);
+                if (viewModel.SegmentText == null)
+                {
+                    _logger.LogError($"Card renewal 'Juvenile' segment id '{segmentId}' not found");
+                }
+                else if (!string.IsNullOrWhiteSpace(viewModel.SegmentText.Text))
+                {
+                    viewModel.SegmentText.Text = CommonMarkConverter.Convert(
+                        viewModel.SegmentText.Text);
+                }
+            }
+
+            return View(viewModel);
         }
 
         [HttpPost("[action]")]
@@ -225,20 +417,28 @@ namespace Ocuda.Promenade.Controllers
         {
             ArgumentNullException.ThrowIfNull(viewModel);
 
-            if (!TempData.ContainsKey(TempDataJuvenile))
+            if (!TempData.ContainsKey(TempDataRequest) || !_polarisHelper.IsConfigured)
             {
-                TempData[TempDataTimeout] = true;
+                if (!TempData.ContainsKey(TempDataRequest))
+                {
+                    TempData[TempDataTimeout] = true;
+                }
                 return RedirectToAction(nameof(Index));
+            }
+
+            var request = JsonSerializer.Deserialize<CardRenewalRequest>(
+                (string)TempData.Peek(TempDataRequest));
+
+            if (!request.IsJuvenile)
+            {
+                return RedirectToAction(nameof(VerifyAddress));
             }
 
             if (ModelState.IsValid)
             {
-                var request = JsonSerializer
-                    .Deserialize<CardRenewalRequest>((string)TempData.Peek(TempDataRequest));
-
-                request.GuardianBarcode = viewModel.GuardianBarcode;
-                request.GuardianName = viewModel.GuardianName;
-
+                request.GuardianBarcode = string.Concat(viewModel.GuardianBarcode
+                    .Where(_ => !char.IsWhiteSpace(_)));
+                request.GuardianName = viewModel.GuardianName.Trim();
                 TempData[TempDataRequest] = JsonSerializer.Serialize(request);
 
                 return RedirectToAction(nameof(VerifyAddress));
@@ -250,62 +450,139 @@ namespace Ocuda.Promenade.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> Submitted()
         {
-            if (!TempData.ContainsKey(TempDataRequest))
+            if (!_polarisHelper.IsConfigured)
             {
                 return RedirectToAction(nameof(Index));
             }
 
-            var viewModel = new SubmittedViewModel()
-            {
-                Request = JsonSerializer
-                    .Deserialize<CardRenewalRequest>((string)TempData.Peek(TempDataRequest))
-            };
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
-            var submittedSegmentId = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.Card.SubmittedSegment);
-            if (submittedSegmentId > 0)
+            var segmentId = await _siteSettingService.GetSettingIntAsync(
+                Models.Keys.SiteSetting.CardRenewal.SubmittedSegment,
+                forceReload);
+
+            SegmentText segmentText = null;
+            if (segmentId > 0)
             {
-                viewModel.SegmentText = await _segmentService
-                    .GetSegmentTextBySegmentIdAsync(submittedSegmentId, false);
+                segmentText = await _segmentService
+                    .GetSegmentTextBySegmentIdAsync(segmentId, forceReload);
+
+                if (segmentText == null)
+                {
+                    _logger.LogError($"Card renewal 'Juvenile' segment id '{segmentId}' not found");
+                }
+                else if (!string.IsNullOrWhiteSpace(segmentText.Text))
+                {
+                    segmentText.Text = CommonMarkConverter.Convert(segmentText.Text);
+                }
             }
 
-            TempData.Remove(TempDataRequest);
+            return View(segmentText);
+        }
 
-            return View(viewModel);
+        [HttpGet("[action]")]
+        public async Task<IActionResult> UnableToRenew()
+        {
+            if (!TempData.ContainsKey(TempDataRequest) || !_polarisHelper.IsConfigured)
+            {
+                if (!TempData.ContainsKey(TempDataRequest))
+                {
+                    TempData[TempDataTimeout] = true;
+                }
+                return RedirectToAction(nameof(Index));
+            }
+
+            var segmentId = (int)TempData.Peek(TempDataUnableToRenew);
+
+            SegmentText segmentText = null;
+            if (segmentId > 0)
+            {
+                var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+                segmentText = await _segmentService.GetSegmentTextBySegmentIdAsync(
+                segmentId,
+                forceReload);
+
+                if (segmentText == null)
+                {
+                    _logger.LogError($"Card renewal segment id '{segmentId}' not found for unable to renew response");
+                }
+                else if (!string.IsNullOrWhiteSpace(segmentText.Text))
+                {
+                    segmentText.Text = CommonMarkConverter.Convert(segmentText.Text);
+                }
+            }
+
+            return View(segmentText);
         }
 
         [HttpGet("[action]")]
         [RestoreModelState]
         public async Task<IActionResult> VerifyAddress()
         {
-            if (!TempData.ContainsKey(TempDataRequest))
+            if (!TempData.ContainsKey(TempDataRequest) || !_polarisHelper.IsConfigured)
             {
+                if (!TempData.ContainsKey(TempDataRequest))
+                {
+                    TempData[TempDataTimeout] = true;
+                }
                 return RedirectToAction(nameof(Index));
             }
 
+            var request = JsonSerializer.Deserialize<CardRenewalRequest>(
+                (string)TempData.Peek(TempDataRequest));
+
+            if (request.IsJuvenile && string.IsNullOrWhiteSpace(request.GuardianName))
+            {
+                return RedirectToAction(nameof(Juvenile));
+            }
+
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
             var viewModel = new VerifyAddressViewModel()
             {
-                Addresses = JsonSerializer
-                    .Deserialize<List<PatronAddress>>((string)TempData.Peek(TempDataAddresses)),
-                Email = (string)TempData.Peek(TempDataEmail)
+                Addresses = request.Addresses,
+                Email = request.Email
             };
 
-            var verifyAddressSegmentId = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.Card.VerifyAddressSegment);
+            var verifyAddressSegmentId = await _siteSettingService.GetSettingIntAsync(
+                Models.Keys.SiteSetting.CardRenewal.VerifyAddressSegment,
+                forceReload);
             if (verifyAddressSegmentId > 0)
             {
                 viewModel.HeaderSegmentText = await _segmentService
-                    .GetSegmentTextBySegmentIdAsync(verifyAddressSegmentId, false);
+                    .GetSegmentTextBySegmentIdAsync(verifyAddressSegmentId, forceReload);
+
+                if (viewModel.HeaderSegmentText == null)
+                {
+                    _logger.LogError($"Card renewal 'Verify address' segment id '{verifyAddressSegmentId}' not found");
+                }
+                else if (!string.IsNullOrWhiteSpace(viewModel.HeaderSegmentText.Text))
+                {
+                    viewModel.HeaderSegmentText.Text = CommonMarkConverter.Convert(
+                        viewModel.HeaderSegmentText.Text);
+                }
             }
 
-            if (viewModel.Addresses.Count == 0)
+            if (!viewModel.Addresses.Any())
             {
-                var noAddressSegmentId = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.Card.NoAddressSegment);
+                var noAddressSegmentId = await _siteSettingService.GetSettingIntAsync(
+                    Models.Keys.SiteSetting.CardRenewal.NoAddressSegment,
+                    forceReload);
                 if (noAddressSegmentId > 0)
                 {
                     viewModel.NoAddressSegmentText = await _segmentService
-                        .GetSegmentTextBySegmentIdAsync(noAddressSegmentId, false);
+                        .GetSegmentTextBySegmentIdAsync(noAddressSegmentId, forceReload);
+
+                    if (viewModel.NoAddressSegmentText == null)
+                    {
+                        _logger.LogError($"Card renewal 'No address' segment id '{noAddressSegmentId}' not found");
+                    }
+                    else if (!string.IsNullOrWhiteSpace(viewModel.NoAddressSegmentText.Text))
+                    {
+                        viewModel.NoAddressSegmentText.Text = CommonMarkConverter.Convert(
+                            viewModel.NoAddressSegmentText.Text);
+                    }
                 }
             }
 
@@ -318,32 +595,35 @@ namespace Ocuda.Promenade.Controllers
         {
             ArgumentNullException.ThrowIfNull(viewModel);
 
-            if (!TempData.ContainsKey(TempDataRequest))
+            if (!TempData.ContainsKey(TempDataRequest) || !_polarisHelper.IsConfigured)
             {
-                TempData[TempDataTimeout] = true;
+                if (!TempData.ContainsKey(TempDataRequest))
+                {
+                    TempData[TempDataTimeout] = true;
+                }
                 return RedirectToAction(nameof(Index));
+            }
+
+            var request = JsonSerializer.Deserialize<CardRenewalRequest>(
+                (string)TempData.Peek(TempDataRequest));
+
+            if (request.IsJuvenile && string.IsNullOrWhiteSpace(request.GuardianName))
+            {
+                return RedirectToAction(nameof(Juvenile));
             }
 
             if (ModelState.IsValid)
             {
-                var request = JsonSerializer
-                    .Deserialize<CardRenewalRequest>((string)TempData.Peek(TempDataRequest));
-
                 request.Email = viewModel.Email.Trim();
 
-                if (viewModel.SameAddress)
+                if (viewModel.SameAddress && request.Addresses.Any())
                 {
-                    var addresses = JsonSerializer
-                        .Deserialize<List<PatronAddress>>((string)TempData.Peek(TempDataAddresses));
-                    if (addresses.Count > 0)
-                    {
-                        request.SameAddress = true;
-                    }
+                    request.SameAddress = true;
                 }
+
                 await _cardRenewalService.CreateRequestAsync(request);
 
-                TempData.Remove(TempDataAddresses);
-                TempData.Remove(TempDataEmail);
+                TempData.Remove(TempDataRequest);
 
                 return RedirectToAction(nameof(Submitted));
             }

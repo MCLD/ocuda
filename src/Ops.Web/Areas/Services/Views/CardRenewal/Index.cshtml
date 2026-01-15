@@ -6,9 +6,19 @@
 			Card Renewal Requests
 			<small class="text-muted d-print-block">@(Model.IsProcessed ? "Processed" : "Pending")</small>
 		</h1>
-
 	</div>
 </div>
+
+@if (!Model.APIConfigured)
+{
+	<div class="row">
+		<div class="col-12 col-sm-10 offset-sm-1">
+			<div class="alert alert-danger">
+				Please set API/DB configurations to enable processing card renewals
+			</div>
+		</div>
+	</div>
+}
 
 <div class="row mb-2">
 	<div class="col-12">
@@ -65,16 +75,22 @@
 			{
 				<tr>
 					<td>
-						<a asp-action="@(nameof(CardRenewalController.Details))"
-						   asp-route-id="@request.Id">
+						@if (Model.APIConfigured)
+						{
+							<a asp-action="@(nameof(CardRenewalController.Details))"
+							   asp-route-id="@request.Id">
+								@(Model.IsProcessed? request.ProcessedAt: request.SubmittedAt)
+							</a>
+						}
+						else
+						{
 							@(Model.IsProcessed? request.ProcessedAt: request.SubmittedAt)
-						</a>
+						}
 					</td>
 					<td>@request.Barcode</td>
 					<td class="@(request.SameAddress ? "table-success" : "table-danger")">@(request.SameAddress ? "Yes" : "No")</td>
 					@if (Model.IsProcessed)
 					{
-						/*
 						<td>
 							@if (request.Accepted == true)
 							{
@@ -85,7 +101,6 @@
 								<span class="fa-solid fa-xmark fa-fw"></span>
 							}
 						</td>
-						*/
 					}
 				</tr>
 			}

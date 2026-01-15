@@ -14,5 +14,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.CardRenewal
         [Required(ErrorMessage = ErrorMessage.FieldRequired)]
         [DisplayName(i18n.Keys.Promenade.PromptGuardianName)]
         public string GuardianName { get; set; }
+
+        public SegmentText SegmentText { get; set; }
     }
 }

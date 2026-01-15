@@ -22,11 +22,11 @@ namespace Ocuda.Promenade.Data.Promenade
             await _context.SaveChangesAsync();
         }
 
-        public async Task<CardRenewalRequest> GetPendingRequestAsync(int patronId)
+        public async Task<CardRenewalRequest> GetPendingRequestAsync(int customerId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.PatronId == patronId && !_.IsDiscarded && !_.ProcessedAt.HasValue)
+                .Where(_ => _.CustomerId == customerId && !_.IsDiscarded && !_.ProcessedAt.HasValue)
                 .OrderByDescending(_ => _.SubmittedAt)
                 .FirstOrDefaultAsync();
         }

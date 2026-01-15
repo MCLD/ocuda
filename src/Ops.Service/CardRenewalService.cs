@@ -100,8 +100,7 @@ namespace Ocuda.Ops.Service
             {
                 throw new OcudaException("Request does not exist");
             }
-
-            if (request.ProcessedAt.HasValue)
+            else if (request.ProcessedAt.HasValue)
             {
                 throw new OcudaException("Request has already been processed");
             }
@@ -175,16 +174,26 @@ namespace Ocuda.Ops.Service
             return await _cardRenewalResponseRepository.GetAllAsync();
         }
 
-
         public async Task<CardRenewalResult> GetResultForRequestAsync(int requestId)
         {
             return await _cardRenewalResultRepository.GetForRequestAsync(requestId);
         }
 
+        public async Task<bool> IsRequestAccepted(int requestId)
+        {
+            var responseType = await _cardRenewalResultRepository
+                .GetRequestResponseTypeAsync(requestId);
+
+            return responseType == CardRenewalResponse.ResponseType.Accept;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1031:Do not catch general exception types",
+            Justification = "Show end user error message rather than exception")]
         public async Task<ProcessResult> ProcessRequestAsync(int requestId,
             int responseId,
             string responseText,
-            string patronName)
+            string customerName)
         {
             var request = await _cardRenewalRequestRepository
                 .GetByIdAsync(requestId);
@@ -193,13 +202,16 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException("Request has already been processed.");
             }
 
-            var processResult = new ProcessResult();
-
             var response = await _cardRenewalResponseRepository.FindAsync(responseId);
+
+            var processResult = new ProcessResult
+            {
+                Type = response.Type
+            };
 
             if (response.Type == CardRenewalResponse.ResponseType.Accept)
             {
-                var renewResult = _polarisHelper.RenewPatronRegistration(
+                var renewResult = _polarisHelper.RenewCustomerRegistration(
                         request.Barcode,
                         request.Email);
 
@@ -215,7 +227,7 @@ namespace Ocuda.Ops.Service
             var tags = new Dictionary<string, string>
             {
                 { Keys.CardRenewal.CustomerBarcode, request.Barcode },
-                { Keys.CardRenewal.CustomerName, patronName }
+                { Keys.CardRenewal.CustomerName, customerName }
             };
 
             var emailDetails = await _emailService.GetDetailsAsync(response.EmailSetupId.Value,
@@ -223,14 +235,40 @@ namespace Ocuda.Ops.Service
                 tags,
                 responseText);
 
-            emailDetails.ToEmailAddress = request.Email;
-            emailDetails.ToName = patronName;
+            var now = _dateTimeProvider.Now;
 
-            EmailRecord sentEmail = null;
+            request.ProcessedAt = now;
+            _cardRenewalRequestRepository.Update(request);
+
+            var result = new CardRenewalResult
+            {
+                CardRenewalRequestId = request.Id,
+                CardRenewalResponseId = response.Id,
+                CreatedAt = now,
+                CreatedBy = GetCurrentUserId(),
+                ResponseText = emailDetails.BodyText
+            };
+
+            await _cardRenewalResultRepository.AddAsync(result);
+            await _cardRenewalResultRepository.SaveAsync();
+            await _cardRenewalRequestRepository.SaveAsync();
+
+            emailDetails.ToEmailAddress = request.Email;
+            emailDetails.ToName = customerName;
 
             try
             {
-                sentEmail = await _emailService.SendAsync(emailDetails);
+                var sentEmail = await _emailService.SendAsync(emailDetails);
+                if (sentEmail != null)
+                {
+                    processResult.EmailSent = true;
+                }
+                else
+                {
+                    _logger.LogWarning("Card renewal email (setup {EmailSetupId}) failed sending to {EmailTo}",
+                        response.EmailSetupId.Value,
+                        request.Email);
+                }
             }
             catch (Exception ex)
             {
@@ -239,29 +277,7 @@ namespace Ocuda.Ops.Service
                         response.EmailSetupId.Value,
                         emailDetails.ToEmailAddress,
                         ex.Message);
-
-                throw new OcudaException("Unable to send email.");
             }
-
-            if (sentEmail != null)
-            {
-                var now = _dateTimeProvider.Now;
-
-                request.ProcessedAt = now;
-                _cardRenewalRequestRepository.Update(request);
-
-                var result = new CardRenewalResult
-                {
-                    CardRenewalRequestId = request.Id,
-                    CreatedAt = now,
-                    CreatedBy = GetCurrentUserId(),
-                    ResponseText = sentEmail.BodyText
-                };
-
-                await _cardRenewalResultRepository.AddAsync(result);
-                //await _cardRenewalResponseRepository.SaveAsync();
-            }
-
 
             return processResult;
         }

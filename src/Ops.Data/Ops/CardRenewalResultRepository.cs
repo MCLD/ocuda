@@ -23,5 +23,14 @@ namespace Ocuda.Ops.Data.Ops
                 .Where(_ => _.CardRenewalRequestId == requestId)
                 .SingleOrDefaultAsync();
         }
+
+        public async Task<CardRenewalResponse.ResponseType> GetRequestResponseTypeAsync(
+            int requestId)
+        {
+            return await DbSet.AsNoTracking()
+                .Where(_ => _.CardRenewalRequestId == requestId)
+                .Select(_ => _.CardRenewalResponse.Type)
+                .SingleOrDefaultAsync();
+        }
     }
 }

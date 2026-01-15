@@ -6,7 +6,7 @@
 			<tr>
 				<th style="width: 10rem;">Record id</th>
 				<td>
-					@Model.Request.PatronId
+					@Model.Request.CustomerId
 					@if (!string.IsNullOrEmpty(Model.LeapPath))
 					{
 						<a href="@Model.LeapPath" target="_blank" title="View in Leap">
@@ -20,12 +20,16 @@
 				<td>@Model.Request.Barcode</td>
 			</tr>
 			<tr>
+				<th>Request language</th>
+				<td>@Model.Request.Language.Description</td>
+			</tr>
+			<tr>
 				<th>First name</th>
-				<td>@Model.PatronData.NameFirst</td>
+				<td>@Model.Customer.NameFirst</td>
 			</tr>
 			<tr>
 				<th>Last name</th>
-				<td>@Model.PatronData.NameLast</td>
+				<td>@Model.Customer.NameLast</td>
 			</tr>
 			<tr>
 				<th>Email address</th>
@@ -33,11 +37,11 @@
 			</tr>
 			<tr>
 				<th>Expiration date</th>
-				<td>@Model.PatronData.ExpirationDate.ToShortDateString()</td>
+				<td>@Model.Customer.ExpirationDate?.ToShortDateString()</td>
 			</tr>
-			<tr class="@(Model.PatronData.AddrCheckDate == Model.PatronData.ExpirationDate ? "table-success" : "table-danger")">
+			<tr class="@(Model.Customer.AddressVerificationDate == Model.Customer.ExpirationDate ? "table-success" : "table-danger")">
 				<th>Address check date</th>
-				<td>@Model.PatronData.AddrCheckDate?.ToShortDateString()</td>
+				<td>@Model.Customer.AddressVerificationDate?.ToShortDateString()</td>
 			</tr>
 			<tr class="@(Model.Request.SameAddress ? "table-success" : "table-danger")">
 				<th>At the same address</th>
@@ -52,18 +56,18 @@
 			}
 			<tr>
 				<th>Patron code</th>
-				<td>@Model.PatronCode</td>
+				<td>@Model.CustomerCode</td>
 			</tr>
 		</table>
 
-		@if (Model.IsJuvenile)
+		@if (!string.IsNullOrWhiteSpace(Model.Request.GuardianName))
 		{
 			<table class="table table-sm table-bordered">
-				@if (Model.PatronAge.HasValue)
+				@if (Model.CustomerAge.HasValue)
 				{
 					<tr>
 						<th>Age</th>
-						<td>@Model.PatronAge</td>
+						<td>@Model.CustomerAge</td>
 					</tr>
 				}
 				<tr>
@@ -76,33 +80,45 @@
 				</tr>
 				<tr>
 					<th>Polaris guardian's name</th>
-					<td>@Model.PatronData.User3</td>
+					<td>@Model.Customer.UserDefinedField3</td>
 				</tr>
 				<tr>
 					<th>Polaris guardian's barcode</th>
-					<td>@Model.PatronData.User2</td>
+					<td>@Model.Customer.UserDefinedField2</td>
 				</tr>
 			</table>
 		}
 	</div>
 	<div class="col-12 col-md-6 col-xl-4">
 		<table class="table table-sm table-bordered">
-			<tr>
+			<tr class="@(Model.OverChargesLimit ? "table-warning" : "table-success")">
 				<th style="width: 10rem;">Charges</th>
-				<td>@Model.PatronData.ChargeBalance.ToString("C")</td>
+				<td>@Model.Customer.ChargeBalance.ToString("C")</td>
 			</tr>
-			<tr class="@(Model.PatronData.PatronSystemBlocks.Any() ? "table-danger" : "table-success")">
+			<tr class="@(Model.Customer.IsBlocked ? "table-danger" : "table-success")">
 				<th>Has system blocks</th>
-				<td>@(Model.PatronData.PatronSystemBlocks.Any() ? "Yes" : "No")</td>
+				<td>@(Model.Customer.IsBlocked ? "Yes" : "No")</td>
 			</tr>
-			<tr>
+			<tr class="@(Model.CustomerBlocks?.Count > 0 ? "table-danger" : "table-success")">
 				<th>Blocks</th>
-				<td>TODO</td>
+				<td>
+					@if (Model.CustomerBlocks?.Count > 0)
+					{
+						foreach (var block in Model.CustomerBlocks)
+						{
+							<div>@block.Description</div>
+						}
+					}
+					else
+					{
+						@:None
+					}
+				</td>
 			</tr>
-			<tr class="@(string.IsNullOrWhiteSpace(Model.PatronData.PatronNotes?.BlockingStatusNotes) ? "table-success" : "table-danger")">
+			<tr class="@(string.IsNullOrWhiteSpace(Model.Customer.BlockingNotes) ? "table-success" : "table-danger")">
 				<th>
 					Blocking notes
-					@if (Model.PatronData.PatronNotes?.BlockingStatusNotes?.Length > Model.MaxNotesDisplayLength)
+					@if (Model.Customer.BlockingNotes?.Length > Model.MaxNotesDisplayLength)
 					{
 						<button type="button"
 								class="btn btn-sm btn-light"
@@ -115,12 +131,21 @@
 						</button>
 					}
 				</th>
-				<td>@(!string.IsNullOrWhiteSpace(Model.PatronData.PatronNotes?.BlockingStatusNotes) ? new string(Model.PatronData.PatronNotes?.BlockingStatusNotes.Take(Model.MaxNotesDisplayLength).ToArray()) : "None")</td>
+				<td>
+					@if (!string.IsNullOrWhiteSpace(Model.Customer.BlockingNotes))
+					{
+						@Model.Customer.BlockingNotes.Substring(0, Model.MaxNotesDisplayLength)
+					}
+					else
+					{
+						@:None
+					}
+				</td>
 			</tr>
 			<tr>
 				<th>
 					Non-blocking notes
-					@if (Model.PatronData.PatronNotes?.NonBlockingStatusNotes?.Length > Model.MaxNotesDisplayLength)
+					@if (Model.Customer.Notes?.Length > Model.MaxNotesDisplayLength)
 					{
 						<button type="button"
 								class="btn btn-sm btn-light"
@@ -133,11 +158,20 @@
 						</button>
 					}
 				</th>
-				<td>@(!string.IsNullOrWhiteSpace(Model.PatronData.PatronNotes?.NonBlockingStatusNotes) ? new string(Model.PatronData.PatronNotes?.NonBlockingStatusNotes.Take(Model.MaxNotesDisplayLength).ToArray()) : "None")</td>
+				<td>
+					@if (!string.IsNullOrWhiteSpace(Model.Customer.Notes))
+					{
+						@Model.Customer.Notes.Substring(0, Model.MaxNotesDisplayLength)
+					}
+					else
+					{
+						@:None
+					}
+				</td>
 			</tr>
 			<tr>
 				<th>Proof of address</th>
-				<td>@Model.PatronData.User4</td>
+				<td>@Model.Customer.UserDefinedField4</td>
 			</tr>
 		</table>
 		@if (Model.Request.ProcessedAt.HasValue)
@@ -168,7 +202,7 @@
 	</div>
 </div>
 
-<div class="row">
+<div class="row mb-4">
 	<div class="col-12 col-xl-8 offset-xl-2">
 		<div class="accordion" id="addressAccordion">
 			<div class="accordion-item">
@@ -189,26 +223,26 @@
 						<div class="row">
 							<div class="col-12 col-md-4">
 								<div><em>Address(es) in Polaris:</em></div>
-								@foreach (var address in Model.PatronData.PatronAddresses)
+								@foreach (var address in Model.Customer.Addresses)
 								{
 									<div>
-										<strong>@address.FreeTextLabel</strong>
-										@if (!string.IsNullOrWhiteSpace(Model.AddressLookupPath) || !string.IsNullOrWhiteSpace(Model.AssessorLookupPath))
+										<strong>@address.AddressType</strong>
+										@if (Model.AddressLookupUrlSet || !string.IsNullOrWhiteSpace(Model.AssessorLookupUrl))
 										{
 											<span>
 												(<a href="#"
 													class="addressLookup"
-													data-address="@address.StreetOne @address.StreetTwo"
+													data-address="@address.StreetAddressOne @address.StreetAddressTwo"
 													data-zip="@address.PostalCode">Look up</a>)
 											</span>
 
 										}
 									</div>
 									<div class="mb-3">
-										@address.StreetOne<br />
-										@if (!string.IsNullOrWhiteSpace(address.StreetTwo))
+										@address.StreetAddressOne<br />
+										@if (!string.IsNullOrWhiteSpace(address.StreetAddressTwo))
 										{
-											@address.StreetTwo
+											@address.StreetAddressTwo
 											<br />
 										}
 										@address.City @address.State, @address.PostalCode<br />
@@ -216,16 +250,19 @@
 									</div>
 								}
 							</div>
-							@if (!string.IsNullOrWhiteSpace(Model.AddressLookupPath) || !string.IsNullOrWhiteSpace(Model.AssessorLookupPath))
+							@if (Model.AddressLookupUrlSet || !string.IsNullOrWhiteSpace(Model.AssessorLookupUrl))
 							{
 								<div class="col-12 col-md-8">
-									@if (!string.IsNullOrWhiteSpace(Model.AddressLookupPath))
+									@if (Model.AddressLookupUrlSet)
 									{
 										<div id="addressLookupResults" class="mb-2"></div>
 									}
-									@if (!string.IsNullOrWhiteSpace(Model.AssessorLookupPath))
+									@if (!string.IsNullOrWhiteSpace(Model.AssessorLookupUrl))
 									{
-										<div id="assessorLookupResults"></div>
+										<div id="assessorLookupResults" class="d-none">
+											<strong>Assessor results:</strong>
+											<div>Click to <a id="assessorLink" href="" target="_blank">load this search on the County Assessor's site</a></div>
+										</div>
 									}
 								</div>
 							}
@@ -237,129 +274,126 @@
 	</div>
 </div>
 
-<form asp-controller="@CardRenewalController.Name"
-	  asp-action="@nameof(CardRenewalController.Details)"
-	  method="post"
-	  role="form">
-	<input asp-for="PatronName" type="hidden" />
-	<input asp-for="RequestId" value="@Model.Request.Id" type="hidden" />
+@if (!Model.Request.ProcessedAt.HasValue)
+{
+	<form asp-controller="@CardRenewalController.Name"
+		  asp-action="@nameof(CardRenewalController.Details)"
+		  method="post"
+		  role="form">
+		<input asp-for="CustomerName" type="hidden" />
+		<input asp-for="RequestId" value="@Model.Request.Id" type="hidden" />
 
-	<div class="row mt-4">
-		<div class="col-12 col-xl-8 offset-xl-2">
-			<div class="mb-3">
-				<select asp-for="ResponseId" asp-items="@Model.ResponseList" class="form-control">
-					<option value="">Please select a response</option>
-				</select>
-				<span asp-validation-for="ResponseId" class="text-danger"></span>
-			</div>
+		<div class="row">
+			<div class="col-12 col-xl-8 offset-xl-2">
+				<div class="mb-3">
+					<select asp-for="ResponseId" asp-items="@Model.ResponseList" class="form-control">
+						<option value="">Please select a response</option>
+					</select>
+					<span asp-validation-for="ResponseId" class="text-danger"></span>
+				</div>
 
-			<div class="mb-3">
-				<textarea asp-for="ResponseText" class="form-control" rows="5"></textarea>
-				<span asp-validation-for="ResponseText" class="text-danger"></span>
-			</div>
+				<div class="mb-3">
+					<textarea asp-for="ResponseText" class="form-control" rows="5"></textarea>
+					<span asp-validation-for="ResponseText" class="text-danger"></span>
+				</div>
 
-			<div class="row mb-3">
-				<div class="col-12">
-					<strong>Replacement Keys</strong> &ndash; {{@Ocuda.Ops.Service.Keys.CardRenewal.CustomerBarcode}}, {{@Ocuda.Ops.Service.Keys.CardRenewal.CustomerName}}
+				<div class="row mb-3">
+					<div class="col-12">
+						<strong>Replacement Keys</strong> &ndash; {{@Ocuda.Ops.Service.Keys.CardRenewal.CustomerBarcode}}, {{@Ocuda.Ops.Service.Keys.CardRenewal.CustomerName}}
+					</div>
+				</div>
+
+				<div>
+					<button id="processButton"
+							type="submit"
+							class="btn btn-secondary disabled"
+							button-spinner>
+						<span id="buttonIcon" class="d-none"></span>
+						<span id="buttonText">Mark Processed, send email</span>
+					</button>
+					<button type="button"
+							class="btn btn-warning"
+							data-bs-toggle="modal"
+							data-bs-target="#discardModal">
+						<span class="fa-solid fa-trash-can"></span>
+						Discard Request, do not send email
+					</button>
+					<a asp-action="@(nameof(CardRenewalController.Index))"
+					   asp-route-processed="@(Model.Request.ProcessedAt.HasValue ? "true" : "")"
+					   class="btn btn-outline-dark float-end">Back</a>
 				</div>
 			</div>
+		</div>
+	</form>
 
+	<form asp-action="@nameof(CardRenewalController.Discard)"
+		  enctype="multipart/form-data"
+		  method="post"
+		  role="form">
+		<input id="discardId" asp-for="RequestId" value="@Model.Request.Id" type="hidden" />
 
+		<div class="modal" tabindex="-1" id="discardModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Discard Request</h5>
+						<button type="button"
+								class="btn-close"
+								data-bs-dismiss="modal"
+								aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p>Are you sure you want to discard this request?</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-outline-warning">
+							<span class="fa fa-trash" aria-hidden="true"></span>
+							Discard
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+}
+else
+{
+	<div class="row">
+		<div class="col-12 col-xl-8 offset-xl-2">
+			<div class="mb-2">
+				<strong>E-Mail response sent to customer:</strong>
+			</div>
+			<div class="card mb-3">
+				<div class="card-body">
+					@Html.Raw(Model.Result.ResponseText)
+				</div>
+			</div>
 			<div>
-				<button id="processButton"
-						type="submit"
-						class="btn btn-secondary disabled"
-						button-spinner>
-					<span id="buttonIcon" class="d-none"></span>
-					<span id="buttonText">Mark Processed, send email</span>
-				</button>
-				<button type="button"
-						class="btn btn-warning"
-						data-bs-toggle="modal"
-						data-bs-target="#discardModal">
-					<span class="fa-solid fa-trash-can"></span>
-					Discard Request, do not send email
-				</button>
 				<a asp-action="@(nameof(CardRenewalController.Index))"
 				   asp-route-processed="@(Model.Request.ProcessedAt.HasValue ? "true" : "")"
 				   class="btn btn-outline-dark float-end">Back</a>
 			</div>
 		</div>
 	</div>
-</form>
+}
 
-<form asp-action="@nameof(CardRenewalController.Discard)"
-	  enctype="multipart/form-data"
-	  method="post"
-	  role="form">
-	<input name="id" value="@Model.Request.Id" type="hidden" />
-
-	<div class="modal" tabindex="-1" id="discardModal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Discard Request</h5>
-					<button type="button"
-							class="btn-close"
-							data-bs-dismiss="modal"
-							aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<p>Are you sure you want to discard this request?</p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-					<button type="submit" class="btn btn-outline-warning">
-						<span class="fa fa-trash" aria-hidden="true"></span>
-						Discard
-					</button>
-				</div>
-			</div>
-		</div>
-	</div>
-</form>
-
-@if (Model.PatronData.PatronNotes?.BlockingStatusNotes?.Length > Model.MaxNotesDisplayLength)
+@if (Model.Customer.BlockingNotes?.Length > Model.MaxNotesDisplayLength)
 {
 	<div modal id="blockingNotesModal" name="Blocking Notes" suppress-footer="true">
-		@Model.PatronData.PatronNotes?.BlockingStatusNotes
+		@Model.Customer.BlockingNotes
 	</div>
 }
 
-@if (Model.PatronData.PatronNotes?.NonBlockingStatusNotes?.Length > Model.MaxNotesDisplayLength)
+@if (Model.Customer.Notes?.Length > Model.MaxNotesDisplayLength)
 {
 	<div modal id="nonBlockingNotesModal" name="Non-Blocking Notes" suppress-footer="true">
-		@Model.PatronData.PatronNotes?.NonBlockingStatusNotes
+		@Model.Customer.Notes
 	</div>
 }
 
 @section scripts {
 	<script>
-		$('.addressLookup').on("click", function(e) {
-			e.preventDefault();
-			let searchAddress = $(this).attr('data-address');
-			let searchZip = $(this).attr('data-zip');
-			let addressLookupDiv = $('#addressLookupResults');
-			let assessorLookupDiv = $('#assessorLookupResults');
-
-			addressLookupDiv.html('<strong>Loading address...</strong>  <span class="fa-solid fa-spinner fa-pulse fa-fw">');
-			assessorLookupDiv.html('<strong>Loading assessor...</strong>  <span class="fa-solid fa-spinner fa-pulse fa-fw">');
-
-			let addressLookupUrl = '@Model.AddressLookupPath';
-
-			$.get(addressLookupUrl,
-				{
-					address: searchAddress,
-					zip: searchZip
-				})
-				.done(function(response) {
-					if (response.success == true)
-					{
-						alert(response.residents);
-					}
-				});
-		});
-
 		$('#ResponseId').on('change', function() {
 			const languageId = '@Model.Request.LanguageId';
 			let responseId = $(this).val();
@@ -398,18 +432,82 @@
 				buttonText.text('Mark Processed, send email');
 				buttonIcon.attr('class', 'fa-solid fa-xmark');
 			}
+			else if (responseType == 'Partial') {
+				processButton.attr('class', 'btn btn-primary btn-spinner');
+				buttonText.text('Mark Processed, send email');
+				buttonIcon.attr('class', 'fa-solid fa-check');
+			}
 			else {
 				processButton.attr('class', 'btn btn-secondary disabled');
 				buttonText.text('Mark Processed, send email');
 				buttonIcon.attr('class', 'd-none');
 			}
 		}
-
 	</script>
 
-	@if (!Model.Request.ProcessedAt.HasValue)
+	@if (Model.AddressLookupUrlSet)
 	{
 		<script>
+			$('.addressLookup').on("click", function(e) {
+				e.preventDefault();
+
+				const addressLookupDiv = $('#addressLookupResults');
+				const addressLookupHeader = '<strong>Address lookup results:</strong></br>';
+
+				let searchAddress = $(this).attr('data-address').trim();
+				let searchZip = $(this).attr('data-zip');
+
+				addressLookupDiv.html('<strong>Loading address...</strong>  <span class="fa-solid fa-spinner fa-pulse fa-fw">');
+
+				$.get('@Url.Action(nameof(Ocuda.Ops.Controllers.ApiController.AddressLookup), Ocuda.Ops.Controllers.ApiController.Name)',
+					{
+						address: searchAddress,
+						zip: searchZip
+					})
+					.done(function(response) {
+						if (response != null)
+						{
+							if (response.success)
+							{
+								let formattedResults = [];
+								formattedResults.push(response.streetAddress1,
+									" / ",
+									response.postalCode,
+									"<ul>");
+								response.residents.forEach((_) =>
+								{
+									formattedResults.push("<li>", _, "</li>");
+								})
+								formattedResults.push("</ul>");
+								addressLookupDiv.html(addressLookupHeader + formattedResults.join(""));
+							}
+							else
+							{
+								addressLookupDiv.html(addressLookupHeader + response.error);
+							}
+						}
+						else
+						{
+							addressLookupDiv.html(addressLookupHeader + 'An error occured looking up the address');
+						}
+					})
+					.fail(function() {
+						addressLookupDiv.html(addressLookupHeader + 'An error occured looking up the address');
+					});
+			});
+		</script>
+	}
+
+	@if (!string.IsNullOrWhiteSpace(Model.AssessorLookupUrl))
+	{
+		<script>
+			$('.addressLookup').on("click", function(e) {
+				let searchAddress = $(this).attr('data-address').trim();
+				let searchZip = $(this).attr('data-zip');
+
+				$('#assessorLookupResults').removeClass('d-none');
+				$('#assessorLink').attr('href', '@Model.AssessorLookupUrl' + searchAddress + ' ' + searchZip);
+			});
 		</script>
 	}
 }
