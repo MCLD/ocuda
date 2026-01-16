@@ -20,7 +20,7 @@ else
 		<div class="col-12 col-md-6 offset-md-3">
 			<div class="alert alert-danger d-flex">
 				<span class="fa fa-2x fa-exclamation-triangle me-2" aria-hidden="true"></span>
-				<span asp-validation-for="Invalid" class="text-danger fw-bold fs-6"> </span>
+				<span asp-validation-for="Invalid" class="fw-bold fs-6"> </span>
 			</div>
 		</div>
 	</div>
@@ -33,14 +33,14 @@ else
 			  asp-controller="@CardRenewalController.Name"
 			  asp-action="@nameof(CardRenewalController.Index)"
 			  asp-route-culture="">
-			<input asp-for="Barcode" type="text" formgroup />
+			<input asp-for="Barcode" type="text" formgroup autocomplete="off" />
 			<div class="row mb-3">
 				<label asp-for="Password" class="col-form-label text-md-end col-md-3">
 					@Localizer[Promenade.PromptPassword]
 					<span class="fa-solid fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
 				</label>
 				<div class="col-md-9">
-					<input asp-for="Password" type="password" class="form-control" />
+					<input asp-for="Password" type="password" class="form-control" autocomplete="off" />
 					<span asp-validation-for="Password" class="validation-message text-danger"></span>
 					@if (!string.IsNullOrWhiteSpace(Model.ForgotPasswordLink))
 					{

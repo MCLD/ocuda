@@ -21,8 +21,8 @@ else
 			  asp-controller="@CardRenewalController.Name"
 			  asp-action="@nameof(CardRenewalController.Juvenile)"
 			  asp-route-culture="">
-			<input asp-for="GuardianName" type="text" formgroup />
-			<input asp-for="GuardianBarcode" type="text" formgroup />
+			<input asp-for="GuardianName" type="text" formgroup autocomplete="off" />
+			<input asp-for="GuardianBarcode" type="text" formgroup autocomplete="off" />
 			<div>
 				<button type="submit"
 						class="btn btn-outline-dark m-2 btn-lg float-end">
