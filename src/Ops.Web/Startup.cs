@@ -163,8 +163,7 @@ namespace Ocuda.Ops.Web
             string promCs = _config.GetConnectionString("Promenade")
                 ?? throw new OcudaException("ConnectionString:Promenade not configured.");
 
-            var provider = _config[Configuration.OpsDatabaseProvider];
-            switch (provider)
+            switch (_config[Configuration.OpsDatabaseProvider])
             {
                 case "SqlServer":
                     services.AddDbContextPool<OpsContext,
@@ -180,39 +179,6 @@ namespace Ocuda.Ops.Web
 
             // store the data protection key in the context
             services.AddDataProtection().PersistKeysToDbContext<OpsContext>();
-
-            var sessionTimeout = TimeSpan.FromHours(2 * 60);
-            if (int.TryParse(_config[Configuration.OpsSessionTimeoutMinutes],
-                out int configuredTimeout))
-            {
-                sessionTimeout = TimeSpan.FromMinutes(configuredTimeout);
-            }
-
-            string cookieName = string.IsNullOrEmpty(_config[Configuration.OcudaCookieName])
-                ? ".oc.ops"
-                : _config[Configuration.OcudaCookieName];
-
-            services.AddSession(_ =>
-            {
-                _.IdleTimeout = sessionTimeout;
-                _.Cookie.HttpOnly = true;
-                _.Cookie.IsEssential = true;
-                _.Cookie.Name = cookieName;
-            });
-
-            _config[Configuration.OcudaRuntimeSessionTimeout] = sessionTimeout.ToString();
-
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(_ =>
-                {
-                    _.AccessDeniedPath = "/Unauthorized";
-                    _.Cookie.Name = $"{cookieName}.info";
-                    _.LoginPath = "/Authentication";
-                    _.LogoutPath = "/Authentication/Logout";
-                });
-
-            services.AddAuthorizationBuilder().AddPolicy(nameof(ClaimType.SiteManager),
-                _ => _.RequireClaim(nameof(ClaimType.SiteManager)));
 
             if (_isDevelopment)
             {
@@ -239,6 +205,41 @@ namespace Ocuda.Ops.Web
                     })
                     .AddSessionStateTempDataProvider();
             }
+
+            var sessionTimeout = TimeSpan.FromHours(8);
+            if (int.TryParse(_config[Configuration.OpsSessionTimeoutMinutes],
+                out int configuredTimeout))
+            {
+                sessionTimeout = TimeSpan.FromMinutes(configuredTimeout);
+            }
+
+            string cookieName = string.IsNullOrEmpty(_config[Configuration.OcudaCookieName])
+                ? ".oc.ops"
+                : _config[Configuration.OcudaCookieName];
+
+            services.AddSession(_ =>
+            {
+                _.IdleTimeout = sessionTimeout;
+                _.Cookie.HttpOnly = true;
+                _.Cookie.IsEssential = true;
+                _.Cookie.Name = cookieName;
+            });
+
+            _config[Configuration.OcudaRuntimeSessionTimeout] = sessionTimeout.ToString();
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(_ =>
+                {
+                    _.AccessDeniedPath = "/Unauthorized";
+                    _.Cookie.Name = $"{cookieName}.info";
+                    _.ExpireTimeSpan = sessionTimeout;
+                    _.LoginPath = "/Authentication";
+                    _.LogoutPath = "/Authentication/Logout";
+                    _.SlidingExpiration = true;
+                });
+
+            services.AddAuthorizationBuilder().AddPolicy(nameof(ClaimType.SiteManager),
+                _ => _.RequireClaim(nameof(ClaimType.SiteManager)));
 
             services.AddWebOptimizer(_ =>
             {

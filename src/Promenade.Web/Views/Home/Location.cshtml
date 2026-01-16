@@ -33,8 +33,7 @@
                         @if (Model.Location.CurrentStatus != null)
                         {
                             <div class="todays-status">
-                                @if (Model.Location.CurrentStatus?.IsCurrentlyOpen == true
-                               && !string.IsNullOrEmpty(Model.Location.CurrentStatus.TodaysHours))
+                                @if (Model.Location.CurrentStatus?.IsCurrentlyOpen == true && !string.IsNullOrEmpty(Model.Location.CurrentStatus.TodaysHours))
                                 {
                                     @Localizer[Promenade.TodaysHours, @Model.Location.CurrentStatus.TodaysHours]
                                 }
@@ -87,7 +86,7 @@
                         }
                         @if (!string.IsNullOrEmpty(Model.ShowMessage))
                         {
-                            <div class="alert alert-info prom-alert"><p>@Html.Raw(Model.ShowMessage)</p></div>
+                            <div class="alert alert-info"><p>@Html.Raw(Model.ShowMessage)</p></div>
                         }
                     </div>
                     <div class="col-12 col-sm-6 bg-white px-0 py-4 px-sm-4 location-feature-link">
@@ -302,11 +301,17 @@
                                 </div>
                             }
                         </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#interiorPhotoCarousel" data-bs-slide="prev">
+                        <button class="carousel-control-prev"
+                                type="button"
+                                data-bs-target="#interiorPhotoCarousel"
+                                data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                             <span class="visually-hidden">Previous</span>
                         </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#interiorPhotoCarousel" data-bs-slide="next">
+                        <button class="carousel-control-next"
+                                type="button"
+                                data-bs-target="#interiorPhotoCarousel"
+                                data-bs-slide="next">
                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
                             <span class="visually-hidden">Next</span>
                         </button>
@@ -320,8 +325,8 @@
             <div class="mx-auto" style="max-width: 740px;">
                 <div class="row">
                     @if (!string.IsNullOrEmpty(Model.SocialLink) &&
-                    !string.IsNullOrEmpty(Model.SocialName) &&
-                    !string.IsNullOrEmpty(Model.SocialIcon))
+                                        !string.IsNullOrEmpty(Model.SocialName) &&
+                                        !string.IsNullOrEmpty(Model.SocialIcon))
                     {
                         <div class="col-12 col-sm-6 mb-4 location-feature-link">
                             <a href="@Model.SocialLink"
@@ -365,84 +370,53 @@
     }
     @if (Model.NearbyCount > 1)
     {
-        <div class="prom-location-nearby">
-            <h2>@Localizer[Promenade.LocationNearbyLocationsHeader]</h2>
-
-            <p>
-                @Localizer[Promenade.LocationInterestedInNearby]
-                <a aria-label="@Localizer[Promenade.NewWindowItem, @Localizer[Promenade.LocationSubscribeNearby]]"
-                   href="@Model.LocationNeighborGroup.SubscriptionUrl"
-                   target="_blank">@Localizer[Promenade.LocationSubscribeNearby]</a>
-            </p>
-
-            <div class="row">
-                <div class="col-md-6 col-lg-5">
-                    <a href="@Model.LocationNeighborGroup.MapImage"
-                       class="map-popup"
-                       data-bs-toggle="modal"
-                       data-bs-target="#mapModal"
-                       target="_blank">
-                        <img src="@Model.LocationNeighborGroup.MapImage"
-                             class="d-block img-fluid mx-auto"
-                             alt="@Model.LocationNeighborGroup.Description">
-                    </a>
-                </div>
-                <div class="col-md-6 col-lg-7">
-                    <table class="table table-sm">
-                        @foreach (var locationGroup in Model.NearbyLocationGroups)
-                        {
-                            <tr>
-                                <td>@locationGroup.DisplayOrder.</td>
-                                <td colspan="@(locationGroup.Location.HasEvents ? 1 : 2)">
-                                    <a asp-action="@nameof(HomeController.Location)"
-                                       asp-controller="@HomeController.Name"
-                                       asp-route-culture=""
-                                       asp-route-locationSlug="@locationGroup.Location.Stub">@locationGroup.Location.Name</a>
-                                </td>
-                                @if (locationGroup.Location.HasEvents)
+        <div class="row g-0 col-lg-10 offset-lg-1">
+            <div class="col-12">
+                <div class="prom-location-nearby">
+                    <h2>@Localizer[Promenade.LocationNearbyLocationsHeader]</h2>
+                    <div class="row">
+                        <div class="col-md-6 col-lg-5 mb-2">
+                            <a href="@Model.LocationNeighborGroup.MapImage"
+                               class="map-popup"
+                               data-bs-toggle="modal"
+                               data-bs-target="#mapModal"
+                               target="_blank">
+                                <img src="@Model.LocationNeighborGroup.MapImage"
+                                     class="d-block img-fluid mx-auto"
+                                     alt="@Model.LocationNeighborGroup.Description">
+                            </a>
+                        </div>
+                        <div class="col-md-6 col-lg-7">
+                            <table class="table table-sm">
+                                @foreach (var locationGroup in Model.NearbyLocationGroups)
                                 {
-                                    <td>
-                                        @if (!string.IsNullOrWhiteSpace(locationGroup.Location.EventLink))
+                                    <tr>
+                                        <td>@locationGroup.DisplayOrder.</td>
+                                        <td colspan="@(locationGroup.Location.HasEvents ? 1 : 2)">
+                                            <a asp-action="@nameof(HomeController.Location)"
+                                               asp-controller="@HomeController.Name"
+                                               asp-route-culture=""
+                                               asp-route-locationSlug="@locationGroup.Location.Stub">@locationGroup.Location.Name</a>
+                                        </td>
+                                        @if (locationGroup.Location.HasEvents)
                                         {
-                                            <a aria-label="@Localizer[Promenade.LocationSubscribeToName, locationGroup.Location.Name]"
-                                               href="@locationGroup.Location.SubscriptionLink"
-                                               class="btn btn-sm btn-outline-secondary text-dark m-1 float-end">
-                                                <span class="fa-regular fa-envelope"></span>
-                                                @Localizer[Promenade.ButtonSubscribe]
-                                            </a>
+                                            <td>
+                                                @if (!string.IsNullOrWhiteSpace(locationGroup.Location.EventLink))
+                                                {
+                                                    <a aria-label="@Localizer[Promenade.LocationButtonEvents]"
+                                                       href="@locationGroup.Location.EventLink"
+                                                       class="btn btn-sm btn-outline-secondary text-dark m-1 float-end">
+                                                        <span class="fa-regular fa-calendar-days"></span>
+                                                        @Localizer[Promenade.LocationButtonEvents]
+                                                    </a>
+                                                }
+                                            </td>
                                         }
-                                        @if (!string.IsNullOrWhiteSpace(locationGroup.Location.SubscriptionLink))
-                                        {
-                                            <a aria-label="@Localizer[Promenade.LocationViewEventsName, locationGroup.Location.Name]"
-                                               href="@locationGroup.Location.EventLink"
-                                               class="btn btn-sm btn-outline-secondary text-dark m-1 float-end">
-                                                <span class="fa-regular fa-calendar-days"></span>
-                                                @Localizer[Promenade.LocationButtonEvents]
-                                            </a>
-                                        }
-                                    </td>
+                                    </tr>
                                 }
-                            </tr>
-                        }
-                        <tr>
-                            <td colspan="3">
-                                <a href="@Model.LocationNeighborGroup.SubscriptionUrl"
-                                   class="btn btn-sm btn-outline-secondary text-dark m-1 float-end"
-                                   target="_blank">
-                                    <span class="fa-regular fa-envelope"></span>
-                                    @if (Model.NearbyCount == Model.NearbyEventsCount)
-                                    {
-                                        @Localizer[Promenade.LocationUpdatesFromAllCount, Model.NearbyEventsCount]
-                                    }
-                                    else
-                                    {
-                                        @Localizer[Promenade.LocationUpdatesFromCount, Model.NearbyEventsCount]
-                                    }
-                                    <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
-                                </a>
-                            </td>
-                        </tr>
-                    </table>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
