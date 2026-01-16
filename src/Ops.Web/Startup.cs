@@ -163,18 +163,17 @@ namespace Ocuda.Ops.Web
             string promCs = _config.GetConnectionString("Promenade")
                 ?? throw new OcudaException("ConnectionString:Promenade not configured.");
 
-            switch (_config[Configuration.OpsDatabaseProvider])
+            if (_config[Configuration.OpsDatabaseProvider]?.ToUpperInvariant() == "SQLSERVER")
             {
-                case "SqlServer":
-                    services.AddDbContextPool<OpsContext,
-                        DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
-                    services.AddDbContextPool<PromenadeContext,
-                        DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
-                    services.AddHealthChecks();
-                    break;
-
-                default:
-                    throw new OcudaException("No Configuration.OpsDatabaseProvider configured.");
+                services.AddDbContextPool<OpsContext,
+                    DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
+                services.AddDbContextPool<PromenadeContext,
+                    DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+                services.AddHealthChecks();
+            }
+            else
+            {
+                throw new OcudaException("No Configuration.OpsDatabaseProvider configured.");
             }
 
             // store the data protection key in the context
