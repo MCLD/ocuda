@@ -60,16 +60,14 @@
                             <div class="col-12 @(topNavigation?.Navigations.Count() == 0 ? "" : "col-sm-4") mb-2 mb-sm-0 ps-sm-0 ps-md-3 d-flex justify-content-center justify-content-sm-start">
                                 @if (!string.IsNullOrEmpty(bannerImage))
                                 {
-                                    <span role="banner" aria-label="@Localizer[Promenade.VisitHomePage]">
-                                        <a asp-action="Index"
-                                           asp-controller="Home"
-                                           asp-area=""
-                                           asp-route-culture="">
-                                            <img src="@bannerImage"
-                                                 alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImageAlt]"
-                                                 class="img-fluid mx-auto prom-logo" />
-                                        </a>
-                                    </span>
+                                    <a asp-action="Index"
+                                       asp-controller="Home"
+                                       asp-area=""
+                                       asp-route-culture="">
+                                        <img src="@bannerImage"
+                                             alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImageAlt]"
+                                             class="img-fluid mx-auto prom-logo" />
+                                    </a>
                                 }
 
                             </div>
@@ -135,7 +133,7 @@
                 {
                     <div class="row">
                         <div class="d-flex prom-nav-middle-parent p-0 px-lg-2">
-                            <div class="prom-nav-middle navbar navbar-dark navbar-expand-sm p-0 px-lg-2 d-print-none w-100" aria-label="bottom" role="navigation">
+                            <nav class="prom-nav-middle navbar navbar-dark navbar-expand-sm p-0 px-lg-2 d-print-none w-100" aria-label="bottom" role="navigation">
                                 <button class="navbar-toggler nav-link dropdown-toggle border-0 p-3 border-bottom border-top border-white w-100 py-3 text-center collapsed"
                                         style="box-shadow: none;"
                                         type="button"
@@ -148,8 +146,7 @@
                                     <span class="caret"></span>
                                 </button>
                                 <div class="collapse navbar-collapse px-lg-2" id="navbarSupportedContent">
-                                    <ul class="flex-column flex-sm-row align-items-stretch nav nav-pills px-lg-1 col-12 col-lg-10 offset-lg-1"
-                                        role="presentation">
+                                    <ul class="flex-column flex-sm-row align-items-stretch nav nav-pills px-lg-1 col-12 col-lg-10 offset-lg-1">
                                         @foreach (var item in middleNavigation.Navigations)
                                         {
                                             <li class="nav-item prom-nav-link col-12 col-sm-2 @(item.Navigations.Count() > 0 ? "dropdown" : "")">
@@ -205,22 +202,23 @@
                                         }
                                     </ul>
                                 </div>
-                            </div>
+                            </nav>
                         </div>
                     </div>
                 }
                 @if (!string.IsNullOrEmpty(catalogSearchLink))
                 {
-                    <div class="row prom-top-searchbar py-2">
+                    <search class="row prom-top-searchbar py-2">
                         <div class="mx-auto d-block prom-catalog-search">
                             <div class="input-group gap-3 home-catalog-search">
                                 <div class="d-flex flex-grow-1">
-                                    <input type="text"
+                                    <input autocomplete="on"
+                                           class="form-control rounded py-3 py-sm-2"
                                            id="textboxTerm"
                                            onkeypress="return ProcessInput(event)"
-                                           class="form-control rounded py-3 py-sm-2"
                                            placeholder="@Localizer[Promenade.SearchTheCatalog]"
-                                           title="@Localizer[Promenade.Search]" />
+                                           title="@Localizer[Promenade.Search]"
+                                           type="text" />
                                 </div>
                                 <div class="input-group-append d-flex align-items-center justify-content-center">
                                     <button class="btn search-button rounded-circle"
@@ -232,7 +230,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </search>
                 }
             </header>
             <div class="row prom-content-container">
@@ -282,8 +280,10 @@
                                            class="prom-leftnav-social-link"
                                            target="_blank"
                                            title="@Localizer[Promenade.ConnectSocialOn, "Facebook"]"
-                                           aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-facebook"></span></a>
-                                        <span>&nbsp;</span>
+                                           aria-label="@Localizer[Promenade.NewWindow]">
+                                            <span class="fa-brands fa-facebook"></span>
+                                            <span class="visually-hidden">Facebook</span>
+                                        </a>
                                     </li>
                                 }
                                 @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]?.ToString()))
@@ -293,8 +293,10 @@
                                            class="prom-leftnav-social-link"
                                            target="_blank"
                                            title="@Localizer[Promenade.ConnectSocialOn, "Instagram"]"
-                                           aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-instagram"></span></a>
-                                        <span>&nbsp;</span>
+                                           aria-label="@Localizer[Promenade.NewWindow]">
+                                            <span class="fa-brands fa-instagram"></span>
+                                            <span class="visually-hidden">Instagram</span>
+                                        </a>
                                     </li>
                                 }
                                 @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTikTokUrl]?.ToString()))
@@ -304,8 +306,10 @@
                                            class="prom-leftnav-social-link"
                                            target="_blank"
                                            title="@Localizer[Promenade.ConnectSocialOn, "TikTok"]"
-                                           aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-tiktok"></span></a>
-                                        <span>&nbsp;</span>
+                                           aria-label="@Localizer[Promenade.NewWindow]">
+                                            <span class="fa-brands fa-tiktok"></span>
+                                            <span class="visually-hidden">TikTok</span>
+                                        </a>
                                     </li>
                                 }
                                 @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]?.ToString()))
@@ -315,8 +319,10 @@
                                            class="prom-leftnav-social-link"
                                            target="_blank"
                                            title="@Localizer[Promenade.ConnectSocialOn, "Twitter"]"
-                                           aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-x-twitter"></span></a>
-                                        <span>&nbsp;</span>
+                                           aria-label="@Localizer[Promenade.NewWindow]">
+                                            <span class="fa-brands fa-x-twitter"></span>
+                                            <span class="visually-hidden">X</span>
+                                        </a>
                                     </li>
                                 }
                                 @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]?.ToString()))
@@ -326,7 +332,10 @@
                                            class="prom-leftnav-social-link"
                                            target="_blank"
                                            title="@Localizer[Promenade.ConnectSocialOn, "YouTube"]"
-                                           aria-label="@Localizer[Promenade.NewWindow]"><span class="fa-brands fa-youtube"></span></a>
+                                           aria-label="@Localizer[Promenade.NewWindow]">
+                                            <span class="fa-brands fa-youtube"></span>
+                                            <span class="visually-hidden">YouTube</span>
+                                        </a>
                                     </li>
                                 }
                             </ul>
@@ -338,16 +347,14 @@
                 <div class="col-6 col-sm-3 d-flex justify-content-center">
                     @if (!string.IsNullOrEmpty(footerImage))
                     {
-                        <div role="banner" aria-label="@Localizer[Promenade.VisitHomePage]">
-                            <a asp-action="Index"
-                               asp-controller="Home"
-                               asp-area=""
-                               asp-route-culture="">
-                                <img src="@footerImage"
-                                     alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.FooterImageAlt]"
-                                     class="img-fluid mx-auto prom-logo" />
-                            </a>
-                        </div>
+                        <a asp-action="Index"
+                           asp-controller="Home"
+                           asp-area=""
+                           asp-route-culture="">
+                            <img src="@footerImage"
+                                 alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.FooterImageAlt]"
+                                 class="img-fluid mx-auto prom-logo" />
+                        </a>
                     }
                 </div>
                 @if (footerNavigation?.Navigations.Count() > 0)
