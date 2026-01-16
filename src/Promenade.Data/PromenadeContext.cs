@@ -29,7 +29,6 @@ namespace Ocuda.Promenade.Data
         public DbSet<EmediaCategory> EmediaCategories { get; set; }
         public DbSet<EmediaGroup> EmediaGroups { get; }
         public DbSet<EmediaText> EmediaTexts { get; }
-        public DbSet<EmployeeCardRequest> EmployeeCardRequests { get; }
         public DbSet<ExternalResource> ExternalResources { get; set; }
         public DbSet<Feature> Features { get; }
         public DbSet<Group> Groups { get; }

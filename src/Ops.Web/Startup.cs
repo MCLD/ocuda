@@ -484,8 +484,6 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.EmediaRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaTextRepository,
                 Data.Promenade.EmediaTextRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmployeeCardRequestRepository,
-                Data.Promenade.EmployeeCardRequestRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IExternalResourcePromRepository,
                 Data.Promenade.ExternalResourcePromRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IFeatureRepository,
@@ -587,7 +585,6 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IDigitalDisplaySyncService, DigitalDisplaySyncService>();
             services.AddScoped<IEmediaService, EmediaService>();
             services.AddScoped<IEmailService, EmailService>();
-            services.AddScoped<IEmployeeCardService, EmployeeCardService>();
             services.AddScoped<IExternalResourcePromService, ExternalResourcePromService>();
             services.AddScoped<IExternalResourceService, ExternalResourceService>();
             services.AddScoped<IFeatureService, FeatureService>();
