@@ -7,6 +7,7 @@ using Ocuda.Promenade.Controllers.ViewModels.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility;
+using Ocuda.Utility.Filters;
 
 namespace Ocuda.Promenade.Controllers
 {
