@@ -11,7 +11,7 @@
     {
         if (!string.IsNullOrWhiteSpace(group.Segment.SegmentText.Header))
         {
-            if(i == 0)
+            if (i == 0)
             {
                 <h1 class="prom-title">@group.Segment.SegmentText.Header</h1>
             }
@@ -60,20 +60,20 @@
                         <div class="card-body">
                             @Html.Raw(emedia.EmediaText?.Description)
                         </div>
-                        <div class="card-footer h5">
-                            <span class="visually-hidden">
-                                @Localizer[Promenade.OffersItem, emedia.Name]
-                            </span>
-                            @if (emedia.Categories?.Count > 0)
-                            {
+                        @if (emedia.Categories?.Count > 0)
+                        {
+                            <div class="card-footer fs-5">
+                                <span class="visually-hidden">
+                                    @Localizer[Promenade.OffersItem, emedia.Name]
+                                </span>
                                 @foreach (var category in emedia.Categories)
                                 {
                                     <span class="badge mt-1 text-dark @category.Class">
                                         @category.CategoryText?.Text
                                     </span>
                                 }
-                            }
-                        </div>
+                            </div>
+                        }
                     </div>
                 </div>
             }
