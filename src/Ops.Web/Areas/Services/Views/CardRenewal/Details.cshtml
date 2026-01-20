@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.Areas.Services.ViewModels.CardRenewal.DetailsViewModel
+﻿	@model Ocuda.Ops.Controllers.Areas.Services.ViewModels.CardRenewal.DetailsViewModel
 
 <div class="row">
 	<div class="col-12 col-md-6 col-xl-4 offset-xl-2">
@@ -134,7 +134,7 @@
 				<td>
 					@if (!string.IsNullOrWhiteSpace(Model.Customer.BlockingNotes))
 					{
-						@Model.Customer.BlockingNotes.Substring(0, Model.MaxNotesDisplayLength)
+						@(new string(Model.Customer.BlockingNotes.Take(Model.MaxNotesDisplayLength).ToArray()))
 					}
 					else
 					{
@@ -161,7 +161,7 @@
 				<td>
 					@if (!string.IsNullOrWhiteSpace(Model.Customer.Notes))
 					{
-						@Model.Customer.Notes.Substring(0, Model.MaxNotesDisplayLength)
+						@(new string(Model.Customer.Notes.Take(Model.MaxNotesDisplayLength).ToArray()))
 					}
 					else
 					{
