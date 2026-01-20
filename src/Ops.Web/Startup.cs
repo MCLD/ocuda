@@ -166,32 +166,20 @@ namespace Ocuda.Ops.Web
 
             string polarisCs = _config.GetConnectionString("Polaris");
 
-            var provider = _config[Configuration.OpsDatabaseProvider];
-            switch (provider)
             if (_config[Configuration.OpsDatabaseProvider]?.ToUpperInvariant() == "SQLSERVER")
             {
                 services.AddDbContextPool<OpsContext,
                     DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
                 services.AddDbContextPool<PromenadeContext,
                     DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+
+                services.AddDbContextPool<PolarisContext>(_ => _.UseSqlServer(polarisCs));
+
                 services.AddHealthChecks();
             }
             else
             {
                 throw new OcudaException("No Configuration.OpsDatabaseProvider configured.");
-                case "SqlServer":
-                    services.AddDbContextPool<OpsContext,
-                        DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
-                    services.AddDbContextPool<PromenadeContext,
-                        DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
-
-                    services.AddDbContextPool<PolarisContext>(_ => _.UseSqlServer(polarisCs));
-
-                    services.AddHealthChecks();
-                    break;
-
-                default:
-                    throw new OcudaException("No Configuration.OpsDatabaseProvider configured.");
             }
 
             // store the data protection key in the context
