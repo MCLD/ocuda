@@ -589,4 +589,76 @@
     <value>Search</value>
     <comment>Hover text to display on the search button</comment>
   </data>
+  <data name="Thanks for your submission! Your card has more than {0} days until it expires, please come back to renew it any time after {1}" xml:space="preserve">
+    <value>Thanks for your submission! Your card has more than {0} days until it expires, please come back to renew it any time after {1}</value>
+    <comment>Error message: the library card is not near expiration; {0} is how many days before expiration, {1} is the earliest date</comment>
+  </data>
+  <data name="You have entered an invalid card number or password" xml:space="preserve">
+    <value>You have entered an invalid card number or password</value>
+    <comment>Error message: invalid login information</comment>
+  </data>
+  <data name="It appears that the barcode you've entered belongs to a staff account. Please speak to your branch manager or supervisor for instructions on how to renew your account." xml:space="preserve">
+    <value>It appears that the barcode you've entered belongs to a staff account. Please speak to your branch manager or supervisor for instructions on how to renew your account.</value>
+    <comment>Error message: account belongs to a staff member</comment>
+  </data>
+  <data name="It looks like you're trying to renew a juvenile account, please have a parent or guardian complete the rest of the process." xml:space="preserve">
+    <value>It looks like you're trying to renew a juvenile account, please have a parent or guardian complete the rest of the process.</value>
+    <comment>Label indicating how to proceed with the form</comment>
+  </data>
+  <data name="With no valid address on file your renewal request may not be eligible for a full renewal." xml:space="preserve">
+    <value>With no valid address on file your renewal request may not be eligible for a full renewal.</value>
+    <comment>Label informing how the request may be processed</comment>
+  </data>
+  <data name="Please contact &lt;a href=\&quot;{0}\&quot;&gt;your library&lt;/a&gt; to renew your library card." xml:space="preserve">
+    <value>Please contact &lt;a href=\"{0}\"&gt;your library&lt;/a&gt; to renew your library card.</value>
+    <comment>Message informing where to renew a library card; {0} is replaced with a link to the locations</comment>
+  </data>
+  <data name="It looks like we are still working on a request you submitted on {0} at {1}. You'll be hearing from us soon.&quot;" xml:space="preserve">
+    <value>It looks like we are still working on a request you submitted on {0} at {1}. You'll be hearing from us soon."</value>
+    <comment>Error message: there's a pending request for the account; {0} is replace with the date of the request, {1} with the time</comment>
+  </data>
+  <data name="Do you still live at an address listed below?" xml:space="preserve">
+    <value>Do you still live at an address listed below?</value>
+    <comment>Label asking if a customer lives at an address in the list</comment>
+  </data>
+  <data name="No, I have moved" xml:space="preserve">
+    <value>No, I have moved</value>
+    <comment>Button: responding in the negative to the question of if the customer still lives at a listed address</comment>
+  </data>
+  <data name="Yes, this is my address" xml:space="preserve">
+    <value>Yes, this is my address</value>
+    <comment>Button: responding in the affirmative to the question of if the customer still lives at a listed address</comment>
+  </data>
+  <data name="Unfortunately your session has timed out. Please resubmit your barcode and password." xml:space="preserve">
+    <value>Unfortunately your session has timed out. Please resubmit your barcode and password.</value>
+    <comment>Error message: too long has elapsed while the user was viewing a form and their session expired.</comment>
+  </data>
+  <data name="Thank you for using our online renewal service!" xml:space="preserve">
+    <value>Thank you for using our online renewal service!</value>
+    <comment>Default follow-up shown to customer after submitting card renewal form.</comment>
+  </data>
+  <data name="We are unable to renew your card at this time. Please contact &lt;a href=\&quot;{0}\&quot;&gt;your library&lt;/a&gt; to renew your library card.&quot;" xml:space="preserve">
+    <value>We are unable to renew your card at this time. Please contact &lt;a href=\"{0}\"&gt;your library&lt;/a&gt; to renew your library card."</value>
+    <comment>Message informing the card cannot be renewed and how to proceed; {0} is replaced with a link to the locations</comment>
+  </data>
+  <data name="Forgot your password?" xml:space="preserve">
+    <value>Forgot your password?</value>
+    <comment>Link for a customer to click if they've forgotten their password</comment>
+  </data>
+  <data name="Parent/Guardian Barcode" xml:space="preserve">
+    <value>Parent/Guardian Barcode</value>
+    <comment>Label prompting a customer to entier the parent or guardian's barcode number</comment>
+  </data>
+  <data name="Library Card Number" xml:space="preserve">
+    <value>Library Card Number</value>
+    <comment>Label prompting a customer to enter their library card number</comment>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+    <comment>Label prompting a customer to enter their password</comment>
+  </data>
+  <data name="Renew your library card" xml:space="preserve">
+    <value>Renew your library card</value>
+    <comment>Default header for card renewal request pages</comment>
+  </data>
 </root>
