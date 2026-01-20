@@ -55,14 +55,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
             $.each($(this).data(), function (key, value) {
                 switch (key) {
-                    case "title":
-                        $(".modal-content-title").text(value);
+                    case "alttext":
+                        $(".modal-content-image").attr("alt", value);
+                        break;
+                    case "description":
+                        $(".modal-content-description").text(value);
                         break;
                     case "img":
                         $(".modal-content-image").attr("src", value);
                         break;
-                    case "description":
-                        $(".modal-content-description").text(value);
+                    case "title":
+                        $(".modal-content-title").text(value);
                         break;
                     default:
                         if (key.length > 6 && key.substring(0, 6) === "button") {

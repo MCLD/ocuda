@@ -10,6 +10,7 @@ using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
@@ -193,6 +194,15 @@ namespace Ocuda.Promenade.Service
                 isPreview = true;
                 forceReload = true;
             }
+            else if (!string.IsNullOrEmpty(previewIdString))
+            {
+                _logger.LogWarning("Unable to find preview {PreviewId} for header {HeaderId}",
+                    previewIdString,
+                    headerId);
+                var oex = new OcudaException($"Unable to find preview id {previewIdString} for header {headerId}");
+                oex.Data[nameof(StatusCodes)] = StatusCodes.Status405MethodNotAllowed;
+                throw oex;
+            }
             else
             {
                 string currentLayoutIdCacheKey = string.Format(CultureInfo.InvariantCulture,
@@ -237,7 +247,10 @@ namespace Ocuda.Promenade.Service
 
             if (!layoutId.HasValue)
             {
-                return null;
+                _logger.LogWarning("Unable to find layout for header {HeaderId}", headerId);
+                var oex = new OcudaException($"Unable to find layout for header {headerId}");
+                oex.Data[nameof(StatusCodes)] = StatusCodes.Status404NotFound;
+                throw oex;
             }
 
             PageLayout pageLayout = null;

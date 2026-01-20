@@ -528,10 +528,6 @@ a.prom-leftnav-header:hover {
         text-decoration: none;
     }
 
-.prom-alert > p:last-child {
-    margin-bottom: 0;
-}
-
 .prom-card-footer p {
     margin-bottom: 0;
 }

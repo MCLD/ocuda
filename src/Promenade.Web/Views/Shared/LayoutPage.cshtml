@@ -40,16 +40,16 @@
 {
     <div class="row">
         <div class="col-12 col-lg-8 offset-lg-2">
-            <div class="alert alert-info prom-alert text-center">
+            <div class="alert alert-info text-center">
                 <p>
                     You are viewing a preview of how this page will
                     @(Model.PageLayout.StartDate == null
-                        ? "appear."
-                        : $"appear as of {Model.PageLayout.StartDate}.")
-                </p>
-            </div>
+                                    ? "appear."
+                                    : $"appear as of {Model.PageLayout.StartDate}.")
+            </p>
         </div>
     </div>
+</div>
 }
 
 @if (!string.IsNullOrWhiteSpace(Model.PageLayout.PageLayoutText?.Title))
@@ -185,7 +185,7 @@
     }
     else if (item.CarouselId.HasValue)
     {
-        <div class="row mb-4" aria-hidden="true">
+        <div class="row mb-4">
             <div class="col-12">
                 <div class="card">
                     @if (!string.IsNullOrEmpty(item.Carousel.CarouselText?.Title))
@@ -197,13 +197,15 @@
                             @foreach (var carouselItem in item.Carousel.Items)
                             {
                                 <div>
-                                    <a href="@Url.Action(nameof(HomeController.CarouselItem), new { stub = Model.Stub, id = carouselItem.Id, culture = string.Empty})"
-                                       class="prom-carousel-modal"
-                                       data-title="@carouselItem.CarouselItemText.Title"
-                                       data-img="@carouselItem.CarouselItemText.ImageUrl"
+                                    <a class="prom-carousel-modal"
+                                       data-alttext="@carouselItem.CarouselItemText.AltText"
                                        data-description="@carouselItem.CarouselItemText.Description"
-                                    @Html.Raw(PageLayoutViewModel.DataButtonFields(carouselItem.Buttons))>
-                                        <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p>
+                                       data-img="@carouselItem.CarouselItemText.ImageUrl"
+                                       data-title="@carouselItem.CarouselItemText.Title"
+                                       href="@Url.Action(nameof(HomeController.CarouselItem), new { slug = Model.Stub, id = carouselItem.Id, culture = string.Empty })"
+                                       @Html.Raw(PageLayoutViewModel.DataButtonFields(carouselItem.Buttons))>
+                                        <img alt="@carouselItem.CarouselItemText.AltText"
+                                             src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p>
                                     </a>
                                 </div>
                             }
@@ -217,25 +219,6 @@
                     }
                 </div>
             </div>
-        </div>
-        <div class="visually-hidden">
-            @if (!string.IsNullOrEmpty(item.Carousel.CarouselText?.Title))
-            {
-                <h2>@item.Carousel.CarouselText.Title</h2>
-            }
-            <ul>
-                @foreach (var carouselItem in item.Carousel.Items)
-                {
-                    <li>
-                        <a asp-action="@nameof(HomeController.CarouselItem)"
-                           asp-route-culture=""
-                           asp-route-id="@carouselItem.Id"
-                           asp-route-stub="@Model.Stub">
-                            @carouselItem.CarouselItemText.Title
-                        </a>
-                    </li>
-                }
-            </ul>
         </div>
     }
     else if (item.PageFeatureId.HasValue)
