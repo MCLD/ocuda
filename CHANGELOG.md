@@ -32,6 +32,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Application permission handling and administration
 - Emedia management
 - Promenade navigation management
+- Card renewal requests
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces
