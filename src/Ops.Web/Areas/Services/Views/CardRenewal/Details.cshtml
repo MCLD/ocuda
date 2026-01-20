@@ -502,6 +502,8 @@ else
 	{
 		<script>
 			$('.addressLookup').on("click", function(e) {
+				e.preventDefault();
+
 				let searchAddress = $(this).attr('data-address').trim();
 				let searchZip = $(this).attr('data-zip');
 

@@ -124,9 +124,9 @@
 							icon.addClass('fa-arrow-up');
 						}
 						if (response.success) {
-							var row = button.closest('tr');
+							let row = button.closest('tr');
 							if (increase) {
-								var nextRow = row.next();
+								let nextRow = row.next();
 								row.insertAfter(nextRow);
 								row.find('.decreaseSortButton').removeAttr('disabled');
 								if (row.next().length == 0) {
@@ -138,7 +138,7 @@
 								}
 							}
 							else {
-								var prevRow = row.prev();
+								let prevRow = row.prev();
 								row.insertBefore(prevRow);
 								row.find('.increaseSortButton').removeAttr('disabled');
 								if (row.prev().length == 0) {

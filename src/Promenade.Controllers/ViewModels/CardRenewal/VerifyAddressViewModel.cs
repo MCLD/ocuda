@@ -16,7 +16,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.CardRenewal
         public string Email { get; set; }
 
         public SegmentText HeaderSegmentText { get; set; }
-        public SegmentText NoAddressSegmentText {get; set; }
+        public SegmentText NoAddressSegmentText { get; set; }
         public bool SameAddress { get; set; }
     }
 }

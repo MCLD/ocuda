@@ -11,17 +11,7 @@
 	</div>
 </div>
 
-<div class="row pt-3">
-	<div class="col-12">
-		<input asp-for="Response.Type" disabled formgroup hide-required />
-	</div>
-</div>
 
-<div class="row pb-3">
-	<div class="col-12 col-md-9 offset-md-3">
-		<hr />
-	</div>
-</div>
 
 <form asp-controller="@CardRenewalController.Name"
 	  asp-action="@nameof(CardRenewalController.Response)"
@@ -29,6 +19,7 @@
 	  role="form">
 	<input asp-for="Response.Id" type="hidden" />
 
+	<input asp-for="Response.Type" disabled formgroup hide-required />
 	<input asp-for="Response.Name" formgroup />
 	<select asp-for="Response.EmailSetupId" asp-items="Model.EmailSetups" formgroup>
 		<option></option>
@@ -95,7 +86,6 @@
 				$(this).addClass('active');
 				UpdateEmailSetupText();
 			}
-
 		});
 
 		function UpdateEmailSetupText() {
@@ -117,12 +107,12 @@
 					else {
 						alert(response.message);
 					}
-			})
-			.always(function() {
-				$('#emailSpinner').addClass('d-none');
-				$('#Response_EmailSetupId').removeAttr('disabled');
-				$('.languageSelector').removeAttr('disabled');
-			});
+				})
+				.always(function() {
+					$('#emailSpinner').addClass('d-none');
+					$('#Response_EmailSetupId').removeAttr('disabled');
+					$('.languageSelector').removeAttr('disabled');
+				});
 		}
 	</script>
 }

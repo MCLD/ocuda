@@ -24,7 +24,6 @@ namespace Ocuda.Ops.Service
             ArgumentNullException.ThrowIfNull(cardRenewalRequestRepository);
 
             _cardRenewalRequestRepository = cardRenewalRequestRepository;
-
         }
 
         public async Task<CardRenewalRequest> GetRequestAsync(int id)

@@ -471,7 +471,7 @@ namespace Ocuda.Promenade.Controllers
 
                 if (segmentText == null)
                 {
-                    _logger.LogError($"Card renewal 'Juvenile' segment id '{segmentId}' not found");
+                    _logger.LogError($"Card renewal 'Submitted' segment id '{segmentId}' not found");
                 }
                 else if (!string.IsNullOrWhiteSpace(segmentText.Text))
                 {
@@ -485,9 +485,9 @@ namespace Ocuda.Promenade.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> UnableToRenew()
         {
-            if (!TempData.ContainsKey(TempDataRequest) || !_polarisHelper.IsConfigured)
+            if (!TempData.ContainsKey(TempDataUnableToRenew) || !_polarisHelper.IsConfigured)
             {
-                if (!TempData.ContainsKey(TempDataRequest))
+                if (!TempData.ContainsKey(TempDataUnableToRenew))
                 {
                     TempData[TempDataTimeout] = true;
                 }
@@ -566,7 +566,7 @@ namespace Ocuda.Promenade.Controllers
                 }
             }
 
-            if (!viewModel.Addresses.Any())
+            if (!request.Addresses.Any())
             {
                 var noAddressSegmentId = await _siteSettingService.GetSettingIntAsync(
                     Models.Keys.SiteSetting.CardRenewal.NoAddressSegment,

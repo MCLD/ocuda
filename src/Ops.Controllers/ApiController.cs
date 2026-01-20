@@ -15,7 +15,6 @@ using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
-using Org.BouncyCastle.Utilities.Encoders;
 using Serilog.Context;
 
 namespace Ocuda.Ops.Controllers

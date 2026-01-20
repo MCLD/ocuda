@@ -37,8 +37,7 @@
 					<a asp-action="@nameof(CardRenewalController.Index)"
 					   asp-route-Processed="true"
 					   class="nav-link"
-					   ActiveBy routeKey="processed"
-					   value="@true">
+					   ActiveBy routeKey="processed" value="true">
 						Processed
 						<span class="badge text-bg-secondary">@Model.ProcessedCount</span>
 					</a>

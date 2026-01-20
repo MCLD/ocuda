@@ -239,7 +239,7 @@ namespace Ocuda.Ops.Models.Defaults
                 Name = "Email template id",
                 Description = "Email template id to use when sending a notificaton about a new incident report, 0 is disabled",
                 Category = "Incident",
-                Value = "-1",
+                Value = "0",
                 Type = SiteSettingType.Int
             },
             new SiteSetting

@@ -25,7 +25,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
     [Route("[area]/[controller]")]
     public class CardRenewalController : BaseController<CardRenewalController>
     {
-        private const string leapPatronRecordsPath = "/records";
+        private const string leapPatronRecordsPath = "/record";
 
         private readonly ICardRenewalRequestService _cardRenewalRequestService;
         private readonly ICardRenewalService _cardRenewalService;
@@ -292,6 +292,11 @@ namespace Ocuda.Ops.Controllers.Areas.Services
         [HttpGet("[action]")]
         public async Task<IActionResult> Index(int? page, bool processed)
         {
+            if (!_polarisHelper.IsConfigured)
+            {
+                _logger.LogError("Card renewal API settings are not configured");
+            }
+
             page ??= 1;
 
             var filter = new RequestFilter(page.Value)
