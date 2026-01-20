@@ -613,8 +613,8 @@
     <value>Please contact &lt;a href=\"{0}\"&gt;your library&lt;/a&gt; to renew your library card.</value>
     <comment>Message informing where to renew a library card; {0} is replaced with a link to the locations</comment>
   </data>
-  <data name="It looks like we are still working on a request you submitted on {0} at {1}. You'll be hearing from us soon.&quot;" xml:space="preserve">
-    <value>It looks like we are still working on a request you submitted on {0} at {1}. You'll be hearing from us soon."</value>
+  <data name="It looks like we are still working on a request you submitted on {0} at {1}. You'll be hearing from us soon." xml:space="preserve">
+    <value>It looks like we are still working on a request you submitted on {0} at {1}. You'll be hearing from us soon.</value>
     <comment>Error message: there's a pending request for the account; {0} is replace with the date of the request, {1} with the time</comment>
   </data>
   <data name="Do you still live at an address listed below?" xml:space="preserve">
@@ -637,8 +637,8 @@
     <value>Thank you for using our online renewal service!</value>
     <comment>Default follow-up shown to customer after submitting card renewal form.</comment>
   </data>
-  <data name="We are unable to renew your card at this time. Please contact &lt;a href=\&quot;{0}\&quot;&gt;your library&lt;/a&gt; to renew your library card.&quot;" xml:space="preserve">
-    <value>We are unable to renew your card at this time. Please contact &lt;a href=\"{0}\"&gt;your library&lt;/a&gt; to renew your library card."</value>
+  <data name="We are unable to renew your card at this time. Please contact &lt;a href=\&quot;{0}\&quot;&gt;your library&lt;/a&gt; to renew your library card." xml:space="preserve">
+    <value>We are unable to renew your card at this time. Please contact &lt;a href=\"{0}\"&gt;your library&lt;/a&gt; to renew your library card.</value>
     <comment>Message informing the card cannot be renewed and how to proceed; {0} is replaced with a link to the locations</comment>
   </data>
   <data name="Forgot your password?" xml:space="preserve">
