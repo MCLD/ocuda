@@ -44,13 +44,12 @@ namespace Ocuda.Promenade.Models.Defaults
                 Type= SiteSettingType.Int,
                 Value = "-1"
             },
-            
             new SiteSetting
             {
                 Category = nameof(Keys.SiteSetting.CardRenewal),
                 Description = "Segment to show on the card renewal home page",
                 Id = Keys.SiteSetting.CardRenewal.HomeSegment,
-                Name = "Card renewal segment",
+                Name = "Home segment",
                 Type = SiteSettingType.Int,
                 Value = "-1"
             },
