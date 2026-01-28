@@ -8,16 +8,16 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class CardRenewalResponseRepository 
-        : OpsRepository<OpsContext, CardRenewalResponse, int>, 
-        ICardRenewalResponseRepository
+    public class RenewCardResponseRepository
+        : OpsRepository<OpsContext, RenewCardResponse, int>,
+        IRenewCardResponseRepository
     {
-        public CardRenewalResponseRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
-            ILogger<CardRenewalResponseRepository> logger) : base(repositoryFacade, logger)
+        public RenewCardResponseRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+            ILogger<RenewCardResponseRepository> logger) : base(repositoryFacade, logger)
         {
         }
 
-        public override async Task<CardRenewalResponse> FindAsync(int id)
+        public override async Task<RenewCardResponse> FindAsync(int id)
         {
             return await DbSet
                 .AsNoTracking()
@@ -25,7 +25,7 @@ namespace Ocuda.Ops.Data.Ops
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<CardRenewalResponse> GetBySortOrderAsync(int sortOrder)
+        public async Task<RenewCardResponse> GetBySortOrderAsync(int sortOrder)
         {
             return await DbSet
                 .AsNoTracking()
@@ -41,7 +41,7 @@ namespace Ocuda.Ops.Data.Ops
                 .MaxAsync(_ => (int?)_.SortOrder);
         }
 
-        public async Task<IEnumerable<CardRenewalResponse>> GetAllAsync()
+        public async Task<IEnumerable<RenewCardResponse>> GetAllAsync()
         {
             return await DbSet
                 .AsNoTracking()
@@ -51,7 +51,7 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<CardRenewalResponse>> GetAvailableAsync()
+        public async Task<IEnumerable<RenewCardResponse>> GetAvailableAsync()
         {
             return await DbSet
                 .AsNoTracking()
@@ -60,7 +60,7 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public async Task<List<CardRenewalResponse>> GetSubsequentAsync(int sortOrder)
+        public async Task<List<RenewCardResponse>> GetSubsequentAsync(int sortOrder)
         {
             return await DbSet
                 .AsNoTracking()

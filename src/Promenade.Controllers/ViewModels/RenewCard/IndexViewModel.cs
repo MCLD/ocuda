@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility;
 
-namespace Ocuda.Promenade.Controllers.ViewModels.CardRenewal
+namespace Ocuda.Promenade.Controllers.ViewModels.RenewCard
 {
     public class IndexViewModel
     {
@@ -11,9 +11,8 @@ namespace Ocuda.Promenade.Controllers.ViewModels.CardRenewal
         [DisplayName(i18n.Keys.Promenade.PromptLibraryCardNumber)]
         public string Barcode { get; set; }
 
-        public bool Invalid { get; set; }
-
         public string ForgotPasswordLink { get; set; }
+        public bool Invalid { get; set; }
 
         [Required(ErrorMessage = ErrorMessage.FieldRequired)]
         [DisplayName(i18n.Keys.Promenade.PromptPassword)]

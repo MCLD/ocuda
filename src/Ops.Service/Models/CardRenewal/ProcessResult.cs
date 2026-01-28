@@ -1,6 +1,6 @@
-﻿using static Ocuda.Ops.Models.Entities.CardRenewalResponse;
+﻿using static Ocuda.Ops.Models.Entities.RenewCardResponse;
 
-namespace Ocuda.Ops.Service.Models.CardRenewal
+namespace Ocuda.Ops.Service.Models.RenewCard
 {
     public class ProcessResult
     {

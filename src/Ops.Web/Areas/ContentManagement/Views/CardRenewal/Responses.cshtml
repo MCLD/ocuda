@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.CardRenewal.ResponsesViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.RenewCard.ResponsesViewModel
 
 <div class="d-flex justify-content-between">
 	<h1>
@@ -39,7 +39,7 @@
 				<tr>
 					<td>@response.Type</td>
 					<td>
-						<a asp-action="@nameof(CardRenewalController.Response)"
+						<a asp-action="@nameof(RenewCardController.Response)"
 						   asp-route-id="@response.Id">
 							@response.Name
 						</a>
@@ -74,15 +74,15 @@
 	</tbody>
 </table>
 
-<form asp-controller="@CardRenewalController.Name"
-	  asp-action="@nameof(CardRenewalController.CreateResponse)"
+<form asp-controller="@RenewCardController.Name"
+	  asp-action="@nameof(RenewCardController.CreateResponse)"
 	  method="post"
 	  role="form">
 	<div modal id="addModal" name="Response" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
 		<input asp-for="Response.Name" formgroup />
 		<select asp-for="Response.Type" formgroup>
 			<option></option>
-			@foreach (var result in Enum.GetValues(typeof(CardRenewalResponse.ResponseType)))
+			@foreach (var result in Enum.GetValues(typeof(RenewCardResponse.ResponseType)))
 			{
 				<option value="@result">@result</option>
 			}
@@ -90,8 +90,8 @@
 	</div>
 </form>
 
-<form asp-controller="@CardRenewalController.Name"
-	  asp-action="@nameof(CardRenewalController.DeleteResponse)"
+<form asp-controller="@RenewCardController.Name"
+	  asp-action="@nameof(RenewCardController.DeleteResponse)"
 	  method="post"
 	  role="form">
 	<input id="deleteId" asp-for="Response.Id" type="hidden" />
@@ -113,7 +113,7 @@
 			let icon = button.children('span');
 			if (icon.hasClass('fa-spinner') == false) {
 				icon.removeClass('fa-arrow-up fa-arrow-down').addClass('fa-spinner fa-pulse');
-				$.post('@Url.Action(nameof(CardRenewalController.ChangeResponseSort))',
+				$.post('@Url.Action(nameof(RenewCardController.ChangeResponseSort))',
 					{ id, increase },
 					function (response) {
 						icon.removeClass('fa-spinner fa-pulse');

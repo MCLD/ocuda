@@ -9,53 +9,52 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
-using Ocuda.Ops.Service.Models.CardRenewal;
+using Ocuda.Ops.Service.Models.RenewCard;
 using Ocuda.PolarisHelper;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
-    public class CardRenewalService : BaseService<CardRenewalService>,
-        ICardRenewalService
+    public class RenewCardService : BaseService<RenewCardService>, IRenewCardService
     {
-        private readonly ICardRenewalRequestRepository _cardRenewalRequestRepository;
-        private readonly ICardRenewalResponseRepository _cardRenewalResponseRepository;
-        private readonly ICardRenewalResultRepository _cardRenewalResultRepository;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IEmailService _emailService;
         private readonly ILanguageService _languageService;
         private readonly IPolarisHelper _polarisHelper;
+        private readonly IRenewCardRequestRepository _renewCardRequestRepository;
+        private readonly IRenewCardResponseRepository _renewCardResponseRepository;
+        private readonly IRenewCardResultRepository _renewCardResultRepository;
 
-        public CardRenewalService(ILogger<CardRenewalService> logger,
+        public RenewCardService(ILogger<RenewCardService> logger,
             IHttpContextAccessor httpContext,
-            ICardRenewalRequestRepository cardRenewalRequestRepository,
-            ICardRenewalResponseRepository cardRenewalResponseRepository,
-            ICardRenewalResultRepository cardRenewalResultRepository,
             IDateTimeProvider dateTimeProvider,
             IEmailService emailService,
             ILanguageService languageService,
-            IPolarisHelper polarisHelper)
+            IPolarisHelper polarisHelper,
+            IRenewCardRequestRepository renewCardRequestRepository,
+            IRenewCardResponseRepository renewCardResponseRepository,
+            IRenewCardResultRepository renewCardResultRepository)
             : base(logger, httpContext)
         {
-            ArgumentNullException.ThrowIfNull(cardRenewalRequestRepository);
-            ArgumentNullException.ThrowIfNull(cardRenewalResponseRepository);
-            ArgumentNullException.ThrowIfNull(cardRenewalResultRepository);
             ArgumentNullException.ThrowIfNull(dateTimeProvider);
             ArgumentNullException.ThrowIfNull(emailService);
             ArgumentNullException.ThrowIfNull(languageService);
             ArgumentNullException.ThrowIfNull(polarisHelper);
+            ArgumentNullException.ThrowIfNull(renewCardRequestRepository);
+            ArgumentNullException.ThrowIfNull(renewCardResponseRepository);
+            ArgumentNullException.ThrowIfNull(renewCardResultRepository);
 
-            _cardRenewalRequestRepository = cardRenewalRequestRepository;
-            _cardRenewalResponseRepository = cardRenewalResponseRepository;
-            _cardRenewalResultRepository = cardRenewalResultRepository;
             _dateTimeProvider = dateTimeProvider;
             _emailService = emailService;
             _languageService = languageService;
             _polarisHelper = polarisHelper;
+            _renewCardRequestRepository = renewCardRequestRepository;
+            _renewCardResponseRepository = renewCardResponseRepository;
+            _renewCardResultRepository = renewCardResultRepository;
         }
 
-        public async Task<CardRenewalResponse> CreateResponseAsync(CardRenewalResponse response)
+        public async Task<RenewCardResponse> CreateResponseAsync(RenewCardResponse response)
         {
             ArgumentNullException.ThrowIfNull(response);
 
@@ -63,38 +62,38 @@ namespace Ocuda.Ops.Service
             response.CreatedBy = GetCurrentUserId();
             response.Name = response.Name.Trim();
 
-            var maxSortOrder = await _cardRenewalResponseRepository.GetMaxSortOrderAsync();
+            var maxSortOrder = await _renewCardResponseRepository.GetMaxSortOrderAsync();
             if (maxSortOrder.HasValue)
             {
                 response.SortOrder = maxSortOrder.Value + 1;
             }
 
-            await _cardRenewalResponseRepository.AddAsync(response);
-            await _cardRenewalResponseRepository.SaveAsync();
+            await _renewCardResponseRepository.AddAsync(response);
+            await _renewCardResponseRepository.SaveAsync();
 
             return response;
         }
 
         public async Task DeleteResponseAsync(int id)
         {
-            var response = await _cardRenewalResponseRepository.FindAsync(id);
+            var response = await _renewCardResponseRepository.FindAsync(id);
 
-            var subsequentResponses = await _cardRenewalResponseRepository
+            var subsequentResponses = await _renewCardResponseRepository
                 .GetSubsequentAsync(response.SortOrder);
             if (subsequentResponses.Count > 0)
             {
                 subsequentResponses.ForEach(_ => _.SortOrder--);
-                _cardRenewalResponseRepository.UpdateRange(subsequentResponses);
+                _renewCardResponseRepository.UpdateRange(subsequentResponses);
             }
 
             response.IsDeleted = true;
-            _cardRenewalResponseRepository.Update(response);
-            await _cardRenewalResponseRepository.SaveAsync();
+            _renewCardResponseRepository.Update(response);
+            await _renewCardResponseRepository.SaveAsync();
         }
 
         public async Task DiscardRequestAsync(int id)
         {
-            var request = await _cardRenewalRequestRepository.GetByIdAsync(id);
+            var request = await _renewCardRequestRepository.GetByIdAsync(id);
 
             if (request == null)
             {
@@ -107,37 +106,41 @@ namespace Ocuda.Ops.Service
 
             var now = _dateTimeProvider.Now;
 
-            var result = new CardRenewalResult
+            var result = new RenewCardResult
             {
-                CardRenewalRequestId = request.Id,
+                RenewCardRequestId = request.Id,
                 CreatedAt = now,
                 CreatedBy = GetCurrentUserId(),
                 IsDiscarded = true
             };
-            await _cardRenewalResultRepository.AddAsync(result);
-
+            await _renewCardResultRepository.AddAsync(result);
 
             request.IsDiscarded = true;
             request.ProcessedAt = now;
-            _cardRenewalRequestRepository.Update(request);
+            _renewCardRequestRepository.Update(request);
 
-            await _cardRenewalResultRepository.SaveAsync();
-            await _cardRenewalRequestRepository.SaveAsync();
+            await _renewCardResultRepository.SaveAsync();
+            await _renewCardRequestRepository.SaveAsync();
         }
 
-        public async Task<IEnumerable<CardRenewalResponse>> GetAvailableResponsesAsync()
+        public async Task<IEnumerable<RenewCardResponse>> GetAvailableResponsesAsync()
         {
-            return await _cardRenewalResponseRepository.GetAvailableAsync();
+            return await _renewCardResponseRepository.GetAvailableAsync();
         }
 
-        public async Task<CardRenewalResponse> GetResponseAsync(int id)
+        public async Task<RenewCardResponse> GetResponseAsync(int id)
         {
-            return await _cardRenewalResponseRepository.FindAsync(id);
+            return await _renewCardResponseRepository.FindAsync(id);
         }
 
-        public async Task<CardRenewalResponse> GetResponseTextAsync(int responseId, int languageId)
+        public async Task<IEnumerable<RenewCardResponse>> GetResponsesAsync()
         {
-            var response = await _cardRenewalResponseRepository.FindAsync(responseId);
+            return await _renewCardResponseRepository.GetAllAsync();
+        }
+
+        public async Task<RenewCardResponse> GetResponseTextAsync(int responseId, int languageId)
+        {
+            var response = await _renewCardResponseRepository.FindAsync(responseId);
             if (!response.EmailSetupId.HasValue)
             {
                 _logger.LogError($"Invalid card renewal response '{responseId}': no email setup set.");
@@ -169,22 +172,17 @@ namespace Ocuda.Ops.Service
             return response;
         }
 
-        public async Task<IEnumerable<CardRenewalResponse>> GetResponsesAsync()
+        public async Task<RenewCardResult> GetResultForRequestAsync(int requestId)
         {
-            return await _cardRenewalResponseRepository.GetAllAsync();
-        }
-
-        public async Task<CardRenewalResult> GetResultForRequestAsync(int requestId)
-        {
-            return await _cardRenewalResultRepository.GetForRequestAsync(requestId);
+            return await _renewCardResultRepository.GetForRequestAsync(requestId);
         }
 
         public async Task<bool> IsRequestAccepted(int requestId)
         {
-            var responseType = await _cardRenewalResultRepository
+            var responseType = await _renewCardResultRepository
                 .GetRequestResponseTypeAsync(requestId);
 
-            return responseType == CardRenewalResponse.ResponseType.Accept;
+            return responseType == RenewCardResponse.ResponseType.Accept;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
@@ -195,21 +193,21 @@ namespace Ocuda.Ops.Service
             string responseText,
             string customerName)
         {
-            var request = await _cardRenewalRequestRepository
+            var request = await _renewCardRequestRepository
                 .GetByIdAsync(requestId);
             if (request.ProcessedAt.HasValue)
             {
                 throw new OcudaException("Request has already been processed.");
             }
 
-            var response = await _cardRenewalResponseRepository.FindAsync(responseId);
+            var response = await _renewCardResponseRepository.FindAsync(responseId);
 
             var processResult = new ProcessResult
             {
                 Type = response.Type
             };
 
-            if (response.Type == CardRenewalResponse.ResponseType.Accept)
+            if (response.Type == RenewCardResponse.ResponseType.Accept)
             {
                 var renewResult = _polarisHelper.RenewCustomerRegistration(
                         request.Barcode,
@@ -226,8 +224,8 @@ namespace Ocuda.Ops.Service
             var language = await _languageService.GetActiveByIdAsync(request.LanguageId);
             var tags = new Dictionary<string, string>
             {
-                { Keys.CardRenewal.CustomerBarcode, request.Barcode },
-                { Keys.CardRenewal.CustomerName, customerName }
+                { Keys.RenewCard.CustomerBarcode, request.Barcode },
+                { Keys.RenewCard.CustomerName, customerName }
             };
 
             var emailDetails = await _emailService.GetDetailsAsync(response.EmailSetupId.Value,
@@ -238,20 +236,20 @@ namespace Ocuda.Ops.Service
             var now = _dateTimeProvider.Now;
 
             request.ProcessedAt = now;
-            _cardRenewalRequestRepository.Update(request);
+            _renewCardRequestRepository.Update(request);
 
-            var result = new CardRenewalResult
+            var result = new RenewCardResult
             {
-                CardRenewalRequestId = request.Id,
-                CardRenewalResponseId = response.Id,
+                RenewCardRequestId = request.Id,
+                RenewCardResponseId = response.Id,
                 CreatedAt = now,
                 CreatedBy = GetCurrentUserId(),
                 ResponseText = emailDetails.BodyText
             };
 
-            await _cardRenewalResultRepository.AddAsync(result);
-            await _cardRenewalResultRepository.SaveAsync();
-            await _cardRenewalRequestRepository.SaveAsync();
+            await _renewCardResultRepository.AddAsync(result);
+            await _renewCardResultRepository.SaveAsync();
+            await _renewCardRequestRepository.SaveAsync();
 
             emailDetails.ToEmailAddress = request.Email;
             emailDetails.ToName = customerName;
@@ -282,22 +280,22 @@ namespace Ocuda.Ops.Service
             return processResult;
         }
 
-        public async Task UpdateResponseAsync(CardRenewalResponse response)
+        public async Task UpdateResponseAsync(RenewCardResponse response)
         {
             ArgumentNullException.ThrowIfNull(response);
 
-            var currentResponse = await _cardRenewalResponseRepository.FindAsync(response.Id);
+            var currentResponse = await _renewCardResponseRepository.FindAsync(response.Id);
 
             currentResponse.EmailSetupId = response.EmailSetupId;
             currentResponse.Name = response.Name.Trim();
 
-            _cardRenewalResponseRepository.Update(currentResponse);
-            await _cardRenewalResponseRepository.SaveAsync();
+            _renewCardResponseRepository.Update(currentResponse);
+            await _renewCardResponseRepository.SaveAsync();
         }
 
         public async Task UpdateResponseSortOrderAsync(int id, bool increase)
         {
-            var response = await _cardRenewalResponseRepository.FindAsync(id);
+            var response = await _renewCardResponseRepository.FindAsync(id);
 
             int newSortOrder;
             if (increase)
@@ -313,16 +311,16 @@ namespace Ocuda.Ops.Service
                 newSortOrder = response.SortOrder - 1;
             }
 
-            var responseInPosition = await _cardRenewalResponseRepository.GetBySortOrderAsync(
+            var responseInPosition = await _renewCardResponseRepository.GetBySortOrderAsync(
                 newSortOrder)
                 ?? throw new OcudaException("Response is already in the last position.");
 
             responseInPosition.SortOrder = response.SortOrder;
             response.SortOrder = newSortOrder;
 
-            _cardRenewalResponseRepository.Update(response);
-            _cardRenewalResponseRepository.Update(responseInPosition);
-            await _cardRenewalResponseRepository.SaveAsync();
+            _renewCardResponseRepository.Update(response);
+            _renewCardResponseRepository.Update(responseInPosition);
+            await _renewCardResponseRepository.SaveAsync();
         }
     }
 }

@@ -5,7 +5,7 @@
         Justification = "Descriptive key name")]
     public static class ApplicationPermission
     {
-        public static readonly string CardRenewalManagement = nameof(CardRenewalManagement);
+        public static readonly string RenewCardManagement = nameof(RenewCardManagement);
         public static readonly string CoverIssueManagement = nameof(CoverIssueManagement);
         public static readonly string DigitalDisplayContentManagement = nameof(DigitalDisplayContentManagement);
         public static readonly string EmediaManagement = nameof(EmediaManagement);

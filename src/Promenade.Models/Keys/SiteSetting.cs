@@ -5,22 +5,22 @@
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
             "CA1815:Override equals and operator equals on value types",
             Justification = "No reason to compare these site setting keys")]
-        public struct CardRenewal
+        public struct RenewCard
         {
-            public const string AcceptedCounties = "CardRenewal.AcceptedCounties";
-            public const string AgeCheckCustomerCodes = "CardRenewal.AgeCheckCustomerCodes";
-            public const string AgeCheckSegment = "CardRenewal.AgeCheckSegment";
-            public const string HomeSegment = "CardRenewal.HomeSegment";
-            public const string ExpirationCutoffDays = "CardRenewal.ExpirationCutoffDays";
-            public const string JuvenileCustomerCodes = "CardRenewal.JuvenileCustomerCodes";
-            public const string JuvenileSegment = "CardRenewal.JuvenileSegment";
-            public const string NoAddressSegment = "CardRenewal.NoAddressSegment";
-            public const string NonresidentCustomerCodes = "CardRenewal.NonresidentCustomerCodes";
-            public const string NonresidentSegment = "CardRenewal.NonresidentSegment";
-            public const string NotConfiguredSegment = "CardRenewal.NotConfiguredSegment";
-            public const string StaffCustomerCodes = "CardRenewal.StaffCustomerCodes";
-            public const string SubmittedSegment = "CardRenewal.SubmittedSegment";
-            public const string VerifyAddressSegment = "CardRenewal.VerifyAddressSegment";
+            public const string AcceptedCounties = "RenewCard.AcceptedCounties";
+            public const string AgeCheckCustomerCodes = "RenewCard.AgeCheckCustomerCodes";
+            public const string AgeCheckSegment = "RenewCard.AgeCheckSegment";
+            public const string HomeSegment = "RenewCard.HomeSegment";
+            public const string ExpirationCutoffDays = "RenewCard.ExpirationCutoffDays";
+            public const string JuvenileCustomerCodes = "RenewCard.JuvenileCustomerCodes";
+            public const string JuvenileSegment = "RenewCard.JuvenileSegment";
+            public const string NoAddressSegment = "RenewCard.NoAddressSegment";
+            public const string NonresidentCustomerCodes = "RenewCard.NonresidentCustomerCodes";
+            public const string NonresidentSegment = "RenewCard.NonresidentSegment";
+            public const string NotConfiguredSegment = "RenewCard.NotConfiguredSegment";
+            public const string StaffCustomerCodes = "RenewCard.StaffCustomerCodes";
+            public const string SubmittedSegment = "RenewCard.SubmittedSegment";
+            public const string VerifyAddressSegment = "RenewCard.VerifyAddressSegment";
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",

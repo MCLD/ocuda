@@ -81,7 +81,7 @@ namespace Ocuda.Ops.Controllers
             var addressLookupPath = await _siteSettingService.GetSettingStringAsync(Models
                     .Keys
                     .SiteSetting
-                    .CardRenewal
+                    .RenewCard
                     .AddressLookupUrl);
 
             var queryParams = new Dictionary<string, string>

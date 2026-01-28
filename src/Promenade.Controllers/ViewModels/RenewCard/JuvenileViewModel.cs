@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility;
 
-namespace Ocuda.Promenade.Controllers.ViewModels.CardRenewal
+namespace Ocuda.Promenade.Controllers.ViewModels.RenewCard
 {
     public class JuvenileViewModel
     {

@@ -6,7 +6,7 @@ using Ocuda.Models;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class CardRenewalRequest
+    public class RenewCardRequest
     {
         [NotMapped]
         public bool Accepted { get; set; }

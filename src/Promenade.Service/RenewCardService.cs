@@ -9,37 +9,37 @@ using Ocuda.Utility.Abstract;
 
 namespace Ocuda.Promenade.Service
 {
-    public class CardRenewalService : BaseService<CardRenewalService>
+    public class RenewCardService : BaseService<RenewCardService>
     {
-        private ICardRenewalRequestRepository _cardRenewalRequestRepository;
         private LanguageService _languageService;
+        private IRenewCardRequestRepository _renewCardRequestRepository;
 
-        public CardRenewalService(ILogger<CardRenewalService> logger,
+        public RenewCardService(ILogger<RenewCardService> logger,
             IDateTimeProvider dateTimeProvider,
-            ICardRenewalRequestRepository cardRenewalRequestRepository,
+            IRenewCardRequestRepository renewCardRequestRepository,
             LanguageService languageService)
             : base(logger, dateTimeProvider)
         {
-            ArgumentNullException.ThrowIfNull(cardRenewalRequestRepository);
+            ArgumentNullException.ThrowIfNull(renewCardRequestRepository);
             ArgumentNullException.ThrowIfNull(languageService);
 
-            _cardRenewalRequestRepository = cardRenewalRequestRepository;
             _languageService = languageService;
+            _renewCardRequestRepository = renewCardRequestRepository;
         }
 
-        public async Task CreateRequestAsync(CardRenewalRequest request)
+        public async Task CreateRequestAsync(RenewCardRequest request)
         {
             ArgumentNullException.ThrowIfNull(request);
 
             request.LanguageId = await _languageService.GetLanguageIdAsync(
                 CultureInfo.CurrentCulture.Name);
             request.SubmittedAt = _dateTimeProvider.Now;
-            await _cardRenewalRequestRepository.AddSaveAsync(request);
+            await _renewCardRequestRepository.AddSaveAsync(request);
         }
 
-        public async Task<CardRenewalRequest> GetPendingRequestAsync(int customerId)
+        public async Task<RenewCardRequest> GetPendingRequestAsync(int customerId)
         {
-            return await _cardRenewalRequestRepository.GetPendingRequestAsync(customerId);
+            return await _renewCardRequestRepository.GetPendingRequestAsync(customerId);
         }
     }
 }

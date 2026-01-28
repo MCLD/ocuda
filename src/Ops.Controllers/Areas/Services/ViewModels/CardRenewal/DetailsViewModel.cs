@@ -6,14 +6,14 @@ using Ocuda.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Ops.Controllers.Areas.Services.ViewModels.CardRenewal
+namespace Ocuda.Ops.Controllers.Areas.Services.ViewModels.RenewCard
 {
     public class DetailsViewModel
     {
         private const int _maxNotesDisplayLength = 400;
 
-        public CardRenewalRequest Request { get; set; }
-        public CardRenewalResult Result { get; set; }
+        public RenewCardRequest Request { get; set; }
+        public RenewCardResult Result { get; set; }
         public List<CustomerBlock> CustomerBlocks { get; set; }
         public Customer Customer { get; set; }
         public string AcceptedCounty { get; set; }

@@ -1,4 +1,4 @@
-﻿	@model Ocuda.Ops.Controllers.Areas.Services.ViewModels.CardRenewal.DetailsViewModel
+﻿	@model Ocuda.Ops.Controllers.Areas.Services.ViewModels.RenewCard.DetailsViewModel
 
 <div class="row">
 	<div class="col-12 col-md-6 col-xl-4 offset-xl-2">
@@ -276,8 +276,8 @@
 
 @if (!Model.Request.ProcessedAt.HasValue)
 {
-	<form asp-controller="@CardRenewalController.Name"
-		  asp-action="@nameof(CardRenewalController.Details)"
+	<form asp-controller="@RenewCardController.Name"
+		  asp-action="@nameof(RenewCardController.Details)"
 		  method="post"
 		  role="form">
 		<input asp-for="CustomerName" type="hidden" />
@@ -299,7 +299,7 @@
 
 				<div class="row mb-3">
 					<div class="col-12">
-						<strong>Replacement Keys</strong> &ndash; {{@Ocuda.Ops.Service.Keys.CardRenewal.CustomerBarcode}}, {{@Ocuda.Ops.Service.Keys.CardRenewal.CustomerName}}
+						<strong>Replacement Keys</strong> &ndash; {{@Ocuda.Ops.Service.Keys.RenewCard.CustomerBarcode}}, {{@Ocuda.Ops.Service.Keys.RenewCard.CustomerName}}
 					</div>
 				</div>
 
@@ -318,7 +318,7 @@
 						<span class="fa-solid fa-trash-can"></span>
 						Discard Request, do not send email
 					</button>
-					<a asp-action="@(nameof(CardRenewalController.Index))"
+					<a asp-action="@(nameof(RenewCardController.Index))"
 					   asp-route-processed="@(Model.Request.ProcessedAt.HasValue ? "true" : "")"
 					   class="btn btn-outline-dark float-end">Back</a>
 				</div>
@@ -326,7 +326,7 @@
 		</div>
 	</form>
 
-	<form asp-action="@nameof(CardRenewalController.Discard)"
+	<form asp-action="@nameof(RenewCardController.Discard)"
 		  enctype="multipart/form-data"
 		  method="post"
 		  role="form">
@@ -370,7 +370,7 @@ else
 				</div>
 			</div>
 			<div>
-				<a asp-action="@(nameof(CardRenewalController.Index))"
+				<a asp-action="@(nameof(RenewCardController.Index))"
 				   asp-route-processed="@(Model.Request.ProcessedAt.HasValue ? "true" : "")"
 				   class="btn btn-outline-dark float-end">Back</a>
 			</div>
@@ -404,7 +404,7 @@ else
 				UpdateProcessButton('');
 			}
 			else {
-				$.get('@Url.Action(nameof(CardRenewalController.GetResponseText))',
+				$.get('@Url.Action(nameof(RenewCardController.GetResponseText))',
 					{responseId, languageId})
 					.done(function(response) {
 						if (response.success) {

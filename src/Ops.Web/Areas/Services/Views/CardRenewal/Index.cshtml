@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.Areas.Services.ViewModels.CardRenewal.IndexViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.Services.ViewModels.RenewCard.IndexViewModel
 
 <div class="row">
 	<div class="col-12 col-md-6 mb-2">
@@ -25,7 +25,7 @@
 		<div class="d-inline-block">
 			<ul class="nav nav-pills">
 				<li class="nav-item">
-					<a asp-action="@nameof(CardRenewalController.Index)"
+					<a asp-action="@nameof(RenewCardController.Index)"
 					   asp-route-Processed=""
 					   class="nav-link"
 					   ActiveBy routeKey="processed" value=",false">
@@ -34,7 +34,7 @@
 					</a>
 				</li>
 				<li class="nav-item">
-					<a asp-action="@nameof(CardRenewalController.Index)"
+					<a asp-action="@nameof(RenewCardController.Index)"
 					   asp-route-Processed="true"
 					   class="nav-link"
 					   ActiveBy routeKey="processed" value="true">
@@ -76,7 +76,7 @@
 					<td>
 						@if (Model.APIConfigured)
 						{
-							<a asp-action="@(nameof(CardRenewalController.Details))"
+							<a asp-action="@(nameof(RenewCardController.Details))"
 							   asp-route-id="@request.Id">
 								@(Model.IsProcessed? request.ProcessedAt: request.SubmittedAt)
 							</a>

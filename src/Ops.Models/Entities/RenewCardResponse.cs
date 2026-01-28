@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Ops.Models.Entities
 {
-    public class CardRenewalResponse : Abstract.BaseEntity
+    public class RenewCardResponse : Abstract.BaseEntity
     {
         [DisplayName("Email")]
         public int? EmailSetupId { get; set; }

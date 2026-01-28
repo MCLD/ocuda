@@ -5,10 +5,10 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 {
-    public interface ICardRenewalRequestService
+    public interface IRenewCardRequestService
     {
-        Task<CardRenewalRequest> GetRequestAsync(int id);
+        Task<RenewCardRequest> GetRequestAsync(int id);
         Task<int> GetRequestCountAsync(bool? isProcessed);
-        Task<CollectionWithCount<CardRenewalRequest>> GetRequestsAsync(RequestFilter filter);
+        Task<CollectionWithCount<RenewCardRequest>> GetRequestsAsync(RequestFilter filter);
     }
 }

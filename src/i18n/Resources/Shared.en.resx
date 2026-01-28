@@ -117,25 +117,41 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Phone" xml:space="preserve">
-    <value>Phone</value>
-    <comment>Label prompting a customer to enter their telephone number</comment>
+  <data name="(opens in a new window)" xml:space="preserve">
+    <value>(opens in a new window)</value>
+    <comment>Information added to buttons or links to indicate they open in a new window</comment>
   </data>
-  <data name="Requested date" xml:space="preserve">
-    <value>Requested date</value>
-    <comment>Label prompting a customer to select a date</comment>
+  <data name="An error occurred and we could not find libraries near that location." xml:space="preserve">
+    <value>An error occurred and we could not find libraries near that location.</value>
+    <comment>Performing a zip code lookup failed due to a technical issue.</comment>
   </data>
-  <data name="Requested date and time" xml:space="preserve">
-    <value>Requested date and time</value>
-    <comment>Label to show a customer what date and time they selected</comment>
+  <data name="An error occurred and we could not save your submission, please try again." xml:space="preserve">
+    <value>An error occurred and we could not save your submission, please try again.</value>
+    <comment>Saving a volunteer submission failed due to a technical issue.</comment>
   </data>
-  <data name="Requested time" xml:space="preserve">
-    <value>Requested time</value>
-    <comment>Label prompting a customer to select a time</comment>
+  <data name="An error occurred while processing your request." xml:space="preserve">
+    <value>An error occurred while processing your request.</value>
+    <comment>Message indicating a general, unspecified error</comment>
   </data>
-  <data name="Subject" xml:space="preserve">
-    <value>Subject</value>
-    <comment>Label next to a drop-down with a list of subjects</comment>
+  <data name="Are you a teen looking to volunteer?" xml:space="preserve">
+    <value>Are you a teen looking to volunteer?</value>
+    <comment>If the customer is on the adult form, this prompts them to use the teen form if needed.</comment>
+  </data>
+  <data name="Are you an adult looking to volunteer?" xml:space="preserve">
+    <value>Are you an adult looking to volunteer?</value>
+    <comment>If the customer is on the teen form, this prompts them to use the adult form if needed.</comment>
+  </data>
+  <data name="Are you interested in regular volunteer work or certain number of hours?" xml:space="preserve">
+    <value>Are you interested in regular volunteer work or certain number of hours?</value>
+    <comment>Volunteer form prompt asking a teen about their volunteer desires</comment>
+  </data>
+  <data name="At This Location" xml:space="preserve">
+    <value>At This Location</value>
+    <comment>Header for displaying services available at this particular location</comment>
+  </data>
+  <data name="Availability &amp; Experience" xml:space="preserve">
+    <value>Availability &amp; Experience</value>
+    <comment>The second part of the volunteer form has this as a header</comment>
   </data>
   <data name="Back" xml:space="preserve">
     <value>Back</value>
@@ -145,113 +161,9 @@
     <value>Back to the site</value>
     <comment>Navigation button: go back to the Web site</comment>
   </data>
-  <data name="Go" xml:space="preserve">
-    <value>Go</value>
-    <comment>Navigation button: perform a search or other action</comment>
-  </data>
-  <data name="Next" xml:space="preserve">
-    <value>Next</value>
-    <comment>Navigation button: go forward to the next page in a process</comment>
-  </data>
-  <data name="Submit" xml:space="preserve">
-    <value>Submit</value>
-    <comment>Button: submit form data</comment>
-  </data>
-  <data name="Subscribe" xml:space="preserve">
-    <value>Subscribe</value>
-    <comment>Button: subscribe to a mailing list</comment>
-  </data>
-  <data name="Use my location" xml:space="preserve">
-    <value>Use my location</value>
-    <comment>Button: engage a mobile device's GPS to look up the customer's location</comment>
-  </data>
-  <data name="Connect with us on social media!" xml:space="preserve">
-    <value>Connect with us on social media!</value>
-    <comment>Call to action: visit social media accounts</comment>
-  </data>
-  <data name="Connect with us on {0}" xml:space="preserve">
-    <value>Connect with us on {0}</value>
-    <comment>Call to action: visit a specific social media account; {0} is replaced with the platform (e.g. "Twitter" or "Instagram")</comment>
-  </data>
-  <data name="There was a problem locating these coordinates: {0}, {1}" xml:space="preserve">
-    <value>There was a problem locating these coordinates: {0}, {1}</value>
-    <comment>Error message: that the customer's geographic location couldn't be located; {0} and {1} are the GPS coordinates</comment>
-  </data>
-  <data name="Error" xml:space="preserve">
-    <value>Error</value>
-    <comment>Message indicating a general, unspecified error</comment>
-  </data>
-  <data name="This service is only available on the following days: {0}" xml:space="preserve">
-    <value>This service is only available on the following days: {0}</value>
-    <comment>Error message: showing which days a service is available; {0} are the days the service is available</comment>
-  </data>
-  <data name="That date is not available for scheduling: {0}" xml:space="preserve">
-    <value>That date is not available for scheduling: {0}</value>
-    <comment>Error message: a day is not available for a service; {0} is the date the customer selected</comment>
-  </data>
-  <data name="You must request a date on or after: {0}" xml:space="preserve">
-    <value>You must request a date on or after: {0}</value>
-    <comment>Error message: the earliest day a service can be engaged; {0} is the earliest date</comment>
-  </data>
-  <data name="The earliest time you can select is: {0}" xml:space="preserve">
-    <value>The earliest time you can select is: {0}</value>
-    <comment>Error message: the earliest time a service can be engaged; {0} is the earliest time</comment>
-  </data>
-  <data name="The furthest date you can schedule a call is: {0}" xml:space="preserve">
-    <value>The furthest date you can schedule a call is: {0}</value>
-    <comment>Error message: the latest date that a telephone call can be scheduled; {0} is the furthest date a call can be scheduled</comment>
-  </data>
-  <data name="There was a problem finding this ZIP code: {0}" xml:space="preserve">
-    <value>There was a problem finding this ZIP code: {0}</value>
-    <comment>Error message: that a ZIP code could not be found; {0} is the ZIP code the customer entered</comment>
-  </data>
-  <data name="No available times for scheduling could be found." xml:space="preserve">
-    <value>No available times for scheduling could be found.</value>
-    <comment>Error message: there are no times available to schedule</comment>
-  </data>
-  <data name="Page not found" xml:space="preserve">
-    <value>Page not found</value>
-    <comment>Web error when a page is not found (a 404 error)</comment>
-  </data>
-  <data name="An error occurred while processing your request." xml:space="preserve">
-    <value>An error occurred while processing your request.</value>
-    <comment>Message indicating a general, unspecified error</comment>
-  </data>
-  <data name="Unfortunately your session has timed out. Please reselect your time and subject." xml:space="preserve">
-    <value>Unfortunately your session has timed out. Please reselect your time and subject.</value>
-    <comment>Too long has elapsed while the user was viewing a form and their session expired.</comment>
-  </data>
-  <data name="Please enter a telephone number in the format: ###-###-####" xml:space="preserve">
-    <value>Please enter a telephone number in the format: ###-###-####</value>
-    <comment>Error message: telephone number was not entered in the proper format</comment>
-  </data>
-  <data name="You must request a time before: {0}" xml:space="preserve">
-    <value>You must request a time before: {0}</value>
-    <comment>Error message: the latest time a service can be requested; {0} is the latest time</comment>
-  </data>
-  <data name="Please enter a 5 digit numeric ZIP code." xml:space="preserve">
-    <value>Please enter a 5 digit numeric ZIP code.</value>
-    <comment>Error message: the ZIP code format was not correct</comment>
-  </data>
-  <data name="{0} help" xml:space="preserve">
-    <value>{0} help</value>
-    <comment>Title for help on a specific resource; {0} is the name of the resource (e.g. "ConsumerReports.org" or "OverDrive")</comment>
-  </data>
-  <data name="Keywords: {0}" xml:space="preserve">
-    <value>Keywords: {0}</value>
-    <comment>Display a list of keywords; {0} is replaced with a comma-separated list of keywords</comment>
-  </data>
   <data name="Back to {0}" xml:space="preserve">
     <value>Back to {0}</value>
     <comment>Button: return to the page detailing a location; {0} is the name of the location</comment>
-  </data>
-  <data name="Details" xml:space="preserve">
-    <value>Details</value>
-    <comment>Button: view details</comment>
-  </data>
-  <data name="Events" xml:space="preserve">
-    <value>Events</value>
-    <comment>Button: view events</comment>
   </data>
   <data name="Call us at {0}" xml:space="preserve">
     <value>Call us at {0}</value>
@@ -265,33 +177,157 @@
     <value>Closed today</value>
     <comment>Location status message, the location is closed for today</comment>
   </data>
-  <data name="Our current operating hours are:" xml:space="preserve">
-    <value>Our current operating hours are:</value>
-    <comment>Label prefixing the current operating hours of a location</comment>
+  <data name="Connect with us on social media!" xml:space="preserve">
+    <value>Connect with us on social media!</value>
+    <comment>Call to action: visit social media accounts</comment>
   </data>
-  <data name="{0} at {1} Library" xml:space="preserve">
-    <value>{0} at {1} Library</value>
-    <comment>Location feature heading; {0} is the feature of the location, {1} is the name of the location</comment>
+  <data name="Connect with us on {0}" xml:space="preserve">
+    <value>Connect with us on {0}</value>
+    <comment>Call to action: visit a specific social media account; {0} is replaced with the platform (e.g. "Twitter" or "Instagram")</comment>
+  </data>
+  <data name="Contact Information" xml:space="preserve">
+    <value>Contact Information</value>
+    <comment>The first part of the volunteer from has this as a header</comment>
+  </data>
+  <data name="Contact Us" xml:space="preserve">
+    <value>Contact Us</value>
+    <comment>Link to instructions on how to contact the site owner</comment>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Details</value>
+    <comment>Button: view details</comment>
+  </data>
+  <data name="Do you still live at an address listed below?" xml:space="preserve">
+    <value>Do you still live at an address listed below?</value>
+    <comment>Label asking if a customer lives at an address in the list</comment>
+  </data>
+  <data name="Does not have {0}" xml:space="preserve">
+    <value>Does not have {0}</value>
+    <comment>Text indicating that a location does not have an item. {0} will be replaced with the name of the item</comment>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+    <comment>Label prompting a customer to enter their email address</comment>
+  </data>
+  <data name="Enter a 5 digit ZIP code" xml:space="preserve">
+    <value>Enter a 5 digit ZIP code</value>
+    <comment>Prompt to enter a five digit ZIP code to find the nearest locations</comment>
+  </data>
+  <data name="Episode {0}, published {1}." xml:space="preserve">
+    <value>Episode {0}, published {1}.</value>
+    <comment>Podcast details message; {0} is the episode number, {1} is the publication date</comment>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+    <comment>Message indicating a general, unspecified error</comment>
+  </data>
+  <data name="Events" xml:space="preserve">
+    <value>Events</value>
+    <comment>Button: view events</comment>
   </data>
   <data name="Find my Library" xml:space="preserve">
     <value>Find my Library</value>
     <comment>Title of the page to locate the nearest library</comment>
   </data>
-  <data name="Library Information" xml:space="preserve">
-    <value>Library Information</value>
-    <comment>Page header for information section of location page</comment>
+  <data name="Forgot your password?" xml:space="preserve">
+    <value>Forgot your password?</value>
+    <comment>Link for a customer to click if they've forgotten their password</comment>
+  </data>
+  <data name="Go" xml:space="preserve">
+    <value>Go</value>
+    <comment>Navigation button: perform a search or other action</comment>
+  </data>
+  <data name="Has {0}" xml:space="preserve">
+    <value>Has {0}</value>
+    <comment>Text indicating that a location has an item. {0} will be replaced with the name of the item</comment>
+  </data>
+  <data name="Here are the details of your appointment:" xml:space="preserve">
+    <value>Here are the details of your appointment:</value>
+    <comment>Label indicating the details for a customer's service appointment</comment>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>Hours</value>
+    <comment>Column header describing when the location is open</comment>
+  </data>
+  <data name="How can we help?" xml:space="preserve">
+    <value>How can we help?</value>
+    <comment>Label asking what sort of assistance the customer needs</comment>
   </data>
   <data name="Interested in updates from every library in this area?" xml:space="preserve">
     <value>Interested in updates from every library in this area?</value>
     <comment>Prompt before button to subscribe to multiple mailing lists</comment>
   </data>
+  <data name="It appears that the barcode you've entered belongs to a staff account. Please speak to your branch manager or supervisor for instructions on how to renew your account." xml:space="preserve">
+    <value>It appears that the barcode you've entered belongs to a staff account. Please speak to your branch manager or supervisor for instructions on how to renew your account.</value>
+    <comment>Error message: account belongs to a staff member</comment>
+  </data>
+  <data name="It looks like you're trying to renew a juvenile account, please have a parent or guardian complete the rest of the process." xml:space="preserve">
+    <value>It looks like you're trying to renew a juvenile account, please have a parent or guardian complete the rest of the process.</value>
+    <comment>Label indicating how to proceed with the form</comment>
+  </data>
+  <data name="Keywords: {0}" xml:space="preserve">
+    <value>Keywords: {0}</value>
+    <comment>Display a list of keywords; {0} is replaced with a comma-separated list of keywords</comment>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+    <comment>Label prompting a customer to select a language</comment>
+  </data>
+  <data name="Last Update" xml:space="preserve">
+    <value>Last Update</value>
+    <comment>Column header describing when data was last updated</comment>
+  </data>
+  <data name="Libraries closest to ZIP code: {0}" xml:space="preserve">
+    <value>Libraries closest to ZIP code: {0}</value>
+    <comment>Label describing the search results for libraries close to a ZIP code; {0} is the ZIP code</comment>
+  </data>
+  <data name="Library Card Number" xml:space="preserve">
+    <value>Library Card Number</value>
+    <comment>Label prompting a customer to enter their library card number</comment>
+  </data>
+  <data name="Library Information" xml:space="preserve">
+    <value>Library Information</value>
+    <comment>Page header for information section of location page</comment>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Location</value>
+    <comment>Column header for a location</comment>
+  </data>
+  <data name="Locations" xml:space="preserve">
+    <value>Locations</value>
+    <comment>Page header for showing locations</comment>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+    <comment>Label prompting a customer to enter their name</comment>
+  </data>
   <data name="Nearby Locations" xml:space="preserve">
     <value>Nearby Locations</value>
     <comment>Page header for other locations which are narby</comment>
   </data>
+  <data name="Next" xml:space="preserve">
+    <value>Next</value>
+    <comment>Navigation button: go forward to the next page in a process</comment>
+  </data>
+  <data name="No available times for scheduling could be found." xml:space="preserve">
+    <value>No available times for scheduling could be found.</value>
+    <comment>Error message: there are no times available to schedule</comment>
+  </data>
+  <data name="No, I have moved." xml:space="preserve">
+    <value>No, I have moved.</value>
+    <comment>Button: responding in the negative to the question of if the customer still lives at a listed address</comment>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>Notes</value>
+    <comment>Label prompting a customer to enter notes regarding their service request</comment>
+  </data>
   <data name="Open" xml:space="preserve">
     <value>Open</value>
     <comment>Location status message, the location is open</comment>
+  </data>
+  <data name="Open until {0}" xml:space="preserve">
+    <value>Open until {0}</value>
+    <comment>Location status message, open until a time; {0} is the time that the location closes</comment>
   </data>
   <data name="Opens at {0}" xml:space="preserve">
     <value>Opens at {0}</value>
@@ -301,237 +337,21 @@
     <value>Opens {0} at {1}</value>
     <comment>Location status message, the location opens at a date and time; {0} is the day of the week, {1} is the time</comment>
   </data>
-  <data name="Open until {0}" xml:space="preserve">
-    <value>Open until {0}</value>
-    <comment>Location status message, open until a time; {0} is the time that the location closes</comment>
-  </data>
   <data name="Our address:" xml:space="preserve">
     <value>Our address:</value>
     <comment>Label indicating the location address follows</comment>
   </data>
-  <data name="There was a problem determining your location." xml:space="preserve">
-    <value>There was a problem determining your location.</value>
-    <comment>Error message: location could not be determined for finding the nearest location via GPS</comment>
+  <data name="Our current operating hours are:" xml:space="preserve">
+    <value>Our current operating hours are:</value>
+    <comment>Label prefixing the current operating hours of a location</comment>
   </data>
-  <data name="See a map to this location" xml:space="preserve">
-    <value>See a map to this location (opens in a new window)</value>
-    <comment>Label indicating a link takes the customer to a map of the location</comment>
+  <data name="Page not found" xml:space="preserve">
+    <value>Page not found</value>
+    <comment>Web error when a page is not found (a 404 error)</comment>
   </data>
-  <data name="Locations" xml:space="preserve">
-    <value>Locations</value>
-    <comment>Page header for showing locations</comment>
-  </data>
-  <data name="Subscribe to updates from all of these libraries." xml:space="preserve">
-    <value>Subscribe to updates from all of these libraries.</value>
-    <comment>Link to subscribe to mailing lists for all libraries which are listed</comment>
-  </data>
-  <data name="Subscribe to updates from: {0}" xml:space="preserve">
-    <value>Subscribe to updates from: {0}</value>
-    <comment>Link to subscribe to a mailing list for a location; {0} is the name of the location</comment>
-  </data>
-  <data name="tomorrow" xml:space="preserve">
-    <value>tomorrow</value>
-    <comment>Location status message, word to indicate the next open date is tomorrow</comment>
-  </data>
-  <data name="Updates from all {0} locations" xml:space="preserve">
-    <value>Updates from all {0} locations</value>
-    <comment>Button to subscribe to updates from all listed locations; {0} is the number of locations</comment>
-  </data>
-  <data name="Updates from {0} locations" xml:space="preserve">
-    <value>Updates from {0} locations</value>
-    <comment>Button to subscribe to updates from a number of listed locations; {0} is the number of locations</comment>
-  </data>
-  <data name="View events at: {0}" xml:space="preserve">
-    <value>View events at: {0}</value>
-    <comment>Link to view events at a location; {0} is the name of the location</comment>
-  </data>
-  <data name="{0} (opens in a new window)" xml:space="preserve">
-    <value>{0} (opens in a new window)</value>
-    <comment>Description of a link with information added to indicate the link opens in a new window; {0} is the link description</comment>
-  </data>
-  <data name="{0} offers:" xml:space="preserve">
-    <value>{0} offers:</value>
-    <comment>Label indicating what type of materials a service offers; {0} is the name of the service (e.g. "ConsumerReports.org", "OverDrive")</comment>
-  </data>
-  <data name="Episode {0}, published {1}." xml:space="preserve">
-    <value>Episode {0}, published {1}.</value>
-    <comment>Podcast details message; {0} is the episode number, {1} is the publication date</comment>
-  </data>
-  <data name="You can listen to our podcast on:" xml:space="preserve">
-    <value>You can listen to our podcast on:</value>
-    <comment>Label prompting external services which carry a podcast</comment>
-  </data>
-  <data name="Podcasts" xml:space="preserve">
-    <value>Podcasts</value>
-    <comment>Page header for podcasts</comment>
-  </data>
-  <data name="{0} Podcast" xml:space="preserve">
-    <value>{0} Podcast</value>
-    <comment>Podcast title; {0} is the name of the podcast</comment>
-  </data>
-  <data name="Email" xml:space="preserve">
-    <value>Email</value>
-    <comment>Label prompting a customer to enter their email address</comment>
-  </data>
-  <data name="Language" xml:space="preserve">
-    <value>Language</value>
-    <comment>Label prompting a customer to select a language</comment>
-  </data>
-  <data name="Name" xml:space="preserve">
-    <value>Name</value>
-    <comment>Label prompting a customer to enter their name</comment>
-  </data>
-  <data name="Notes" xml:space="preserve">
-    <value>Notes</value>
-    <comment>Label prompting a customer to enter notes regarding their service request</comment>
-  </data>
-  <data name="You must supply a value for: {0}" xml:space="preserve">
-    <value>You must supply a value for: {0}</value>
-    <comment>Error message: required field; {0} is the required field</comment>
-  </data>
-  <data name="The {0} field is required." xml:space="preserve">
-    <value>The {0} field is required.</value>
-    <comment>Label noting that a field is required; {0} is the required field</comment>
-  </data>
-  <data name="Here are the details of your appointment:" xml:space="preserve">
-    <value>Here are the details of your appointment:</value>
-    <comment>Label indicating the details for a customer's service appointment</comment>
-  </data>
-  <data name="Please check your email for important information about this appointment." xml:space="preserve">
-    <value>Please check your email for important information about this appointment.</value>
-    <comment>Label indicating the customer should check their email for details about the appointment</comment>
-  </data>
-  <data name="How can we help?" xml:space="preserve">
-    <value>How can we help?</value>
-    <comment>Label asking what sort of assistance the customer needs</comment>
-  </data>
-  <data name="Scheduling is currently not available." xml:space="preserve">
-    <value>Scheduling is currently not available.</value>
-    <comment>Label asserting that scheduling appointments is currently not available</comment>
-  </data>
-  <data name="Request a different time" xml:space="preserve">
-    <value>Request a different time</value>
-    <comment>Label encouraging selection of a different time if the selected time is not available</comment>
-  </data>
-  <data name="Please help us out by telling us a little about your request." xml:space="preserve">
-    <value>Please help us out by telling us a little about your request.</value>
-    <comment>Label encouraging customer to describe their help request</comment>
-  </data>
-  <data name="Schedule your time" xml:space="preserve">
-    <value>Schedule your time</value>
-    <comment>Header for customers to schedule a time for their help request</comment>
-  </data>
-  <data name="Your time is scheduled" xml:space="preserve">
-    <value>Your time is scheduled</value>
-    <comment>Header for success page once a customer's time is scheduled</comment>
-  </data>
-  <data name="Visit home page" xml:space="preserve">
-    <value>Visit home page</value>
-    <comment>Label describing the home page link</comment>
-  </data>
-  <data name="Libraries closest to ZIP code: {0}" xml:space="preserve">
-    <value>Libraries closest to ZIP code: {0}</value>
-    <comment>Label describing the search results for libraries close to a ZIP code; {0} is the ZIP code</comment>
-  </data>
-  <data name="Enter a 5 digit ZIP code" xml:space="preserve">
-    <value>Enter a 5 digit ZIP code</value>
-    <comment>Prompt to enter a five digit ZIP code to find the nearest locations</comment>
-  </data>
-  <data name="Use my location" xml:space="preserve">
-    <value>Use my location</value>
-    <comment>Button: engage a mobile device's GPS to look up the customer's location</comment>
-  </data>
-  <data name="(opens in a new window)" xml:space="preserve">
-    <value>(opens in a new window)</value>
-    <comment>Information added to buttons or links to indicate they open in a new window</comment>
-  </data>
-  <data name="Location" xml:space="preserve">
-    <value>Location</value>
-    <comment>Column header for a location</comment>
-  </data>
-  <data name="Hours" xml:space="preserve">
-    <value>Hours</value>
-    <comment>Column header describing when the location is open</comment>
-  </data>
-  <data name="Status" xml:space="preserve">
-    <value>Status</value>
-    <comment>Column header with product inventory status</comment>
-  </data>
-  <data name="Last Update" xml:space="preserve">
-    <value>Last Update</value>
-    <comment>Column header describing when data was last updated</comment>
-  </data>
-  <data name="Has {0}" xml:space="preserve">
-    <value>Has {0}</value>
-    <comment>Text indicating that a location has an item. {0} will be replaced with the name of the item</comment>
-  </data>
-  <data name="Does not have {0}" xml:space="preserve">
-    <value>Does not have {0}</value>
-    <comment>Text indicating that a location does not have an item. {0} will be replaced with the name of the item</comment>
-  </data>
-  <data name="Show notes for: {0}" xml:space="preserve">
-    <value>Show notes for: {0}</value>
-    <comment>Header for a podcast's show notes; {0} is the episode title</comment>
-  </data>
-  <data name="View show notes" xml:space="preserve">
-    <value>View show notes</value>
-    <comment>Label that links to a podcast's show notes</comment>
-  </data>
-  <data name="Special Hours" xml:space="preserve">
-    <value>Special Hours</value>
-    <comment>Indicating that operating hours are atypical on this day</comment>
-  </data>
-  <data name="Today's Hours: {0}" xml:space="preserve">
-    <value>Today's Hours: {0}</value>
-    <comment>Text to indicate what the hours are for today</comment>
-  </data>
-  <data name="Availability &amp; Experience" xml:space="preserve">
-    <value>Availability &amp; Experience</value>
-    <comment>The second part of the volunteer form has this as a header</comment>
-  </data>
-  <data name="Contact Information" xml:space="preserve">
-    <value>Contact Information</value>
-    <comment>The first part of the volunteer from has this as a header</comment>
-  </data>
-  <data name="An error occurred and we could not find libraries near that location." xml:space="preserve">
-    <value>An error occurred and we could not find libraries near that location.</value>
-    <comment>Performing a zip code lookup failed due to a technical issue.</comment>
-  </data>
-  <data name="An error occurred and we could not save your submission, please try again." xml:space="preserve">
-    <value>An error occurred and we could not save your submission, please try again.</value>
-    <comment>Saving a volunteer submission failed due to a technical issue.</comment>
-  </data>
-  <data name="This location is not accepting volunteer applications at this time." xml:space="preserve">
-    <value>This location is not accepting volunteer applications at this time.</value>
-    <comment>Customer tried to access the form for a location not taking applications.</comment>
-  </data>
-  <data name="This location is not accepting adult volunteer applications at this time." xml:space="preserve">
-    <value>This location is not accepting adult volunteer applications at this time.</value>
-    <comment>Customer tried to access the form for a location not taking adult applications.</comment>
-  </data>
-  <data name="This location is not accepting teen volunteer applications at this time." xml:space="preserve">
-    <value>This location is not accepting teen volunteer applications at this time.</value>
-    <comment>Customer tried to access the form for a location not taking teen applications.</comment>
-  </data>
-  <data name="Use our adult volunteer form." xml:space="preserve">
-    <value>Use our adult volunteer form.</value>
-    <comment>If the customer is on the teen form, this is the text that links to the adult form.</comment>
-  </data>
-  <data name="Use our teen volunteer form." xml:space="preserve">
-    <value>Use our teen volunteer form.</value>
-    <comment>If the customer is on the adult form, this is the text that links to the teen form.</comment>
-  </data>
-  <data name="Are you an adult looking to volunteer?" xml:space="preserve">
-    <value>Are you an adult looking to volunteer?</value>
-    <comment>If the customer is on the teen form, this prompts them to use the adult form if needed.</comment>
-  </data>
-  <data name="Are you a teen looking to volunteer?" xml:space="preserve">
-    <value>Are you a teen looking to volunteer?</value>
-    <comment>If the customer is on the adult form, this prompts them to use the teen form if needed.</comment>
-  </data>
-  <data name="Why do you want to volunteer? Describe any previous volunteer experience." xml:space="preserve">
-    <value>Why do you want to volunteer? Describe any previous volunteer experience.</value>
-    <comment>Volunteer form prompt asking about interest.</comment>
+  <data name="Parent/Guardian Barcode" xml:space="preserve">
+    <value>Parent/Guardian Barcode</value>
+    <comment>Label prompting a customer to entier the parent or guardian's barcode number</comment>
   </data>
   <data name="Parent/Guardian Email" xml:space="preserve">
     <value>Parent/Guardian Email</value>
@@ -545,29 +365,77 @@
     <value>Parent/Guardian Phone</value>
     <comment>If a teen is volunteering, this prompts for their parent or guardian phone.</comment>
   </data>
-  <data name="Are you interested in regular volunteer work or certain number of hours?" xml:space="preserve">
-    <value>Are you interested in regular volunteer work or certain number of hours?</value>
-    <comment>Volunteer form prompt asking a teen about their volunteer desires</comment>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+    <comment>Label prompting a customer to enter their password</comment>
   </data>
-  <data name="Weekly Availability" xml:space="preserve">
-    <value>Weekly Availability</value>
-    <comment>Volunteer form prompt asking about when a customer is available to work</comment>
+  <data name="Phone" xml:space="preserve">
+    <value>Phone</value>
+    <comment>Label prompting a customer to enter their telephone number</comment>
   </data>
-  <data name="Volunteer" xml:space="preserve">
-    <value>Volunteer</value>
-    <comment>Text to show as the page title on the volunteer form page</comment>
+  <data name="Please check your email for important information about this appointment." xml:space="preserve">
+    <value>Please check your email for important information about this appointment.</value>
+    <comment>Label indicating the customer should check their email for details about the appointment</comment>
   </data>
-  <data name="Thank you for your interest! Someone will be in touch with you very soon." xml:space="preserve">
-    <value>Thank you for your interest! Someone will be in touch with you very soon.</value>
-    <comment>Default follow-up shown to customer after submitting volunteer form.</comment>
+  <data name="Please contact &lt;a href=&quot;{0}&quot;&gt;your library&lt;/a&gt; to renew your library card." xml:space="preserve">
+    <value>Please contact &lt;a href="{0}"&gt;your library&lt;/a&gt; to renew your library card.</value>
+    <comment>Message informing where to renew a library card; {0} is replaced with a link to the locations</comment>
   </data>
-  <data name="At This Location" xml:space="preserve">
-    <value>At This Location</value>
-    <comment>Header for displaying services available at this particular location</comment>
+  <data name="Please enter a 5 digit numeric ZIP code." xml:space="preserve">
+    <value>Please enter a 5 digit numeric ZIP code.</value>
+    <comment>Error message: the ZIP code format was not correct</comment>
   </data>
-  <data name="Contact Us" xml:space="preserve">
-    <value>Contact Us</value>
-    <comment>Link to instructions on how to contact the site owner</comment>
+  <data name="Please enter a telephone number in the format: ###-###-####" xml:space="preserve">
+    <value>Please enter a telephone number in the format: ###-###-####</value>
+    <comment>Error message: telephone number was not entered in the proper format</comment>
+  </data>
+  <data name="Please help us out by telling us a little about your request." xml:space="preserve">
+    <value>Please help us out by telling us a little about your request.</value>
+    <comment>Label encouraging customer to describe their help request</comment>
+  </data>
+  <data name="Podcasts" xml:space="preserve">
+    <value>Podcasts</value>
+    <comment>Page header for podcasts</comment>
+  </data>
+  <data name="Renew your library card" xml:space="preserve">
+    <value>Renew your library card</value>
+    <comment>Default header for card renewal request pages</comment>
+  </data>
+  <data name="Request a different time" xml:space="preserve">
+    <value>Request a different time</value>
+    <comment>Label encouraging selection of a different time if the selected time is not available</comment>
+  </data>
+  <data name="Requested date" xml:space="preserve">
+    <value>Requested date</value>
+    <comment>Label prompting a customer to select a date</comment>
+  </data>
+  <data name="Requested date and time" xml:space="preserve">
+    <value>Requested date and time</value>
+    <comment>Label to show a customer what date and time they selected</comment>
+  </data>
+  <data name="Requested time" xml:space="preserve">
+    <value>Requested time</value>
+    <comment>Label prompting a customer to select a time</comment>
+  </data>
+  <data name="Schedule your time" xml:space="preserve">
+    <value>Schedule your time</value>
+    <comment>Header for customers to schedule a time for their help request</comment>
+  </data>
+  <data name="Scheduling is currently not available." xml:space="preserve">
+    <value>Scheduling is currently not available.</value>
+    <comment>Label asserting that scheduling appointments is currently not available</comment>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+    <comment>Hover text to display on the search button</comment>
+  </data>
+  <data name="Search the catalog" xml:space="preserve">
+    <value>Search the catalog</value>
+    <comment>Placeholder text for the search field</comment>
+  </data>
+  <data name="See a map to this location" xml:space="preserve">
+    <value>See a map to this location (opens in a new window)</value>
+    <comment>Label indicating a link takes the customer to a map of the location</comment>
   </data>
   <data name="See services at all of our libraries" xml:space="preserve">
     <value>See services at all of our libraries</value>
@@ -577,88 +445,220 @@
     <value>Services Available</value>
     <comment>Header for displaying services available for a location</comment>
   </data>
+  <data name="Show notes for: {0}" xml:space="preserve">
+    <value>Show notes for: {0}</value>
+    <comment>Header for a podcast's show notes; {0} is the episode title</comment>
+  </data>
   <data name="Sign up for our email newsletter" xml:space="preserve">
     <value>Sign up for our email newsletter</value>
     <comment>Button for call to action - subscribe to newsletter</comment>
   </data>
-  <data name="Search the catalog" xml:space="preserve">
-    <value>Search the catalog</value>
-    <comment>Placeholder text for the search field</comment>
+  <data name="Special Hours" xml:space="preserve">
+    <value>Special Hours</value>
+    <comment>Indicating that operating hours are atypical on this day</comment>
   </data>
-  <data name="Search" xml:space="preserve">
-    <value>Search</value>
-    <comment>Hover text to display on the search button</comment>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+    <comment>Column header with product inventory status</comment>
   </data>
-  <data name="Thanks for your submission! Your card has more than {0} days until it expires, please come back to renew it any time after {1}" xml:space="preserve">
-    <value>Thanks for your submission! Your card has more than {0} days until it expires, please come back to renew it any time after {1}</value>
-    <comment>Error message: the library card is not near expiration; {0} is how many days before expiration, {1} is the earliest date</comment>
+  <data name="Subject" xml:space="preserve">
+    <value>Subject</value>
+    <comment>Label next to a drop-down with a list of subjects</comment>
   </data>
-  <data name="You have entered an invalid card number or password" xml:space="preserve">
-    <value>You have entered an invalid card number or password</value>
-    <comment>Error message: invalid login information</comment>
+  <data name="Submit" xml:space="preserve">
+    <value>Submit</value>
+    <comment>Button: submit form data</comment>
   </data>
-  <data name="It appears that the barcode you've entered belongs to a staff account. Please speak to your branch manager or supervisor for instructions on how to renew your account." xml:space="preserve">
-    <value>It appears that the barcode you've entered belongs to a staff account. Please speak to your branch manager or supervisor for instructions on how to renew your account.</value>
-    <comment>Error message: account belongs to a staff member</comment>
+  <data name="Subscribe" xml:space="preserve">
+    <value>Subscribe</value>
+    <comment>Button: subscribe to a mailing list</comment>
   </data>
-  <data name="It looks like you're trying to renew a juvenile account, please have a parent or guardian complete the rest of the process." xml:space="preserve">
-    <value>It looks like you're trying to renew a juvenile account, please have a parent or guardian complete the rest of the process.</value>
-    <comment>Label indicating how to proceed with the form</comment>
+  <data name="Subscribe to updates from all of these libraries." xml:space="preserve">
+    <value>Subscribe to updates from all of these libraries.</value>
+    <comment>Link to subscribe to mailing lists for all libraries which are listed</comment>
   </data>
-  <data name="With no valid address on file your renewal request may not be eligible for a full renewal." xml:space="preserve">
-    <value>With no valid address on file your renewal request may not be eligible for a full renewal.</value>
-    <comment>Label informing how the request may be processed</comment>
-  </data>
-  <data name="Please contact &lt;a href=\&quot;{0}\&quot;&gt;your library&lt;/a&gt; to renew your library card." xml:space="preserve">
-    <value>Please contact &lt;a href=\"{0}\"&gt;your library&lt;/a&gt; to renew your library card.</value>
-    <comment>Message informing where to renew a library card; {0} is replaced with a link to the locations</comment>
-  </data>
-  <data name="It looks like we are still working on a request you submitted on {0} at {1}. You'll be hearing from us soon." xml:space="preserve">
-    <value>It looks like we are still working on a request you submitted on {0} at {1}. You'll be hearing from us soon.</value>
-    <comment>Error message: there's a pending request for the account; {0} is replace with the date of the request, {1} with the time</comment>
-  </data>
-  <data name="Do you still live at an address listed below?" xml:space="preserve">
-    <value>Do you still live at an address listed below?</value>
-    <comment>Label asking if a customer lives at an address in the list</comment>
-  </data>
-  <data name="No, I have moved" xml:space="preserve">
-    <value>No, I have moved</value>
-    <comment>Button: responding in the negative to the question of if the customer still lives at a listed address</comment>
-  </data>
-  <data name="Yes, this is my address" xml:space="preserve">
-    <value>Yes, this is my address</value>
-    <comment>Button: responding in the affirmative to the question of if the customer still lives at a listed address</comment>
-  </data>
-  <data name="Unfortunately your session has timed out. Please resubmit your barcode and password." xml:space="preserve">
-    <value>Unfortunately your session has timed out. Please resubmit your barcode and password.</value>
-    <comment>Error message: too long has elapsed while the user was viewing a form and their session expired.</comment>
+  <data name="Subscribe to updates from: {0}" xml:space="preserve">
+    <value>Subscribe to updates from: {0}</value>
+    <comment>Link to subscribe to a mailing list for a location; {0} is the name of the location</comment>
   </data>
   <data name="Thank you for using our online renewal service!" xml:space="preserve">
     <value>Thank you for using our online renewal service!</value>
     <comment>Default follow-up shown to customer after submitting card renewal form.</comment>
   </data>
-  <data name="We are unable to renew your card at this time. Please contact &lt;a href=\&quot;{0}\&quot;&gt;your library&lt;/a&gt; to renew your library card." xml:space="preserve">
-    <value>We are unable to renew your card at this time. Please contact &lt;a href=\"{0}\"&gt;your library&lt;/a&gt; to renew your library card.</value>
+  <data name="Thank you for your interest! Someone will be in touch with you very soon." xml:space="preserve">
+    <value>Thank you for your interest! Someone will be in touch with you very soon.</value>
+    <comment>Default follow-up shown to customer after submitting volunteer form.</comment>
+  </data>
+  <data name="Thanks for your submission! Your card has more than {0} days until it expires, please come back to renew it any time after {1}." xml:space="preserve">
+    <value>Thanks for your submission! Your card has more than {0} days until it expires, please come back to renew it any time after {1}.</value>
+    <comment>Error message: the library card is not near expiration; {0} is how many days before expiration, {1} is the earliest date</comment>
+  </data>
+  <data name="That date is not available for scheduling: {0}" xml:space="preserve">
+    <value>That date is not available for scheduling: {0}</value>
+    <comment>Error message: a day is not available for a service; {0} is the date the customer selected</comment>
+  </data>
+  <data name="The earliest time you can select is: {0}" xml:space="preserve">
+    <value>The earliest time you can select is: {0}</value>
+    <comment>Error message: the earliest time a service can be engaged; {0} is the earliest time</comment>
+  </data>
+  <data name="The furthest date you can schedule a call is: {0}" xml:space="preserve">
+    <value>The furthest date you can schedule a call is: {0}</value>
+    <comment>Error message: the latest date that a telephone call can be scheduled; {0} is the furthest date a call can be scheduled</comment>
+  </data>
+  <data name="The {0} field is required." xml:space="preserve">
+    <value>The {0} field is required.</value>
+    <comment>Label noting that a field is required; {0} is the required field</comment>
+  </data>
+  <data name="There was a problem determining your location." xml:space="preserve">
+    <value>There was a problem determining your location.</value>
+    <comment>Error message: location could not be determined for finding the nearest location via GPS</comment>
+  </data>
+  <data name="There was a problem finding this ZIP code: {0}" xml:space="preserve">
+    <value>There was a problem finding this ZIP code: {0}</value>
+    <comment>Error message: that a ZIP code could not be found; {0} is the ZIP code the customer entered</comment>
+  </data>
+  <data name="There was a problem locating these coordinates: {0}, {1}" xml:space="preserve">
+    <value>There was a problem locating these coordinates: {0}, {1}</value>
+    <comment>Error message: that the customer's geographic location couldn't be located; {0} and {1} are the GPS coordinates</comment>
+  </data>
+  <data name="This location is not accepting adult volunteer applications at this time." xml:space="preserve">
+    <value>This location is not accepting adult volunteer applications at this time.</value>
+    <comment>Customer tried to access the form for a location not taking adult applications.</comment>
+  </data>
+  <data name="This location is not accepting teen volunteer applications at this time." xml:space="preserve">
+    <value>This location is not accepting teen volunteer applications at this time.</value>
+    <comment>Customer tried to access the form for a location not taking teen applications.</comment>
+  </data>
+  <data name="This location is not accepting volunteer applications at this time." xml:space="preserve">
+    <value>This location is not accepting volunteer applications at this time.</value>
+    <comment>Customer tried to access the form for a location not taking applications.</comment>
+  </data>
+  <data name="This service is only available on the following days: {0}" xml:space="preserve">
+    <value>This service is only available on the following days: {0}</value>
+    <comment>Error message: showing which days a service is available; {0} are the days the service is available</comment>
+  </data>
+  <data name="Today's Hours: {0}" xml:space="preserve">
+    <value>Today's Hours: {0}</value>
+    <comment>Text to indicate what the hours are for today</comment>
+  </data>
+  <data name="tomorrow" xml:space="preserve">
+    <value>tomorrow</value>
+    <comment>Location status message, word to indicate the next open date is tomorrow</comment>
+  </data>
+  <data name="Unfortunately your session has timed out. Please reselect your time and subject." xml:space="preserve">
+    <value>Unfortunately your session has timed out. Please reselect your time and subject.</value>
+    <comment>Too long has elapsed while the user was viewing a form and their session expired.</comment>
+  </data>
+  <data name="Unfortunately your session has timed out. Please resubmit your barcode and password." xml:space="preserve">
+    <value>Unfortunately your session has timed out. Please resubmit your barcode and password.</value>
+    <comment>Error message: too long has elapsed while the user was viewing a form and their session expired.</comment>
+  </data>
+  <data name="Updates from all {0} locations" xml:space="preserve">
+    <value>Updates from all {0} locations</value>
+    <comment>Button to subscribe to updates from all listed locations; {0} is the number of locations</comment>
+  </data>
+  <data name="Updates from {0} locations" xml:space="preserve">
+    <value>Updates from {0} locations</value>
+    <comment>Button to subscribe to updates from a number of listed locations; {0} is the number of locations</comment>
+  </data>
+  <data name="Use my location" xml:space="preserve">
+    <value>Use my location</value>
+    <comment>Button: engage a mobile device's GPS to look up the customer's location</comment>
+  </data>
+  <data name="Use our adult volunteer form." xml:space="preserve">
+    <value>Use our adult volunteer form.</value>
+    <comment>If the customer is on the teen form, this is the text that links to the adult form.</comment>
+  </data>
+  <data name="Use our teen volunteer form." xml:space="preserve">
+    <value>Use our teen volunteer form.</value>
+    <comment>If the customer is on the adult form, this is the text that links to the teen form.</comment>
+  </data>
+  <data name="Use my location" xml:space="preserve">
+    <value>Use my location</value>
+    <comment>Button: engage a mobile device's GPS to look up the customer's location</comment>
+  </data>
+  <data name="View events at: {0}" xml:space="preserve">
+    <value>View events at: {0}</value>
+    <comment>Link to view events at a location; {0} is the name of the location</comment>
+  </data>
+  <data name="View show notes" xml:space="preserve">
+    <value>View show notes</value>
+    <comment>Label that links to a podcast's show notes</comment>
+  </data>
+  <data name="Visit home page" xml:space="preserve">
+    <value>Visit home page</value>
+    <comment>Label describing the home page link</comment>
+  </data>
+  <data name="Volunteer" xml:space="preserve">
+    <value>Volunteer</value>
+    <comment>Text to show as the page title on the volunteer form page</comment>
+  </data>
+  <data name="We are still working on a request you submitted on {0} at {1}. You'll be hearing from us soon." xml:space="preserve">
+    <value>We are still working on a request you submitted on {0} at {1}. You'll be hearing from us soon.</value>
+    <comment>Error message: there's a pending request for the account; {0} is replace with the date of the request, {1} with the time</comment>
+  </data>
+  <data name="We are unable to renew your card at this time. Please contact &lt;a href=&quot;{0}&quot;&gt;your library&lt;/a&gt; to renew your library card." xml:space="preserve">
+    <value>We are unable to renew your card at this time. Please contact &lt;a href="{0}"&gt;your library&lt;/a&gt; to renew your library card.</value>
     <comment>Message informing the card cannot be renewed and how to proceed; {0} is replaced with a link to the locations</comment>
   </data>
-  <data name="Forgot your password?" xml:space="preserve">
-    <value>Forgot your password?</value>
-    <comment>Link for a customer to click if they've forgotten their password</comment>
+  <data name="Weekly Availability" xml:space="preserve">
+    <value>Weekly Availability</value>
+    <comment>Volunteer form prompt asking about when a customer is available to work</comment>
   </data>
-  <data name="Parent/Guardian Barcode" xml:space="preserve">
-    <value>Parent/Guardian Barcode</value>
-    <comment>Label prompting a customer to entier the parent or guardian's barcode number</comment>
+  <data name="Why do you want to volunteer? Describe any previous volunteer experience." xml:space="preserve">
+    <value>Why do you want to volunteer? Describe any previous volunteer experience.</value>
+    <comment>Volunteer form prompt asking about interest.</comment>
   </data>
-  <data name="Library Card Number" xml:space="preserve">
-    <value>Library Card Number</value>
-    <comment>Label prompting a customer to enter their library card number</comment>
+  <data name="With no valid address on file your renewal request may not be eligible for a full renewal." xml:space="preserve">
+    <value>With no valid address on file your renewal request may not be eligible for a full renewal.</value>
+    <comment>Label informing how the request may be processed</comment>
   </data>
-  <data name="Password" xml:space="preserve">
-    <value>Password</value>
-    <comment>Label prompting a customer to enter their password</comment>
+  <data name="Yes, this is my address." xml:space="preserve">
+    <value>Yes, this is my address.</value>
+    <comment>Button: responding in the affirmative to the question of if the customer still lives at a listed address</comment>
   </data>
-  <data name="Renew your library card" xml:space="preserve">
-    <value>Renew your library card</value>
-    <comment>Default header for card renewal request pages</comment>
+  <data name="You can listen to our podcast on:" xml:space="preserve">
+    <value>You can listen to our podcast on:</value>
+    <comment>Label prompting external services which carry a podcast</comment>
+  </data>
+  <data name="You have entered an invalid card number or password." xml:space="preserve">
+    <value>You have entered an invalid card number or password.</value>
+    <comment>Error message: invalid login information</comment>
+  </data>
+  <data name="You must request a date on or after: {0}" xml:space="preserve">
+    <value>You must request a date on or after: {0}</value>
+    <comment>Error message: the earliest day a service can be engaged; {0} is the earliest date</comment>
+  </data>
+  <data name="You must request a time before: {0}" xml:space="preserve">
+    <value>You must request a time before: {0}</value>
+    <comment>Error message: the latest time a service can be requested; {0} is the latest time</comment>
+  </data>
+  <data name="You must supply a value for: {0}" xml:space="preserve">
+    <value>You must supply a value for: {0}</value>
+    <comment>Error message: required field; {0} is the required field</comment>
+  </data>
+  <data name="Your time is scheduled" xml:space="preserve">
+    <value>Your time is scheduled</value>
+    <comment>Header for success page once a customer's time is scheduled</comment>
+  </data>
+  <data name="{0} (opens in a new window)" xml:space="preserve">
+    <value>{0} (opens in a new window)</value>
+    <comment>Description of a link with information added to indicate the link opens in a new window; {0} is the link description</comment>
+  </data>
+  <data name="{0} at {1} Library" xml:space="preserve">
+    <value>{0} at {1} Library</value>
+    <comment>Location feature heading; {0} is the feature of the location, {1} is the name of the location</comment>
+  </data>
+  <data name="{0} help" xml:space="preserve">
+    <value>{0} help</value>
+    <comment>Title for help on a specific resource; {0} is the name of the resource (e.g. "ConsumerReports.org" or "OverDrive")</comment>
+  </data>
+  <data name="{0} offers:" xml:space="preserve">
+    <value>{0} offers:</value>
+    <comment>Label indicating what type of materials a service offers; {0} is the name of the service (e.g. "ConsumerReports.org", "OverDrive")</comment>
+  </data>
+  <data name="{0} Podcast" xml:space="preserve">
+    <value>{0} Podcast</value>
+    <comment>Podcast title; {0} is the name of the podcast</comment>
   </data>
 </root>

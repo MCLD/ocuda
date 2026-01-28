@@ -9,7 +9,7 @@ namespace Ocuda.Ops.Models.Definitions
             {
             new()
             {
-                Id = ApplicationPermission.CardRenewalManagement,
+                Id = ApplicationPermission.RenewCardManagement,
                 Info = "Manage settings related to card renewal.",
                 Name = "Card Renewal Management"
             },

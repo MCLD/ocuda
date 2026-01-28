@@ -8,21 +8,21 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class CardRenewalRequestRepository
-        : GenericRepository<PromenadeContext, CardRenewalRequest>, ICardRenewalRequestRepository
+    public class RenewCardRequestRepository
+        : GenericRepository<PromenadeContext, RenewCardRequest>, IRenewCardRequestRepository
     {
-        public CardRenewalRequestRepository(Repository<PromenadeContext> repositoryFacade,
-            ILogger<CardRenewalRequest> logger) : base(repositoryFacade, logger)
+        public RenewCardRequestRepository(Repository<PromenadeContext> repositoryFacade,
+            ILogger<RenewCardRequest> logger) : base(repositoryFacade, logger)
         {
         }
 
-        public async Task AddSaveAsync(CardRenewalRequest request)
+        public async Task AddSaveAsync(RenewCardRequest request)
         {
             await DbSet.AddAsync(request);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<CardRenewalRequest> GetPendingRequestAsync(int customerId)
+        public async Task<RenewCardRequest> GetPendingRequestAsync(int customerId)
         {
             return await DbSet
                 .AsNoTracking()

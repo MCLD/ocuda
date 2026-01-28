@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.Areas.Services.ViewModels.CardRenewal;
+using Ocuda.Ops.Controllers.Areas.Services.ViewModels.RenewCard;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
@@ -23,35 +23,35 @@ namespace Ocuda.Ops.Controllers.Areas.Services
 {
     [Area("Services")]
     [Route("[area]/[controller]")]
-    public class CardRenewalController : BaseController<CardRenewalController>
+    public class RenewCardController : BaseController<RenewCardController>
     {
         private const string leapPatronRecordsPath = "/record";
 
-        private readonly ICardRenewalRequestService _cardRenewalRequestService;
-        private readonly ICardRenewalService _cardRenewalService;
+        private readonly IRenewCardRequestService _renewCardRequestService;
+        private readonly IRenewCardService _renewCardService;
         private readonly ILanguageService _languageService;
         private readonly IPolarisHelper _polarisHelper;
 
-        public CardRenewalController(ServiceFacades.Controller<CardRenewalController> context,
-            ICardRenewalRequestService cardRenewalRequestService,
-            ICardRenewalService cardRenewalService,
+        public RenewCardController(ServiceFacades.Controller<RenewCardController> context,
+            IRenewCardRequestService renewCardRequestService,
+            IRenewCardService renewCardService,
             ILanguageService languageService,
             IPolarisHelper polarisHelper)
             : base(context)
         {
-            ArgumentNullException.ThrowIfNull(cardRenewalRequestService);
-            ArgumentNullException.ThrowIfNull(cardRenewalService);
+            ArgumentNullException.ThrowIfNull(renewCardRequestService);
+            ArgumentNullException.ThrowIfNull(renewCardService);
             ArgumentNullException.ThrowIfNull(languageService);
             ArgumentNullException.ThrowIfNull(polarisHelper);
 
-            _cardRenewalRequestService = cardRenewalRequestService;
-            _cardRenewalService = cardRenewalService;
+            _renewCardRequestService = renewCardRequestService;
+            _renewCardService = renewCardService;
             _languageService = languageService;
             _polarisHelper = polarisHelper;
         }
 
         public static string Name
-        { get { return "CardRenewal"; } }
+        { get { return "RenewCard"; } }
 
         [HttpGet("[action]/{id}")]
         [RestoreModelState]
@@ -62,7 +62,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 return RedirectToAction(nameof(Index));
             }
 
-            var request = await _cardRenewalRequestService.GetRequestAsync(id);
+            var request = await _renewCardRequestService.GetRequestAsync(id);
 
             if (request == null)
             {
@@ -79,12 +79,12 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                     await _siteSettingService.GetSettingStringAsync(Models
                         .Keys
                         .SiteSetting
-                        .CardRenewal
+                        .RenewCard
                         .AddressLookupUrl)),
                 AssessorLookupUrl = await _siteSettingService.GetSettingStringAsync(Models
                     .Keys
                     .SiteSetting
-                    .CardRenewal
+                    .RenewCard
                     .AssessorLookupUrl),
                 Customer = customer,
                 CustomerCode = await _polarisHelper
@@ -95,7 +95,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
 
             if (!request.ProcessedAt.HasValue)
             {
-                var responses = await _cardRenewalService.GetAvailableResponsesAsync();
+                var responses = await _renewCardService.GetAvailableResponsesAsync();
                 viewModel.ResponseList = responses.Select(_ => new SelectListItem
                 {
                     Text = _.Name,
@@ -104,7 +104,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
             }
             else
             {
-                var result = await _cardRenewalService.GetResultForRequestAsync(request.Id);
+                var result = await _renewCardService.GetResultForRequestAsync(request.Id);
                 result.ResponseText = CommonMark.CommonMarkConverter.Convert(result.ResponseText);
                 viewModel.Result = result;
             }
@@ -115,7 +115,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 var ignoredBlocks = await _siteSettingService.GetSettingStringAsync(Models
                    .Keys
                    .SiteSetting
-                   .CardRenewal
+                   .RenewCard
                    .IgnoredBlockIds);
                 if (!string.IsNullOrWhiteSpace(ignoredBlocks))
                 {
@@ -143,7 +143,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
             var acceptedCounty = await _siteSettingService.GetSettingStringAsync(Models
                 .Keys
                 .SiteSetting
-                .CardRenewal
+                .RenewCard
                 .AcceptedCounty);
             if (!string.IsNullOrWhiteSpace(acceptedCounty))
             {
@@ -155,7 +155,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
             var chargeLimit = await _siteSettingService.GetSettingDoubleAsync(Models
                 .Keys
                 .SiteSetting
-                .CardRenewal
+                .RenewCard
                 .ChargesLimit);
             if (chargeLimit >= 0 && customer.ChargeBalance >= chargeLimit)
             {
@@ -178,7 +178,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
             var leapPatronUrl = await _siteSettingService.GetSettingStringAsync(Models
                 .Keys
                 .SiteSetting
-                .CardRenewal
+                .RenewCard
                 .LeapPatronUrl);
             if (!string.IsNullOrWhiteSpace(leapPatronUrl))
             {
@@ -203,7 +203,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
             {
                 try
                 {
-                    var processResult = await _cardRenewalService.ProcessRequestAsync(
+                    var processResult = await _renewCardService.ProcessRequestAsync(
                         viewModel.RequestId,
                         viewModel.ResponseId.Value,
                         viewModel.ResponseText,
@@ -214,7 +214,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                         ShowAlertDanger($"There was an error sending the email for request {viewModel.RequestId}");
                     }
 
-                    if (processResult.Type == CardRenewalResponse.ResponseType.Accept)
+                    if (processResult.Type == RenewCardResponse.ResponseType.Accept)
                     {
                         ShowAlertSuccess($"Request {viewModel.RequestId} has been successfully processed and the record has been updated in Polaris!");
 
@@ -224,7 +224,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                             return RedirectToAction(nameof(Details), new { viewModel.RequestId });
                         }
                     }
-                    else if (processResult.Type == CardRenewalResponse.ResponseType.Partial)
+                    else if (processResult.Type == RenewCardResponse.ResponseType.Partial)
                     {
                         ShowAlertSuccess($"Request {viewModel.RequestId} has been successfully processed, be sure to update the record in Polaris!");
                     }
@@ -251,7 +251,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
         {
             try
             {
-                await _cardRenewalService.DiscardRequestAsync(requestId);
+                await _renewCardService.DiscardRequestAsync(requestId);
                 ShowAlertSuccess($"Request {requestId} has been discarded");
             }
             catch (OcudaException ex)
@@ -268,7 +268,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
         {
             try
             {
-                var response = await _cardRenewalService
+                var response = await _renewCardService
                     .GetResponseTextAsync(responseId, languageId);
 
                 var options = new JsonSerializerOptions
@@ -304,7 +304,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 IsProcessed = processed
             };
 
-            var requests = await _cardRenewalRequestService.GetRequestsAsync(filter);
+            var requests = await _renewCardRequestService.GetRequestsAsync(filter);
 
             var viewModel = new IndexViewModel
             {
@@ -318,18 +318,18 @@ namespace Ocuda.Ops.Controllers.Areas.Services
 
             if (processed)
             {
-                viewModel.PendingCount = await _cardRenewalRequestService.GetRequestCountAsync(false);
+                viewModel.PendingCount = await _renewCardRequestService.GetRequestCountAsync(false);
                 viewModel.ProcessedCount = viewModel.ItemCount;
 
                 foreach (var request in viewModel.CardRequests)
                 {
-                    request.Accepted = await _cardRenewalService.IsRequestAccepted(request.Id);
+                    request.Accepted = await _renewCardService.IsRequestAccepted(request.Id);
                 }
             }
             else
             {
                 viewModel.PendingCount = viewModel.ItemCount;
-                viewModel.ProcessedCount = await _cardRenewalRequestService.GetRequestCountAsync(true);
+                viewModel.ProcessedCount = await _renewCardRequestService.GetRequestCountAsync(true);
             }
 
             return View(viewModel);

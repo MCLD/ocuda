@@ -5,15 +5,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Ops.Models.Entities
 {
-    public class CardRenewalResult
+    public class RenewCardResult
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Required]
-        public int CardRenewalRequestId { get; set; }
+        public int RenewCardRequestId { get; set; }
 
-        public int? CardRenewalResponseId { get; set; }
-        public CardRenewalResponse CardRenewalResponse { get; set; }
+        public int? RenewCardResponseId { get; set; }
+        public RenewCardResponse RenewCardResponse { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

@@ -2,14 +2,14 @@
 {
     namespace SiteSetting
     {
-        public static class CardRenewal
+        public static class RenewCard
         {
-            public static readonly string AcceptedCounty = "CardRenewal.AcceptedCounty";
-            public static readonly string AddressLookupUrl = "CardRenewal.AddressLookupUrl";
-            public static readonly string AssessorLookupUrl = "CardRenewal.AssessorLookupUrl";
-            public static readonly string ChargesLimit = "CardRenewal.ChargesLimit";
-            public static readonly string IgnoredBlockIds = "CardRenewal.IgnoredBlockIds";
-            public static readonly string LeapPatronUrl = "CardRenewal.LeapPatronUrl";
+            public static readonly string AcceptedCounty = "RenewCard.AcceptedCounty";
+            public static readonly string AddressLookupUrl = "RenewCard.AddressLookupUrl";
+            public static readonly string AssessorLookupUrl = "RenewCard.AssessorLookupUrl";
+            public static readonly string ChargesLimit = "RenewCard.ChargesLimit";
+            public static readonly string IgnoredBlockIds = "RenewCard.IgnoredBlockIds";
+            public static readonly string LeapPatronUrl = "RenewCard.LeapPatronUrl";
         }
 
         public static class Carousel

@@ -11,16 +11,16 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class CardRenewalRequestRepository :
-        GenericRepository<PromenadeContext, CardRenewalRequest>, ICardRenewalRequestRepository
+    public class RenewCardRequestRepository :
+        GenericRepository<PromenadeContext, RenewCardRequest>, IRenewCardRequestRepository
     {
-        public CardRenewalRequestRepository(Repository<PromenadeContext> repositoryFacade,
-            ILogger<CardRenewalRequestRepository> logger)
+        public RenewCardRequestRepository(Repository<PromenadeContext> repositoryFacade,
+            ILogger<RenewCardRequestRepository> logger)
             : base(repositoryFacade, logger)
         {
         }
 
-        public async Task<CardRenewalRequest> GetByIdAsync(int id)
+        public async Task<RenewCardRequest> GetByIdAsync(int id)
         {
             return await DbSet
                 .AsNoTracking()
@@ -42,7 +42,7 @@ namespace Ocuda.Ops.Data.Promenade
             return await query.CountAsync();
         }
 
-        public async Task<CollectionWithCount<CardRenewalRequest>> GetPaginatedAsync(
+        public async Task<CollectionWithCount<RenewCardRequest>> GetPaginatedAsync(
             RequestFilter filter)
         {
             var query = DbSet
@@ -63,7 +63,7 @@ namespace Ocuda.Ops.Data.Promenade
                 query = query.OrderBy(_ => _.SubmittedAt);
             }
 
-            return new CollectionWithCount<CardRenewalRequest>
+            return new CollectionWithCount<RenewCardRequest>
             {
                 Count = await query.CountAsync(),
                 Data = await query

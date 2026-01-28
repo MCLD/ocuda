@@ -1,0 +1,85 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.RenewCard.VerifyAddressViewModel
+
+@if (Model?.HeaderSegmentText != null)
+{
+    if (!string.IsNullOrEmpty(Model.HeaderSegmentText.Header))
+    {
+        <h1 class="prom-title">@Model.HeaderSegmentText.Header</h1>
+    }
+    @Html.Raw(Model.HeaderSegmentText.Text)
+}
+else
+{
+    <h1 class="prom-title">@Localizer[Promenade.RenewYourLibraryCard]</h1>
+}
+
+<div class="row">
+    <div class="col-12">
+        <form asp-action="@nameof(RenewCardController.VerifyAddress)"
+              asp-controller="@RenewCardController.Name"
+              asp-route-culture=""
+              method="post"
+              role="form">
+            <input asp-for="Email" formgroup autocomplete="email" />
+            <div class="row">
+                <div class="col-md-9 offset-md-3">
+                    @if (Model.Addresses.Any())
+                    {
+                        <div class="row fs-6">
+                            <strong class="mb-2">
+                                @Localizer[Promenade.RenewCardSameAddress]
+                            </strong>
+                            @foreach (var address in Model.Addresses)
+                            {
+                                <div class="form-group mb-3">
+                                    <div>@address.StreetAddressOne</div>
+                                    @if (!string.IsNullOrWhiteSpace(address.StreetAddressTwo))
+                                    {
+                                        <div>@address.StreetAddressTwo</div>
+                                    }
+                                    <span>@address.City</span>
+                                    <span>@address.PostalCode</span>
+                                    <div>County: @address.County</div>
+                                </div>
+                            }
+                        </div>
+                        <div>
+                            <button type="submit"
+                                    name="@nameof(Model.SameAddress)"
+                                    value="true"
+                                    class="btn btn-outline-success btn-lg mb-3 d-block">
+                                <span class="fa-regular fa-circle-check"></span>
+                                @Localizer[Promenade.RenewCardSameAddressYes]
+                            </button>
+                            <button type="submit"
+                                    name="@nameof(Model.SameAddress)"
+                                    value="false"
+                                    class="btn btn-outline-warning btn-lg d-block">
+                                <span class="fa-regular fa-circle-xmark"></span>
+                                @Localizer[Promenade.RenewCardSameAddressNo]
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        @if (Model?.NoAddressSegmentText != null)
+                        {
+                            @Html.Raw(Model.NoAddressSegmentText.Text)
+                        }
+                        else
+                        {
+                            <p>@Localizer[Promenade.RenewCardNoAddress]</p>
+                        }
+                        <div>
+                            <button type="submit"
+                                    class="btn btn-outline-success btn-lg mt-3">
+                                <span class="fa-regular fa-circle-check"></span>
+                                @Localizer[Promenade.ButtonSubmit]
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

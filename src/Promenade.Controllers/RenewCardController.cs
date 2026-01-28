@@ -11,7 +11,7 @@ using Ocuda.Models;
 using Ocuda.PolarisHelper;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.Filters;
-using Ocuda.Promenade.Controllers.ViewModels.CardRenewal;
+using Ocuda.Promenade.Controllers.ViewModels.RenewCard;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
@@ -19,9 +19,9 @@ using Ocuda.Utility.Filters;
 
 namespace Ocuda.Promenade.Controllers
 {
-    [Route("[Controller]")]
-    [Route("{culture:cultureConstraint?}/[Controller]")]
-    public class CardRenewalController : BaseController<CardRenewalController>
+    [Route("renew-card")]
+    [Route("{culture:cultureConstraint?}/renew-card")]
+    public class RenewCardController : BaseController<RenewCardController>
     {
         private const int AgeOfMajority = 18;
 
@@ -29,31 +29,31 @@ namespace Ocuda.Promenade.Controllers
         private const string TempDataTimeout = "TempData.Timeout";
         private const string TempDataUnableToRenew = "TempData.UnableToRenew";
 
-        private readonly CardRenewalService _cardRenewalService;
+        private readonly RenewCardService _renewCardService;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IPolarisHelper _polarisHelper;
         private readonly SegmentService _segmentService;
 
-        public CardRenewalController(ServiceFacades.Controller<CardRenewalController> context,
-            CardRenewalService cardRenewalService,
+        public RenewCardController(ServiceFacades.Controller<RenewCardController> context,
+            RenewCardService renewCardService,
             IDateTimeProvider dateTimeProvider,
             IPolarisHelper polarisHelper,
             SegmentService segmentService)
             : base(context)
         {
-            ArgumentNullException.ThrowIfNull(cardRenewalService);
+            ArgumentNullException.ThrowIfNull(renewCardService);
             ArgumentNullException.ThrowIfNull(dateTimeProvider);
             ArgumentNullException.ThrowIfNull(polarisHelper);
             ArgumentNullException.ThrowIfNull(segmentService);
 
-            _cardRenewalService = cardRenewalService;
+            _renewCardService = renewCardService;
             _dateTimeProvider = dateTimeProvider;
             _polarisHelper = polarisHelper;
             _segmentService = segmentService;
         }
 
         public static string Name
-        { get { return "CardRenewal"; } }
+        { get { return "RenewCard"; } }
 
         [HttpGet]
         [RestoreModelState]
@@ -66,7 +66,7 @@ namespace Ocuda.Promenade.Controllers
                 _logger.LogError("Card renewal API settings are not configured");
 
                 var notConfiguredSegmentId = await _siteSettingService.GetSettingIntAsync(
-                    Models.Keys.SiteSetting.CardRenewal.NotConfiguredSegment,
+                    Models.Keys.SiteSetting.RenewCard.NotConfiguredSegment,
                     forceReload);
 
                 SegmentText notConfiguredSegmentText = null;
@@ -92,7 +92,7 @@ namespace Ocuda.Promenade.Controllers
             if (TempData.ContainsKey(TempDataTimeout))
             {
                 ModelState.AddModelError(nameof(IndexViewModel.Invalid),
-                    _localizer[i18n.Keys.Promenade.CardRenewalSessionTimeout]);
+                    _localizer[i18n.Keys.Promenade.RenewCardSessionTimeout]);
                 TempData.Remove(TempDataTimeout);
             }
 
@@ -104,17 +104,18 @@ namespace Ocuda.Promenade.Controllers
                     forceReload)
             };
 
-            var cardRenewalSegmentId = await _siteSettingService.GetSettingIntAsync(
-                Models.Keys.SiteSetting.CardRenewal.HomeSegment,
+            var renewCardSegmentId = await _siteSettingService.GetSettingIntAsync(
+                Models.Keys.SiteSetting.RenewCard.HomeSegment,
                 forceReload);
-            if (cardRenewalSegmentId > 0)
+            if (renewCardSegmentId > 0)
             {
                 viewModel.SegmentText = await _segmentService.GetSegmentTextBySegmentIdAsync(
-                    cardRenewalSegmentId,
+                    renewCardSegmentId,
                     forceReload);
                 if (viewModel.SegmentText == null)
                 {
-                    _logger.LogError($"Card renewal 'Home' segment id '{cardRenewalSegmentId}' not found");
+                    _logger.LogError("Card renewal 'Home' segment id {SegmentId} not found",
+                        renewCardSegmentId);
                 }
                 else if (!string.IsNullOrWhiteSpace(viewModel.SegmentText.Text))
                 {
@@ -148,19 +149,19 @@ namespace Ocuda.Promenade.Controllers
                 {
                     _logger.LogInformation($"Invalid card number or password for Barcode '{barcode}'");
                     ModelState.AddModelError(nameof(viewModel.Invalid),
-                        _localizer[i18n.Keys.Promenade.CardRenewalInvalidLogin]);
+                        _localizer[i18n.Keys.Promenade.RenewCardInvalidLogin]);
                     return RedirectToAction(nameof(Index));
                 }
 
                 var customer = _polarisHelper.GetCustomerData(barcode, password);
 
                 // Handle accounts with a pending request
-                var pendingRequest = await _cardRenewalService
+                var pendingRequest = await _renewCardService
                     .GetPendingRequestAsync(customer.Id);
                 if (pendingRequest != null)
                 {
                     ModelState.AddModelError(nameof(viewModel.Invalid),
-                        _localizer[i18n.Keys.Promenade.CardRenewalPendingRequest,
+                        _localizer[i18n.Keys.Promenade.RenewCardPendingRequest,
                         pendingRequest.SubmittedAt.ToString("d", CultureInfo.CurrentCulture),
                         pendingRequest.SubmittedAt.ToString("t", CultureInfo.CurrentCulture)]);
                     return RedirectToAction(nameof(Index));
@@ -168,7 +169,7 @@ namespace Ocuda.Promenade.Controllers
 
                 // Handle accounts that aren't expiring soon
                 var cutoffDays = await _siteSettingService.GetSettingIntAsync(
-                    Models.Keys.SiteSetting.CardRenewal.ExpirationCutoffDays);
+                    Models.Keys.SiteSetting.RenewCard.ExpirationCutoffDays);
                 if (cutoffDays > -1)
                 {
                     var renewalAllowedDate = customer
@@ -176,7 +177,7 @@ namespace Ocuda.Promenade.Controllers
                     if (renewalAllowedDate > _dateTimeProvider.Now.Date)
                     {
                         ModelState.AddModelError(nameof(viewModel.Invalid),
-                            _localizer[i18n.Keys.Promenade.CardRenewalInvalidCutoff,
+                            _localizer[i18n.Keys.Promenade.RenewCardInvalidCutoff,
                                 cutoffDays,
                                 renewalAllowedDate.ToShortDateString()]);
                         return RedirectToAction(nameof(Index));
@@ -185,7 +186,7 @@ namespace Ocuda.Promenade.Controllers
 
                 // Handle accounts belonging to staff
                 var staffCustomerCodes = await _siteSettingService.GetSettingStringAsync(
-                    Models.Keys.SiteSetting.CardRenewal.StaffCustomerCodes);
+                    Models.Keys.SiteSetting.RenewCard.StaffCustomerCodes);
                 if (!string.IsNullOrWhiteSpace(staffCustomerCodes))
                 {
                     var customerCodeList = staffCustomerCodes
@@ -200,7 +201,7 @@ namespace Ocuda.Promenade.Controllers
                             if (customer.CustomerCodeId == customerCodeId)
                             {
                                 ModelState.AddModelError(nameof(viewModel.Invalid),
-                                    _localizer[i18n.Keys.Promenade.CardRenewalInvalidStaff]);
+                                    _localizer[i18n.Keys.Promenade.RenewCardInvalidStaff]);
                                 return RedirectToAction(nameof(Index));
                             }
                         }
@@ -213,7 +214,7 @@ namespace Ocuda.Promenade.Controllers
 
                 // Handle accounts belonging to nonresidents 
                 var nonresidentCustomerCodes = await _siteSettingService.GetSettingStringAsync(
-                    Models.Keys.SiteSetting.CardRenewal.NonresidentCustomerCodes);
+                    Models.Keys.SiteSetting.RenewCard.NonresidentCustomerCodes);
                 if (!string.IsNullOrWhiteSpace(nonresidentCustomerCodes))
                 {
                     var customerCodeList = nonresidentCustomerCodes
@@ -228,7 +229,7 @@ namespace Ocuda.Promenade.Controllers
                             if (customer.CustomerCodeId == customerCodeId)
                             {
                                 var nonresidentSegmentId = await _siteSettingService
-                                    .GetSettingIntAsync(Models.Keys.SiteSetting.CardRenewal
+                                    .GetSettingIntAsync(Models.Keys.SiteSetting.RenewCard
                                         .NonresidentSegment);
                                 if (nonresidentSegmentId <= 0)
                                 {
@@ -249,7 +250,7 @@ namespace Ocuda.Promenade.Controllers
 
                 // Handle accounts that have aged out of their code
                 var ageCheckCustomerCodes = await _siteSettingService.GetSettingStringAsync(
-                    Models.Keys.SiteSetting.CardRenewal.AgeCheckCustomerCodes);
+                    Models.Keys.SiteSetting.RenewCard.AgeCheckCustomerCodes);
                 if (!string.IsNullOrWhiteSpace(ageCheckCustomerCodes))
                 {
                     var customerCodeList = ageCheckCustomerCodes
@@ -276,7 +277,7 @@ namespace Ocuda.Promenade.Controllers
                                     if (age >= AgeOfMajority)
                                     {
                                         var ageCheckSegmentId = await _siteSettingService
-                                            .GetSettingIntAsync(Models.Keys.SiteSetting.CardRenewal
+                                            .GetSettingIntAsync(Models.Keys.SiteSetting.RenewCard
                                                 .AgeCheckSegment);
                                         if (ageCheckSegmentId <= 0)
                                         {
@@ -302,7 +303,7 @@ namespace Ocuda.Promenade.Controllers
                 IEnumerable<CustomerAddress> addresses = customer.Addresses;
 
                 var acceptedCounties = await _siteSettingService
-                    .GetSettingStringAsync(Models.Keys.SiteSetting.CardRenewal.AcceptedCounties);
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.RenewCard.AcceptedCounties);
                 if (!string.IsNullOrWhiteSpace(acceptedCounties))
                 {
                     var counties = acceptedCounties.Split(",",
@@ -319,7 +320,7 @@ namespace Ocuda.Promenade.Controllers
                         _.PostalCode
                     });
 
-                var request = new CardRenewalRequest
+                var request = new RenewCardRequest
                 {
                     Addresses = addresses,
                     Barcode = barcode,
@@ -328,7 +329,7 @@ namespace Ocuda.Promenade.Controllers
                 };
 
                 var juvenileCustomerCodes = await _siteSettingService.GetSettingStringAsync(
-                    Models.Keys.SiteSetting.CardRenewal.JuvenileCustomerCodes);
+                    Models.Keys.SiteSetting.RenewCard.JuvenileCustomerCodes);
                 if (!string.IsNullOrWhiteSpace(juvenileCustomerCodes))
                 {
                     var customerCodeList = juvenileCustomerCodes
@@ -378,7 +379,7 @@ namespace Ocuda.Promenade.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var request = JsonSerializer.Deserialize<CardRenewalRequest>(
+            var request = JsonSerializer.Deserialize<RenewCardRequest>(
                 (string)TempData.Peek(TempDataRequest));
 
             if (!request.IsJuvenile)
@@ -391,7 +392,7 @@ namespace Ocuda.Promenade.Controllers
             var viewModel = new JuvenileViewModel();
 
             var segmentId = await _siteSettingService.GetSettingIntAsync(
-                Models.Keys.SiteSetting.CardRenewal.JuvenileSegment,
+                Models.Keys.SiteSetting.RenewCard.JuvenileSegment,
                 forceReload);
 
             if (segmentId > 0)
@@ -428,7 +429,7 @@ namespace Ocuda.Promenade.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var request = JsonSerializer.Deserialize<CardRenewalRequest>(
+            var request = JsonSerializer.Deserialize<RenewCardRequest>(
                 (string)TempData.Peek(TempDataRequest));
 
             if (!request.IsJuvenile)
@@ -460,7 +461,7 @@ namespace Ocuda.Promenade.Controllers
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
             var segmentId = await _siteSettingService.GetSettingIntAsync(
-                Models.Keys.SiteSetting.CardRenewal.SubmittedSegment,
+                Models.Keys.SiteSetting.RenewCard.SubmittedSegment,
                 forceReload);
 
             SegmentText segmentText = null;
@@ -531,7 +532,7 @@ namespace Ocuda.Promenade.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var request = JsonSerializer.Deserialize<CardRenewalRequest>(
+            var request = JsonSerializer.Deserialize<RenewCardRequest>(
                 (string)TempData.Peek(TempDataRequest));
 
             if (request.IsJuvenile && string.IsNullOrWhiteSpace(request.GuardianName))
@@ -548,7 +549,7 @@ namespace Ocuda.Promenade.Controllers
             };
 
             var verifyAddressSegmentId = await _siteSettingService.GetSettingIntAsync(
-                Models.Keys.SiteSetting.CardRenewal.VerifyAddressSegment,
+                Models.Keys.SiteSetting.RenewCard.VerifyAddressSegment,
                 forceReload);
             if (verifyAddressSegmentId > 0)
             {
@@ -569,7 +570,7 @@ namespace Ocuda.Promenade.Controllers
             if (!request.Addresses.Any())
             {
                 var noAddressSegmentId = await _siteSettingService.GetSettingIntAsync(
-                    Models.Keys.SiteSetting.CardRenewal.NoAddressSegment,
+                    Models.Keys.SiteSetting.RenewCard.NoAddressSegment,
                     forceReload);
                 if (noAddressSegmentId > 0)
                 {
@@ -606,7 +607,7 @@ namespace Ocuda.Promenade.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var request = JsonSerializer.Deserialize<CardRenewalRequest>(
+            var request = JsonSerializer.Deserialize<RenewCardRequest>(
                 (string)TempData.Peek(TempDataRequest));
 
             if (request.IsJuvenile && string.IsNullOrWhiteSpace(request.GuardianName))
@@ -623,7 +624,7 @@ namespace Ocuda.Promenade.Controllers
                     request.SameAddress = true;
                 }
 
-                await _cardRenewalService.CreateRequestAsync(request);
+                await _renewCardService.CreateRequestAsync(request);
 
                 TempData.Remove(TempDataRequest);
 

@@ -394,8 +394,8 @@ namespace Ocuda.Promenade.Web
             // repositories
             services.AddScoped<Service.Interfaces.Repositories.ICardDetailRepository,
                 Data.Promenade.CardDetailRepository>();
-            services.AddScoped<Service.Interfaces.Repositories.ICardRenewalRequestRepository,
-                Data.Promenade.CardRenewalRequestRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IRenewCardRequestRepository,
+                Data.Promenade.RenewCardRequestRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ICardRepository,
                 Data.Promenade.CardRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ICarouselButtonLabelTextRepository,
@@ -528,7 +528,7 @@ namespace Ocuda.Promenade.Web
                 Utility.Services.PathResolverService>();
 
             // promenade services
-            services.AddScoped<CardRenewalService>();
+            services.AddScoped<RenewCardService>();
             services.AddScoped<CarouselService>();
             services.AddScoped<CategoryService>();
             services.AddScoped<DeckService>();

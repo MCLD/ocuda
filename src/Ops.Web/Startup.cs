@@ -345,10 +345,10 @@ namespace Ocuda.Ops.Web
             // repositories
             services.AddScoped<Service.Interfaces.Ops.Repositories.IApiKeyRepository,
                 Data.Ops.ApiKeyRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ICardRenewalResponseRepository,
-                Data.Ops.CardRenewalResponseRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ICardRenewalResultRepository,
-                Data.Ops.CardRenewalResultRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IRenewCardResponseRepository,
+                Data.Ops.RenewCardResponseRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IRenewCardResultRepository,
+                Data.Ops.RenewCardResultRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
                 Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
@@ -458,8 +458,8 @@ namespace Ocuda.Ops.Web
 
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardDetailRepository,
                 Data.Promenade.CardDetailRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardRenewalRequestRepository,
-                Data.Promenade.CardRenewalRequestRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IRenewCardRequestRepository,
+                Data.Promenade.RenewCardRequestRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardRepository,
                 Data.Promenade.CardRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselButtonLabelRepository,
@@ -580,8 +580,8 @@ namespace Ocuda.Ops.Web
             // services
             services.AddScoped<IApiKeyService, ApiKeyService>();
             services.AddScoped<IAuthorizationService, AuthorizationService>();
-            services.AddScoped<ICardRenewalRequestService, CardRenewalRequestService>();
-            services.AddScoped<ICardRenewalService, CardRenewalService>();
+            services.AddScoped<IRenewCardRequestService, RenewCardRequestService>();
+            services.AddScoped<IRenewCardService, RenewCardService>();
             services.AddScoped<ICarouselService, CarouselService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ICoverIssueService, CoverIssueService>();
