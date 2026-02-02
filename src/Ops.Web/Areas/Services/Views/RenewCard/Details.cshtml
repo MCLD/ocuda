@@ -1,4 +1,4 @@
-﻿	@model Ocuda.Ops.Controllers.Areas.Services.ViewModels.RenewCard.DetailsViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.Services.ViewModels.RenewCard.DetailsViewModel
 
 <div class="row">
 	<div class="col-12 col-md-6 col-xl-4 offset-xl-2">
@@ -54,9 +54,18 @@
 					<td>@(Model.InCounty ? "Yes" : "No")</td>
 				</tr>
 			}
-			<tr>
+			<tr class="@(!string.IsNullOrWhiteSpace(Model.CustomerCodeErrorMessage) ? "table-warning" : "")">
 				<th>Patron code</th>
-				<td>@Model.CustomerCode</td>
+				<td>
+					@if (!string.IsNullOrWhiteSpace(Model.CustomerCodeErrorMessage))
+					{
+						@Model.CustomerCodeErrorMessage
+					}
+					else
+					{
+						@Model.CustomerCode
+					}
+				</td>
 			</tr>
 		</table>
 
@@ -99,10 +108,14 @@
 				<th>Has system blocks</th>
 				<td>@(Model.Customer.IsBlocked ? "Yes" : "No")</td>
 			</tr>
-			<tr class="@(Model.CustomerBlocks?.Count > 0 ? "table-danger" : "table-success")">
+			<tr class="@(!string.IsNullOrWhiteSpace(Model.CustomerBlocksErrorMessage) ? "table-warning" : Model.CustomerBlocks?.Count > 0 ? "table-danger" : "table-success")">
 				<th>Blocks</th>
 				<td>
-					@if (Model.CustomerBlocks?.Count > 0)
+					@if (!string.IsNullOrWhiteSpace(Model.CustomerBlocksErrorMessage))
+					{
+						@Model.CustomerBlocksErrorMessage
+					}
+					else if (Model.CustomerBlocks?.Count > 0)
 					{
 						foreach (var block in Model.CustomerBlocks)
 						{

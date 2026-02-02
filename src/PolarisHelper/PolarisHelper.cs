@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Clc.Polaris.Api;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Models;
 using Ocuda.PolarisHelper.Models;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Services.Interfaces;
 
@@ -72,30 +74,46 @@ namespace Ocuda.PolarisHelper
 
         public bool AuthenticateCustomer(string barcode, string password)
         {
-            var validateResult = _papiClient.PatronValidate(barcode, password)?.Data;
+            var validateResult = _papiClient.PatronValidate(barcode, password);
 
-            return validateResult != null;
+            if (validateResult.Exception != null)
+            {
+                _logger.LogError(validateResult.Exception, 
+                    "Error authenticating Polaris account through PAPI");
+                throw new OcudaException("Error authenticating customer");
+            }
+
+            return validateResult?.Data != null;
         }
 
         public async Task<List<CustomerBlock>> GetCustomerBlocksAsync(int customerId)
         {
-            var blocks = await _context.Database
-                .SqlQuery<CustomerBlock>(@$"SELECT PS.PatronStopID AS BlockId, PSD.Description
+            try
+            {
+                var blocks = await _context.Database
+                    .SqlQuery<CustomerBlock>(@$"SELECT PS.PatronStopID AS BlockId, PSD.Description
                     FROM PatronStops as PS
                     INNER JOIN PatronStopDescriptions as PSD
                     on PS.PatronStopId = PSD.PatronStopId
                     WHERE PS.PatronID = {customerId}")
-                .ToListAsync();
+                    .ToListAsync();
 
-            var freeTextBlocks = await _context.Database
-                .SqlQuery<CustomerBlock>(@$"SELECT NULL AS BlockId, FreeTextBlock AS Description
+                var freeTextBlocks = await _context.Database
+                    .SqlQuery<CustomerBlock>(@$"SELECT NULL AS BlockId, FreeTextBlock AS Description
                     FROM PatronFreeTextBlocks
                     WHERE PatronID = {customerId}")
-                .ToListAsync();
+                    .ToListAsync();
 
-            blocks.AddRange(freeTextBlocks);
+                blocks.AddRange(freeTextBlocks);
 
-            return blocks;
+                return blocks;
+            }
+            catch (Exception ex) when (ex is DbException || ex is InvalidOperationException)
+            {
+                _logger.LogError(ex, "Error querying Polaris blocks for patron {PatronId}",
+                    customerId);
+                throw new OcudaException("Error retrieving customer blocks");
+            }
         }
 
         public async Task<string> GetCustomerCodeNameAsync(int customerCodeId)
@@ -105,7 +123,15 @@ namespace Ocuda.PolarisHelper
 
             if (patronCodes == null)
             {
-                patronCodes = _papiClient.PatronCodesGet().Data.PatronCodesRows;
+                var patronCodesResult = _papiClient.PatronCodesGet();
+                if (patronCodesResult?.Exception != null)
+                {
+                    _logger.LogError(patronCodesResult.Exception, 
+                        "Error getting Polaris patron codes through PAPI");
+                    throw new OcudaException("Error resolving patron code name");
+                }
+
+                patronCodes = patronCodesResult.Data.PatronCodesRows;
                 await _cache.SaveToCacheAsync(Cache.PolarisPatronCodes,
                     patronCodes,
                     CacheCodesHours);
@@ -119,20 +145,42 @@ namespace Ocuda.PolarisHelper
 
         public Customer GetCustomerData(string barcode, string password)
         {
-            var patronData = _papiClient.PatronBasicDataGet(barcode, password, addresses: true)
-                .Data
-                .PatronBasicData;
+            var patronDataResult = _papiClient.PatronBasicDataGet(barcode, password, addresses: true);
 
-            return GetCustomerInfo(patronData);
+            if (patronDataResult?.Exception != null)
+            {
+                _logger.LogError(patronDataResult.Exception, "Error getting Polaris account data through PAPI");
+                throw new OcudaException("Error accessing Polaris records");
+            }
+
+            var patronData = patronDataResult?.Data?.PatronBasicData;
+
+            if (patronData != null)
+            {
+                return GetCustomerInfo(patronData);
+            }
+
+            return null;
+
         }
 
         public Customer GetCustomerDataOverride(string barcode)
         {
-            var patronData = _papiClient.PatronBasicDataGet(barcode, addresses: true, notes: true)
-                .Data
-                .PatronBasicData;
+            var patronDataResult = _papiClient.PatronBasicDataGet(barcode, addresses: true, notes: true);
+            if (patronDataResult?.Exception != null)
+            {
+                _logger.LogError(patronDataResult.Exception, "Error getting Polaris account data through PAPI override");
+                throw new OcudaException("Error accessing Polaris records");
+            }
 
-            return GetCustomerInfo(patronData);
+            var patronData = patronDataResult?.Data?.PatronBasicData;
+
+            if (patronData != null)
+            {
+                return GetCustomerInfo(patronData);
+            }
+
+            return null;
         }
 
         public RenewRegistrationResult RenewCustomerRegistration(string barcode, string email)
@@ -245,25 +293,60 @@ namespace Ocuda.PolarisHelper
 
         private bool ValidateConfiguration()
         {
-            var validConfiguration = !string.IsNullOrEmpty(_papiClient.AccessID)
-                && !string.IsNullOrWhiteSpace(_papiClient.AccessKey)
-                && !string.IsNullOrWhiteSpace(_papiClient.Hostname);
+            var validConfiguration = true;
 
-            if (!validConfiguration)
+            if (string.IsNullOrEmpty(_papiClient.AccessID))
             {
-                _logger.LogError("PAPI not configured");
+                _logger.LogError("Polaris Helper is not configured: PapiSetting 'AccessID' is missing");
+                validConfiguration = false;
             }
-            else if (_papiClient.AllowStaffOverrideRequests)
+            if (string.IsNullOrWhiteSpace(_papiClient.AccessKey))
             {
-                validConfiguration = _papiClient.OrganizationId != 0
-                    && _papiClient.UserId != 0
-                    && _papiClient.WorkstationId != 0
-                    && _papiClient.StaffOverrideAccount != null
-                    && !string.IsNullOrWhiteSpace(_context.Database.GetConnectionString());
+                _logger.LogError("Polaris Helper is not configured: PapiSetting 'AccessKey' is missing");
+                validConfiguration = false;
+            }
+            if (string.IsNullOrWhiteSpace(_papiClient.Hostname))
+            {
+                _logger.LogError("Polaris Helper is not configured: PapiSetting 'Hostname' is missing");
+                validConfiguration = false;
+            }
 
-                if (!validConfiguration)
+            if (_papiClient.AllowStaffOverrideRequests)
+            {
+                if (_papiClient.OrganizationId == 0)
                 {
-                    _logger.LogError("PAPI/PolarisDB not configured for staff requests");
+                    _logger.LogError("Polaris Helper is not configured: PapiSetting 'OrganizationId' is missing");
+                    validConfiguration = false;
+                }
+                if (_papiClient.UserId == 0)
+                {
+                    _logger.LogError("Polaris Helper is not configured: PapiSetting 'UserId' is missing");
+                    validConfiguration = false;
+                }
+                if (_papiClient.WorkstationId == 0)
+                {
+                    _logger.LogError("Polaris Helper is not configured: PapiSetting 'WorkstationId' is missing");
+                    validConfiguration = false;
+                }
+                if (string.IsNullOrWhiteSpace(_papiClient.StaffOverrideAccount.Domain))
+                {
+                    _logger.LogError("Polaris Helper is not configured: PapiSetting 'StaffOverrideAccount.Domain' is missing");
+                    validConfiguration = false;
+                }
+                if (string.IsNullOrWhiteSpace(_papiClient.StaffOverrideAccount.Password))
+                {
+                    _logger.LogError("Polaris Helper is not configured: PapiSetting 'StaffOverrideAccount.Password' is missing");
+                    validConfiguration = false;
+                }
+                if (string.IsNullOrWhiteSpace(_papiClient.StaffOverrideAccount.Username))
+                {
+                    _logger.LogError("Polaris Helper is not configured: PapiSetting 'StaffOverrideAccount.Username' is missing");
+                    validConfiguration = false;
+                }
+                if (string.IsNullOrWhiteSpace(_context.Database.GetConnectionString()))
+                {
+                    _logger.LogError("Polaris Helper is not configured: ConnectionString 'Polaris' is missing");
+                    validConfiguration = false;
                 }
             }
 

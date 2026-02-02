@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+using Ocuda.Models;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Services.ViewModels.RenewCard;
 using Ocuda.Ops.Controllers.Filters;
@@ -69,9 +70,26 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 return RedirectToAction(nameof(Index));
             }
 
-            request.Language = await _languageService.GetActiveByIdAsync(request.LanguageId);
+            Customer customer;
+            try
+            {
+                customer = _polarisHelper.GetCustomerDataOverride(request.Barcode);
 
-            var customer = _polarisHelper.GetCustomerDataOverride(request.Barcode);
+                if (customer == null)
+                {
+                    _logger.LogWarning("Unable to find Polaris record for the barcode {Barcode}",
+                        request.Barcode);
+                    ShowAlertDanger($"Unable to find Polaris record for the barcode '{request.Barcode}'");
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (OcudaException oex)
+            {
+                ShowAlertDanger(oex.Message);
+                return RedirectToAction(nameof(Index));
+            }
+
+            request.Language = await _languageService.GetActiveByIdAsync(request.LanguageId);
 
             var viewModel = new DetailsViewModel
             {
@@ -87,8 +105,6 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                     .RenewCard
                     .AssessorLookupUrl),
                 Customer = customer,
-                CustomerCode = await _polarisHelper
-                    .GetCustomerCodeNameAsync(customer.CustomerCodeId),
                 CustomerName = $"{customer.NameFirst} {customer.NameLast}",
                 Request = request
             };
@@ -109,35 +125,53 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 viewModel.Result = result;
             }
 
-            var blocks = await _polarisHelper.GetCustomerBlocksAsync(customer.Id);
-            if (blocks.Count > 0)
+            try
             {
-                var ignoredBlocks = await _siteSettingService.GetSettingStringAsync(Models
-                   .Keys
-                   .SiteSetting
-                   .RenewCard
-                   .IgnoredBlockIds);
-                if (!string.IsNullOrWhiteSpace(ignoredBlocks))
-                {
-                    var ignoredBlockIdList = ignoredBlocks
-                        .Split(',', StringSplitOptions.RemoveEmptyEntries
-                            | StringSplitOptions.TrimEntries)
-                        .ToList();
+                viewModel.CustomerCode = await _polarisHelper
+                    .GetCustomerCodeNameAsync(customer.CustomerCodeId);
+            }
+            catch (OcudaException oex)
+            {
+                viewModel.CustomerCodeErrorMessage = oex.Message;
+            }
 
-                    foreach (var ignoredBlock in ignoredBlockIdList)
+            try
+            {
+                var blocks = await _polarisHelper.GetCustomerBlocksAsync(customer.Id);
+                if (blocks.Count > 0)
+                {
+                    var ignoredBlocks = await _siteSettingService.GetSettingStringAsync(Models
+                       .Keys
+                       .SiteSetting
+                       .RenewCard
+                       .IgnoredBlockIds);
+                    if (!string.IsNullOrWhiteSpace(ignoredBlocks))
                     {
-                        if (int.TryParse(ignoredBlock, out int ignoredBlockId))
+                        var ignoredBlockIdList = ignoredBlocks
+                            .Split(',', StringSplitOptions.RemoveEmptyEntries
+                                | StringSplitOptions.TrimEntries)
+                            .ToList();
+
+                        foreach (var ignoredBlock in ignoredBlockIdList)
                         {
-                            blocks.RemoveAll(_ => _.BlockId == ignoredBlockId);
-                        }
-                        else
-                        {
-                            _logger.LogError($"Invalid ignored block id '{ignoredBlock}'");
+                            if (int.TryParse(ignoredBlock, out int ignoredBlockId))
+                            {
+                                blocks.RemoveAll(_ => _.BlockId == ignoredBlockId);
+                            }
+                            else
+                            {
+                                _logger.LogError($"Invalid ignored block id '{ignoredBlock}'");
+                            }
                         }
                     }
-                }
 
-                viewModel.CustomerBlocks = blocks;
+                    viewModel.CustomerBlocks = blocks;
+                }
+            
+            }
+            catch (OcudaException oex)
+            {
+                viewModel.CustomerBlocksErrorMessage = oex.Message;
             }
 
             var acceptedCounty = await _siteSettingService.GetSettingStringAsync(Models

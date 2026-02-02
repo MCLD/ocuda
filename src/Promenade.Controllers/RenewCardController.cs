@@ -15,6 +15,7 @@ using Ocuda.Promenade.Controllers.ViewModels.RenewCard;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Filters;
 
 namespace Ocuda.Promenade.Controllers
@@ -143,17 +144,44 @@ namespace Ocuda.Promenade.Controllers
                 var barcode = string.Concat(viewModel.Barcode.Where(_ => !char.IsWhiteSpace(_)));
                 var password = viewModel.Password.Trim();
 
-                var validateResult = _polarisHelper.AuthenticateCustomer(barcode, password);
-
-                if (!validateResult)
+                try
                 {
-                    _logger.LogInformation($"Invalid card number or password for Barcode '{barcode}'");
+                    var validateResult = _polarisHelper.AuthenticateCustomer(barcode, password);
+
+                    if (!validateResult)
+                    {
+                        _logger.LogInformation($"Invalid card number or password for Barcode '{barcode}'");
+                        ModelState.AddModelError(nameof(viewModel.Invalid),
+                            _localizer[i18n.Keys.Promenade.RenewCardInvalidLogin]);
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+                catch (OcudaException)
+                {
                     ModelState.AddModelError(nameof(viewModel.Invalid),
-                        _localizer[i18n.Keys.Promenade.RenewCardInvalidLogin]);
+                            _localizer[i18n.Keys.Promenade.ErrorProcessingRequest]);
                     return RedirectToAction(nameof(Index));
                 }
 
-                var customer = _polarisHelper.GetCustomerData(barcode, password);
+                Customer customer;
+                try
+                {
+                    customer = _polarisHelper.GetCustomerData(barcode, password);
+
+                    if (customer == null)
+                    {
+                        _logger.LogError("Unable to find customer record for the barcode {Barcode}", barcode);
+                        ModelState.AddModelError(nameof(viewModel.Invalid),
+                            _localizer[i18n.Keys.Promenade.ErrorProcessingRequest]);
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+                catch (OcudaException)
+                {
+                    ModelState.AddModelError(nameof(viewModel.Invalid),
+                            _localizer[i18n.Keys.Promenade.ErrorProcessingRequest]);
+                    return RedirectToAction(nameof(Index));
+                }
 
                 // Handle accounts with a pending request
                 var pendingRequest = await _renewCardService

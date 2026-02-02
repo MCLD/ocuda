@@ -12,15 +12,17 @@ namespace Ocuda.Ops.Controllers.Areas.Services.ViewModels.RenewCard
     {
         private const int _maxNotesDisplayLength = 400;
 
+        public Customer Customer { get; set; }
+        public List<CustomerBlock> CustomerBlocks { get; set; }
         public RenewCardRequest Request { get; set; }
         public RenewCardResult Result { get; set; }
-        public List<CustomerBlock> CustomerBlocks { get; set; }
-        public Customer Customer { get; set; }
         public string AcceptedCounty { get; set; }
         public bool AddressLookupUrlSet { get; set; }
         public string AssessorLookupUrl { get; set; }
         public int? CustomerAge { get; set; }
+        public string CustomerBlocksErrorMessage { get; set; }
         public string CustomerCode { get; set; }
+        public string CustomerCodeErrorMessage { get; set; }
         public string CustomerName { get; set; }
         public bool InCounty { get; set; }
         public string LeapPath { get; set; }
