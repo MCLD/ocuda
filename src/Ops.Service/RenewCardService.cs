@@ -143,7 +143,8 @@ namespace Ocuda.Ops.Service
             var response = await _renewCardResponseRepository.FindAsync(responseId);
             if (!response.EmailSetupId.HasValue)
             {
-                _logger.LogError($"Invalid card renewal response '{responseId}': no email setup set.");
+                _logger.LogError("Invalid card renewal response {ResponseId}: no email setup set.",
+                    responseId);
                 throw new OcudaException("Invalid response");
             }
 
@@ -162,7 +163,9 @@ namespace Ocuda.Ops.Service
                     defaultLanguage);
                 if (emailSetupText == null)
                 {
-                    _logger.LogError($"Invalid card renewal response '{responseId}': email setup {response.EmailSetupId} is missing text.");
+                    _logger.LogError("Invalid card renewal response {ResponseId}: email setup {EmailSetupId} is missing text.",
+                        responseId,
+                        response.EmailSetupId);
                     throw new OcudaException("Invalid response");
                 }
             }
@@ -263,7 +266,7 @@ namespace Ocuda.Ops.Service
                 }
                 else
                 {
-                    _logger.LogWarning("Card renewal email (setup {EmailSetupId}) failed sending to {EmailTo}",
+                    _logger.LogWarning("Card renewal email setup {EmailSetupId}) failed sending to {EmailTo}",
                         response.EmailSetupId.Value,
                         request.Email);
                 }

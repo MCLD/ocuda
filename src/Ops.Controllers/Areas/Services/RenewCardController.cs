@@ -160,7 +160,8 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                             }
                             else
                             {
-                                _logger.LogError($"Invalid ignored block id '{ignoredBlock}'");
+                                _logger.LogError("Invalid ignored block id {IgnoredBlock}",
+                                    ignoredBlock);
                             }
                         }
                     }

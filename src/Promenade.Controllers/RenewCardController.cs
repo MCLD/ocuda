@@ -78,7 +78,8 @@ namespace Ocuda.Promenade.Controllers
                         forceReload);
                     if (notConfiguredSegmentText == null)
                     {
-                        _logger.LogError($"Card renewal 'Not configured' segment id '{notConfiguredSegmentId}' not found");
+                        _logger.LogError("Card renewal 'Not configured' segment id {SegmentId} not found",
+                            notConfiguredSegmentId);
                     }
                     else if (!string.IsNullOrWhiteSpace(notConfiguredSegmentText.Text))
                     {
@@ -150,7 +151,8 @@ namespace Ocuda.Promenade.Controllers
 
                     if (!validateResult)
                     {
-                        _logger.LogInformation($"Invalid card number or password for Barcode '{barcode}'");
+                        _logger.LogInformation("Invalid card number or password for Barcode {Barcode}",
+                            barcode);
                         ModelState.AddModelError(nameof(viewModel.Invalid),
                             _localizer[i18n.Keys.Promenade.RenewCardInvalidLogin]);
                         return RedirectToAction(nameof(Index));
@@ -235,7 +237,8 @@ namespace Ocuda.Promenade.Controllers
                         }
                         else
                         {
-                            _logger.LogError($"Invalid staff customer code id '{customerCode}'");
+                            _logger.LogError("Invalid staff customer code id {CustomerCode}",
+                                customerCode);
                         }
                     }
                 }
@@ -271,7 +274,8 @@ namespace Ocuda.Promenade.Controllers
                         }
                         else
                         {
-                            _logger.LogError($"Invalid nonresident customer code id '{customerCode}'");
+                            _logger.LogError("Invalid nonresident customer code id {CustomerCode}",
+                                customerCode);
                         }
                     }
                 }
@@ -323,7 +327,8 @@ namespace Ocuda.Promenade.Controllers
                         }
                         else
                         {
-                            _logger.LogError($"Invalid age check customer code id '{customerCode}'");
+                            _logger.LogError("Invalid age check customer code id {CustomerCode}",
+                                customerCode);
                         }
                     }
                 }
@@ -377,7 +382,8 @@ namespace Ocuda.Promenade.Controllers
                         }
                         else
                         {
-                            _logger.LogError($"Invalid juvenile customer code id '{customerCode}'");
+                            _logger.LogError("Invalid juvenile customer code id {CustomerCode}",
+                                customerCode);
                         }
                     }
                 }
@@ -430,7 +436,8 @@ namespace Ocuda.Promenade.Controllers
                     forceReload);
                 if (viewModel.SegmentText == null)
                 {
-                    _logger.LogError($"Card renewal 'Juvenile' segment id '{segmentId}' not found");
+                    _logger.LogError("Card renewal 'Juvenile' segment id {SegmentId} not found",
+                        segmentId);
                 }
                 else if (!string.IsNullOrWhiteSpace(viewModel.SegmentText.Text))
                 {
@@ -500,7 +507,8 @@ namespace Ocuda.Promenade.Controllers
 
                 if (segmentText == null)
                 {
-                    _logger.LogError($"Card renewal 'Submitted' segment id '{segmentId}' not found");
+                    _logger.LogError("Card renewal 'Submitted' segment id {SegmentId} not found",
+                        segmentId);
                 }
                 else if (!string.IsNullOrWhiteSpace(segmentText.Text))
                 {
@@ -536,7 +544,8 @@ namespace Ocuda.Promenade.Controllers
 
                 if (segmentText == null)
                 {
-                    _logger.LogError($"Card renewal segment id '{segmentId}' not found for unable to renew response");
+                    _logger.LogError("Card renewal segment id {SegmentId} not found for unable to renew response",
+                        segmentId);
                 }
                 else if (!string.IsNullOrWhiteSpace(segmentText.Text))
                 {
@@ -586,7 +595,8 @@ namespace Ocuda.Promenade.Controllers
 
                 if (viewModel.HeaderSegmentText == null)
                 {
-                    _logger.LogError($"Card renewal 'Verify address' segment id '{verifyAddressSegmentId}' not found");
+                    _logger.LogError("Card renewal 'Verify address' segment id {SegmentId} not found",
+                        verifyAddressSegmentId);
                 }
                 else if (!string.IsNullOrWhiteSpace(viewModel.HeaderSegmentText.Text))
                 {
@@ -607,7 +617,8 @@ namespace Ocuda.Promenade.Controllers
 
                     if (viewModel.NoAddressSegmentText == null)
                     {
-                        _logger.LogError($"Card renewal 'No address' segment id '{noAddressSegmentId}' not found");
+                        _logger.LogError("Card renewal 'No address' segment id {SegmentId} not found",
+                            noAddressSegmentId);
                     }
                     else if (!string.IsNullOrWhiteSpace(viewModel.NoAddressSegmentText.Text))
                     {
