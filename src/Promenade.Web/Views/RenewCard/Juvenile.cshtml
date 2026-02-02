@@ -1,0 +1,35 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.RenewCard.JuvenileViewModel
+
+@if (Model?.SegmentText != null)
+{
+    if (!string.IsNullOrEmpty(Model.SegmentText.Header))
+    {
+        <h1 class="prom-title">@Model.SegmentText.Header</h1>
+    }
+    @Html.Raw(Model.SegmentText.Text)
+}
+else
+{
+    <h1 class="prom-title">@Localizer[Promenade.RenewYourLibraryCard]</h1>
+    <p>@Localizer[Promenade.RenewCardJuvenile]</p>
+}
+
+<div class="row">
+    <div class="col-12">
+        <form method="post"
+              asp-action="@nameof(RenewCardController.Juvenile)"
+              asp-controller="@RenewCardController.Name"
+              asp-route-culture=""
+              role="form">
+            <input asp-for="GuardianName" type="text" formgroup autocomplete="off" />
+            <input asp-for="GuardianBarcode" type="text" formgroup autocomplete="off" />
+            <div>
+                <button type="submit"
+                        class="btn btn-outline-dark m-2 btn-lg float-end">
+                    @Localizer[Promenade.ButtonNext]
+                    <span class="fa-solid fa-chevron-right"></span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -90,6 +90,20 @@ namespace Ocuda.Ops.Service
             }
         }
 
+        public async Task<double> GetSettingDoubleAsync(string key)
+        {
+            var settingValue = await GetSettingValueAsync(key);
+
+            if (double.TryParse(settingValue, out double result))
+            {
+                return result;
+            }
+            else
+            {
+                throw new OcudaException($"Invalid value for double setting {key}: {settingValue}");
+            }
+        }
+
         public async Task<int> GetSettingIntAsync(string key)
         {
             var settingValue = await GetSettingValueAsync(key);

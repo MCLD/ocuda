@@ -7,6 +7,12 @@ namespace Ocuda.Ops.Models.Definitions
     {
         public static readonly ApplicationPermissionDefinition[] ApplicationPermissions =
             {
+            new()
+            {
+                Id = ApplicationPermission.RenewCardManagement,
+                Info = "Manage settings related to card renewal.",
+                Name = "Card Renewal Management"
+            },
             new() {
                 Id = ApplicationPermission.CoverIssueManagement,
                 Info = "Able to mark cover issues as resolved.",

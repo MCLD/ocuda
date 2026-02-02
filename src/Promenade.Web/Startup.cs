@@ -20,6 +20,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Ocuda.i18n;
 using Ocuda.i18n.RouteConstraint;
+using Ocuda.PolarisHelper;
 using Ocuda.Promenade.Controllers;
 using Ocuda.Promenade.Data;
 using Ocuda.Promenade.Service;
@@ -382,6 +383,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
             services.AddScoped<Utility.Services.Interfaces.IOcudaCache,
                 Utility.Services.OcudaCache>();
+            services.AddScoped<IPolarisHelper, PolarisHelper.PolarisHelper>();
 
             services.AddHttpClient<IGoogleClient, GoogleClient>();
 
@@ -392,6 +394,8 @@ namespace Ocuda.Promenade.Web
             // repositories
             services.AddScoped<Service.Interfaces.Repositories.ICardDetailRepository,
                 Data.Promenade.CardDetailRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IRenewCardRequestRepository,
+                Data.Promenade.RenewCardRequestRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ICardRepository,
                 Data.Promenade.CardRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ICarouselButtonLabelTextRepository,
@@ -523,7 +527,8 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
                 Utility.Services.PathResolverService>();
 
-            // promenade servicews
+            // promenade services
+            services.AddScoped<RenewCardService>();
             services.AddScoped<CarouselService>();
             services.AddScoped<CategoryService>();
             services.AddScoped<DeckService>();

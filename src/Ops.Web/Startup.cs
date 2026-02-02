@@ -22,6 +22,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Ops.Web.JobScheduling;
 using Ocuda.Ops.Web.StartupHelper;
+using Ocuda.PolarisHelper;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
@@ -163,12 +164,17 @@ namespace Ocuda.Ops.Web
             string promCs = _config.GetConnectionString("Promenade")
                 ?? throw new OcudaException("ConnectionString:Promenade not configured.");
 
+            string polarisCs = _config.GetConnectionString("Polaris");
+
             if (_config[Configuration.OpsDatabaseProvider]?.ToUpperInvariant() == "SQLSERVER")
             {
                 services.AddDbContextPool<OpsContext,
                     DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
                 services.AddDbContextPool<PromenadeContext,
                     DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+
+                services.AddDbContextPool<PolarisContext>(_ => _.UseSqlServer(polarisCs));
+
                 services.AddHealthChecks();
             }
             else
@@ -334,10 +340,15 @@ namespace Ocuda.Ops.Web
             // helpers
             services.AddScoped<Utility.Helpers.WebHelper>();
             services.AddScoped<Utility.Email.Sender>();
+            services.AddScoped<IPolarisHelper, PolarisHelper.PolarisHelper>();
 
             // repositories
             services.AddScoped<Service.Interfaces.Ops.Repositories.IApiKeyRepository,
                 Data.Ops.ApiKeyRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IRenewCardResponseRepository,
+                Data.Ops.RenewCardResponseRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IRenewCardResultRepository,
+                Data.Ops.RenewCardResultRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
                 Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
@@ -360,6 +371,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.DigitalDisplaySetRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailRecordRepository,
                 Data.Ops.EmailRecordRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailSetupRepository,
+                Data.Ops.EmailSetupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailSetupTextRepository,
                 Data.Ops.EmailSetupTextRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailTemplateTextRepository,
@@ -445,6 +458,8 @@ namespace Ocuda.Ops.Web
 
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardDetailRepository,
                 Data.Promenade.CardDetailRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IRenewCardRequestRepository,
+                Data.Promenade.RenewCardRequestRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardRepository,
                 Data.Promenade.CardRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselButtonLabelRepository,
@@ -565,6 +580,8 @@ namespace Ocuda.Ops.Web
             // services
             services.AddScoped<IApiKeyService, ApiKeyService>();
             services.AddScoped<IAuthorizationService, AuthorizationService>();
+            services.AddScoped<IRenewCardRequestService, RenewCardRequestService>();
+            services.AddScoped<IRenewCardService, RenewCardService>();
             services.AddScoped<ICarouselService, CarouselService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ICoverIssueService, CoverIssueService>();

@@ -57,6 +57,8 @@ namespace Ocuda.Ops.Data
         public DbSet<PermissionGroupSectionManager> PermissionGroupSectionManager { get; set; }
         public DbSet<PostCategory> PostCategories { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<RenewCardResponse> RenewCardResponses { get; set; }
+        public DbSet<RenewCardResult> RenewCardResults { get; set; }
         public DbSet<RosterDetail> RosterDetails { get; set; }
         public DbSet<RosterDivision> RosterDivisions { get; set; }
         public DbSet<RosterHeader> RosterHeaders { get; set; }

@@ -9,6 +9,7 @@ namespace Ocuda.Models
         public DateTime? AddressVerificationDate { get; set; }
         public DateTime? BirthDate { get; set; }
         public string BlockingNotes { get; set; }
+        public double ChargeBalance { get; set; }
         public int CustomerCodeId { get; set; }
         public string CustomerIdNumber { get; set; }
         public string EmailAddress { get; set; }
