@@ -210,7 +210,8 @@
                                     </div>
                                 }
                                 <form asp-controller="@CarouselsController.Name"
-                                      asp-action="@nameof(CarouselsController.EditCarouselItemText)">
+                                      asp-action="@nameof(CarouselsController.EditCarouselItemText)"
+                                      class="carousel-form">
                                     <input id="carouselItem@(item.Id)Carousel"
                                            asp-for="CarouselId"
                                            type="hidden" />
@@ -230,13 +231,15 @@
                                            value="@item.CarouselItemText?.ImageUrl"
                                            formgroup
                                            info-tooltip="@(!string.IsNullOrWhiteSpace(Model.AllowedImageDomains) ? $"Images are restricted to the following domains: {Model.AllowedImageDomains}" : null)" />
-                                    <input id="carouselItem@(item.Id)AltText"
-                                           asp-for="CarouselItemText.AltText"
-                                           value="@item.CarouselItemText?.AltText"
-                                           formgroup />
                                     <input id="carouselItem@(item.Id)Title"
                                            asp-for="CarouselItemText.Title"
+                                           class="carousel-title-field"
                                            value="@item.CarouselItemText?.Title"
+                                           formgroup />
+                                    <input id="carouselItem@(item.Id)AltText"
+                                           asp-for="CarouselItemText.AltText"
+                                           class="carousel-alttext-field"
+                                           value="@item.CarouselItemText?.AltText"
                                            formgroup />
                                     <textarea id="carouselItem@(item.Id)Description"
                                               asp-for="CarouselItemText.Description"
@@ -488,6 +491,26 @@
                     });
             }
         });
+
+        const defaultAltTextString = "@Model.DefaultAltText";
+
+        function handleTitleBlur(e) {
+            if(!e.target) { return; }
+            let carouselNode = e.target.closest(".carousel-form");
+            if(!carouselNode) { return; }
+            let childNodes = carouselNode.getElementsByClassName("carousel-alttext-field");
+            if(!childNodes || childNodes.length == 0) { return; }
+            let altField = childNodes[0];
+            if(altField.value.length == 0) {
+                altField.value = defaultAltTextString.replace("{0}", e.target.value);
+            }
+        }
+
+        if(defaultAltTextString && defaultAltTextString.length > 0) {
+            for(const titleField of document.getElementsByClassName("carousel-title-field")) {
+                titleField.addEventListener("blur", handleTitleBlur);
+            }
+        }
     </script>
 
     @foreach (var item in Model.Carousel.Items)
