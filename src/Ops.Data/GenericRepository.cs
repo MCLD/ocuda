@@ -21,10 +21,7 @@ namespace Ocuda.Ops.Data
 
         protected GenericRepository(Repository<TContext> repositoryFacade, ILogger logger)
         {
-            if (repositoryFacade == null)
-            {
-                throw new ArgumentNullException(nameof(repositoryFacade));
-            }
+            ArgumentNullException.ThrowIfNull(repositoryFacade);
 
             _context = repositoryFacade.context;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -65,7 +62,14 @@ namespace Ocuda.Ops.Data
 
         public virtual async Task SaveAsync()
         {
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException dbue)
+            {
+                throw new Utility.Exceptions.OcudaException("Database save failed.", dbue);
+            }
         }
 
         public virtual async Task<ICollection<TEntity>>

@@ -35,5 +35,14 @@ namespace Ocuda.Ops.Data.Ops
                 .Select(_ => _.PermissionGroup)
                 .ToListAsync();
         }
+
+        public async Task<ICollection<string>> GetAssignedPermissions(int permissionGroupId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.PermissionGroupId == permissionGroupId)
+                .Select(_ => _.ApplicationPermission)
+                .ToListAsync();
+        }
     }
 }

@@ -192,10 +192,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<JsonResult> CreateMetadataType(UserMetadataType metadataType)
         {
-            if (metadataType == null)
-            {
-                throw new ArgumentNullException(nameof(metadataType));
-            }
+            ArgumentNullException.ThrowIfNull(metadataType);
 
             var success = false;
             var message = string.Empty;
@@ -218,10 +215,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<JsonResult> CreatePermissionGroup(PermissionGroup permissionGroup)
         {
-            if (permissionGroup == null)
-            {
-                throw new ArgumentNullException(nameof(permissionGroup));
-            }
+            ArgumentNullException.ThrowIfNull(permissionGroup);
 
             var success = false;
             var message = string.Empty;
@@ -263,10 +257,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<JsonResult> DeleteMetadataType(UserMetadataType metadataType)
         {
-            if (metadataType == null)
-            {
-                throw new ArgumentNullException(nameof(metadataType));
-            }
+            ArgumentNullException.ThrowIfNull(metadataType);
 
             var success = false;
             var message = string.Empty;
@@ -289,10 +280,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<JsonResult> DeletePermissionGroup(PermissionGroup permissionGroup)
         {
-            if (permissionGroup == null)
-            {
-                throw new ArgumentNullException(nameof(permissionGroup));
-            }
+            ArgumentNullException.ThrowIfNull(permissionGroup);
 
             var success = false;
             var message = string.Empty;
@@ -305,7 +293,15 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
             catch (OcudaException ex)
             {
-                message = ex.Message;
+                var assignedGroups = ex.Data["Assigned"] as ICollection<string>;
+                if (assignedGroups?.Count > 0)
+                {
+                    message = $"This permission group is assigned to application permissions: {string.Join(", ", assignedGroups).Trim()}";
+                }
+                else
+                {
+                    message = ex.Message;
+                }
             }
 
             return Json(new { success, message });
@@ -315,10 +311,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<JsonResult> EditMetadataType(UserMetadataType metadataType)
         {
-            if (metadataType == null)
-            {
-                throw new ArgumentNullException(nameof(metadataType));
-            }
+            ArgumentNullException.ThrowIfNull(metadataType);
 
             var success = false;
             var message = string.Empty;
@@ -341,10 +334,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<JsonResult> EditPermissionGroup(PermissionGroup permissionGroup)
         {
-            if (permissionGroup == null)
-            {
-                throw new ArgumentNullException(nameof(permissionGroup));
-            }
+            ArgumentNullException.ThrowIfNull(permissionGroup);
 
             var success = false;
             var message = string.Empty;
