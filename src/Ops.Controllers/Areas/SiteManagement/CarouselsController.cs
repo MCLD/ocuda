@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -422,6 +423,22 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .Replace(",", ", ", StringComparison.InvariantCulture),
                 PageLayoutId = await _carouselService.GetPageLayoutIdForCarouselAsync(carousel.Id)
             };
+
+            var selectedLanguageName = languages.SingleOrDefault(_ => _.Id == selectedLanguage.Id);
+
+            if (selectedLanguageName != null)
+            {
+                if (selectedLanguageName.Name == i18n.Culture.EnglishUS)
+                {
+                    viewModel.DefaultAltText = await _siteSettingService
+                        .GetSettingStringAsync(Models.Keys.SiteSetting.Carousel.AltTextEnglish);
+                }
+                else if (selectedLanguageName.Name == i18n.Culture.EspanolUS)
+                {
+                    viewModel.DefaultAltText = await _siteSettingService
+                        .GetSettingStringAsync(Models.Keys.SiteSetting.Carousel.AltTextEspanol);
+                }
+            }
 
             if (viewModel.PageLayoutId.HasValue)
             {
