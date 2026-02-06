@@ -133,6 +133,16 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAsync(int permissionGroupId)
         {
+            var assignedPermissions = await _permissionGroupApplicationRepository
+                .GetAssignedPermissions(permissionGroupId);
+
+            if(assignedPermissions.Count > 0)
+            {
+                var ocudaException = new OcudaException();
+                ocudaException.Data.Add("Assigned", assignedPermissions);
+                throw ocudaException;
+            }
+
             _permissionGroupRepository.Remove(permissionGroupId);
             await _permissionGroupRepository.SaveAsync();
         }
@@ -272,7 +282,7 @@ namespace Ocuda.Ops.Service
                 .SingleOrDefault(_ => string.Equals(_.Id, applicationPermission,
                     StringComparison.OrdinalIgnoreCase))
                 ?? throw new OcudaException("Invalid application permission.");
-            
+
             _permissionGroupApplicationRepository.Remove(new PermissionGroupApplication
             {
                 ApplicationPermission = applicationPermission,
