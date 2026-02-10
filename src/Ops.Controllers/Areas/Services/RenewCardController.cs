@@ -26,12 +26,12 @@ namespace Ocuda.Ops.Controllers.Areas.Services
     [Route("[area]/[controller]")]
     public class RenewCardController : BaseController<RenewCardController>
     {
-        private const string leapPatronRecordsPath = "/record";
+        private const string LeapPatronRecordsPath = "/record";
 
-        private readonly IRenewCardRequestService _renewCardRequestService;
-        private readonly IRenewCardService _renewCardService;
         private readonly ILanguageService _languageService;
         private readonly IPolarisHelper _polarisHelper;
+        private readonly IRenewCardRequestService _renewCardRequestService;
+        private readonly IRenewCardService _renewCardService;
 
         public RenewCardController(ServiceFacades.Controller<RenewCardController> context,
             IRenewCardRequestService renewCardRequestService,
@@ -168,7 +168,6 @@ namespace Ocuda.Ops.Controllers.Areas.Services
 
                     viewModel.CustomerBlocks = blocks;
                 }
-            
             }
             catch (OcudaException oex)
             {
@@ -194,7 +193,6 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 .ChargesLimit);
             if (chargeLimit >= 0 && customer.ChargeBalance >= chargeLimit)
             {
-
                 viewModel.OverChargesLimit = true;
             }
 
@@ -217,7 +215,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 .LeapPatronUrl);
             if (!string.IsNullOrWhiteSpace(leapPatronUrl))
             {
-                viewModel.LeapPath = leapPatronUrl + request.CustomerId + leapPatronRecordsPath;
+                viewModel.LeapPath = leapPatronUrl + request.CustomerId + LeapPatronRecordsPath;
             }
 
             return View(viewModel);
@@ -364,7 +362,8 @@ namespace Ocuda.Ops.Controllers.Areas.Services
             else
             {
                 viewModel.PendingCount = viewModel.ItemCount;
-                viewModel.ProcessedCount = await _renewCardRequestService.GetRequestCountAsync(true);
+                viewModel.ProcessedCount = await _renewCardRequestService
+                    .GetRequestCountAsync(true);
             }
 
             return View(viewModel);

@@ -19,11 +19,8 @@ namespace Ocuda.PolarisHelper
 {
     public class PolarisHelper : IPolarisHelper
     {
-        public bool IsConfigured { get; }
-
         private const int CacheCodesHours = 1;
         private const int PAPIInvalidEmailErrorCode = -3518;
-
         private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
         private readonly PolarisContext _context;
@@ -44,8 +41,10 @@ namespace Ocuda.PolarisHelper
 
             var settings = new PapiSettings();
             _config.GetSection(PapiSettings.SECTION_NAME).Bind(settings);
-            _papiClient = new PapiClient(settings);
-            _papiClient.AllowStaffOverrideRequests = false;
+            _papiClient = new PapiClient(settings)
+            {
+                AllowStaffOverrideRequests = false
+            };
 
             IsConfigured = ValidateConfiguration();
         }
@@ -72,15 +71,17 @@ namespace Ocuda.PolarisHelper
             IsConfigured = ValidateConfiguration();
         }
 
+        public bool IsConfigured { get; }
+
         public bool AuthenticateCustomer(string barcode, string password)
         {
             var validateResult = _papiClient.PatronValidate(barcode, password);
 
             if (validateResult.Exception != null)
             {
-                _logger.LogError(validateResult.Exception, 
+                _logger.LogError(validateResult.Exception,
                     "Error authenticating Polaris account through PAPI");
-                throw new OcudaException("Error authenticating customer");
+                throw new OcudaException("Error authenticating customer", validateResult.Exception);
             }
 
             return validateResult?.Data != null;
@@ -92,15 +93,15 @@ namespace Ocuda.PolarisHelper
             {
                 var blocks = await _context.Database
                     .SqlQuery<CustomerBlock>(@$"SELECT PS.PatronStopID AS BlockId, PSD.Description
-                    FROM PatronStops as PS
-                    INNER JOIN PatronStopDescriptions as PSD
+                    FROM Polaris.PatronStops as PS (NOLOCK)
+                    INNER JOIN Polaris.PatronStopDescriptions as PSD (NOLOCK)
                     on PS.PatronStopId = PSD.PatronStopId
                     WHERE PS.PatronID = {customerId}")
                     .ToListAsync();
 
                 var freeTextBlocks = await _context.Database
                     .SqlQuery<CustomerBlock>(@$"SELECT NULL AS BlockId, FreeTextBlock AS Description
-                    FROM PatronFreeTextBlocks
+                    FROM Polaris.PatronFreeTextBlocks (NOLOCK)
                     WHERE PatronID = {customerId}")
                     .ToListAsync();
 
@@ -112,7 +113,7 @@ namespace Ocuda.PolarisHelper
             {
                 _logger.LogError(ex, "Error querying Polaris blocks for patron {PatronId}",
                     customerId);
-                throw new OcudaException("Error retrieving customer blocks");
+                throw new OcudaException("Error retrieving customer blocks", ex);
             }
         }
 
@@ -126,9 +127,10 @@ namespace Ocuda.PolarisHelper
                 var patronCodesResult = _papiClient.PatronCodesGet();
                 if (patronCodesResult?.Exception != null)
                 {
-                    _logger.LogError(patronCodesResult.Exception, 
+                    _logger.LogError(patronCodesResult.Exception,
                         "Error getting Polaris patron codes through PAPI");
-                    throw new OcudaException("Error resolving patron code name");
+                    throw new OcudaException("Error resolving patron code name",
+                        patronCodesResult.Exception);
                 }
 
                 patronCodes = patronCodesResult.Data.PatronCodesRows;
@@ -145,42 +147,38 @@ namespace Ocuda.PolarisHelper
 
         public Customer GetCustomerData(string barcode, string password)
         {
-            var patronDataResult = _papiClient.PatronBasicDataGet(barcode, password, addresses: true);
+            var patronDataResult = _papiClient
+                .PatronBasicDataGet(barcode, password, addresses: true);
 
             if (patronDataResult?.Exception != null)
             {
-                _logger.LogError(patronDataResult.Exception, "Error getting Polaris account data through PAPI");
-                throw new OcudaException("Error accessing Polaris records");
+                _logger.LogError(patronDataResult.Exception,
+                    "Error getting Polaris account data through PAPI");
+                throw new OcudaException("Error accessing Polaris records",
+                    patronDataResult.Exception);
             }
 
             var patronData = patronDataResult?.Data?.PatronBasicData;
 
-            if (patronData != null)
-            {
-                return GetCustomerInfo(patronData);
-            }
-
-            return null;
-
+            return patronData == null ? null : GetCustomerInfo(patronData);
         }
 
         public Customer GetCustomerDataOverride(string barcode)
         {
-            var patronDataResult = _papiClient.PatronBasicDataGet(barcode, addresses: true, notes: true);
+            var patronDataResult = _papiClient
+                .PatronBasicDataGet(barcode, addresses: true, notes: true);
+
             if (patronDataResult?.Exception != null)
             {
-                _logger.LogError(patronDataResult.Exception, "Error getting Polaris account data through PAPI override");
-                throw new OcudaException("Error accessing Polaris records");
+                _logger.LogError(patronDataResult.Exception,
+                    "Error getting Polaris account data through PAPI override");
+                throw new OcudaException("Error accessing Polaris records",
+                    patronDataResult.Exception);
             }
 
             var patronData = patronDataResult?.Data?.PatronBasicData;
 
-            if (patronData != null)
-            {
-                return GetCustomerInfo(patronData);
-            }
-
-            return null;
+            return patronData == null ? null : GetCustomerInfo(patronData);
         }
 
         public RenewRegistrationResult RenewCustomerRegistration(string barcode, string email)
@@ -255,7 +253,7 @@ namespace Ocuda.PolarisHelper
                 EmailAddress = patronData.EmailAddress,
                 ExpirationDate = patronData.ExpirationDate,
                 Id = patronData.PatronID,
-                IsBlocked = patronData.PatronSystemBlocks.Any(),
+                IsBlocked = patronData.PatronSystemBlocks.Length != 0,
                 NameFirst = patronData.NameFirst,
                 NameLast = patronData.NameLast,
                 Notes = patronData.PatronNotes?.NonBlockingStatusNotes,
