@@ -14,8 +14,8 @@ else
     <p>@Localizer[Promenade.RenewCardJuvenile]</p>
 }
 
-<div class="row">
-    <div class="col-12">
+<div class="row mb-4">
+    <div class="col-12 col-md-8 offset-md-2">
         <form method="post"
               asp-action="@nameof(RenewCardController.Juvenile)"
               asp-controller="@RenewCardController.Name"
@@ -23,9 +23,9 @@ else
               role="form">
             <input asp-for="GuardianName" type="text" formgroup autocomplete="off" />
             <input asp-for="GuardianBarcode" type="text" formgroup autocomplete="off" />
-            <div>
+            <div class="d-flex justify-content-end">
                 <button type="submit"
-                        class="btn btn-outline-dark m-2 btn-lg float-end">
+                        class="btn btn-outline-dark m-2 btn-lg fs-5">
                     @Localizer[Promenade.ButtonNext]
                     <span class="fa-solid fa-chevron-right"></span>
                 </button>

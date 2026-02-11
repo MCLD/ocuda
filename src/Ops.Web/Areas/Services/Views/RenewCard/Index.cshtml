@@ -50,8 +50,8 @@
 <table class="table table-sm table-bordered table-striped">
 	<thead>
 		<tr>
-			<th>@(Model.IsProcessed ? "Processed" : "Submitted")</th>
 			<th>Barcode</th>
+            <th>@(Model.IsProcessed ? "Processed" : "Submitted")</th>
 			<th>Same Address?</th>
 			@if (Model.IsProcessed)
 			{
@@ -78,15 +78,15 @@
 						{
 							<a asp-action="@(nameof(RenewCardController.Details))"
 							   asp-route-id="@request.Id">
-								@(Model.IsProcessed? request.ProcessedAt: request.SubmittedAt)
+                                @request.Barcode
 							</a>
 						}
 						else
 						{
-							@(Model.IsProcessed? request.ProcessedAt: request.SubmittedAt)
+                            @request.Barcode
 						}
 					</td>
-					<td>@request.Barcode</td>
+                    <td>@(Model.IsProcessed? request.ProcessedAt: request.SubmittedAt)</td>
 					<td class="@(request.SameAddress ? "table-success" : "table-danger")">@(request.SameAddress ? "Yes" : "No")</td>
 					@if (Model.IsProcessed)
 					{

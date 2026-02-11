@@ -13,8 +13,8 @@ else
     <h1 class="prom-title">@Localizer[Promenade.RenewYourLibraryCard]</h1>
 }
 
-<div class="row">
-    <div class="col-12">
+<div class="row mb-4">
+    <div class="col-12 col-md-8 offset-md-2">
         <form asp-action="@nameof(RenewCardController.VerifyAddress)"
               asp-controller="@RenewCardController.Name"
               asp-route-culture=""
@@ -70,9 +70,9 @@ else
                         {
                             <p>@Localizer[Promenade.RenewCardNoAddress]</p>
                         }
-                        <div>
+                        <div class="d-flex justify-content-end">
                             <button type="submit"
-                                    class="btn btn-outline-success btn-lg mt-3">
+                                    class="btn btn-outline-success btn-lg fs-5 mt-3">
                                 <span class="fa-regular fa-circle-check"></span>
                                 @Localizer[Promenade.ButtonSubmit]
                             </button>
