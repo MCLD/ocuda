@@ -5,9 +5,9 @@
         <h1>Permission Groups</h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
+        <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index)"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
+           class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
         <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
                 data-bs-toggle="modal"
                 data-bs-target="#addModal">
@@ -59,6 +59,7 @@
      name="Permission Group"
      isNonSubmit="true"
      type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
+    <div class="alert alert-warning d-none" id="deleteModalMessage"></div>
     <input id="deleteId" asp-for="PermissionGroup.Id" type="hidden" />
     <input id="deletePermissionGroupName"
            asp-for="PermissionGroup.PermissionGroupName"
@@ -83,20 +84,20 @@
                     <td class="align-middle">@permissionGroup.GroupName</td>
                     <td align="center">
                         <button type="button"
-                        class="btn btn-outline-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target="#editModal"
-                        data-id="@permissionGroup.Id"
-                        data-permissiongroupname="@permissionGroup.PermissionGroupName"
-                        data-groupname="@permissionGroup.GroupName">
+                                class="btn btn-outline-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editModal"
+                                data-id="@permissionGroup.Id"
+                                data-permissiongroupname="@permissionGroup.PermissionGroupName"
+                                data-groupname="@permissionGroup.GroupName">
                             <span class="fa-solid fa-fw fa-pencil" aria-hidden="true"></span>
                         </button>
                         <button type="button"
-                        class="btn btn-outline-danger"
-                        data-bs-toggle="modal"
-                        data-bs-target="#deleteModal"
-                        data-id="@permissionGroup.Id"
-                        data-permissiongroupname="@permissionGroup.PermissionGroupName">
+                                class="btn btn-outline-danger"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal"
+                                data-id="@permissionGroup.Id"
+                                data-permissiongroupname="@permissionGroup.PermissionGroupName">
                             <span class="fa-solid fa-circle-xmark fa-fw" aria-hidden="true"></span>
                         </button>
                     </td>
@@ -117,86 +118,92 @@
 <nav paginate="@Model.PaginateModel"></nav>
 
 @section scripts {
-<script>
-    var addUrl = "@Url.Action(nameof(UsersController.CreatePermissionGroup))";
-    var editUrl = "@Url.Action(nameof(UsersController.EditPermissionGroup))";
-    var deleteUrl = "@Url.Action(nameof(UsersController.DeletePermissionGroup))";
+    <script>
+        const addUrl = "@Url.Action(nameof(UsersController.CreatePermissionGroup))";
+        const editUrl = "@Url.Action(nameof(UsersController.EditPermissionGroup))";
+        const deleteUrl = "@Url.Action(nameof(UsersController.DeletePermissionGroup))";
 
-    $("#addModal").on("click", ".modal-btn-confirm", function (e) {
-        var button = $(this);
-        var modal = $(e.delegateTarget);
-        var permissionGroupName = modal.find("#addPermissionGroupName").val();
-        var groupName = modal.find("#addGroupName").val();
-        $.post(addUrl, { permissionGroupName, groupName }, function (response) {
-            setTimeout(function () {
+        const deleteModalMessage = document.getElementById("deleteModalMessage");
+
+        $("#addModal").on("click", ".modal-btn-confirm", function (e) {
+            var button = $(this);
+            var modal = $(e.delegateTarget);
+            var permissionGroupName = modal.find("#addPermissionGroupName").val();
+            var groupName = modal.find("#addGroupName").val();
+            $.post(addUrl, { permissionGroupName, groupName }, function (response) {
+                setTimeout(function () {
+                    if (response.success) {
+                        location.reload();
+                    }
+                    else
+                    {
+                        ResetSpinners(button);
+                        SetValidation(modal.find("#addPermissionGroupName"), response.message);
+                    }
+                }, 500);
+            });
+        });
+
+        $("#editModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var modal = $(this);
+            var id = button.data("id");
+            var permissionGroupName = button.data("permissiongroupname");
+            var groupName = button.data("groupname");
+            modal.find("#editId").val(id);
+            modal.find("#editPermissionGroupName").val(permissionGroupName);
+            modal.find("#editGroupName").val(groupName);
+        });
+
+        $("#editModal").on("click", ".modal-btn-confirm", function (e) {
+            var button = $(this);
+            var modal = $(e.delegateTarget);
+            var id = modal.find("#editId").val();
+            var permissionGroupName = modal.find("#editPermissionGroupName").val();
+            var groupName = modal.find("#editGroupName").val();
+            $.post(editUrl, { id, permissionGroupName, groupName }, function (response) {
+                setTimeout(function () {
+                    if (response.success) {
+                        location.reload();
+                    }
+                    else
+                    {
+                        ResetSpinners(button);
+                        SetValidation(modal.find("#editPermissionGroupName"), response.message);
+                    }
+                }, 500);
+            });
+        });
+
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            deleteModalMessage.classList.add("d-none");
+            var button = $(e.relatedTarget);
+            var modal = $(this);
+            var id = button.data("id");
+            var permissionGroupName = button.data("permissiongroupname")
+            modal.find("#deleteId").val(id);
+            modal.find("#deletePermissionGroupName").val(permissionGroupName);
+            modal.find(".modal-text").html(`Are you sure you want to delete Permission Group: <strong>${permissionGroupName}</strong>?`);
+        });
+
+        $("#deleteModal").on("click", ".modal-btn-confirm", function (e) {
+            e.target.setAttribute("disabled", "disabled");
+            deleteModalMessage.classList.add("d-none");
+            const button = $(this);
+            const modal = $(e.delegateTarget);
+            const id = modal.find("#deleteId").val();
+            $.post(deleteUrl, { id }, function (response) {
                 if (response.success) {
                     location.reload();
                 }
                 else
                 {
                     ResetSpinners(button);
-                    SetValidation(modal.find("#addPermissionGroupName"), response.message);
+                    deleteModalMessage.classList.remove("d-none");
+                    deleteModalMessage.innerText = response.message;
                 }
-            }, 500);
+                e.target.removeAttribute("disabled");
+            });
         });
-    });
-
-    $("#editModal").on("show.bs.modal", function (e) {
-        var button = $(e.relatedTarget);
-        var modal = $(this);
-        var id = button.data("id");
-        var permissionGroupName = button.data("permissiongroupname");
-        var groupName = button.data("groupname");
-        modal.find("#editId").val(id);
-        modal.find("#editPermissionGroupName").val(permissionGroupName);
-        modal.find("#editGroupName").val(groupName);
-    });
-
-    $("#editModal").on("click", ".modal-btn-confirm", function (e) {
-        var button = $(this);
-        var modal = $(e.delegateTarget);
-        var id = modal.find("#editId").val();
-        var permissionGroupName = modal.find("#editPermissionGroupName").val();
-        var groupName = modal.find("#editGroupName").val();
-        $.post(editUrl, { id, permissionGroupName, groupName }, function (response) {
-            setTimeout(function () {
-                if (response.success) {
-                    location.reload();
-                }
-                else
-                {
-                    ResetSpinners(button);
-                    SetValidation(modal.find("#editPermissionGroupName"), response.message);
-                }
-            }, 500);
-        });
-    });
-
-    $("#deleteModal").on("show.bs.modal", function (e) {
-        var button = $(e.relatedTarget);
-        var modal = $(this);
-        var id = button.data("id");
-        var permissionGroupName = button.data("permissiongroupname")
-        modal.find("#deleteId").val(id);
-        modal.find("#deletePermissionGroupName").val(permissionGroupName);
-        modal.find(".modal-text").text("Are you sure you want to delete Permission Group '" + permissionGroupName + "'?");
-    });
-
-    $("#deleteModal").on("click", ".modal-btn-confirm", function (e) {
-        var button = $(this);
-        var modal = $(e.delegateTarget);
-        var id = modal.find("#deleteId").val();
-        $.post(deleteUrl, { id }, function (response) {
-            setTimeout(function () {
-                if (response.success) {
-                    location.reload();
-                }
-                else
-                {
-                    ResetSpinners(button);
-                }
-            }, 500);
-        });
-    });
-</script>
+    </script>
 }

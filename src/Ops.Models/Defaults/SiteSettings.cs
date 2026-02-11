@@ -71,6 +71,24 @@ namespace Ocuda.Ops.Models.Defaults
 
             new SiteSetting
             {
+                Id = Keys.SiteSetting.Carousel.AltTextEnglish,
+                Name = "Alt text default (English)",
+                Description = "Default carousel item alt text ({0} is replaced with the title)",
+                Category = "Carousel",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.Carousel.AltTextEspanol,
+                Name = "Alt text default (español)",
+                Description = "Default carousel item alt text ({0} is replaced with the title)",
+                Category = "Carousel",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
                 Id = Keys.SiteSetting.Carousel.ImageRestrictToDomains,
                 Name = "Image restrict to domain",
                 Description = "Restrict carousel images to only these domains, comma delimited",
