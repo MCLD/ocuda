@@ -33,6 +33,11 @@
         public static readonly string OpsEmailTemplate = "emailtemplate.{0}.{1}";
 
         /// <summary>
+        /// Cached employee card department name, {0} is the id of the department
+        /// </summary>
+        public static readonly string OpsEmployeeCardDepartmentName = "employeecarddepartmentname.{0}";
+
+        /// <summary>
         /// A user's groups as provided by the authentication system. Replace {0} with the user's
         /// identifier and {1} with a number starting with 1. Once the return is empty you have
         /// enumerated all of the available groups.

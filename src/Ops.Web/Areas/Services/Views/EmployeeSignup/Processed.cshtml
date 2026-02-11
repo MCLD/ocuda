@@ -1,0 +1,92 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Services.ViewModels.EmployeeSignup.ProcessedViewModel
+
+<form asp-controller="@EmployeeSignupController.Name"
+	  asp-action="@nameof(EmployeeSignupController.Processed)"
+	  method="post"
+	  role="form">
+	<input asp-for="Note.EmployeeCardRequestId" value="@Model.CardResult.EmployeeCardRequestId" type="hidden" />
+
+	<div class="d-flex flex-wrap justify-content-between mb-2">
+		<h1 class="mb-0">
+			Employee Card Request
+			<small class="text-muted">#@Model.CardResult.EmployeeCardRequestId</small>
+		</h1>
+		<div>
+			<button type="submit"
+					class="btn btn-outline-info align-top mt-2">
+				<span class="fa fa-comment fa-fw"></span>
+				Save Notes
+			</button>
+			<a class="btn btn-outline-dark align-top mt-2"
+			   asp-controller="@EmployeeSignupController.Name"
+			   asp-action="@(nameof(EmployeeSignupController.Index))"
+			   asp-route-processed="true">
+				Back
+			</a>
+		</div>
+	</div>
+
+	<div class="row">
+		<h4 class="col-md-3 text-md-end">Account Details</h4>
+	</div>
+	<div class="row mt-2">
+		<div class="col-md-3 text-md-end"><strong>Renewing?</strong></div>
+		<div class="col-md-9">@(Model.CardResult.ExistingAccount ? "Yes" : "No")</div>
+	</div>
+	<div class="row mt-2">
+		<div class="col-md-3 text-md-end"><strong>Card Number</strong></div>
+		<div class="col-md-9">@Model.CardResult.CardNumber</div>
+	</div>
+	<div class="row mt-3">
+		<div class="col-md-3 text-md-end"><strong>Last Name</strong></div>
+		<div class="col-md-9">@Model.CardResult.LastName</div>
+	</div>
+	<div class="row mt-2">
+		<div class="col-md-3 text-md-end"><strong>First Name</strong></div>
+		<div class="col-md-9">@Model.CardResult.FirstName</div>
+	</div>
+	<div class="row mt-4">
+		<div class="col-md-3 text-md-end"><strong>Address</strong></div>
+		<div class="col-md-9">@Model.CardResult.StreetAddress</div>
+	</div>
+	<div class="row mt-2">
+		<div class="col-md-9 offset-md-3">@Model.CardResult.City</div>
+	</div>
+	<div class="row mt-2">
+		<div class="col-md-9 offset-md-3">@Model.CardResult.ZipCode</div>
+	</div>
+	<div class="row mt-4">
+		<div class="col-md-3 text-md-end"><strong>Email</strong></div>
+		<div class="col-md-9">@Model.CardResult.Email</div>
+	</div>
+	<div class="row mt-2">
+		<div class="col-md-3 text-md-end"><strong>Phone Number</strong></div>
+		<div class="col-md-9">@Model.CardResult.Phone</div>
+	</div>
+	<div class="row mt-2">
+		<div class="col-md-3 text-md-end"><strong>Birth Date</strong></div>
+		<div class="col-md-9">@Model.CardResult.BirthDate.Value.ToShortDateString()</div>
+	</div>
+	<div class="row mt-4">
+		<div class="col-md-3 text-md-end"><strong>Department</strong></div>
+		<div class="col-md-9">@Model.CardResult.DepartmentName</div>
+	</div>
+	<div class="row mt-2">
+		<div class="col-md-3 text-md-end"><strong>Employee #</strong></div>
+		<div class="col-md-9">@Model.CardResult.EmployeeNumber</div>
+	</div>
+
+	<div class="row mt-4">
+		<h4 class="col-md-3 text-md-end">Request notes</h4>
+	</div>
+	<div class="row mt-2">
+		<div class="col-md-3 text-md-end">
+			<label asp-for="Note.StaffNote" class="form-label fw-bold mb-0"></label>
+			<div><em>(Not saved in Polaris)</em></div>
+		</div>
+		<div class="col-md-9">
+			<textarea asp-for="Note.StaffNote" class="form-control" rows="3"></textarea>
+			<span asp-validation-for="Note.StaffNote" class="text-danger"></span>
+		</div>
+	</div>
+</form>

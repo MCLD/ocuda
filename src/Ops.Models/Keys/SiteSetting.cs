@@ -39,6 +39,12 @@
             public static readonly string RestrictToDomain = "Email.RestrictToDomain";
         }
 
+        public static class EmployeeCard
+        {
+            public static readonly string NewEmailSetupId = "EmployeeCard.NewEmailSetupId";
+            public static readonly string RenewEmailSetupId = "EmployeeCard.RenewEmailSetupId";
+        }
+
         public static class FileManagement
         {
             public static readonly string MaxThumbnailCount = "FileManagement.MaxThumbnailCount";

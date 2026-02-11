@@ -216,6 +216,29 @@ namespace Ocuda.Ops.Models.Defaults
 
             #endregion Email
 
+            #region EmployeeCard
+
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.EmployeeCard.NewEmailSetupId,
+                Name = "New email setup id",
+                Description = "Email setup id to use when sending a notification for a new employee card",
+                Category = "EmployeeCard",
+                Value = "-1",
+                Type = SiteSettingType.Int
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.EmployeeCard.RenewEmailSetupId,
+                Name = "Renew email setup id",
+                Description = "Email setup id to use when sending a notification for a renewed employee card",
+                Category = "EmployeeCard",
+                Value = "-1",
+                Type = SiteSettingType.Int
+            },
+
+            #endregion EmployeeCard
+
             #region FileManagement
 
             new SiteSetting
