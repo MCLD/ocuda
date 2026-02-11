@@ -135,7 +135,7 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication
             _logger.LogInformation("Logging out user {Username}",
                 HttpContext.User?.Identity?.Name ?? "unauthenticated user");
 
-            await Request.HttpContext.SignOutAsync();
+            await HttpContext.SignOutAsync();
             return Ok();
         }
 
@@ -183,7 +183,8 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication
             _logger.LogInformation("Logging out user {Username}",
                 HttpContext.User?.Identity?.Name ?? "unauthenticated user");
 
-            await Request.HttpContext.SignOutAsync();
+            await HttpContext.SignOutAsync();
+            HttpContext.Session.Clear();
             return RedirectToAction(nameof(Index));
         }
 
@@ -450,10 +451,10 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication
                 ClaimTypes.Name,
                 ClaimType.ADGroup);
 
-            await Request.HttpContext.SignInAsync(new ClaimsPrincipal(identity));
+            await HttpContext.SignInAsync(new ClaimsPrincipal(identity));
 
             // TODO set a reasonable initial nickname
-            Request.HttpContext.Items[ItemKey.Nickname] = user.Nickname ?? username;
+            HttpContext.Items[ItemKey.Nickname] = user.Nickname ?? username;
         }
     }
 }
