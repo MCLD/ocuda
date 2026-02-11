@@ -212,6 +212,8 @@ namespace Ocuda.Ops.Web
                 sessionTimeout = TimeSpan.FromMinutes(configuredTimeout);
             }
 
+            string cookieDomain = _config[Configuration.OcudaCookieDomainName];
+
             string cookieName = string.IsNullOrEmpty(_config[Configuration.OcudaCookieName])
                 ? ".oc.ops"
                 : _config[Configuration.OcudaCookieName];
@@ -222,6 +224,10 @@ namespace Ocuda.Ops.Web
                 _.Cookie.HttpOnly = true;
                 _.Cookie.IsEssential = true;
                 _.Cookie.Name = cookieName;
+                if (!string.IsNullOrWhiteSpace(cookieDomain))
+                {
+                    _.Cookie.Domain = cookieDomain;
+                }
             });
 
             _config[Configuration.OcudaRuntimeSessionTimeout] = sessionTimeout.ToString();
@@ -231,6 +237,10 @@ namespace Ocuda.Ops.Web
                 {
                     _.AccessDeniedPath = "/Unauthorized";
                     _.Cookie.Name = $"{cookieName}.info";
+                    if (!string.IsNullOrWhiteSpace(cookieDomain))
+                    {
+                        _.Cookie.Domain = cookieDomain;
+                    }
                     _.ExpireTimeSpan = sessionTimeout;
                     _.LoginPath = "/Authentication";
                     _.LogoutPath = "/Authentication/Logout";
