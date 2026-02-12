@@ -1,0 +1,32 @@
+﻿@using Ocuda.Ops.Controllers.Areas.Authentication.ViewModels
+@model LoginViewModel
+
+<div class="row mt-3">
+    <div class="col-md-4 offset-md-4">
+        <div class="card">
+            <div class="card-header">
+                You are authenticated
+            </div>
+            <div class="card-body">
+                You are authenticated as <strong>@Model.AuthenticatedUser</strong>.
+                Click below to log out.
+            </div>
+            <div class="card-footer d-flex justify-content-end">
+                <a asp-action="@nameof(HomeController.Logout)"
+                   class="btn btn-outline-primary ms-2">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-1">
+    <div class="col-md-4 offset-md-4 d-flex justify-content-center">
+        <em>
+            <small>
+                Difficulty with access?
+                <a href="@Model.AdminEmail">
+                    Contact an administrator.
+                </a>
+            </small>
+        </em>
+    </div>
+</div>

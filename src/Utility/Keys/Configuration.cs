@@ -2,6 +2,7 @@
 {
     public readonly struct Configuration
     {
+        public static readonly string OcudaCookieDomainName = "Ocuda.CookieDomainName";
         public static readonly string OcudaCookieName = "Ocuda.CookieName";
         public static readonly string OcudaErrorControllerName = "Ocuda.ErrorControllerName";
         public static readonly string OcudaFileShared = "Ocuda.FileShared";

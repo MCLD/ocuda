@@ -231,6 +231,8 @@ namespace Ocuda.Promenade.Web
                 sessionTimeout = TimeSpan.FromMinutes(configuredTimeout);
             }
 
+            string cookieDomain = _config[Configuration.OcudaCookieDomainName];
+
             string cookieName = string.IsNullOrEmpty(_config[Configuration.OcudaCookieName])
                 ? ".oc"
                 : _config[Configuration.OcudaCookieName];
@@ -241,6 +243,10 @@ namespace Ocuda.Promenade.Web
                 _.Cookie.HttpOnly = true;
                 _.Cookie.IsEssential = true;
                 _.Cookie.Name = cookieName;
+                if (!string.IsNullOrWhiteSpace(cookieDomain))
+                {
+                    _.Cookie.Domain = cookieDomain;
+                }
             });
 
             // database configuration
