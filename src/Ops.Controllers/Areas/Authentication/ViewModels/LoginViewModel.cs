@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Ops.Controllers.Areas.Authentication.ViewModels
@@ -10,6 +11,8 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication.ViewModels
             ProviderLinks = new Dictionary<string, string>();
         }
 
+        public string AuthenticatedUser { get; set; }
+
         public string AdminEmail { get; set; }
 
         [Required]
@@ -19,6 +22,7 @@ namespace Ocuda.Ops.Controllers.Areas.Authentication.ViewModels
         public string ReturnUrl { get; set; }
 
         [Required]
+        [DisplayName("Windows login")]
         public string Username { get; set; }
     }
 }

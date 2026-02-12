@@ -53,6 +53,8 @@ namespace Ocuda.Ops.Web
                     config["org.opencontainers.image.version"] ?? "unknown");
             }
 
+            new Web(webHost.Services).Initalize();
+
             try
             {
                 if (string.IsNullOrEmpty(config[Configuration.OcudaRuntimeRedisCacheConfiguration]))
