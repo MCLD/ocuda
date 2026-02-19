@@ -4,6 +4,22 @@
 <h1>Intranet management</h1>
 
 <div class="row">
+	@if (Model.IsSiteManager || Model.HasRenewCardPermissions)
+	{
+		<div class="col-12 col-md-4 my-2">
+			<div class="card">
+				<div class="card-header lead fw-bold">
+					Card Renewal
+				</div>
+				<div class="card-body">
+					<a asp-area="@RenewCardController.Area"
+					   asp-controller="@RenewCardController.Name"
+					   asp-action="@nameof(RenewCardController.Responses)"
+					   class="btn btn-outline-dark mt-1">View @nameof(RenewCardController.Responses)</a>
+				</div>
+			</div>
+		</div>
+	}
     <div class="col-12 col-md-4 my-2">
         <div class="card">
             <div class="card-header lead fw-bold">

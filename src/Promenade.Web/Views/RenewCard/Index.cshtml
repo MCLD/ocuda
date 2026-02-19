@@ -1,0 +1,67 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.RenewCard.IndexViewModel
+
+@if (Model?.SegmentText != null)
+{
+    if (!string.IsNullOrEmpty(Model.SegmentText.Header))
+    {
+        <h1 class="prom-title">@Model.SegmentText.Header</h1>
+    }
+    @Html.Raw(Model.SegmentText.Text)
+}
+else
+{
+    <h1 class="prom-title">@Localizer[Promenade.RenewYourLibraryCard]</h1>
+}
+
+@if (ViewData.ModelState[nameof(Model.Invalid)]?.ValidationState
+    == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+{
+    <div class="row">
+        <div class="col-12 col-md-6 offset-md-3">
+            <div class="alert alert-danger d-flex">
+                <span class="fa fa-2x fa-exclamation-triangle me-2" aria-hidden="true"></span>
+                <span asp-validation-for="Invalid" class="fw-bold fs-6"> </span>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row mb-4">
+    <div class="col-12 col-md-8 offset-md-2">
+        <form method="post"
+              role="form"
+              asp-controller="@RenewCardController.Name"
+              asp-action="@nameof(RenewCardController.Index)"
+              asp-route-culture="">
+            <input asp-for="Barcode" type="text" formgroup autocomplete="off" />
+            <div class="row mb-3">
+                <label asp-for="Password" class="col-form-label text-md-end col-md-3">
+                    @Localizer[Promenade.PromptPassword]
+                    <span class="fa-solid fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
+                </label>
+                <div class="col-md-9">
+                    <input asp-for="Password"
+                           autocomplete="off"
+                           class="form-control"
+                           type="password" />
+                    <span asp-validation-for="Password"
+                          class="validation-message text-danger"></span>
+                    @if (!string.IsNullOrWhiteSpace(Model.ForgotPasswordLink))
+                    {
+                        <div class="fs-5 mt-2">
+                            <a href="@Model.ForgotPasswordLink"
+                               target="_blank">@Localizer[Promenade.ForgotPassword]</a>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="submit"
+                        class="btn btn-outline-dark m-2 btn-lg fs-5">
+                    @Localizer[Promenade.ButtonNext]
+                    <span class="fa-solid fa-chevron-right"></span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

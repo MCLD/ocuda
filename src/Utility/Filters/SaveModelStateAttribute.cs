@@ -2,8 +2,12 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Ocuda.Utility.Helpers;
 
-namespace Ocuda.Ops.Controllers.Filters
+namespace Ocuda.Utility.Filters
 {
+    /// <summary>
+    /// Save model state items to temp data when redirecting after a model state error. Key can be
+    /// set manually or generated from route values.
+    /// </summary>
     public class SaveModelStateAttribute : ActionFilterAttribute
     {
         public string Key { get; set; }

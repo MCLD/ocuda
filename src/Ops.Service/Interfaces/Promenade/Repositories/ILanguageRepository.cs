@@ -16,6 +16,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<int> GetDefaultLanguageId();
 
+        Task<string> GetDefaultLanguageNameAsync();
+
         Task<int> GetLanguageId(string culture);
     }
 }

@@ -14,6 +14,27 @@
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
             "CA1815:Override equals and operator equals on value types",
             Justification = "No reason to compare these site setting keys")]
+        public struct RenewCard
+        {
+            public const string AcceptedCounties = "RenewCard.AcceptedCounties";
+            public const string AgeCheckCustomerCodes = "RenewCard.AgeCheckCustomerCodes";
+            public const string AgeCheckSegment = "RenewCard.AgeCheckSegment";
+            public const string HomeSegment = "RenewCard.HomeSegment";
+            public const string ExpirationCutoffDays = "RenewCard.ExpirationCutoffDays";
+            public const string JuvenileCustomerCodes = "RenewCard.JuvenileCustomerCodes";
+            public const string JuvenileSegment = "RenewCard.JuvenileSegment";
+            public const string NoAddressSegment = "RenewCard.NoAddressSegment";
+            public const string NonresidentCustomerCodes = "RenewCard.NonresidentCustomerCodes";
+            public const string NonresidentSegment = "RenewCard.NonresidentSegment";
+            public const string NotConfiguredSegment = "RenewCard.NotConfiguredSegment";
+            public const string StaffCustomerCodes = "RenewCard.StaffCustomerCodes";
+            public const string SubmittedSegment = "RenewCard.SubmittedSegment";
+            public const string VerifyAddressSegment = "RenewCard.VerifyAddressSegment";
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
+            "CA1815:Override equals and operator equals on value types",
+            Justification = "No reason to compare these site setting keys")]
         public struct Scheduling
         {
             public const string AvailableHours = "Scheduling.AvailableHours";
@@ -37,6 +58,7 @@
             public const string CatalogSearchLink = "Site.CatalogSearchLink";
             public const string FooterImage = "Site.FooterImage";
             public const string FooterImageAlt = "Site.FooterImageAlt";
+            public const string ForgotPasswordLink = "Site.ForgotPasswordLink";
             public const string GoogleTrackingCode = "Site.GoogleTrackingCode";
             public const string IsTLS = "Site.IsTLS";
             public const string NavigationIdFooter = "Site.NavigationIdFooter";
