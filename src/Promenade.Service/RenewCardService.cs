@@ -16,12 +16,12 @@ namespace Ocuda.Promenade.Service
 
         public RenewCardService(ILogger<RenewCardService> logger,
             IDateTimeProvider dateTimeProvider,
-            IRenewCardRequestRepository renewCardRequestRepository,
-            LanguageService languageService)
+            LanguageService languageService,
+            IRenewCardRequestRepository renewCardRequestRepository)
             : base(logger, dateTimeProvider)
         {
-            ArgumentNullException.ThrowIfNull(renewCardRequestRepository);
             ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(renewCardRequestRepository);
 
             _languageService = languageService;
             _renewCardRequestRepository = renewCardRequestRepository;

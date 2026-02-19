@@ -21,27 +21,27 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
     [Route("[area]/[controller]")]
     public class RenewCardController : BaseController<RenewCardController>
     {
-        private readonly IRenewCardService _renewCardService;
         private readonly IEmailService _emailService;
         private readonly ILanguageService _languageService;
         private readonly IPermissionGroupService _permissionGroupService;
+        private readonly IRenewCardService _renewCardService;
 
         public RenewCardController(ServiceFacades.Controller<RenewCardController> context,
-            IRenewCardService renewCardService,
             IEmailService emailService,
             ILanguageService languageService,
-            IPermissionGroupService permissionGroupService)
+            IPermissionGroupService permissionGroupService,
+            IRenewCardService renewCardService)
             : base(context)
         {
-            ArgumentNullException.ThrowIfNull(renewCardService);
             ArgumentNullException.ThrowIfNull(emailService);
             ArgumentNullException.ThrowIfNull(languageService);
             ArgumentNullException.ThrowIfNull(permissionGroupService);
+            ArgumentNullException.ThrowIfNull(renewCardService);
 
-            _renewCardService = renewCardService;
             _emailService = emailService;
             _languageService = languageService;
             _permissionGroupService = permissionGroupService;
+            _renewCardService = renewCardService;
         }
 
         public static string Area

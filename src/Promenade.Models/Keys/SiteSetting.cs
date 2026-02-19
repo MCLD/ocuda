@@ -5,6 +5,15 @@
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
             "CA1815:Override equals and operator equals on value types",
             Justification = "No reason to compare these site setting keys")]
+        public struct Contact
+        {
+            public const string Link = "Contact.Link";
+            public const string Telephone = "Contact.Telephone";
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
+            "CA1815:Override equals and operator equals on value types",
+            Justification = "No reason to compare these site setting keys")]
         public struct RenewCard
         {
             public const string AcceptedCounties = "RenewCard.AcceptedCounties";
@@ -21,15 +30,6 @@
             public const string StaffCustomerCodes = "RenewCard.StaffCustomerCodes";
             public const string SubmittedSegment = "RenewCard.SubmittedSegment";
             public const string VerifyAddressSegment = "RenewCard.VerifyAddressSegment";
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
-            "CA1815:Override equals and operator equals on value types",
-            Justification = "No reason to compare these site setting keys")]
-        public struct Contact
-        {
-            public const string Link = "Contact.Link";
-            public const string Telephone = "Contact.Telephone";
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",

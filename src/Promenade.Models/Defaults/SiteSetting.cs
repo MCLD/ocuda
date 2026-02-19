@@ -8,6 +8,27 @@ namespace Ocuda.Promenade.Models.Defaults
     {
         public static IEnumerable<SiteSetting> Get { get; } = new[]
         {
+            #region Contact
+
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Contact),
+                Description = "Link for 'Contact Us' text in the site footer",
+                Id = Keys.SiteSetting.Contact.Link,
+                Name = "Contact Us link",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Contact),
+                Description = "Telephone number for the site footer",
+                Id = Keys.SiteSetting.Contact.Telephone,
+                Name = "Telephone number",
+                Type = SiteSettingType.StringNullable
+            },
+
+            #endregion Contact
+
             #region RenewCard
 
             new SiteSetting
@@ -133,27 +154,6 @@ namespace Ocuda.Promenade.Models.Defaults
             },
 
             #endregion RenewCard
-
-            #region Contact
-
-            new SiteSetting
-            {
-                Category = nameof(Keys.SiteSetting.Contact),
-                Description = "Link for 'Contact Us' text in the site footer",
-                Id = Keys.SiteSetting.Contact.Link,
-                Name = "Contact Us link",
-                Type = SiteSettingType.StringNullable
-            },
-            new SiteSetting
-            {
-                Category = nameof(Keys.SiteSetting.Contact),
-                Description = "Telephone number for the site footer",
-                Id = Keys.SiteSetting.Contact.Telephone,
-                Name = "Telephone number",
-                Type = SiteSettingType.StringNullable
-            },
-
-            #endregion Contact
 
             #region Scheduling
 

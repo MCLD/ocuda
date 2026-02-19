@@ -355,10 +355,6 @@ namespace Ocuda.Ops.Web
             // repositories
             services.AddScoped<Service.Interfaces.Ops.Repositories.IApiKeyRepository,
                 Data.Ops.ApiKeyRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IRenewCardResponseRepository,
-                Data.Ops.RenewCardResponseRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IRenewCardResultRepository,
-                Data.Ops.RenewCardResultRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
                 Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
@@ -395,8 +391,6 @@ namespace Ocuda.Ops.Web
                 Data.Ops.FileRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileTypeRepository,
                 Data.Ops.FileTypeRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IVolunteerUserMappingRepository,
-                Data.Ops.VolunteerUserMappingRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IHistoricalIncidentRepository,
                 Data.Ops.HistoricalIncidentRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IIdentityProviderRepository,
@@ -427,14 +421,18 @@ namespace Ocuda.Ops.Web
                 Data.Ops.PermissionGroupPodcastItemRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupReplaceFilesRepository
                 , Data.Ops.PermissionGroupReplaceFilesRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupRepository,
-                Data.Ops.PermissionGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupProductManagerRepository,
                 Data.Ops.PermissionGroupProductManagerRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupRepository,
+                Data.Ops.PermissionGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupSectionManagerRepository,
                 Data.Ops.PermissionGroupSectionManagerRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository,
                 Data.Ops.PostRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IRenewCardResponseRepository,
+                Data.Ops.RenewCardResponseRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IRenewCardResultRepository,
+                Data.Ops.RenewCardResultRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterDetailRepository,
                 Data.Ops.RosterDetailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterDivisionRepository,
@@ -465,11 +463,11 @@ namespace Ocuda.Ops.Web
                 Data.Ops.UserSyncLocationRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IVolunteerFormSubmissionEmailRecordRepository,
                 Data.Ops.VolunteerFormSubmissionEmailRecordRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IVolunteerUserMappingRepository,
+                Data.Ops.VolunteerUserMappingRepository>();
 
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardDetailRepository,
                 Data.Promenade.CardDetailRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IRenewCardRequestRepository,
-                Data.Promenade.RenewCardRequestRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardRepository,
                 Data.Promenade.CardRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselButtonLabelRepository,
@@ -506,6 +504,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.FeatureRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IGroupRepository,
                 Data.Promenade.GroupRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IImageAltTextRepository,
+                Data.Promenade.ImageAltTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IImageFeatureItemRepository,
                 Data.Promenade.ImageFeatureItemRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IImageFeatureItemTextRepository,
@@ -524,6 +524,14 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.LocationHoursOverrideRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationHoursRepository,
                 Data.Promenade.LocationHoursRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationProductMapRepository,
+                Data.Promenade.LocationProductMapRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationFormRepository,
+                Data.Promenade.LocationFormRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationInteriorImageRepository,
+                Data.Promenade.LocationInteriorImageRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationRepository,
+                Data.Promenade.LocationRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.INavBannerImageRepository,
                 Data.Promenade.NavBannerImageRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.INavBannerLinkRepository,
@@ -536,18 +544,6 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.NavigationRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.INavigationTextRepository,
                 Data.Promenade.NavigationTextRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageRepository,
-                Data.Promenade.PageRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationProductMapRepository,
-                Data.Promenade.LocationProductMapRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationRepository,
-                Data.Promenade.LocationRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationFormRepository,
-                Data.Promenade.LocationFormRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationInteriorImageRepository,
-                Data.Promenade.LocationInteriorImageRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IImageAltTextRepository,
-                Data.Promenade.ImageAltTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
                 Data.Promenade.PageHeaderRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageItemRepository,
@@ -566,6 +562,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.ProductLocationInventoryRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IProductRepository,
                 Data.Promenade.ProductRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IRenewCardRequestRepository,
+                Data.Promenade.RenewCardRequestRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestLimitRepository,
                 Data.Promenade.ScheduleRequestLimitRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestRepository,
@@ -590,8 +588,6 @@ namespace Ocuda.Ops.Web
             // services
             services.AddScoped<IApiKeyService, ApiKeyService>();
             services.AddScoped<IAuthorizationService, AuthorizationService>();
-            services.AddScoped<IRenewCardRequestService, RenewCardRequestService>();
-            services.AddScoped<IRenewCardService, RenewCardService>();
             services.AddScoped<ICarouselService, CarouselService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ICoverIssueService, CoverIssueService>();
@@ -599,8 +595,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IDigitalDisplayService, DigitalDisplayService>();
             services.AddScoped<IDigitalDisplayCleanupService, DigitalDisplayCleanupService>();
             services.AddScoped<IDigitalDisplaySyncService, DigitalDisplaySyncService>();
-            services.AddScoped<IEmediaService, EmediaService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IEmediaService, EmediaService>();
             services.AddScoped<IExternalResourcePromService, ExternalResourcePromService>();
             services.AddScoped<IExternalResourceService, ExternalResourceService>();
             services.AddScoped<IFeatureService, FeatureService>();
@@ -616,31 +612,33 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<ILdapService, LdapService>();
-            services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<ILinkService, LinkService>();
             services.AddScoped<ILocationHoursService, LocationHoursService>();
             services.AddScoped<ILocationGroupService, LocationGroupService>();
             services.AddScoped<ILocationFeatureService, LocationFeatureService>();
-            services.AddScoped<ILinkService, LinkService>();
+            services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<INavBannerService, NavBannerService>();
+            services.AddScoped<INavigationService, NavigationService>();
             services.AddScoped<Utility.Services.Interfaces.IOcudaCache,
                 Utility.Services.OcudaCache>();
-            services.AddScoped<INavigationService, NavigationService>();
             services.AddScoped<IPageService, PageService>();
-            services.AddScoped<IPublicFilesService, PublicFilesService>();
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
                 Utility.Services.PathResolverService>();
             services.AddScoped<IPodcastService, PodcastService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IPermissionGroupService, PermissionGroupService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IPublicFilesService, PublicFilesService>();
+            services.AddScoped<IRenewCardRequestService, RenewCardRequestService>();
+            services.AddScoped<IRenewCardService, RenewCardService>();
             services.AddScoped<IRosterService, RosterService>();
             services.AddScoped<ISamlService, SamlService>();
             services.AddScoped<IScheduleNotificationService, ScheduleNotificationService>();
-            services.AddScoped<IScheduleService, ScheduleService>();
             services.AddScoped<IScheduleRequestLimitService,
                 ScheduleRequestLimitService>();
             services.AddScoped<Service.Interfaces.Ops.Services.IScheduleRequestService,
                 ScheduleRequestService>();
+            services.AddScoped<IScheduleService, ScheduleService>();
             services.AddScoped<IScreenlyService, ScreenlyService>();
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<ISegmentService, SegmentService>();
@@ -650,8 +648,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ISocialCardService, SocialCardService>();
             services.AddScoped<ITitleClassService, TitleClassService>();
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
-            services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserManagementService, UserManagementService>();
+            services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserSyncService, UserSyncService>();
             services.AddScoped<IVolunteerFormService, VolunteerFormService>();

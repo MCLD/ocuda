@@ -30,26 +30,26 @@ namespace Ocuda.Promenade.Controllers
         private const string TempDataTimeout = "TempData.Timeout";
         private const string TempDataUnableToRenew = "TempData.UnableToRenew";
 
-        private readonly RenewCardService _renewCardService;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IPolarisHelper _polarisHelper;
+        private readonly RenewCardService _renewCardService;
         private readonly SegmentService _segmentService;
 
         public RenewCardController(ServiceFacades.Controller<RenewCardController> context,
-            RenewCardService renewCardService,
             IDateTimeProvider dateTimeProvider,
             IPolarisHelper polarisHelper,
+            RenewCardService renewCardService,
             SegmentService segmentService)
             : base(context)
         {
-            ArgumentNullException.ThrowIfNull(renewCardService);
             ArgumentNullException.ThrowIfNull(dateTimeProvider);
             ArgumentNullException.ThrowIfNull(polarisHelper);
+            ArgumentNullException.ThrowIfNull(renewCardService);
             ArgumentNullException.ThrowIfNull(segmentService);
 
-            _renewCardService = renewCardService;
             _dateTimeProvider = dateTimeProvider;
             _polarisHelper = polarisHelper;
+            _renewCardService = renewCardService;
             _segmentService = segmentService;
         }
 

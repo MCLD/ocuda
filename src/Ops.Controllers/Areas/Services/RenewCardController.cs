@@ -34,21 +34,21 @@ namespace Ocuda.Ops.Controllers.Areas.Services
         private readonly IRenewCardService _renewCardService;
 
         public RenewCardController(ServiceFacades.Controller<RenewCardController> context,
-            IRenewCardRequestService renewCardRequestService,
-            IRenewCardService renewCardService,
             ILanguageService languageService,
-            IPolarisHelper polarisHelper)
+            IPolarisHelper polarisHelper,
+            IRenewCardRequestService renewCardRequestService,
+            IRenewCardService renewCardService)
             : base(context)
         {
-            ArgumentNullException.ThrowIfNull(renewCardRequestService);
-            ArgumentNullException.ThrowIfNull(renewCardService);
             ArgumentNullException.ThrowIfNull(languageService);
             ArgumentNullException.ThrowIfNull(polarisHelper);
+            ArgumentNullException.ThrowIfNull(renewCardRequestService);
+            ArgumentNullException.ThrowIfNull(renewCardService);
 
-            _renewCardRequestService = renewCardRequestService;
-            _renewCardService = renewCardService;
             _languageService = languageService;
             _polarisHelper = polarisHelper;
+            _renewCardRequestService = renewCardRequestService;
+            _renewCardService = renewCardService;
         }
 
         public static string Name
@@ -67,6 +67,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
 
             if (request == null)
             {
+                ShowAlertWarning($"Unable to find card request id {id}");
                 return RedirectToAction(nameof(Index));
             }
 
@@ -348,6 +349,11 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 ItemCount = requests.Count,
                 ItemsPerPage = filter.Take.Value
             };
+
+            if (viewModel.PastMaxPage)
+            {
+                return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
+            }
 
             if (processed)
             {
