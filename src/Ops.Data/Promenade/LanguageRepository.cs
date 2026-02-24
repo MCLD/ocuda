@@ -60,6 +60,15 @@ namespace Ocuda.Ops.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
+        public async Task<string> GetDefaultLanguageNameAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.IsActive && _.IsDefault)
+                .Select(_ => _.Name)
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<int> GetLanguageId(string culture)
         {
             return await DbSet

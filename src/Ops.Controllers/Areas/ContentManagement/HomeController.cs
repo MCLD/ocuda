@@ -44,6 +44,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var viewModel = new IndexViewModel
             {
                 IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
+                HasRenewCardPermissions = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.RenewCardManagement),
                 HasRosterPermissions = await HasAppPermissionAsync(_permissionGroupService,
                     ApplicationPermission.RosterManagement),
                 HasUserSyncPermissions = await HasAppPermissionAsync(_permissionGroupService,

@@ -59,6 +59,18 @@ namespace Ocuda.Ops.Models.Definitions
                 Info = "Add and edit podcast show notes.",
                 Name = "Podcast Show Notes Management"
             },
+            new()
+            {
+                Id = ApplicationPermission.RenewCard,
+                Info = "Access card renewal.",
+                Name = "Card Renewal"
+            },
+            new()
+            {
+                Id = ApplicationPermission.RenewCardManagement,
+                Info = "Manage settings related to card renewal.",
+                Name = "Card Renewal Management"
+            },
             new() {
                 Id = ApplicationPermission.RosterManagement,
                 Info = "Upload rosters and manage mapping units to locations.",

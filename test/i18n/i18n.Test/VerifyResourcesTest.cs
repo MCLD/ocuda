@@ -56,7 +56,7 @@ namespace i18n.Test
             var constStrings = typeof(Promenade).GetFields(BindingFlags.Public
                     | BindingFlags.Static
                     | BindingFlags.FlattenHierarchy)
-                .Where(_ => _.FieldType == typeof(string));
+                .Where(_ => _.IsLiteral && !_.IsInitOnly);
 
             var constValues = constStrings.Select(_ => (string)_.GetValue(null));
 

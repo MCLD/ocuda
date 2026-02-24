@@ -17,7 +17,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.22")
+                .HasAnnotation("ProductVersion", "8.0.24")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1714,6 +1714,53 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.ToTable("ProductLocationInventories");
                 });
 
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.RenewCardRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Barcode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GuardianBarcode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GuardianName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDiscarded")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("SameAddress")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("RenewCardRequests");
+                });
+
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ScheduleRequest", b =>
                 {
                     b.Property<int>("Id")
@@ -2800,6 +2847,17 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Navigation("Location");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.RenewCardRequest", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Language");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ScheduleRequest", b =>

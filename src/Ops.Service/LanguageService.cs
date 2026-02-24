@@ -36,5 +36,10 @@ namespace Ocuda.Ops.Service
         {
             return await _languageRepository.GetDefaultLanguageId();
         }
+
+        public async Task<string> GetDefaultLanguageNameAsync()
+        {
+            return await _languageRepository.GetDefaultLanguageNameAsync();
+        }
     }
 }

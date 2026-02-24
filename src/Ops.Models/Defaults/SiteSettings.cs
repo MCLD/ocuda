@@ -8,6 +8,64 @@ namespace Ocuda.Ops.Models.Defaults
     {
         public static IEnumerable<SiteSetting> Get { get; } =
         [
+            #region RenewCard
+
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.RenewCard.AcceptedCounty,
+                Name = "Accepted county",
+                Description = "Accepted county for card renewal addresses",
+                Category = nameof(Keys.SiteSetting.RenewCard),
+                Value = string.Empty,
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.RenewCard.AddressLookupUrl,
+                Name = "Address lookup url",
+                Description = "Address lookup url with scheme, host and path",
+                Category = nameof(Keys.SiteSetting.RenewCard),
+                Value = string.Empty,
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.RenewCard.AssessorLookupUrl,
+                Name = "Assessor lookup url",
+                Description = "Assessor lookup with scheme, host and path",
+                Category = nameof(Keys.SiteSetting.RenewCard),
+                Value = string.Empty,
+                Type= SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.RenewCard.ChargesLimit,
+                Name = "Charges Limit",
+                Description = "Charges amount when a warning starts being shown",
+                Category = nameof(Keys.SiteSetting.RenewCard),
+                Value = "-1",
+                Type = SiteSettingType.Double
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.RenewCard.IgnoredBlockIds,
+                Name = "Ignored block ids",
+                Description = "Ids of blocks that won't be included, comma delimited",
+                Category = nameof(Keys.SiteSetting.RenewCard),
+                Value = string.Empty,
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.RenewCard.LeapPatronUrl,
+                Name = "Leap patron records url",
+                Description = "Leap patron records url with scheme, host and path",
+                Category = nameof(Keys.SiteSetting.RenewCard),
+                Value = string.Empty,
+                Type = SiteSettingType.StringNullable
+            },
+
+            #endregion RenewCard
 
             #region Carousel
 
@@ -317,7 +375,6 @@ namespace Ocuda.Ops.Models.Defaults
             },
 
             #endregion UserInterface
-
         ];
     }
 }

@@ -17,7 +17,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.22")
+                .HasAnnotation("ProductVersion", "8.0.24")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1512,6 +1512,83 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.ToTable("PostCategories");
                 });
 
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.RenewCardResponse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmailSetupId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("EmailSetupId");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.ToTable("RenewCardResponses");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.RenewCardResult", b =>
+                {
+                    b.Property<int>("RenewCardRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDiscarded")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("RenewCardResponseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ResponseText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RenewCardRequestId");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("RenewCardResponseId");
+
+                    b.ToTable("RenewCardResults");
+                });
+
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.RosterDetail", b =>
                 {
                     b.Property<int>("Id")
@@ -2922,6 +2999,49 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.RenewCardResponse", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Ops.Models.Entities.EmailSetup", "EmailSetup")
+                        .WithMany()
+                        .HasForeignKey("EmailSetupId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Ocuda.Ops.Models.Entities.User", "UpdatedByUser")
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("EmailSetup");
+
+                    b.Navigation("UpdatedByUser");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.RenewCardResult", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Ops.Models.Entities.RenewCardResponse", "RenewCardResponse")
+                        .WithMany()
+                        .HasForeignKey("RenewCardResponseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("RenewCardResponse");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.RosterDetail", b =>
