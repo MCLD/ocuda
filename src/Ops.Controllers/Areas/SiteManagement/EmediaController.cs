@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Emedia;
@@ -15,42 +16,35 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Filters;
 using Ocuda.Utility.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
     [Area("SiteManagement")]
     [Route("[area]/[controller]")]
-    public class EmediaController : BaseController<EmediaController>
+    public class EmediaController(ServiceFacades.Controller<EmediaController> context,
+        ICategoryService categoryService,
+        IEmediaService emediaService,
+        ILanguageService languageService,
+        IPermissionGroupService permissionGroupService,
+        ISegmentService segmentService) : BaseController<EmediaController>(context)
     {
-        private readonly ICategoryService _categoryService;
-        private readonly IEmediaService _emediaService;
-        private readonly ILanguageService _languageService;
-        private readonly IPermissionGroupService _permissionGroupService;
-        private readonly ISegmentService _segmentService;
+        private readonly ICategoryService _categoryService = categoryService
+                ?? throw new ArgumentNullException(nameof(categoryService));
+        private readonly IEmediaService _emediaService = emediaService
+                ?? throw new ArgumentNullException(nameof(emediaService));
+        private readonly ILanguageService _languageService = languageService
+                ?? throw new ArgumentNullException(nameof(languageService));
+        private readonly IPermissionGroupService _permissionGroupService = permissionGroupService
+                ?? throw new ArgumentNullException(nameof(permissionGroupService));
+        private readonly ISegmentService _segmentService = segmentService
+                ?? throw new ArgumentNullException(nameof(segmentService));
 
         public static string Name { get { return "Emedia"; } }
         public static string Area { get { return "SiteManagement"; } }
-
-        public EmediaController(ServiceFacades.Controller<EmediaController> context,
-            ICategoryService categoryService,
-            IEmediaService emediaService,
-            ILanguageService languageService,
-            IPermissionGroupService permissionGroupService,
-            ISegmentService segmentService) : base(context)
-        {
-            _categoryService = categoryService
-                ?? throw new ArgumentNullException(nameof(categoryService));
-            _emediaService = emediaService
-                ?? throw new ArgumentNullException(nameof(emediaService));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
-            _segmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
-        }
 
         [Route("")]
         [Route("[action]")]
@@ -99,7 +93,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (!await HasAppPermissionAsync(_permissionGroupService,
+            if (model == null)
+            {
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = "Unable to create empty group."
+                };
+            }
+            else if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
                 response = new JsonResponse
@@ -150,7 +152,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (!await HasAppPermissionAsync(_permissionGroupService,
+            if (model == null)
+            {
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = "Unable to edit empty group."
+                };
+            }
+            else if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
                 response = new JsonResponse
@@ -200,6 +210,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteGroup(IndexViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
@@ -211,7 +223,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 await _emediaService.DeleteGroupAsync(model.EmediaGroup.Id);
                 ShowAlertSuccess($"Deleted emedia group: {model.EmediaGroup.Name}");
             }
-            catch (Exception ex)
+            catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Error deleting emedia group: {Message}", ex.Message);
                 ShowAlertDanger($"Error deleting emedia group: {model.EmediaGroup.Name}");
@@ -298,7 +310,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             foreach (var emedia in emediaList.Data)
             {
-                emedia.EmediaLanguages = await _emediaService.GetEmediaLanguagesAsync(emedia.Id);
+                var languages = await _emediaService.GetEmediaLanguagesAsync(emedia.Id);
+                emedia.EmediaLanguages.AddRange(languages);
             }
 
             var viewModel = new GroupDetailsViewModel
@@ -323,7 +336,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (!await HasAppPermissionAsync(_permissionGroupService,
+            if (model == null)
+            {
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = "Unable to update empty group."
+                };
+            }
+            else if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
                 response = new JsonResponse
@@ -363,7 +384,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         Url = url
                     };
                 }
-                catch (Exception ex)
+                catch (DbUpdateException ex)
                 {
                     response = new JsonResponse
                     {
@@ -392,6 +413,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteGroupSegment(GroupDetailsViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
@@ -403,7 +426,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 await _emediaService.DeleteGroupSegmentAsync(model.EmediaGroupId);
                 ShowAlertSuccess($"Deleted group segment: {model.Segment.Name}");
             }
-            catch (Exception ex)
+            catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Error deleting group segment: {Message}", ex.Message);
                 ShowAlertDanger($"Error deleting group segment: {model.Segment.Name}");
@@ -422,7 +445,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (!await HasAppPermissionAsync(_permissionGroupService,
+            if (model == null)
+            {
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = "Unable to create empty emedia item."
+                };
+            }
+            else if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
                 response = new JsonResponse
@@ -473,7 +504,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (!await HasAppPermissionAsync(_permissionGroupService,
+            if (model == null)
+            {
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = "Unable to edit empty emedia item."
+                };
+            }
+            else if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
                 response = new JsonResponse
@@ -523,6 +562,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteEmedia(GroupDetailsViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
@@ -534,7 +575,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 await _emediaService.DeleteAsync(model.Emedia.Id);
                 ShowAlertSuccess($"Deleted emedia : {model.Emedia.Name}");
             }
-            catch (Exception ex)
+            catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Error deleting emedia: {Message}", ex.Message);
                 ShowAlertDanger($"Error deleting emedia: {model.Emedia.Name}");
@@ -579,9 +620,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var viewModel = new DetailsViewModel
             {
                 CategoryList = await _categoryService.GetAllAsync(),
-                CategorySelection = selectedCategories.Select(_ => _.Id).ToList(),
+                CategorySelection = [.. selectedCategories.Select(_ => _.Id)],
                 CategorySelectionText = string.Join(", ",
-                    selectedCategories.Select(_ => _.Name).OrderBy(_ => _)),
+                    selectedCategories.Select(_ => _.Name).Order()),
                 Emedia = emedia,
                 EmediaText = emediaText,
                 LanguageId = selectedLanguage.Id,
@@ -599,6 +640,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> Details(DetailsViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
@@ -612,7 +655,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     await _emediaService.SetEmediaTextAsync(model.EmediaText);
                     ShowAlertSuccess("Updated emedia text");
                 }
-                catch (Exception ex)
+                catch (DbUpdateException ex)
                 {
                     _logger.LogError(ex, "Error updating emedia text: {Message}", ex.Message);
                     ShowAlertDanger("Error updating emedia text");

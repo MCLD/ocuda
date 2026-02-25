@@ -11,6 +11,7 @@ using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
@@ -44,25 +45,29 @@ namespace Ocuda.Promenade.Service
             LanguageService languageService)
             : base(logger, dateTimeProvider)
         {
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(categoryRepository);
+            ArgumentNullException.ThrowIfNull(categoryTextRepository);
+            ArgumentNullException.ThrowIfNull(config);
+            ArgumentNullException.ThrowIfNull(emediaCategoryRepository);
+            ArgumentNullException.ThrowIfNull(emediaGroupRepository);
+            ArgumentNullException.ThrowIfNull(emediaRepository);
+            ArgumentNullException.ThrowIfNull(emediaTextRepository);
+            ArgumentNullException.ThrowIfNull(httpContextAccessor);
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(segmentService);
+
+            _cache = cache;
+            _categoryRepository = categoryRepository;
+            _categoryTextRepository = categoryTextRepository;
+            _config = config;
+            _emediaCategoryRepository = emediaCategoryRepository;
+            _emediaGroupRepository = emediaGroupRepository;
+            _emediaRepository = emediaRepository;
+            _emediaTextRepository = emediaTextRepository;
+            _httpContextAccessor = httpContextAccessor;
+            _languageService = languageService;
             _segmentService = segmentService;
-            _httpContextAccessor = httpContextAccessor
-                ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _categoryRepository = categoryRepository
-                ?? throw new ArgumentNullException(nameof(categoryRepository));
-            _categoryTextRepository = categoryTextRepository
-                ?? throw new ArgumentNullException(nameof(categoryTextRepository));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-            _emediaRepository = emediaRepository
-                ?? throw new ArgumentNullException(nameof(emediaRepository));
-            _emediaCategoryRepository = emediaCategoryRepository
-                ?? throw new ArgumentNullException(nameof(emediaCategoryRepository));
-            _emediaGroupRepository = emediaGroupRepository
-                ?? throw new ArgumentNullException(nameof(emediaGroupRepository));
-            _emediaTextRepository = emediaTextRepository
-                ?? throw new ArgumentNullException(nameof(emediaTextRepository));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
         }
 
         private int CachePagesInHours
@@ -147,12 +152,9 @@ namespace Ocuda.Promenade.Service
                         (int)currentLanguageId,
                         category.Id);
                 }
-                if (category.CategoryText == null)
-                {
-                    category.CategoryText = await GetCategoryTextAsync(forceReload,
+                category.CategoryText ??= await GetCategoryTextAsync(forceReload,
                         defaultLanguageId,
                         category.Id);
-                }
             }
 
             ICollection<EmediaCategory> emediaCategories = null;
@@ -174,10 +176,9 @@ namespace Ocuda.Promenade.Service
 
             foreach (var group in groups)
             {
-                group.Emedias = emedias
+                group.Emedias = [.. emedias
                     .Where(_ => _.GroupId == group.Id)
-                    .OrderBy(_ => _.Name)
-                    .ToList();
+                    .OrderBy(_ => _.Name)];
 
                 if (group.SegmentId.HasValue && group.Segment == null)
                 {
@@ -197,20 +198,16 @@ namespace Ocuda.Promenade.Service
                             emedia.Id);
                     }
 
-                    if (emedia.EmediaText == null)
-                    {
-                        emedia.EmediaText = await GetEmediaTextAsync(forceReload,
+                    emedia.EmediaText ??= await GetEmediaTextAsync(forceReload,
                             defaultLanguageId,
                             emedia.Id);
-                    }
 
                     var thisEmediaCategoryIds = emediaCategories
                         .Where(_ => _.EmediaId == emedia.Id)
                         .Select(_ => _.CategoryId);
 
-                    emedia.Categories = categories
-                        .Where(_ => thisEmediaCategoryIds.Contains(_.Id))
-                        .ToList();
+                    emedia.Categories
+                        .AddRange([.. categories.Where(_ => thisEmediaCategoryIds.Contains(_.Id))]);
                 }
             }
 

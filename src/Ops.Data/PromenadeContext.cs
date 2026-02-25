@@ -31,6 +31,7 @@ namespace Ocuda.Ops.Data
         public DbSet<EmediaCategory> EmediaCategories { get; set; }
         public DbSet<EmediaGroup> EmediaGroups { get; set; }
         public DbSet<EmediaText> EmediaTexts { get; set; }
+        public DbSet<EmediaTopic> EmediaTopics { get; set; }
         public DbSet<ExternalResource> ExternalResources { get; set; }
         public DbSet<Feature> Features { get; set; }
         public DbSet<Group> Groups { get; set; }
@@ -74,6 +75,8 @@ namespace Ocuda.Ops.Data
         public DbSet<SegmentText> SegmentTexts { get; set; }
         public DbSet<SiteSetting> SiteSettings { get; set; }
         public DbSet<SocialCard> SocialCards { get; set; }
+        public DbSet<Topic> Topics { get; set; }
+        public DbSet<TopicText> TopicTexts { get; set; }
         public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
         public DbSet<UrlRedirect> UrlRedirects { get; set; }
         public DbSet<VolunteerForm> VolunteerForms { get; set; }
@@ -81,10 +84,7 @@ namespace Ocuda.Ops.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            if (modelBuilder == null)
-            {
-                throw new System.ArgumentNullException(nameof(modelBuilder));
-            }
+            System.ArgumentNullException.ThrowIfNull(modelBuilder);
 
             // turn off cascading deletes
             foreach (var relationship in modelBuilder.Model
@@ -110,6 +110,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.CategoryId, _.EmediaId });
             modelBuilder.Entity<EmediaText>()
                 .HasKey(_ => new { _.EmediaId, _.LanguageId });
+            modelBuilder.Entity<EmediaTopic>()
+                .HasKey(_ => new { _.TopicId, _.EmediaId });
             modelBuilder.Entity<LocationInteriorImageAltText>()
                 .HasKey(_ => new { _.LocationInteriorImageId, _.LanguageId });
             modelBuilder.Entity<ImageFeatureItemText>()
@@ -142,6 +144,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.ScheduleRequestSubjectId, _.LanguageId });
             modelBuilder.Entity<SegmentText>()
                 .HasKey(_ => new { _.LanguageId, _.SegmentId });
+            modelBuilder.Entity<TopicText>()
+                .HasKey(_ => new { _.LanguageId, _.TopicId });
 
             modelBuilder.Entity<VolunteerForm>()
                 .Property(_ => _.VolunteerFormType)
