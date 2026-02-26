@@ -28,6 +28,7 @@ namespace Ocuda.Promenade.Data
         public DbSet<EmediaCategory> EmediaCategories { get; set; }
         public DbSet<EmediaGroup> EmediaGroups { get; }
         public DbSet<EmediaText> EmediaTexts { get; }
+        public DbSet<EmediaTopic> EmediaTopics { get; set; }
         public DbSet<ExternalResource> ExternalResources { get; set; }
         public DbSet<Feature> Features { get; }
         public DbSet<Group> Groups { get; }
@@ -71,6 +72,8 @@ namespace Ocuda.Promenade.Data
         public DbSet<SegmentText> SegmentTexts { get; }
         public DbSet<SiteSetting> SiteSettings { get; }
         public DbSet<SocialCard> SocialCards { get; }
+        public DbSet<Topic> Topics { get; set; }
+        public DbSet<TopicText> TopicTexts { get; set; }
         public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
         public DbSet<UrlRedirect> UrlRedirects { get; }
         public DbSet<VolunteerForm> VolunteerForms { get; }
@@ -99,6 +102,8 @@ namespace Ocuda.Promenade.Data
                 .HasKey(_ => new { _.CategoryId, _.EmediaId });
             modelBuilder.Entity<EmediaText>()
                 .HasKey(_ => new { _.EmediaId, _.LanguageId });
+            modelBuilder.Entity<EmediaTopic>()
+                .HasKey(_ => new { _.TopicId, _.EmediaId });
             modelBuilder.Entity<LocationInteriorImageAltText>()
                 .HasKey(_ => new { _.LocationInteriorImageId, _.LanguageId });
             modelBuilder.Entity<ImageFeatureItemText>()
@@ -131,6 +136,8 @@ namespace Ocuda.Promenade.Data
                 .HasKey(_ => new { _.LanguageId, _.ScheduleRequestSubjectId });
             modelBuilder.Entity<SegmentText>()
                 .HasKey(_ => new { _.LanguageId, _.SegmentId });
+            modelBuilder.Entity<TopicText>()
+                .HasKey(_ => new { _.LanguageId, _.TopicId });
         }
     }
 }

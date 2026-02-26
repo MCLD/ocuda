@@ -78,6 +78,11 @@ namespace Ocuda.Promenade.Service
             }
         }
 
+        public async Task<Emedia> GetAsync(string slug)
+        {
+            return await _emediaRepository.Find(slug);
+        }
+
         public async Task<ICollection<EmediaGroup>> GetGroupedEmediaAsync(bool forceReload)
         {
             var currentCultureName = _httpContextAccessor

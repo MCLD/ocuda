@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -15,15 +17,15 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Filters;
 using Ocuda.Utility.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
-    [Area("SiteManagement")]
+    [Area(nameof(SiteManagement))]
     [Route("[area]/[controller]")]
     public class EmediaController(ServiceFacades.Controller<EmediaController> context,
         ICategoryService categoryService,
@@ -34,202 +36,61 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly ICategoryService _categoryService = categoryService
                 ?? throw new ArgumentNullException(nameof(categoryService));
+
         private readonly IEmediaService _emediaService = emediaService
                 ?? throw new ArgumentNullException(nameof(emediaService));
+
         private readonly ILanguageService _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
+
         private readonly IPermissionGroupService _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
+
         private readonly ISegmentService _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
 
-        public static string Name { get { return "Emedia"; } }
-        public static string Area { get { return "SiteManagement"; } }
+        public static string Area
+        { get { return nameof(SiteManagement); } }
 
-        [Route("")]
+        public static string Name
+        { get { return "Emedia"; } }
+
+        [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> ChangeCategories(int id, ICollection<int> categories)
         {
+            JsonResponse response;
+
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
-                return RedirectToUnauthorized();
-            }
-
-            var itemsPerPage = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
-
-            var filter = new BaseFilter(page, itemsPerPage);
-
-            var groupList = await _emediaService.GetPaginatedGroupListAsync(filter);
-
-            var paginateModel = new PaginateModel
-            {
-                ItemCount = groupList.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
-            if (paginateModel.PastMaxPage)
-            {
-                return RedirectToRoute(
-                    new
-                    {
-                        page = paginateModel.LastPage ?? 1
-                    });
-            }
-
-            var viewModel = new IndexViewModel
-            {
-                EmediaGroups = groupList.Data,
-                PaginateModel = paginateModel
-            };
-
-            return View(viewModel);
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> CreateGroup(IndexViewModel model)
-        {
-            JsonResponse response;
-
-            if (model == null)
-            {
-                response = new JsonResponse
-                {
-                    Success = false,
-                    Message = "Unable to create empty group."
-                };
-            }
-            else if (!await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.EmediaManagement))
-            {
                 response = new JsonResponse
                 {
                     Message = "Unauthorized",
                     Success = false
                 };
-            }
-            else if (ModelState.IsValid)
-            {
-                try
-                {
-                    var group = await _emediaService.CreateGroupAsync(model.EmediaGroup);
-                    response = new JsonResponse
-                    {
-                        Success = true,
-                        Url = Url.Action(nameof(GroupDetails), new { id = group.Id })
-                    };
-                }
-                catch (OcudaException ex)
-                {
-                    response = new JsonResponse
-                    {
-                        Success = false,
-                        Message = ex.Message
-                    };
-                }
             }
             else
             {
-                var errors = ModelState.Values
-                    .SelectMany(_ => _.Errors)
-                    .Select(_ => _.ErrorMessage);
-
-                response = new JsonResponse
-                {
-                    Success = false,
-                    Message = string.Join(Environment.NewLine, errors)
-                };
-            }
-
-            return Json(response);
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> EditGroup(IndexViewModel model)
-        {
-            JsonResponse response;
-
-            if (model == null)
-            {
-                response = new JsonResponse
-                {
-                    Success = false,
-                    Message = "Unable to edit empty group."
-                };
-            }
-            else if (!await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.EmediaManagement))
-            {
-                response = new JsonResponse
-                {
-                    Message = "Unauthorized",
-                    Success = false
-                };
-            }
-            else if (ModelState.IsValid)
-            {
                 try
                 {
-                    var group = await _emediaService.EditGroupAsync(model.EmediaGroup);
+                    await _emediaService.UpdateCategoriesAsync(id, categories);
                     response = new JsonResponse
                     {
                         Success = true
                     };
-
-                    ShowAlertSuccess($"Updated group: {group.Name}");
                 }
                 catch (OcudaException ex)
                 {
                     response = new JsonResponse
                     {
-                        Success = false,
-                        Message = ex.Message
+                        Message = ex.Message,
+                        Success = false
                     };
                 }
             }
-            else
-            {
-                var errors = ModelState.Values
-                    .SelectMany(_ => _.Errors)
-                    .Select(_ => _.ErrorMessage);
-
-                response = new JsonResponse
-                {
-                    Success = false,
-                    Message = string.Join(Environment.NewLine, errors)
-                };
-            }
 
             return Json(response);
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> DeleteGroup(IndexViewModel model)
-        {
-            ArgumentNullException.ThrowIfNull(model);
-
-            if (!await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.EmediaManagement))
-            {
-                return RedirectToUnauthorized();
-            }
-
-            try
-            {
-                await _emediaService.DeleteGroupAsync(model.EmediaGroup.Id);
-                ShowAlertSuccess($"Deleted emedia group: {model.EmediaGroup.Name}");
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Error deleting emedia group: {Message}", ex.Message);
-                ShowAlertDanger($"Error deleting emedia group: {model.EmediaGroup.Name}");
-            }
-
-            return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
         }
 
         [HttpPost]
@@ -268,175 +129,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             return Json(response);
-        }
-
-        [Route("[action]/{id}")]
-        public async Task<IActionResult> GroupDetails(int id, int page = 1)
-        {
-            if (!await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.EmediaManagement))
-            {
-                return RedirectToUnauthorized();
-            }
-
-            var group = await _emediaService.GetGroupIncludingSegmentAsync(id);
-
-            if (group == null)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            var itemsPerPage = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
-
-            var filter = new BaseFilter(page, itemsPerPage);
-
-            var emediaList = await _emediaService.GetPaginatedListForGroupAsync(group.Id, filter);
-
-            var paginateModel = new PaginateModel
-            {
-                ItemCount = emediaList.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
-            if (paginateModel.PastMaxPage)
-            {
-                return RedirectToRoute(
-                    new
-                    {
-                        page = paginateModel.LastPage ?? 1
-                    });
-            }
-
-            foreach (var emedia in emediaList.Data)
-            {
-                var languages = await _emediaService.GetEmediaLanguagesAsync(emedia.Id);
-                emedia.EmediaLanguages.AddRange(languages);
-            }
-
-            var viewModel = new GroupDetailsViewModel
-            {
-                EmediaGroup = group,
-                Emedias = emediaList.Data,
-                PaginateModel = paginateModel
-            };
-
-            if (group.SegmentId.HasValue)
-            {
-                viewModel.SegmentLanguages = await _segmentService
-                    .GetSegmentLanguagesByIdAsync(group.SegmentId.Value);
-            }
-
-            return View(viewModel);
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> UpdateGroupSegment(GroupDetailsViewModel model)
-        {
-            JsonResponse response;
-
-            if (model == null)
-            {
-                response = new JsonResponse
-                {
-                    Success = false,
-                    Message = "Unable to update empty group."
-                };
-            }
-            else if (!await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.EmediaManagement))
-            {
-                response = new JsonResponse
-                {
-                    Message = "Unauthorized",
-                    Success = false
-                };
-            }
-            else if (ModelState.IsValid)
-            {
-                try
-                {
-                    string url = null;
-
-                    var group = await _emediaService.GetGroupByIdAsync(model.EmediaGroupId);
-                    if (group.SegmentId.HasValue)
-                    {
-                        var segment = await _segmentService.GetByIdAsync(group.SegmentId.Value);
-                        segment.Name = model.Segment.Name;
-                        segment = await _segmentService.EditAsync(segment);
-                        ShowAlertSuccess($"Updated group segment: {segment.Name}");
-                    }
-                    else
-                    {
-                        group.Segment = model.Segment;
-                        group.Segment.IsActive = true;
-                        await _emediaService.AddGroupSegmentAsync(group);
-                        url = Url.Action(
-                            nameof(SegmentsController.Detail),
-                            SegmentsController.Name,
-                            new { id = group.SegmentId });
-                    }
-
-                    response = new JsonResponse
-                    {
-                        Success = true,
-                        Url = url
-                    };
-                }
-                catch (DbUpdateException ex)
-                {
-                    response = new JsonResponse
-                    {
-                        Success = false,
-                        Message = ex.Message
-                    };
-                }
-            }
-            else
-            {
-                var errors = ModelState.Values
-                    .SelectMany(_ => _.Errors)
-                    .Select(_ => _.ErrorMessage);
-
-                response = new JsonResponse
-                {
-                    Success = false,
-                    Message = string.Join(Environment.NewLine, errors)
-                };
-            }
-
-            return Json(response);
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> DeleteGroupSegment(GroupDetailsViewModel model)
-        {
-            ArgumentNullException.ThrowIfNull(model);
-
-            if (!await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.EmediaManagement))
-            {
-                return RedirectToUnauthorized();
-            }
-
-            try
-            {
-                await _emediaService.DeleteGroupSegmentAsync(model.EmediaGroupId);
-                ShowAlertSuccess($"Deleted group segment: {model.Segment.Name}");
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Error deleting group segment: {Message}", ex.Message);
-                ShowAlertDanger($"Error deleting group segment: {model.Segment.Name}");
-            }
-
-            return RedirectToAction(nameof(GroupDetails), new
-            {
-                id = model.EmediaGroupId,
-                page = model.PaginateModel.CurrentPage
-            });
         }
 
         [HttpPost]
@@ -500,7 +192,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> EditEmedia(GroupDetailsViewModel model)
+        public async Task<IActionResult> CreateGroup(IndexViewModel model)
         {
             JsonResponse response;
 
@@ -509,7 +201,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 response = new JsonResponse
                 {
                     Success = false,
-                    Message = "Unable to edit empty emedia item."
+                    Message = "Unable to create empty group."
                 };
             }
             else if (!await HasAppPermissionAsync(_permissionGroupService,
@@ -525,13 +217,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 try
                 {
-                    var emedia = await _emediaService.EditAsync(model.Emedia);
+                    var group = await _emediaService.CreateGroupAsync(model.EmediaGroup);
                     response = new JsonResponse
                     {
-                        Success = true
+                        Success = true,
+                        Url = Url.Action(nameof(GroupDetails), new { id = group.Id })
                     };
-
-                    ShowAlertSuccess($"Updated emedia: {emedia.Name}");
                 }
                 catch (OcudaException ex)
                 {
@@ -587,6 +278,62 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     id = model.EmediaGroup.Id,
                     page = model.PaginateModel.CurrentPage
                 });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteGroup(IndexViewModel model)
+        {
+            ArgumentNullException.ThrowIfNull(model);
+
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            try
+            {
+                await _emediaService.DeleteGroupAsync(model.EmediaGroup.Id);
+                ShowAlertSuccess($"Deleted emedia group: {model.EmediaGroup.Name}");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Error deleting emedia group: {Message}", ex.Message);
+                ShowAlertDanger($"Error deleting emedia group: {model.EmediaGroup.Name}");
+            }
+
+            return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteGroupSegment(GroupDetailsViewModel model)
+        {
+            ArgumentNullException.ThrowIfNull(model);
+
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            try
+            {
+                await _emediaService.DeleteGroupSegmentAsync(model.EmediaGroupId);
+                ShowAlertSuccess($"Deleted group segment: {model.Segment.Name}");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Error deleting group segment: {Message}", ex.Message);
+                ShowAlertDanger($"Error deleting group segment: {model.Segment.Name}");
+            }
+
+            return RedirectToAction(nameof(GroupDetails), new
+            {
+                id = model.EmediaGroupId,
+                page = model.PaginateModel.CurrentPage
+            });
         }
 
         [Route("[action]/{id}")]
@@ -673,11 +420,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> ChangeCategories(int id, ICollection<int> categories)
+        public async Task<IActionResult> EditEmedia(GroupDetailsViewModel model)
         {
             JsonResponse response;
 
-            if (!await HasAppPermissionAsync(_permissionGroupService,
+            if (model == null)
+            {
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = "Unable to edit empty emedia item."
+                };
+            }
+            else if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
                 response = new JsonResponse
@@ -686,24 +441,303 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     Success = false
                 };
             }
-            else
+            else if (ModelState.IsValid)
             {
                 try
                 {
-                    await _emediaService.UpdateCategoriesAsync(id, categories);
+                    var emedia = await _emediaService.EditAsync(model.Emedia);
                     response = new JsonResponse
                     {
                         Success = true
                     };
+
+                    ShowAlertSuccess($"Updated emedia: {emedia.Name}");
                 }
                 catch (OcudaException ex)
                 {
                     response = new JsonResponse
                     {
-                        Message = ex.Message,
-                        Success = false
+                        Success = false,
+                        Message = ex.Message
                     };
                 }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> EditGroup(IndexViewModel model)
+        {
+            JsonResponse response;
+
+            if (model == null)
+            {
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = "Unable to edit empty group."
+                };
+            }
+            else if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else if (ModelState.IsValid)
+            {
+                try
+                {
+                    var group = await _emediaService.EditGroupAsync(model.EmediaGroup);
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+
+                    ShowAlertSuccess($"Updated group: {group.Name}");
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+
+            return Json(response);
+        }
+
+        [Route("[action]/{id}")]
+        public async Task<IActionResult> GroupDetails(int id, int page = 1)
+        {
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var group = await _emediaService.GetGroupIncludingSegmentAsync(id);
+
+            if (group == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var itemsPerPage = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
+
+            var filter = new BaseFilter(page, itemsPerPage);
+
+            var emediaList = await _emediaService.GetPaginatedListForGroupAsync(group.Id, filter);
+
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = emediaList.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(
+                    new
+                    {
+                        page = paginateModel.LastPage ?? 1
+                    });
+            }
+
+            foreach (var emedia in emediaList.Data)
+            {
+                var languages = await _emediaService.GetEmediaLanguagesAsync(emedia.Id);
+                emedia.EmediaLanguages.AddRange(languages);
+            }
+
+            var viewModel = new GroupDetailsViewModel
+            {
+                EmediaGroup = group,
+                EmediaGroupId = id,
+                Emedias = emediaList.Data,
+                PaginateModel = paginateModel
+            };
+
+            if (group.SegmentId.HasValue)
+            {
+                viewModel.SegmentLanguages = await _segmentService
+                    .GetSegmentLanguagesByIdAsync(group.SegmentId.Value);
+            }
+
+            return View(viewModel);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Import(int groupId, IFormFile jsonImportFile)
+        {
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            if (jsonImportFile == null)
+            {
+                return StatusCode(500);
+            }
+
+            var jsonStream = jsonImportFile.OpenReadStream();
+
+            var dataFromFile = await JsonSerializer
+                .DeserializeAsync<PortableList<Ocuda.Models.ESourceImport>>(jsonStream);
+
+            await _emediaService.ImportItemsAsync(groupId, dataFromFile.Items);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [Route("")]
+        [Route("[action]")]
+        public async Task<IActionResult> Index(int page = 1)
+        {
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var itemsPerPage = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
+
+            var filter = new BaseFilter(page, itemsPerPage);
+
+            var groupList = await _emediaService.GetPaginatedGroupListAsync(filter);
+
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = groupList.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(
+                    new
+                    {
+                        page = paginateModel.LastPage ?? 1
+                    });
+            }
+
+            var viewModel = new IndexViewModel
+            {
+                EmediaGroups = groupList.Data,
+                PaginateModel = paginateModel
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> UpdateGroupSegment(GroupDetailsViewModel model)
+        {
+            JsonResponse response;
+
+            if (model == null)
+            {
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = "Unable to update empty group."
+                };
+            }
+            else if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else if (ModelState.IsValid)
+            {
+                try
+                {
+                    string url = null;
+
+                    var group = await _emediaService.GetGroupByIdAsync(model.EmediaGroupId);
+                    if (group.SegmentId.HasValue)
+                    {
+                        var segment = await _segmentService.GetByIdAsync(group.SegmentId.Value);
+                        segment.Name = model.Segment.Name;
+                        segment = await _segmentService.EditAsync(segment);
+                        ShowAlertSuccess($"Updated group segment: {segment.Name}");
+                    }
+                    else
+                    {
+                        group.Segment = model.Segment;
+                        group.Segment.IsActive = true;
+                        await _emediaService.AddGroupSegmentAsync(group);
+                        url = Url.Action(
+                            nameof(SegmentsController.Detail),
+                            SegmentsController.Name,
+                            new { id = group.SegmentId });
+                    }
+
+                    response = new JsonResponse
+                    {
+                        Success = true,
+                        Url = url
+                    };
+                }
+                catch (DbUpdateException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
             }
 
             return Json(response);

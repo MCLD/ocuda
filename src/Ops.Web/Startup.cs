@@ -73,6 +73,8 @@ namespace Ocuda.Ops.Web
             // update databases to include latest migrations
             app.InitialSetup();
 
+            app.EnsureRequiredDataIsPresent();
+
             // use the culture configured above in services
             app.UseRequestLocalization();
 
@@ -498,6 +500,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.EmediaRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaTextRepository,
                 Data.Promenade.EmediaTextRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaTopicRepository,
+                Data.Promenade.EmediaTopicRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IExternalResourcePromRepository,
                 Data.Promenade.ExternalResourcePromRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IFeatureRepository,
@@ -580,6 +584,10 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.SiteSettingPromRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISocialCardRepository,
                 Data.Promenade.SocialCardRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ITopicRepository,
+                Data.Promenade.TopicRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ITopicTextRepository,
+                Data.Promenade.TopicTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IVolunteerFormRepository,
                 Data.Promenade.VolunteerFormRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IVolunteerFormSubmissionRepository,

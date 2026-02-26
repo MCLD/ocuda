@@ -6,6 +6,8 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface IEmediaRepository : IGenericRepository<Emedia>
     {
+        Task<Emedia> Find(string slug);
+
         Task<List<Emedia>> GetAllAsync();
     }
 }

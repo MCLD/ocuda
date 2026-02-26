@@ -35,7 +35,8 @@
                         <div class="card-header d-flex">
                             <div class="flex-grow-1">
                                 <a aria-label="@Localizer[Promenade.NewWindowItem, emedia.Name]"
-                                   href="@emedia.RedirectUrl"
+                                   asp-action="@nameof(DigitalLibraryController.Launch)"
+                                   asp-route-id="@emedia.Slug"
                                    target="_blank">
                                     <h2 class="fs-5 d-inline btn-link">
                                         @emedia.Name

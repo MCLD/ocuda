@@ -46,6 +46,10 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public string RedirectUrl { get; set; }
 
+        [MaxLength(255)]
+        [Required]
+        public string Slug { get; set; }
+
         [NotMapped]
         public ICollection<Topic> Topics { get; }
     }

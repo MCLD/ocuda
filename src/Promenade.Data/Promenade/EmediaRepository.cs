@@ -17,6 +17,13 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
+        public async Task<Emedia> Find(string slug)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .FirstOrDefaultAsync(_ => _.Slug == slug);
+        }
+
         public async Task<List<Emedia>> GetAllAsync()
         {
             return await DbSet

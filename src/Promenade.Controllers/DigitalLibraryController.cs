@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.DigitalLibrary;
 using Ocuda.Promenade.Service;
@@ -9,22 +10,17 @@ namespace Ocuda.Promenade.Controllers
 {
     [Route("digital-library")]
     [Route("{culture:cultureConstraint?}/digital-library")]
-    public class DigitalLibraryController : BaseController<DigitalLibraryController>
+    public class DigitalLibraryController(ServiceFacades.Controller<DigitalLibraryController> context,
+        EmediaService emediaService,
+        SocialCardService socialCardService) : BaseController<DigitalLibraryController>(context)
     {
-        private readonly EmediaService _emediaService;
-        private readonly SocialCardService _socialCardService;
+        private readonly EmediaService _emediaService = emediaService
+            ?? throw new ArgumentNullException(nameof(emediaService));
 
-        public DigitalLibraryController(ServiceFacades.Controller<DigitalLibraryController> context,
-            EmediaService emediaService,
-            SocialCardService socialCardService) : base(context)
-        {
-            _emediaService = emediaService
-                ?? throw new ArgumentNullException(nameof(emediaService));
-            _socialCardService = socialCardService
-                ?? throw new ArgumentNullException(nameof(socialCardService));
-        }
+        private readonly SocialCardService _socialCardService = socialCardService
+            ?? throw new ArgumentNullException(nameof(socialCardService));
 
-        [Route("")]
+        [HttpGet("")]
         public async Task<IActionResult> Index()
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
@@ -72,6 +68,35 @@ namespace Ocuda.Promenade.Controllers
             PageTitle = "Digital Library";
 
             return View(emediaViewModel);
+        }
+
+        [HttpGet("[action]/{id}")]
+        public async Task<IActionResult> Launch(string id)
+        {
+            var emedia = await _emediaService.GetAsync(id);
+
+            if (emedia == null)
+            {
+                return NotFound();
+            }
+
+            if (emedia.IsHttpPost)
+            {
+                var launchViewModel = new LaunchViewModel
+                {
+                    Name = emedia.Name,
+                    Uri = new Uri(emedia.RedirectUrl)
+                };
+                foreach (var (s, sv) in QueryHelpers.ParseQuery(launchViewModel.Uri.Query))
+                {
+                    launchViewModel.QueryStringValues.Add(s, sv);
+                }
+                return View(launchViewModel);
+            }
+            else
+            {
+                return Redirect(emedia.RedirectUrl);
+            }
         }
     }
 }

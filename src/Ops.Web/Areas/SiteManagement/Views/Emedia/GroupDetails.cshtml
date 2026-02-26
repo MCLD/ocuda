@@ -1,32 +1,37 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Emedia.GroupDetailsViewModel
 
-<div class="row mb-2">
-    <div class="col-sm-8">
-        <h1>
-            Emedia Group
-            <small class="text-muted">@Model.EmediaGroup.Name</small>
-        </h1>
-    </div>
-    <div class="col-sm-4">
-        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
-           asp-action="@(nameof(EmediaController.Index))">Back</a>
-
+<div class="d-flex justify-content-between mb-2">
+    <h1>
+        Emedia Group
+        <small class="text-muted">@Model.EmediaGroup.Name</small>
+    </h1>
+    <div>
+        <button data-bs-toggle="modal"
+                data-bs-target="#importJsonModal"
+                class="btn btn-outline-info me-2">
+            Import
+        </button>
         @if (!Model.EmediaGroup.SegmentId.HasValue)
         {
-            <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+            <button class="btn btn-outline-success"
                     data-bs-toggle="modal"
                     data-bs-target="#updateSegmentModal">
                 <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Add a Segment
             </button>
         }
-
-        <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+        <button class="btn btn-outline-success"
                 data-bs-toggle="modal"
                 data-bs-target="#addModal">
             <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
             Add Emedia
         </button>
+        <a class="btn btn-outline-dark ms-2"
+           asp-action="@nameof(EmediaController.Index)"
+           asp-area="@EmediaController.Area"
+           asp-controller="@EmediaController.Name">
+            Back
+        </a>
     </div>
 </div>
 
@@ -218,6 +223,47 @@
         </div>
     </form>
 }
+
+<form asp-action="@nameof(EmediaController.Import)"
+      enctype="multipart/form-data"
+      method="post"
+      role="form">
+    <input type="hidden" name="groupId" value="@Model.EmediaGroupId" />
+    <div class="modal" tabindex="-1" id="importJsonModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload new navigation</h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Upload a <code>.json</code> file containing electronic resources. This
+                        process will attempt to insert all electronic resource
+                        items from the uploaded <code>.json</code> file.
+                    </p>
+                    <div class="input-group">
+                        <input type="file"
+                               class="form-control"
+                               name="jsonImportFile"
+                               accept=".json" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal"
+                            type="button">
+                        Close
+                    </button>
+                    <button class="btn btn-outline-primary" type="submit">Upload file</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 
 @section scripts {
     <script>
