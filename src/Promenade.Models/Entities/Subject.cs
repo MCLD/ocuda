@@ -2,7 +2,7 @@
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class Topic
+    public class Subject
     {
         [Key]
         [Required]

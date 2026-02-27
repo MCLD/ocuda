@@ -12,12 +12,12 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class TopicRepository(Repository<PromenadeContext> repositoryFacade,
-        ILogger<TopicRepository> logger)
-            : GenericRepository<PromenadeContext, Topic>(repositoryFacade, logger),
-            ITopicRepository
+    public class SubjectRepository(Repository<PromenadeContext> repositoryFacade,
+        ILogger<SubjectRepository> logger)
+            : GenericRepository<PromenadeContext, Subject>(repositoryFacade, logger),
+            ISubjectRepository
     {
-        public async Task<Topic> FindAsync(int id)
+        public async Task<Subject> FindAsync(int id)
         {
             var entity = await DbSet.FindAsync(id);
             if (entity != null)
@@ -27,7 +27,7 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
-        public async Task<ICollection<Topic>> GetAllAsync()
+        public async Task<ICollection<Subject>> GetAllAsync()
         {
             return await DbSet
                 .AsNoTracking()
@@ -35,10 +35,10 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<DataWithCount<ICollection<Topic>>> GetPaginatedListAsync(
+        public async Task<DataWithCount<ICollection<Subject>>> GetPaginatedListAsync(
             BaseFilter filter)
         {
-            return new DataWithCount<ICollection<Topic>>
+            return new DataWithCount<ICollection<Subject>>
             {
                 Count = await DbSet.AsNoTracking().CountAsync(),
                 Data = await DbSet.AsNoTracking()

@@ -9,12 +9,12 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class EmediaTopicRepository(Repository<PromenadeContext> repositoryFacade,
-        ILogger<EmediaTopicRepository> logger)
-            : GenericRepository<PromenadeContext, EmediaTopic>(repositoryFacade, logger),
-            IEmediaTopicRepository
+    public class EmediaSubjectRepository(Repository<PromenadeContext> repositoryFacade,
+        ILogger<EmediaSubjectRepository> logger)
+            : GenericRepository<PromenadeContext, EmediaSubject>(repositoryFacade, logger),
+            IEmediaSubjectRepository
     {
-        public async Task<ICollection<EmediaTopic>> GetAllForEmediaAsync(int emediaId)
+        public async Task<ICollection<EmediaSubject>> GetAllForEmediaAsync(int emediaId)
         {
             return await DbSet
                 .AsNoTracking()
@@ -22,7 +22,7 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<ICollection<EmediaTopic>> GetAllForGroupAsync(int groupId)
+        public async Task<ICollection<EmediaSubject>> GetAllForGroupAsync(int groupId)
         {
             return await DbSet
                 .AsNoTracking()
@@ -30,49 +30,49 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<ICollection<EmediaTopic>> GetByTopicIdAsync(int topicId)
+        public async Task<ICollection<EmediaSubject>> GetBySubjectIdAsync(int subjectId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.TopicId == topicId)
+                .Where(_ => _.SubjectId == subjectId)
                 .ToListAsync();
         }
 
-        public async Task<ICollection<string>> GetEmediasForTopicAsync(int topicId)
+        public async Task<ICollection<string>> GetEmediasForSubjectAsync(int subjectId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.TopicId == topicId)
+                .Where(_ => _.SubjectId == subjectId)
                 .Select(_ => _.Emedia.Name)
                 .OrderBy(_ => _)
                 .ToListAsync();
         }
 
-        public async Task<ICollection<int>> GetTopicIdsForEmediaAsync(int emediaId)
+        public async Task<ICollection<int>> GetSubjectIdsForEmediaAsync(int emediaId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.EmediaId == emediaId)
-                .Select(_ => _.TopicId)
+                .Select(_ => _.SubjectId)
                 .ToListAsync();
         }
 
-        public async Task<ICollection<Topic>> GetTopicsForEmediaAsync(int emediaId)
+        public async Task<ICollection<Subject>> GetSubjectsForEmediaAsync(int emediaId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.EmediaId == emediaId)
-                .Select(_ => _.Topic)
+                .Select(_ => _.Subject)
                 .ToListAsync();
         }
 
-        public void RemoveByEmediaAndTopics(int emediaId, ICollection<int> topicIds)
+        public void RemoveByEmediaAndSubjects(int emediaId, ICollection<int> subjectIds)
         {
-            var emediaTopics = DbSet
+            var emediaSubjects = DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId && topicIds.Contains(_.TopicId));
+                .Where(_ => _.EmediaId == emediaId && subjectIds.Contains(_.SubjectId));
 
-            DbSet.RemoveRange(emediaTopics);
+            DbSet.RemoveRange(emediaSubjects);
         }
     }
 }

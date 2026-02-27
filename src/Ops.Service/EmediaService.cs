@@ -22,11 +22,11 @@ namespace Ocuda.Ops.Service
         IEmediaGroupRepository emediaGroupRepository,
         IEmediaRepository emediaRepository,
         IEmediaTextRepository emediaTextRepository,
-        IEmediaTopicRepository emediaTopicRepository,
+        IEmediaSubjectRepository emediaSubjectRepository,
         ILanguageRepository languageRepository,
         ISegmentService segmentService,
-        ITopicRepository topicRepository,
-        ITopicTextRepository topicTextRepository)
+        ISubjectRepository subjectRepository,
+        ISubjectTextRepository subjectTextRepository)
             : BaseService<EmediaService>(logger, httpContextAccessor),
             IEmediaService
     {
@@ -40,11 +40,11 @@ namespace Ocuda.Ops.Service
         private readonly IEmediaRepository _emediaRepository = emediaRepository
             ?? throw new ArgumentNullException(nameof(emediaRepository));
 
-        private readonly IEmediaTextRepository _emediaTextReposiory = emediaTextRepository
-            ?? throw new ArgumentNullException(nameof(emediaTextRepository));
+        private readonly IEmediaSubjectRepository _emediaSubjectRepository = emediaSubjectRepository
+            ?? throw new ArgumentNullException(nameof(emediaSubjectRepository));
 
-        private readonly IEmediaTopicRepository _emediaTopicRepository = emediaTopicRepository
-            ?? throw new ArgumentNullException(nameof(emediaTopicRepository));
+        private readonly IEmediaTextRepository _emediaTextReposiory = emediaTextRepository
+                    ?? throw new ArgumentNullException(nameof(emediaTextRepository));
 
         private readonly ILanguageRepository _languageRepository = languageRepository
             ?? throw new ArgumentNullException(nameof(languageRepository));
@@ -52,11 +52,11 @@ namespace Ocuda.Ops.Service
         private readonly ISegmentService _segmentService = segmentService
             ?? throw new ArgumentNullException(nameof(segmentService));
 
-        private readonly ITopicRepository _topicRepository = topicRepository
-            ?? throw new ArgumentNullException(nameof(topicRepository));
+        private readonly ISubjectRepository _subjectRepository = subjectRepository
+            ?? throw new ArgumentNullException(nameof(subjectRepository));
 
-        private readonly ITopicTextRepository _topicTextRepository = topicTextRepository
-            ?? throw new ArgumentNullException(nameof(topicTextRepository));
+        private readonly ISubjectTextRepository _subjectTextRepository = subjectTextRepository
+            ?? throw new ArgumentNullException(nameof(subjectTextRepository));
 
         public async Task AddGroupSegmentAsync(EmediaGroup group)
         {
@@ -260,36 +260,36 @@ namespace Ocuda.Ops.Service
         {
             ArgumentNullException.ThrowIfNull(importData);
 
-            var importTopics = importData
+            var importSubjects = importData
                 .SelectMany(_ => _.Categories, (_, __) => new string(__)).Distinct();
 
             var defaultLanguageId = await _languageRepository.GetDefaultLanguageId();
 
-            var dbTopicsDictionary = (await _topicRepository.GetAllAsync())
+            var dbSubjectsDictionary = (await _subjectRepository.GetAllAsync())
                 .ToDictionary(k => k.Name, v => v.Id);
 
-            foreach (var importTopic in importTopics)
+            foreach (var importSubject in importSubjects)
             {
-                if (!dbTopicsDictionary.ContainsKey(importTopic.Trim()))
+                if (!dbSubjectsDictionary.ContainsKey(importSubject.Trim()))
                 {
-                    _logger.LogDebug("Adding topic {Topic}", importTopic.Trim());
-                    var addTopic = new Topic
+                    _logger.LogDebug("Adding subject {Subject}", importSubject.Trim());
+                    var addSubject = new Subject
                     {
-                        Name = importTopic.Trim()
+                        Name = importSubject.Trim()
                     };
-                    await _topicRepository.AddAsync(addTopic);
-                    await _topicTextRepository.AddAsync(new TopicText
+                    await _subjectRepository.AddAsync(addSubject);
+                    await _subjectTextRepository.AddAsync(new SubjectText
                     {
                         LanguageId = defaultLanguageId,
-                        Text = importTopic.Trim(),
-                        Topic = addTopic
+                        Text = importSubject.Trim(),
+                        Subject = addSubject
                     });
-                    await _topicRepository.SaveAsync();
-                    dbTopicsDictionary.Add(addTopic.Name, addTopic.Id);
+                    await _subjectRepository.SaveAsync();
+                    dbSubjectsDictionary.Add(addSubject.Name, addSubject.Id);
                 }
                 else
                 {
-                    _logger.LogInformation("Topic {Topic} already present", importTopic.Trim());
+                    _logger.LogInformation("Subject {Subject} already present", importSubject.Trim());
                 }
             }
 
@@ -340,15 +340,15 @@ namespace Ocuda.Ops.Service
 
                 foreach (var importCategory in importEsource.Categories)
                 {
-                    var addTopicMapping = new EmediaTopic
+                    var addSubjectMapping = new EmediaSubject
                     {
                         // if it's a new emedia it doesn't have an id yet, let EF map the object
                         Emedia = newEmedia ? emedia : null,
                         EmediaId = newEmedia ? default : emedia.Id,
-                        TopicId = dbTopicsDictionary[importCategory.Trim()]
+                        SubjectId = dbSubjectsDictionary[importCategory.Trim()]
                     };
 
-                    await _emediaTopicRepository.AddAsync(addTopicMapping);
+                    await _emediaSubjectRepository.AddAsync(addSubjectMapping);
                 }
 
                 await _emediaRepository.SaveAsync();

@@ -9,32 +9,32 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class TopicTextRepository(Repository<PromenadeContext> repositoryFacade,
-        ILogger<TopicTextRepository> logger)
-            : GenericRepository<PromenadeContext, TopicText>(repositoryFacade, logger),
-            ITopicTextRepository
+    public class SubjectTextRepository(Repository<PromenadeContext> repositoryFacade,
+        ILogger<SubjectTextRepository> logger)
+            : GenericRepository<PromenadeContext, SubjectText>(repositoryFacade, logger),
+            ISubjectTextRepository
     {
-        public async Task<ICollection<TopicText>> GetAllForTopicAsync(int topicId)
+        public async Task<ICollection<SubjectText>> GetAllForSubjectAsync(int subjectId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.TopicId == topicId)
+                .Where(_ => _.SubjectId == subjectId)
                 .ToListAsync();
         }
 
-        public async Task<TopicText> GetByTopicAndLanguageAsync(int topicId, int languageId)
+        public async Task<SubjectText> GetBySubjectAndLanguageAsync(int subjectId, int languageId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.TopicId == topicId && _.LanguageId == languageId)
+                .Where(_ => _.SubjectId == subjectId && _.LanguageId == languageId)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<ICollection<string>> GetUsedLanguagesForTopicAsync(int topicId)
+        public async Task<ICollection<string>> GetUsedLanguagesForSubjectAsync(int subjectId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.TopicId == topicId)
+                .Where(_ => _.SubjectId == subjectId)
                 .OrderByDescending(_ => _.Language.IsDefault)
                 .ThenBy(_ => _.Language.Name)
                 .Select(_ => _.Language.Name)

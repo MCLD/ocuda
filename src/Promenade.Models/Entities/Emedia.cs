@@ -11,7 +11,7 @@ namespace Ocuda.Promenade.Models.Entities
         {
             Categories = [];
             EmediaLanguages = [];
-            Topics = [];
+            Subjects = [];
         }
 
         [NotMapped]
@@ -51,6 +51,6 @@ namespace Ocuda.Promenade.Models.Entities
         public string Slug { get; set; }
 
         [NotMapped]
-        public ICollection<Topic> Topics { get; }
+        public ICollection<Subject> Subjects { get; }
     }
 }

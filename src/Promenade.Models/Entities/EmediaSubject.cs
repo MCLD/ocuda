@@ -2,7 +2,7 @@
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class EmediaTopic
+    public class EmediaSubject
     {
         public Emedia Emedia { get; set; }
 
@@ -10,10 +10,10 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int EmediaId { get; set; }
 
-        public Topic Topic { get; set; }
+        public Subject Subject { get; set; }
 
         [Key]
         [Required]
-        public int TopicId { get; set; }
+        public int SubjectId { get; set; }
     }
 }

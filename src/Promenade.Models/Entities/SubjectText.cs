@@ -2,7 +2,7 @@
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class TopicText
+    public class SubjectText
     {
         public Language Language { get; set; }
 
@@ -10,14 +10,14 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int LanguageId { get; set; }
 
-        [MaxLength(255)]
-        [Required]
-        public string Text { get; set; }
-
-        public Topic Topic { get; set; }
+        public Subject Subject { get; set; }
 
         [Key]
         [Required]
-        public int TopicId { get; set; }
+        public int SubjectId { get; set; }
+
+        [MaxLength(255)]
+        [Required]
+        public string Text { get; set; }
     }
 }
