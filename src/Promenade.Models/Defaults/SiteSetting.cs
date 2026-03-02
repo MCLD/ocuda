@@ -29,6 +29,35 @@ namespace Ocuda.Promenade.Models.Defaults
 
             #endregion Contact
 
+            #region EmployeeSignup
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.EmployeeSignup),
+                Description = "Required format for employee numbers, as regex",
+                Id = Keys.SiteSetting.EmployeeSignup.EmployeeNumberFormat,
+                Name = "Employee number format",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.EmployeeSignup),
+                Description = "Segment to show on the employee signup home page",
+                Id = Keys.SiteSetting.EmployeeSignup.HomeSegment,
+                Name = "Home segment",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.EmployeeSignup),
+                Description = "Segment to show on the employee signup submitted page",
+                Id = Keys.SiteSetting.EmployeeSignup.SubmittedSegment,
+                Name = "Submitted segment",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            #endregion EmployeeSignup
+
             #region RenewCard
 
             new SiteSetting
@@ -154,27 +183,6 @@ namespace Ocuda.Promenade.Models.Defaults
             },
 
             #endregion RenewCard
-
-            #region EmployeeSignup
-            new SiteSetting
-            {
-                Category = nameof(Keys.SiteSetting.EmployeeSignup),
-                Description = "Segment to show on the employee signup home page",
-                Id = Keys.SiteSetting.EmployeeSignup.HomeSegment,
-                Name = "Home segment",
-                Type = SiteSettingType.Int,
-                Value = "-1"
-            },
-            new SiteSetting
-            {
-                Category = nameof(Keys.SiteSetting.EmployeeSignup),
-                Description = "Segment to show on the employee signup submitted page",
-                Id = Keys.SiteSetting.EmployeeSignup.SubmittedSegment,
-                Name = "Submitted segment",
-                Type = SiteSettingType.Int,
-                Value = "-1"
-            },
-            #endregion EmployeeSignup
 
             #region Scheduling
 

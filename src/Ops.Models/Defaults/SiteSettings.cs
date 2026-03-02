@@ -216,28 +216,70 @@ namespace Ocuda.Ops.Models.Defaults
 
             #endregion Email
 
-            #region EmployeeCard
+            #region EmployeeSignup
 
             new SiteSetting
             {
-                Id = Keys.SiteSetting.EmployeeCard.NewEmailSetupId,
+                Id = Keys.SiteSetting.EmployeeSignup.NewEmailSetupId,
                 Name = "New email setup id",
                 Description = "Email setup id to use when sending a notification for a new employee card",
-                Category = "EmployeeCard",
+                Category = "EmployeeSignup",
                 Value = "-1",
                 Type = SiteSettingType.Int
             },
             new SiteSetting
             {
-                Id = Keys.SiteSetting.EmployeeCard.RenewEmailSetupId,
+                Id = Keys.SiteSetting.EmployeeSignup.RegistrationCountryId,
+                Name = "Registration country id",
+                Description = "Country id for new account registrations",
+                Category = "EmployeeSignup",
+                Value = "-1",
+                Type = SiteSettingType.Int
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.EmployeeSignup.RegistrationCounty,
+                Name = "Registration county",
+                Description = "County name for new account registrations",
+                Category = "EmployeeSignup",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.EmployeeSignup.RegistrationCustomerCode,
+                Name = "Registration customer code",
+                Description = "Customer code id for new account registrations",
+                Category = "EmployeeSignup",
+                Value = "-1",
+                Type = SiteSettingType.Int
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.EmployeeSignup.RegistrationState,
+                Name = "Registration state",
+                Description = "State name for new account registrations",
+                Category = "EmployeeSignup",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.EmployeeSignup.RegistrationUserField,
+                Name = "Registration user field",
+                Description = "User field value for new account registrations",
+                Category = "EmployeeSignup",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.EmployeeSignup.RenewEmailSetupId,
                 Name = "Renew email setup id",
                 Description = "Email setup id to use when sending a notification for a renewed employee card",
-                Category = "EmployeeCard",
+                Category = "EmployeeSignup",
                 Value = "-1",
                 Type = SiteSettingType.Int
             },
 
-            #endregion EmployeeCard
+            #endregion EmployeeSignup
 
             #region FileManagement
 

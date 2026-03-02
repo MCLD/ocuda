@@ -61,7 +61,7 @@
 	</div>
 	<div class="row mt-2">
 		<div class="col-md-3 text-md-end"><strong>Renewing?</strong></div>
-		<div class="col-md-9">@(Model.CardRequest.ExistingAccount ? "Yes" : "No")</div>
+		<div class="col-md-9">@(Model.Renewing ? "Yes" : "No")</div>
 	</div>
 	<div class="row mt-2">
 		<input asp-for="CardNumber" formgroup label-class="col-md-3 fw-bold" />

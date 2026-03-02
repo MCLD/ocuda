@@ -10,5 +10,8 @@ namespace Ocuda.Promenade.Models.Entities
         public int Id { get; set; }
 
         public EmployeeCardDepartment Department { get; set; }
+
+        // Adds foreign key constraint to LanguageId for Promenade
+        public Language Language { get; set; }
     }
 }

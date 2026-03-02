@@ -12,7 +12,7 @@ namespace Ocuda.Promenade.Models.Abstract
         public DateTime? BirthDate { get; set; }
 
         [DisplayName(i18n.Keys.Promenade.PromptLibraryCardNumber)]
-        [MaxLength(16)]
+        [MaxLength(13)]
         public string CardNumber { get; set; }
 
         [Required]
@@ -34,12 +34,12 @@ namespace Ocuda.Promenade.Models.Abstract
         [MaxLength(16)]
         public string EmployeeNumber { get; set; }
 
-        public bool ExistingAccount { get; set; }
-
         [Required]
         [DisplayName(i18n.Keys.Promenade.PromptFirstName)]
         [MaxLength(255)]
         public string FirstName { get; set; }
+
+        public int LanguageId { get; set; }
 
         [Required]
         [DisplayName(i18n.Keys.Promenade.PromptLastName)]

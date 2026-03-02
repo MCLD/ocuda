@@ -21,26 +21,26 @@ else
 			  asp-controller="@EmployeeSignupController.Name"
 			  asp-route-culture="">
 			<div class="row mb-3">
-				<label class="col-form-label text-md-end col-md-3 pt-0">@Localizer[Promenade.EmployeeSignupRenewLabel]</label>
+				<div class="col-form-label text-md-end col-md-3 pt-0">@Localizer[Promenade.EmployeeSignupRenewLabel]</div>
 				<div class="col-md-9">
 					<div class="form-check form-check-inline">
-						<label class="form-check-label" for="ExistingCardYes">@Localizer[Promenade.LabelYes]</label>
-						<input asp-for="CardRequest.ExistingAccount" id="ExistingAccountYes" class="form-check-input" type="radio" value="true" />
+						<label class="form-check-label" for="ExistingAccountYes">@Localizer[Promenade.LabelYes]</label>
+						<input asp-for="ExistingAccount" id="ExistingAccountYes" class="form-check-input" type="radio" value="true" />
 					</div>
 					<div class="form-check form-check-inline">
-						<label class="form-check-label" for="ExistingCardNo">@Localizer[Promenade.LabelNo]</label>
-						<input asp-for="CardRequest.ExistingAccount" id="ExistingAccountNo" class="form-check-input" type="radio" value="false" />
+						<label class="form-check-label" for="ExistingAccountNo">@Localizer[Promenade.LabelNo]</label>
+						<input asp-for="ExistingAccount" id="ExistingAccountNo" class="form-check-input" type="radio" value="false" />
 					</div>
 					<em>@Localizer[Promenade.EmployeeSignupRenewInfo]</em>
 				</div>
 			</div>
-			<div id="cardNumberInputContainer" class="row mb-3 @(ViewData.ModelState["CardRequest.ExistingAccount"]?.AttemptedValue == "true" ? "" : "d-none")">
+			<div id="cardNumberInputContainer" class="row mb-3 @(ViewData.ModelState["ExistingAccount"]?.AttemptedValue == "true" ? "" : "d-none")">
 				<label asp-for="CardRequest.CardNumber" class="col-form-label text-md-end col-md-3">
 					@Localizer[Promenade.PromptLibraryCardNumber]
 					<span class="fa-solid fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
 				</label>
 				<div class="col-md-9">
-					<input asp-for="CardRequest.CardNumber" class="form-control" />
+					<input asp-for="CardRequest.CardNumber" class="form-control" autocomplete="off" />
 					<span asp-validation-for="CardRequest.CardNumber" class="validation-message text-danger"></span>
 				</div>
 			</div>
@@ -48,37 +48,37 @@ else
 			<hr class="col-md-9 offset-md-3" />
 
 			<div class="row mb-1">
-				<label class="form-label text-md-end col-md-3"><strong>@Localizer[Promenade.EmployeeSignupPersonalLabel]</strong></label>
+				<div class="form-label text-md-end col-md-3"><strong>@Localizer[Promenade.EmployeeSignupPersonalLabel]</strong></div>
 			</div>
 
-			<input asp-for="CardRequest.FirstName" formgroup />
-			<input asp-for="CardRequest.LastName" formgroup />
-			<input asp-for="CardRequest.BirthDate" formgroup />
-			<input asp-for="CardRequest.Email" formgroup />
-			<input asp-for="CardRequest.Phone" formgroup />
+			<input asp-for="CardRequest.FirstName" formgroup autocomplete="given-name" />
+			<input asp-for="CardRequest.LastName" formgroup autocomplete="family-name" />
+			<input asp-for="CardRequest.BirthDate" formgroup autocomplete="bday" />
+			<input asp-for="CardRequest.Email" formgroup autocomplete="email" />
+			<input asp-for="CardRequest.Phone" formgroup placeholder="###-###-####" autocomplete="tel-national" />
 
 			<div class="row mb-1">
-				<label class="form-label text-md-end col-md-3"><strong>@Localizer[Promenade.EmployeeSignupAddressLabel]</strong></label>
+				<div class="form-label text-md-end col-md-3"><strong>@Localizer[Promenade.EmployeeSignupAddressLabel]</strong></div>
 				<div class="col-md-9">
 					<em>@Localizer[Promenade.EmployeeSignupAddressInfo]</em>
 				</div>
 			</div>
 
-			<input asp-for="CardRequest.StreetAddress" formgroup />
-			<input asp-for="CardRequest.City" formgroup />
-			<input asp-for="CardRequest.ZipCode" formgroup />
+			<input asp-for="CardRequest.StreetAddress" formgroup autocomplete="address-line1" />
+			<input asp-for="CardRequest.City" formgroup autocomplete="address-level2" />
+			<input asp-for="CardRequest.ZipCode" formgroup autocomplete="postal-code" />
 
 			<div class="row mb-1">
-				<label class="form-label text-md-end col-md-3"><strong>@Localizer[Promenade.EmployeeSignupEmployeeLabel]</strong></label>
+				<div class="form-label text-md-end col-md-3"><strong>@Localizer[Promenade.EmployeeSignupEmployeeLabel]</strong></div>
 			</div>
 
-			<input asp-for="CardRequest.EmployeeNumber" formgroup />
-			<select asp-for="CardRequest.DepartmentId" asp-items="Model.Departments" formgroup>
+			<input asp-for="CardRequest.EmployeeNumber" formgroup autocomplete="off" />
+			<select asp-for="CardRequest.DepartmentId" asp-items="Model.Departments" formgroup autocomplete="off">
 				<option></option>
 			</select>
 
 			<button type="submit"
-					class="btn btn-outline-success m-2 btn-lg float-end">
+					class="btn btn-outline-success m-2 btn-lg float-end" button-spinner>
 				<span class="fa-regular fa-circle-check"></span>
 				@Localizer[Promenade.ButtonSubmit]
 			</button>
@@ -89,7 +89,7 @@ else
 @section scripts
 {
 	<script>
-		$('input[name="CardRequest.ExistingAccount"]').on('change', function() {
+		$('input[name="ExistingAccount"]').on('change', function() {
 			if ($(this).val() == "true") {
 				$('#cardNumberInputContainer').removeClass('d-none');
 			}

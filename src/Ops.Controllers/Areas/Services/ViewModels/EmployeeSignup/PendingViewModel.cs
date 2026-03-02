@@ -12,9 +12,10 @@ namespace Ocuda.Ops.Controllers.Areas.Services.ViewModels.EmployeeSignup
         public bool APIConfigured { get; set; }
 
         [DisplayName("Card Number")]
-        [MaxLength(16)]
+        [MaxLength(13)]
         public string CardNumber { get; set; }
 
+        public bool Renewing { get; set; }
         public int RequestId { get; set; }
         public EmployeeCardResult.ResultType? Type { get; set; }
     }

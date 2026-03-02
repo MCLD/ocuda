@@ -9,6 +9,7 @@ namespace Ocuda.PolarisHelper
     {
         bool IsConfigured { get; }
         bool AuthenticateCustomer(string barcode, string password);
+        CreateRegistrationResult CreateCustomerRegistration(Customer customer);
         Task<List<CustomerBlock>> GetCustomerBlocksAsync(int customerId);
         Task<string> GetCustomerCodeNameAsync(int customerCodeId);
         Customer GetCustomerData(string barcode, string password);

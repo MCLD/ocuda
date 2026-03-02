@@ -11,7 +11,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<EmployeeCardResult> GetResultAsync(int id);
         Task<int> GetResultCountAsync();
         Task<CollectionWithCount<EmployeeCardResult>> GetResultsAsync(BaseFilter filter);
-        Task<EmployeeCardResult> ProcessRequestAsync(int requestId,
+        Task<bool?> ProcessRequestAsync(int requestId,
             string cardNumber,
             EmployeeCardResult.ResultType type);
         Task SetRequestNote(EmployeeCardNote note);

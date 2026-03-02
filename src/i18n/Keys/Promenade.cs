@@ -49,6 +49,7 @@
         public const string HelpItem = "{0} help";
         public const string HowCanWeHelp = "How can we help?";
         public const string KeywordsItem = "Keywords: {0}";
+        public const string InvalidFieldFormat = "The {0} field is in an invalid format.";
         public const string LabelNo = "No";
         public const string LabelYes = "Yes";
         public const string LinkAdultVolunteerForm = "Use our adult volunteer form.";

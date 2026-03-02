@@ -21,6 +21,8 @@ namespace Ocuda.Ops.Models.Entities
         public int? ProcessedBy { get; set; }
         public User ProcessedByUser { get; set; }
 
+        public bool Renewal { get; set; }
+
         public ResultType Type { get; set; }
 
         public enum ResultType

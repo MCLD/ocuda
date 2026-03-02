@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Security.Principal;
+using System.Globalization;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Services.ViewModels.EmployeeSignup;
 using Ocuda.Ops.Controllers.Filters;
@@ -13,7 +13,6 @@ using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.PolarisHelper;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Filters;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Ocuda.Ops.Controllers.Areas.Services
 {
@@ -43,6 +42,62 @@ namespace Ocuda.Ops.Controllers.Areas.Services
         public static string Name
         { get { return "EmployeeSignup"; } }
 
+        [HttpGet]
+        public async Task<IActionResult> Index(int? page, bool processed)
+        {
+            page ??= 1;
+
+            var filter = new BaseFilter(page.Value);
+
+            var viewModel = new IndexViewModel
+            {
+                CurrentPage = page.Value,
+                IsProcessed = processed,
+                ItemsPerPage = filter.Take.Value
+            };
+
+            if (processed)
+            {
+                var results = await _employeeCardService.GetResultsAsync(filter);
+                viewModel.CardResults = results.Data;
+                viewModel.ItemCount = results.Count;
+                viewModel.ProcessedCount = results.Count;
+
+                if (viewModel.PastMaxPage)
+                {
+                    return RedirectToRoute(new
+                    {
+                        page = viewModel.LastPage ?? 1,
+                        processed = true
+                    });
+                }
+
+                viewModel.PendingCount = await _employeeCardRequestService.GetRequestCountAsync();
+
+                foreach (var request in viewModel.CardResults)
+                {
+                    request.DepartmentName = await _employeeCardRequestService
+                        .GetDepartmentNameAsync(request.DepartmentId);
+                }
+            }
+            else
+            {
+                var requests = await _employeeCardRequestService.GetRequestsAsync(filter);
+                viewModel.CardRequests = requests.Data;
+                viewModel.ItemCount = requests.Count;
+                viewModel.PendingCount = requests.Count;
+
+                if (viewModel.PastMaxPage)
+                {
+                    return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
+                }
+
+                viewModel.ProcessedCount = await _employeeCardService.GetResultCountAsync();
+            }
+
+            return View(viewModel);
+        }
+
         [HttpGet("[action]/{id}")]
         [RestoreModelState]
         public async Task<IActionResult> Pending(int id)
@@ -60,6 +115,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 APIConfigured = _polarisHelper.IsConfigured,
                 CardNumber = request.CardNumber,
                 CardRequest = request,
+                Renewing = !string.IsNullOrWhiteSpace(request.CardNumber),
                 Note = await _employeeCardService.GetRequestNoteAsync(id)
             };
 
@@ -86,47 +142,50 @@ namespace Ocuda.Ops.Controllers.Areas.Services
 
                 if (viewModel.Type != null)
                 {
-                    EmployeeCardResult cardResult;
                     try
                     {
-                        cardResult = await _employeeCardService.ProcessRequestAsync(
+                        var emailSent = await _employeeCardService.ProcessRequestAsync(
                             viewModel.RequestId,
                             viewModel.CardNumber,
                             viewModel.Type.Value);
+
+                        if (emailSent == false)
+                        {
+                            ShowAlertDanger("The email failed to send, please contact the customer directly.");
+                        }
+
+                        if (viewModel.Type == EmployeeCardResult.ResultType.CardCreated
+                            || viewModel.Type == EmployeeCardResult.ResultType.Processed)
+                        {
+                            var successMessage = new StringBuilder();
+                            if (viewModel.Type == EmployeeCardResult.ResultType.CardCreated)
+                            {
+                                successMessage.Append(CultureInfo.InvariantCulture,
+                                    $"Polaris account created for {viewModel.CardNumber}. ");
+                            }
+                            successMessage.Append(CultureInfo.InvariantCulture,
+                                $"Request {viewModel.RequestId} has been marked as processed");
+                            if (emailSent == true)
+                            {
+                                successMessage.Append(" and an email has been sent.");
+                            }
+                            else
+                            {
+                                successMessage.Append('.');
+                            }
+                            ShowAlertSuccess(successMessage.ToString());
+                        }
+                        else if (viewModel.Type == EmployeeCardResult.ResultType.ProcessedNoEmail)
+                        {
+                            ShowAlertWarning($"Marked request {viewModel.RequestId} processed without sending an email. Please contact the customer directly.");
+                        }
+                        return RedirectToAction(nameof(Processed),
+                            new { id = viewModel.RequestId });
                     }
                     catch (OcudaException oex)
                     {
                         ShowAlertDanger(oex.Message);
-                        return RedirectToAction(nameof(Pending), new { id = viewModel.RequestId });
                     }
-
-                    if (cardResult.Type == EmployeeCardResult.ResultType.CardCreated)
-                    {
-                        _logger.LogInformation("Employee card Polaris account created for request {RequestId} by {ProcessedBy}",
-                            cardResult.EmployeeCardRequestId,
-                            cardResult.ProcessedBy);
-
-                        ShowAlertSuccess($"Polaris account created for {cardResult.FirstName} {cardResult.LastName} ({cardResult.CardNumber}), the request has been marked as processed and an email has been sent!");
-                    }
-                    else if (cardResult.Type == EmployeeCardResult.ResultType.Processed)
-                    {
-                        _logger.LogInformation("Employee card request {RequestId} processed by {ProcessedBy}",
-                            cardResult.EmployeeCardRequestId,
-                            cardResult.ProcessedBy);
-
-                        ShowAlertSuccess($"Request by {cardResult.FirstName} {cardResult.LastName} ({cardResult.CardNumber}) marked as processed and an email has been sent!");
-                    }
-                    else if (cardResult.Type == EmployeeCardResult.ResultType.ProcessedNoEmail)
-                    {
-                        _logger.LogInformation("Employee card request {RequestId} marked as processed with no email by {ProcessedBy}",
-                            cardResult.EmployeeCardRequestId,
-                            cardResult.ProcessedBy);
-
-                        ShowAlertWarning($"Marked request {cardResult.EmployeeCardRequestId} processed without sending an email. Please contact the customer directly!");
-                    }
-
-                    return RedirectToAction(nameof(Processed),
-                        new { id = cardResult.EmployeeCardRequestId });
                 }
             }
 
@@ -165,46 +224,6 @@ namespace Ocuda.Ops.Controllers.Areas.Services
 
             return RedirectToAction(nameof(Processed),
                 new { id = viewModel.Note.EmployeeCardRequestId });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Index(int? page, bool processed)
-        {
-            page ??= 1;
-
-            var filter = new BaseFilter(page.Value);
-
-            var viewModel = new IndexViewModel
-            {
-                CurrentPage = page.Value,
-                IsProcessed = processed,
-                ItemsPerPage = filter.Take.Value
-            };
-
-            if (processed)
-            {
-                var results = await _employeeCardService.GetResultsAsync(filter);
-                viewModel.CardResults = results.Data;
-                viewModel.ItemCount = results.Count;
-                viewModel.PendingCount = await _employeeCardRequestService.GetRequestCountAsync();
-                viewModel.ProcessedCount = results.Count;
-
-                foreach (var request in viewModel.CardResults)
-                {
-                    request.DepartmentName = await _employeeCardRequestService
-                        .GetDepartmentNameAsync(request.DepartmentId);
-                }
-            }
-            else
-            {
-                var requests = await _employeeCardRequestService.GetRequestsAsync(filter);
-                viewModel.CardRequests = requests.Data;
-                viewModel.ItemCount = requests.Count;
-                viewModel.PendingCount = requests.Count;
-                viewModel.ProcessedCount = await _employeeCardService.GetResultCountAsync();
-            }
-
-            return View(viewModel);
         }
     }
 }

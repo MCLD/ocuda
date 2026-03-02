@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CommonMark;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +18,7 @@ namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
     [Route("{culture:cultureConstraint?}/[Controller]")]
-    public class EmployeeSignupController : BaseController<EmployeeSignupController>
+    public partial class EmployeeSignupController : BaseController<EmployeeSignupController>
     {
         private readonly EmployeeCardService _employeeCardService;
         private readonly SegmentService _segmentService;
@@ -43,14 +45,14 @@ namespace Ocuda.Promenade.Controllers
 
             var viewModel = new EmployeeSignupViewModel()
             {
-                CardRequest = new EmployeeCardRequest(),
-                Departments = new SelectList(await _employeeCardService.GetDepartmentsAsync(), 
-                    nameof(EmployeeCardDepartment.Id), 
+                Departments = new SelectList(await _employeeCardService.GetDepartmentsAsync(),
+                    nameof(EmployeeCardDepartment.Id),
                     nameof(EmployeeCardDepartment.Name))
             };
 
             var segmentId = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.EmployeeSignup.HomeSegment);
+                .GetSettingIntAsync(Models.Keys.SiteSetting.EmployeeSignup.HomeSegment,
+                forceReload);
             if (segmentId > 0)
             {
                 viewModel.SegmentText = await _segmentService.GetSegmentTextBySegmentIdAsync(
@@ -77,7 +79,7 @@ namespace Ocuda.Promenade.Controllers
         {
             ArgumentNullException.ThrowIfNull(viewModel);
 
-            if (viewModel.CardRequest.ExistingAccount
+            if (viewModel.ExistingAccount
                 && string.IsNullOrWhiteSpace(viewModel.CardRequest.CardNumber))
             {
                 ModelState.AddModelError("CardRequest.CardNumber",
@@ -85,13 +87,46 @@ namespace Ocuda.Promenade.Controllers
                         _localizer[i18n.Keys.Promenade.PromptLibraryCardNumber]]);
             }
 
+            string phoneNumber = viewModel.CardRequest.Phone;
+            if (!string.IsNullOrEmpty(phoneNumber))
+            {
+                phoneNumber = DigitsOnlyRegex().Replace(viewModel.CardRequest.Phone, string.Empty);
+                if (phoneNumber.Length != 10)
+                {
+                    ModelState.AddModelError(
+                        $"{nameof(viewModel.CardRequest)}.{nameof(viewModel.CardRequest.Phone)}",
+                        _localizer[i18n.Keys.Promenade.ErrorTelephoneFormat]);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(viewModel.CardRequest.ZipCode)
+                && (!long.TryParse(viewModel.CardRequest.ZipCode, out long _)
+                    || viewModel.CardRequest.ZipCode.Length != 5))
+            {
+                ModelState.AddModelError(
+                        $"{nameof(viewModel.CardRequest)}.{nameof(viewModel.CardRequest.ZipCode)}",
+                        _localizer[i18n.Keys.Promenade.ErrorZipCode]);
+            }
+
+            var employeeNumberFormat = await _siteSettingService.GetSettingStringAsync(
+                Models.Keys.SiteSetting.EmployeeSignup.EmployeeNumberFormat);
+            if (!string.IsNullOrWhiteSpace(employeeNumberFormat)
+                && !Regex.IsMatch(viewModel.CardRequest.EmployeeNumber, employeeNumberFormat))
+            {
+                ModelState.AddModelError(
+                    $"{nameof(viewModel.CardRequest)}.{nameof(viewModel.CardRequest.EmployeeNumber)}",
+                        _localizer[i18n.Keys.Promenade.InvalidFieldFormat,
+                            i18n.Keys.Promenade.PromptEmployeeNumber]);
+            }
+
             if (ModelState.IsValid)
             {
-                if (!viewModel.CardRequest.ExistingAccount)
+                if (!viewModel.ExistingAccount)
                 {
                     viewModel.CardRequest.CardNumber = null;
                 }
 
+                viewModel.CardRequest.Phone = phoneNumber.Insert(6, "-").Insert(3, "-");
                 await _employeeCardService.AddRequestAsync(viewModel.CardRequest);
 
                 return RedirectToAction(nameof(Submitted));
@@ -128,5 +163,8 @@ namespace Ocuda.Promenade.Controllers
 
             return View(segmentText);
         }
+
+        [GeneratedRegex("[^0-9.]")]
+        private static partial Regex DigitsOnlyRegex();
     }
 }
