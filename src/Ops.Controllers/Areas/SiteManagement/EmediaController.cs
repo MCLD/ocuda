@@ -32,22 +32,27 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         IEmediaService emediaService,
         ILanguageService languageService,
         IPermissionGroupService permissionGroupService,
-        ISegmentService segmentService) : BaseController<EmediaController>(context)
+        ISegmentService segmentService,
+        ISubjectService subjectService) : BaseController<EmediaController>(context)
     {
         private readonly ICategoryService _categoryService = categoryService
-                ?? throw new ArgumentNullException(nameof(categoryService));
+            ?? throw new ArgumentNullException(nameof(categoryService));
 
         private readonly IEmediaService _emediaService = emediaService
-                ?? throw new ArgumentNullException(nameof(emediaService));
+            ?? throw new ArgumentNullException(nameof(emediaService));
 
         private readonly ILanguageService _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
+            ?? throw new ArgumentNullException(nameof(languageService));
 
         private readonly IPermissionGroupService _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
+            ?? throw new ArgumentNullException(nameof(permissionGroupService));
 
         private readonly ISegmentService _segmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
+            ?? throw new ArgumentNullException(nameof(segmentService));
+
+        private readonly ISubjectService _subjectService = subjectService
+            ?? throw new ArgumentNullException(nameof(subjectService));
+
 
         public static string Area
         { get { return nameof(SiteManagement); } }
@@ -92,6 +97,46 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             return Json(response);
         }
+
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> ChangeSubjects(int id, ICollection<int> subjects)
+        {
+            JsonResponse response;
+
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else
+            {
+                try
+                {
+                    await _emediaService.UpdateSubjectsAsync(id, subjects);
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Message = ex.Message,
+                        Success = false
+                    };
+                }
+            }
+
+            return Json(response);
+        }
+
 
         [HttpPost]
         [Route("[action]")]
@@ -362,12 +407,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var emediaText = await _emediaService.GetTextByEmediaAndLanguageAsync(emedia.Id,
                 selectedLanguage.Id);
 
+            var selectedTopics = await _emediaService.GetSubjectsForEmediaAsync(emedia.Id);
+
             var selectedCategories = await _emediaService.GetCategoriesForEmediaAsync(emedia.Id);
 
             var viewModel = new DetailsViewModel
             {
-                CategoryList = await _categoryService.GetAllAsync(),
-                CategorySelection = [.. selectedCategories.Select(_ => _.Id)],
                 CategorySelectionText = string.Join(", ",
                     selectedCategories.Select(_ => _.Name).Order()),
                 Emedia = emedia,
@@ -376,8 +421,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 LanguageList = new SelectList(languages,
                     nameof(Language.Name),
                     nameof(Language.Description),
-                    selectedLanguage.Name)
+                    selectedLanguage.Name),
+                SubjectSelectionText = string.Join(", ",
+                    selectedTopics.Select(_ => _.Name).Order())
             };
+
+            viewModel.CategoryList.AddRange(await _categoryService.GetAllAsync());
+            viewModel.CategorySelection.AddRange(selectedCategories.Select(_ => _.Id).ToList());
+
+            viewModel.SubjectList.AddRange(await _subjectService.GetAllAsync());
+            viewModel.SubjectSelection.AddRange(selectedTopics.Select(_ => _.Id).ToList());
 
             return View(viewModel);
         }

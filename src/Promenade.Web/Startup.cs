@@ -424,6 +424,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.EmediaGroupRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IEmediaRepository,
                 Data.Promenade.EmediaRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IEmediaSubjectRepository,
+                Data.Promenade.EmediaSubjectRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IEmediaTextRepository,
                 Data.Promenade.EmediaTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IExternalResourceRepository,
@@ -510,6 +512,10 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.SiteSettingRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ISocialCardRepository,
                 Data.Promenade.SocialCardRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ISubjectRepository,
+                Data.Promenade.SubjectRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ISubjectTextRepository,
+                Data.Promenade.SubjectTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IUrlRedirectAccessRepository,
                 Data.Promenade.UrlRedirectAccessRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IUrlRedirectRepository,
@@ -545,6 +551,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<SiteAlertService>();
             services.AddScoped<SiteSettingService>();
             services.AddScoped<SocialCardService>();
+            services.AddScoped<SubjectService>();
             services.AddScoped<VolunteerFormService>();
         }
     }

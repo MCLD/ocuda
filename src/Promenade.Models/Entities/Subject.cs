@@ -11,5 +11,9 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         [Required]
         public string Name { get; set; }
+
+        [MaxLength(255)]
+        [Required]
+        public string Slug { get; set; }
     }
 }

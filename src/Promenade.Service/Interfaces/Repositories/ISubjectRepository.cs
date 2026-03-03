@@ -4,8 +4,8 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
-    public interface IEmediaRepository : IGenericRepository<Emedia>
+    public interface ISubjectRepository : IGenericRepository<Subject>
     {
-        Task<ICollection<Emedia>> GetAllAsync();
+        Task<ICollection<Subject>> GetAllAsync();
     }
 }

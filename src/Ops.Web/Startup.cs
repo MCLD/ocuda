@@ -654,6 +654,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ISiteSettingPromService, SiteSettingPromService>();
             services.AddScoped<ISiteSettingService, SiteSettingService>();
             services.AddScoped<ISocialCardService, SocialCardService>();
+            services.AddScoped<ISubjectService, SubjectService>();
             services.AddScoped<ITitleClassService, TitleClassService>();
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserManagementService, UserManagementService>();

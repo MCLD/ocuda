@@ -99,7 +99,7 @@ namespace Ocuda.Promenade.Service.Abstract
         /// <returns>A list of language ids in the preferred order.</returns>
         /// <exception cref="ArgumentNullException">A required argument was not specified.
         /// </exception>
-        protected async Task<IEnumerable<int>> GetCurrentDefaultLanguageIdAsync(
+        protected async Task<int[]> GetCurrentDefaultLanguageIdAsync(
             IHttpContextAccessor httpContextAccessor,
             LanguageService languageService)
         {
@@ -122,11 +122,9 @@ namespace Ocuda.Promenade.Service.Abstract
                     currentCultureName);
             }
 
-            return new[]
-            {
-                currentLanguageId ?? defaultLanguageId,
-                defaultLanguageId
-            }.Distinct();
+            return currentLanguageId.HasValue
+                ? [currentLanguageId.Value, defaultLanguageId]
+                : [defaultLanguageId];
         }
 
         /// <summary>

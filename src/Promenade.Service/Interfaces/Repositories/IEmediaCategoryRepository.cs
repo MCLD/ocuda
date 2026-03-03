@@ -9,4 +9,3 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
         Task<ICollection<EmediaCategory>> GetAllAsync();
     }
 }
-

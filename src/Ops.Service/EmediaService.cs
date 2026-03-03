@@ -103,19 +103,18 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAsync(int id)
         {
-            var emedia = await _emediaRepository.FindAsync(id);
-
-            if (emedia == null)
-            {
-                throw new OcudaException("Emedia does not exist.");
-            }
+            var emedia = await _emediaRepository.FindAsync(id)
+                ?? throw new OcudaException("Emedia does not exist.");
 
             var emediaCategories = await _emediaCategoryRepository.GetAllForEmediaAsync(emedia.Id);
+            _emediaCategoryRepository.RemoveRange(emediaCategories);
+
+            var emediaSubjects = await _emediaSubjectRepository.GetAllForEmediaAsync(emedia.Id);
+            _emediaSubjectRepository.RemoveRange(emediaSubjects);
 
             var emediaTexts = await _emediaTextReposiory.GetAllForEmediaAsync(emedia.Id);
-
-            _emediaCategoryRepository.RemoveRange(emediaCategories);
             _emediaTextReposiory.RemoveRange(emediaTexts);
+
             _emediaRepository.Remove(emedia);
 
             await _emediaRepository.SaveAsync();
@@ -141,11 +140,14 @@ namespace Ocuda.Ops.Service
             }
 
             var emediaCategories = await _emediaCategoryRepository.GetAllForGroupAsync(id);
+            _emediaCategoryRepository.RemoveRange(emediaCategories);
+
+            var emediaSubjects = await _emediaSubjectRepository.GetAllForEmediaAsync(id);
+            _emediaSubjectRepository.RemoveRange(emediaSubjects);
 
             var emediaTexts = await _emediaTextReposiory.GetAllForGroupAsync(group.Id);
-
-            _emediaCategoryRepository.RemoveRange(emediaCategories);
             _emediaTextReposiory.RemoveRange(emediaTexts);
+
             _emediaRepository.RemoveRange(group.Emedias);
             _emediaGroupRepository.Remove(group);
 
@@ -175,6 +177,8 @@ namespace Ocuda.Ops.Service
 
             currentEmedia.Name = emedia.Name?.Trim();
             currentEmedia.RedirectUrl = emedia.RedirectUrl?.Trim();
+
+            throw new NotImplementedException("Update HTTPPost and External Access HEre");
 
             _emediaRepository.Update(currentEmedia);
             await _emediaRepository.SaveAsync();
@@ -250,6 +254,11 @@ namespace Ocuda.Ops.Service
             return await _emediaRepository.GetPaginatedListForGroupAsync(emediaId, filter);
         }
 
+        public async Task<ICollection<Subject>> GetSubjectsForEmediaAsync(int emediaId)
+        {
+            return await _emediaSubjectRepository.GetSubjectsForEmediaAsync(emediaId);
+        }
+
         public async Task<EmediaText> GetTextByEmediaAndLanguageAsync(int emediaId,
             int languageId)
         {
@@ -268,20 +277,27 @@ namespace Ocuda.Ops.Service
             var dbSubjectsDictionary = (await _subjectRepository.GetAllAsync())
                 .ToDictionary(k => k.Name, v => v.Id);
 
+            var slugHelper = new SlugHelper();
+
             foreach (var importSubject in importSubjects)
             {
-                if (!dbSubjectsDictionary.ContainsKey(importSubject.Trim()))
+                var subjectName = importSubject.Trim();
+                if (!dbSubjectsDictionary.ContainsKey(subjectName))
                 {
-                    _logger.LogDebug("Adding subject {Subject}", importSubject.Trim());
+                    var slug = await _subjectRepository
+                        .GetUnusedSlugAsync(slugHelper.GenerateSlug(subjectName));
+                    _logger.LogDebug("Adding subject {Subject} ({Slug})", subjectName, slug);
                     var addSubject = new Subject
                     {
-                        Name = importSubject.Trim()
+                        Name = subjectName,
+                        Slug = slug
                     };
+
                     await _subjectRepository.AddAsync(addSubject);
                     await _subjectTextRepository.AddAsync(new SubjectText
                     {
                         LanguageId = defaultLanguageId,
-                        Text = importSubject.Trim(),
+                        Text = subjectName,
                         Subject = addSubject
                     });
                     await _subjectRepository.SaveAsync();
@@ -292,8 +308,6 @@ namespace Ocuda.Ops.Service
                     _logger.LogInformation("Subject {Subject} already present", importSubject.Trim());
                 }
             }
-
-            var slugHelper = new SlugHelper();
 
             foreach (var importEsource in importData)
             {
@@ -334,7 +348,7 @@ namespace Ocuda.Ops.Service
                     await _emediaTextReposiory.AddAsync(addEmediaText);
                 }
 
-                _logger.LogDebug("Adding {Count} categories to {ESource}",
+                _logger.LogDebug("Adding {Count} subjects to {ESource}",
                     importEsource.Categories.Count,
                     name);
 
@@ -418,12 +432,8 @@ namespace Ocuda.Ops.Service
                 newSortOrder = group.SortOrder - 1;
             }
 
-            var groupInPosition = await _emediaGroupRepository.GetByOrderAsync(newSortOrder);
-
-            if (groupInPosition == null)
-            {
-                throw new OcudaException("Group is already in the last position.");
-            }
+            var groupInPosition = await _emediaGroupRepository.GetByOrderAsync(newSortOrder)
+                ?? throw new OcudaException("Group is already in the last position.");
 
             groupInPosition.SortOrder = group.SortOrder;
             group.SortOrder = newSortOrder;
@@ -431,6 +441,26 @@ namespace Ocuda.Ops.Service
             _emediaGroupRepository.Update(group);
             _emediaGroupRepository.Update(groupInPosition);
             await _emediaGroupRepository.SaveAsync();
+        }
+
+        public async Task UpdateSubjectsAsync(int emediaId, ICollection<int> subjectIds)
+        {
+            var currentSubjects = await _emediaSubjectRepository
+                .GetSubjectIdsForEmediaAsync(emediaId);
+
+            var subjectIdsToAdd = subjectIds.Except(currentSubjects).ToList();
+            var subjectIdsToRemove = currentSubjects.Except(subjectIds).ToList();
+
+            var subjectsToAdd = subjectIdsToAdd.ConvertAll(_ => new EmediaSubject
+            {
+                SubjectId = _,
+                EmediaId = emediaId
+            });
+
+            await _emediaSubjectRepository.AddRangeAsync(subjectsToAdd);
+            _emediaSubjectRepository.RemoveByEmediaAndSubjects(emediaId, subjectIdsToRemove);
+
+            await _emediaSubjectRepository.SaveAsync();
         }
     }
 }

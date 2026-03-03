@@ -1,0 +1,27 @@
+﻿@using Ocuda.Promenade.Controllers;
+@model Ocuda.Promenade.Controllers.ViewModels.DigitalLibrary.DigitalLibraryViewModel
+
+<nav class="mb-2">
+    @if (!string.IsNullOrEmpty(Model.PopularDescription))
+    {
+        <a asp-action="@nameof(DigitalLibraryController.Index)"
+           auto-active
+           class="btn btn-outline-primary mb-2">@Model.PopularDescription</a>
+    }
+    @if (!string.IsNullOrEmpty(Model.AllDescription))
+    {
+        <a asp-action="@nameof(DigitalLibraryController.All)"
+           auto-active
+           class="btn btn-outline-primary mb-2">@Model.AllDescription</a>
+    }
+    @if (Model.SlugsSubjects?.Count > 0)
+    {
+        @foreach (var slugSubject
+            in Model.SlugsSubjects.OrderBy(_ => _.Value))
+        {
+            <a asp-action="@nameof(DigitalLibraryController.Subject)"
+               asp-route-subject="@slugSubject.Key"
+               class="btn btn-outline-primary mb-2 @Model.IsActive(slugSubject.Key)">@slugSubject.Value</a>
+        }
+    }
+</nav>

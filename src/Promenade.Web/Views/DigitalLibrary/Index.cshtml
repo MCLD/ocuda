@@ -1,5 +1,7 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.DigitalLibrary.DigitalLibraryViewModel
-
+@{
+    var navDisplayed = false;
+}
 @section metadata {
     <socialcard card="@Model.SocialCard"></socialcard>
 }
@@ -13,7 +15,9 @@
         {
             if (i == 0)
             {
+                navDisplayed = true;
                 <h1 class="prom-title">@group.Segment.SegmentText.Header</h1>
+                <partial name="_DigitalLibraryPartial" />
             }
             else
             {
@@ -24,6 +28,10 @@
         {
             @Html.Raw(group.Segment.SegmentText.Text)
         }
+    }
+    if (!navDisplayed)
+    {
+        <partial name="_DigitalLibraryPartial" />
     }
     if (group.Emedias.Any())
     {

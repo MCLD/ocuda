@@ -13,5 +13,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<ICollection<Subject>> GetAllAsync();
 
         Task<DataWithCount<ICollection<Subject>>> GetPaginatedListAsync(BaseFilter filter);
+
+        Task<string> GetUnusedSlugAsync(string slug);
     }
 }

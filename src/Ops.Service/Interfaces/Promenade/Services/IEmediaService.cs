@@ -43,6 +43,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListForGroupAsync(int emediaId,
             BaseFilter filter);
 
+        Task<ICollection<Subject>> GetSubjectsForEmediaAsync(int emediaId);
+
         Task<EmediaText> GetTextByEmediaAndLanguageAsync(int emediaId, int languageId);
 
         Task ImportItemsAsync(int groupId, IEnumerable<Ocuda.Models.ESourceImport> importData);
@@ -52,5 +54,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task UpdateCategoriesAsync(int emediaId, ICollection<int> categoryIds);
 
         Task UpdateGroupSortOrder(int id, bool increase);
+
+        Task UpdateSubjectsAsync(int emediaId, ICollection<int> subjectIds);
     }
 }
