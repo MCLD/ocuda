@@ -54,7 +54,10 @@
                 </div>
             </div>
 
-            <input asp-for="SegmentLanguages" value="@string.Join(", ", Model.SegmentLanguages)" formgroup readonly />
+            <input asp-for="SegmentLanguages"
+                   value="@string.Join(", ", Model.SegmentLanguages)"
+                   formgroup
+                   readonly />
 
             <div class="row">
                 <div class="offset-md-3 col-md-9">
@@ -86,6 +89,9 @@
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Slug</th>
+                    <th>Method</th>
+                    <th>Available externally?</th>
                     <th>Languages</th>
                     <th>Actions</th>
                 </tr>
@@ -114,10 +120,14 @@
                     {
                         <tr>
                             <td class="align-middle">
-                                <a asp-action="@(nameof(EmediaController.Details))" asp-route-id="@emedia.Id">
+                                <a asp-action="@(nameof(EmediaController.Details))"
+                                   asp-route-id="@emedia.Id">
                                     @emedia.Name
                                 </a>
                             </td>
+                            <td class="align-middle">@emedia.Slug</td>
+                            <td class="align-middle">HTTP @(emedia.IsHttpPost ? "POST" : "GET")</td>
+                            <td class="align-middle @(emedia.IsAvailableExternally ? "text-success" : "text-danger")">@(emedia.IsAvailableExternally ? "Yes" : "No")</td>
                             <td class="align-middle">@string.Join(", ", emedia.EmediaLanguages)</td>
                             <td class="align-middle">
                                 <button type="button"
@@ -126,7 +136,10 @@
                                         data-bs-target="#editModal"
                                         data-id="@emedia.Id"
                                         data-name="@emedia.Name"
+                                        data-slug="@emedia.Slug"
                                         data-url="@emedia.RedirectUrl"
+                                        data-availableexternally="@emedia.IsAvailableExternally"
+                                        data-ispost="@emedia.IsHttpPost"
                                         title="Edit Emedia">
                                     <span class="fa-solid fa-gear" aria-hidden="true"></span>
                                 </button>
@@ -143,7 +156,8 @@
                                         data-bs-target="#deleteModal"
                                         data-id="@emedia.Id"
                                         data-name="@emedia.Name">
-                                    <span class="fa-solid fa-circle-minus" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-circle-minus"
+                                          aria-hidden="true"></span>
                                 </button>
                             </td>
                         </tr>
@@ -164,8 +178,20 @@
          isLarge="true"
          name="Emedia"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
-        <input id="addName" asp-for="Emedia.Name" formgroup />
+        <input id="addName" asp-for="Emedia.Name" formgroup data-slugifyto="addSlug" />
         <input id="addUrl" asp-for="Emedia.RedirectUrl" formgroup />
+        <input id="addSlug" asp-for="Emedia.Slug" formgroup />
+        <select id="addIsHttpPost" asp-for="Emedia.IsHttpPost" formgroup autocomplete="off">
+            <option value="False">HTTP GET</option>
+            <option value="True">HTTP POST</option>
+        </select>
+        <select asp-for="Emedia.IsAvailableExternally"
+                id="addIsAvailableExternally"
+                formgroup
+                autocomplete="off">
+            <option value="False">No</option>
+            <option value="True">Yes</option>
+        </select>
     </div>
 </form>
 
@@ -177,12 +203,35 @@
          isLarge="true"
          name="Emedia"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
-        <input id="editName" asp-for="Emedia.Name" formgroup />
+        <div id="slugWarning" class="alert alert-warning">
+            <strong>
+                Changing the slug value will change the URL to get to this electronic resource
+                and possibly break user's bookmarks!
+            </strong>
+        </div>
+        <input id="editName" asp-for="Emedia.Name" formgroup data-slugifyto="editSlug" />
         <input id="editUrl" asp-for="Emedia.RedirectUrl" formgroup />
+        <input id="editSlug" asp-for="Emedia.Slug" formgroup />
+        <select id="editIsHttpPost"
+                asp-for="Emedia.IsHttpPost"
+                formgroup>
+            <option value="False">HTTP GET</option>
+            <option value="True">HTTP POST</option>
+        </select>
+        <select id="editIsAvailableExternally"
+                asp-for="Emedia.IsAvailableExternally"
+                formgroup>
+            <option value="False">No</option>
+            <option value="True">Yes</option>
+        </select>
     </div>
 </form>
 
-<form asp-controller="@EmediaController.Name" asp-action="@(nameof(EmediaController.DeleteEmedia))" method="post" role="form">
+<form asp-action="@(nameof(EmediaController.DeleteEmedia))"
+      asp-controller="@EmediaController.Name"
+      method="post"
+      role="form">
+    <input id="deleteCurrentEmediaGroupId" asp-for="EmediaGroup.Id" type="hidden" />
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
 
     <input id="deleteId" asp-for="Emedia.Id" type="hidden" />
@@ -196,24 +245,39 @@
 </form>
 
 <form id="updateSegmentForm" role="form">
-    <input id="updateSegmentGroupId" asp-for="EmediaGroupId" value="@Model.EmediaGroup.Id" type="hidden" />
+    <input id="updateSegmentGroupId"
+           asp-for="EmediaGroupId"
+           value="@Model.EmediaGroup.Id"
+           type="hidden" />
 
     <div modal
          id="updateSegmentModal"
          isLarge="true"
          name="Segment"
          type="@(Model.EmediaGroup.SegmentId.HasValue ? Ocuda.Utility.TagHelpers.ModalTypes.Edit : Ocuda.Utility.TagHelpers.ModalTypes.Add)">
-        <input id="updateSegmentName" asp-for="Segment.Name" value="@Model.EmediaGroup.Segment?.Name" formgroup />
+        <input id="updateSegmentName"
+               asp-for="Segment.Name"
+               value="@Model.EmediaGroup.Segment?.Name"
+               formgroup />
     </div>
 </form>
 
 @if (Model.EmediaGroup.SegmentId.HasValue)
 {
-    <form asp-controller="@EmediaController.Name" asp-action="@(nameof(EmediaController.DeleteGroupSegment))" method="post" role="form">
+    <form asp-action="@(nameof(EmediaController.DeleteGroupSegment))"
+          asp-controller="@EmediaController.Name"
+          method="post"
+          role="form">
         <input id="deleteSegmentCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
 
-        <input id="deleteSegmentGroupId" asp-for="EmediaGroupId" value="@Model.EmediaGroup.Id" type="hidden" />
-        <input id="deleteSegmentNape" asp-for="Segment.Name" value="@Model.EmediaGroup.Segment.Name" type="hidden" />
+        <input id="deleteSegmentGroupId"
+               asp-for="EmediaGroupId"
+               value="@Model.EmediaGroup.Id"
+               type="hidden" />
+        <input id="deleteSegmentNape"
+               asp-for="Segment.Name"
+               value="@Model.EmediaGroup.Segment.Name"
+               type="hidden" />
 
         <div modal
              id="deleteSegmentModal"
@@ -283,15 +347,40 @@
                 });
         });
 
-        $("#editModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-            var url = button.data("url");
+        function doSlugify(e) {
+            let slugFromField = $(e.currentTarget)
+            let slugifyTo = $("#"+slugFromField.data("slugifyto"));
+            if (slugFromField.val().length > 0 && slugifyTo.val().length == 0 && slugify) {
+                slugifyTo.val(slugify(slugFromField.val()).substring(0, 80).toLowerCase());
+            }
+        }
 
-            $("#editEmedia").val(id);
-            $("#editName").val(name);
-            $("#editUrl").val(url);
+        function showWarning(e) {
+            let currentSlugField = $(e.currentTarget);
+            let priorValue = currentSlugField.data("priorvalue");
+            if(currentSlugField.val() != priorValue) {
+                $("#slugWarning").show();
+            }
+            else {
+                $("#slugWarning").hide();
+            }
+        }
+
+        $("#addName").blur(doSlugify);
+        $("#editName").blur(doSlugify);
+
+        $("#editSlug").blur(showWarning);
+
+        $("#editModal").on("show.bs.modal", function (e) {
+            $("#slugWarning").hide();
+            var button = $(e.relatedTarget);
+            $("#editEmedia").val(button.data("id"));
+            $("#editName").val(button.data("name"));
+            $("#editSlug").val(button.data("slug"));
+            $("#editSlug").data("priorvalue", button.data("slug"));
+            $("#editUrl").val(button.data("url"));
+            $("#editIsAvailableExternally").val(button.data("availableexternally"));
+            $("#editIsHttpPost").val(button.data("ispost"));
         });
 
         $("#editForm").submit(function (e) {
@@ -317,7 +406,7 @@
             var modal = $(this);
             $("#deleteId").val(id);
             $("#deleteName").val(name);
-            modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
+            modal.find(".modal-text").html(`Are you sure you want to delete <strong>${name}</strong>?`);
         });
 
         $("#updateSegmentForm").submit(function (e) {
@@ -348,7 +437,7 @@
             var modal = $(this);
             $("#deleteId").val(id);
             $("#deleteName").val(name);
-            modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
+            modal.find(".modal-text").html(`Are you sure you want to delete <strong>${name}</strong>?`);
         });
     </script>
 }

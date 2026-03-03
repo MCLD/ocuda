@@ -32,9 +32,11 @@ namespace Ocuda.Promenade.Models.Entities
         public int Id { get; set; }
 
         [Required]
+        [DisplayName("Available outside our network")]
         public bool IsAvailableExternally { get; set; }
 
         [Required]
+        [DisplayName("HTTP Method")]
         public bool IsHttpPost { get; set; }
 
         [MaxLength(255)]

@@ -78,8 +78,6 @@
     <input asp-for="EmediaText.LanguageId" value="@Model.LanguageId" type="hidden" />
     <input asp-for="LanguageId" type="hidden" />
 
-    @* <textarea asp-for="EmediaText.Description" formgroup></textarea> *@
-
     <div class="mb-3 row">
         <div class="col-md-3 text-md-end">
             <label asp-for="EmediaText.Description" class="col-form-label"></label>
@@ -169,13 +167,13 @@
     <script src="~/js/md.min.js" asp-append-version="true"></script>
 
     <script>
-        var editor = new Markdown.Editor($("#EmediaText_Details"), { allowUploads: true });
+        const editor = new Markdown.Editor($("#EmediaText_Details"), { allowUploads: true });
         editor.run();
 
-        var editorDescription = new Markdown.Editor($("#EmediaText_Description"), { allowUploads: true });
+        const editorDescription = new Markdown.Editor($("#EmediaText_Description"), { allowUploads: true });
         editorDescription.run();
 
-        var emediaDetailsUrl
+        const emediaDetailsUrl
             = "@Url.Action(nameof(EmediaController.Details), new { id = Model.Emedia.Id })";
 
         $("#SelectedLanguage").on("change", function () {
@@ -185,8 +183,8 @@
         $("#categoryForm").submit(function (e) {
             e.preventDefault();
 
-            var id = @Model.Emedia.Id;
-            var categories = $(".categorySelector:checked")
+            let id = @Model.Emedia.Id;
+            let categories = $(".categorySelector:checked")
                 .map(function () { return $(this).data("id"); })
                 .get();
 
@@ -206,8 +204,8 @@
         $("#subjectForm").submit(function (e) {
             e.preventDefault();
 
-            var id = @Model.Emedia.Id;
-            var categories = $(".subjectSelector:checked")
+            let id = @Model.Emedia.Id;
+            let subjects = $(".subjectSelector:checked")
                 .map(function () { return $(this).data("id"); })
                 .get();
 

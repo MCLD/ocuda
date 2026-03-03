@@ -177,8 +177,9 @@ namespace Ocuda.Ops.Service
 
             currentEmedia.Name = emedia.Name?.Trim();
             currentEmedia.RedirectUrl = emedia.RedirectUrl?.Trim();
-
-            throw new NotImplementedException("Update HTTPPost and External Access HEre");
+            currentEmedia.Slug = emedia.Slug?.Trim();
+            currentEmedia.IsHttpPost = emedia.IsHttpPost;
+            currentEmedia.IsAvailableExternally = emedia.IsAvailableExternally;
 
             _emediaRepository.Update(currentEmedia);
             await _emediaRepository.SaveAsync();
