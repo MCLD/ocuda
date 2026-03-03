@@ -39,7 +39,7 @@ namespace Ocuda.Promenade.Models.Defaults
                 Id= Keys.SiteSetting.Network.LocalNetworks,
                 Name="Local Networks",
                 Type=SiteSettingType.String,
-                Value="10/8,172.16/12,192.168/16"
+                Value="10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
             },
 
             #endregion Network
