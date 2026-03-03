@@ -15,6 +15,7 @@
         public const string ForceReload = nameof(ForceReload);
         public const string GoogleAnalyticsTrackingCode = nameof(GoogleAnalyticsTrackingCode);
         public const string HrefLang = nameof(HrefLang);
+        public const string IsLocalNetwork = nameof(IsLocalNetwork);
         public const string L10n = nameof(L10n);
         public const string LeftNavigation = nameof(LeftNavigation);
         public const string MiddleNavigation = nameof(MiddleNavigation);
