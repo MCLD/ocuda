@@ -14,13 +14,21 @@
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
             "CA1815:Override equals and operator equals on value types",
             Justification = "No reason to compare these site setting keys")]
+        public struct Network
+        {
+            public const string LocalNetworks = "Network.LocalNetworks";
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
+            "CA1815:Override equals and operator equals on value types",
+            Justification = "No reason to compare these site setting keys")]
         public struct RenewCard
         {
             public const string AcceptedCounties = "RenewCard.AcceptedCounties";
             public const string AgeCheckCustomerCodes = "RenewCard.AgeCheckCustomerCodes";
             public const string AgeCheckSegment = "RenewCard.AgeCheckSegment";
-            public const string HomeSegment = "RenewCard.HomeSegment";
             public const string ExpirationCutoffDays = "RenewCard.ExpirationCutoffDays";
+            public const string HomeSegment = "RenewCard.HomeSegment";
             public const string JuvenileCustomerCodes = "RenewCard.JuvenileCustomerCodes";
             public const string JuvenileSegment = "RenewCard.JuvenileSegment";
             public const string NoAddressSegment = "RenewCard.NoAddressSegment";

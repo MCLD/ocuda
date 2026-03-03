@@ -10,6 +10,7 @@
         public static readonly string HttpReferer = nameof(HttpReferer);
         public static readonly string Identifier = nameof(Identifier);
         public static readonly string Instance = nameof(Instance);
+        public static readonly string IsLocalNetwork = nameof(IsLocalNetwork);
         public static readonly string RemoteAddress = nameof(RemoteAddress);
         public static readonly string RouteAction = nameof(RouteAction);
         public static readonly string RouteArea = nameof(RouteArea);
