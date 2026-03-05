@@ -30,6 +30,20 @@ namespace Ocuda.Promenade.Models.Defaults
 
             #endregion Contact
 
+            #region Emedia
+
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Emedia),
+                Description = "Valid referers to launch electronic resources",
+                Id= Keys.SiteSetting.Emedia.ValidReferers,
+                Name="Valid Referers",
+                Type=SiteSettingType.StringNullable,
+                Value=""
+            },
+
+            #endregion Emedia
+
             #region Network
 
             new SiteSetting

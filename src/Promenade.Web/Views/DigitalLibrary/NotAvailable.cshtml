@@ -1,0 +1,15 @@
+﻿@using Ocuda.Promenade.Controllers
+@model Ocuda.Promenade.Controllers.ViewModels.DigitalLibrary.LaunchViewModel
+
+<div class="d-flex justify-content-center mt-3">
+    <div class="card">
+        <div class="card-body text-center">
+            <h1 class="display-4 px-5 py-3">You must be in a library to use this resource.</h1>
+            <p class="h2">
+                Find our nearest <a asp-action="@nameof(LocationsController.Find)"
+                                    asp-area=""
+                                    asp-controller="@LocationsController.Name">location</a> to you.
+            </p>
+        </div>
+    </div>
+</div>

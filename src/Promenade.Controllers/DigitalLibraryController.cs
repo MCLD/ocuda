@@ -16,7 +16,8 @@ namespace Ocuda.Promenade.Controllers
 {
     [Route("digital-library")]
     [Route("{culture:cultureConstraint?}/digital-library")]
-    public class DigitalLibraryController(ServiceFacades.Controller<DigitalLibraryController> context,
+    public class DigitalLibraryController(
+        ServiceFacades.Controller<DigitalLibraryController> context,
         EmediaService emediaService,
         SocialCardService socialCardService,
         SubjectService subjectService) : BaseController<DigitalLibraryController>(context)
@@ -89,6 +90,11 @@ namespace Ocuda.Promenade.Controllers
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
+            if (!await ValidateRefererAsync(forceReload))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             var emedia = await _emediaService.GetAsync(forceReload, id);
 
             if (emedia == null)
@@ -96,18 +102,12 @@ namespace Ocuda.Promenade.Controllers
                 return NotFound();
             }
 
-            var requestAddress = HttpContext.Request.Headers["X-Forwarded-For"];
-            if (string.IsNullOrEmpty(requestAddress))
-            {
-                requestAddress = HttpContext.Connection.RemoteIpAddress.ToString();
-            }
+            var isLocalNetwork = HttpContext.Items[ItemKey.IsLocalNetwork] as bool? == true;
 
-            _logger.LogInformation("Launching emedia {Name} via {Method} from {Address} ({ConnectionAddress} via {Referer}",
-                emedia.Name,
-                emedia.IsHttpPost ? "POST" : "GET",
-                requestAddress,
-                HttpContext.Connection.RemoteIpAddress,
-                HttpContext.Request.Headers.Referer);
+            if (!emedia.IsAvailableExternally && !isLocalNetwork)
+            {
+                return View("NotAvailable");
+            }
 
             if (emedia.IsHttpPost)
             {
@@ -126,37 +126,6 @@ namespace Ocuda.Promenade.Controllers
             {
                 return Redirect(emedia.RedirectUrl);
             }
-        }
-        private async Task<DigitalLibraryViewModel> GetViewModelAsync(bool forceReload)
-        {
-            return await GetViewModelAsync(forceReload, null);
-        }
-
-        private async Task<DigitalLibraryViewModel> GetViewModelAsync(bool forceReload,
-            ICollection<EmediaGroup> emediaGroups)
-        {
-
-            var emediaSocial = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.Social.EmediaCardId, forceReload);
-
-            var emediaViewModel = new DigitalLibraryViewModel
-            {
-                AllDescription = "A-Z List",
-                PopularDescription = "Popular Items",
-                SocialCard = emediaSocial > -1
-                    ? await _socialCardService.GetByIdAsync(emediaSocial, forceReload)
-                    : null
-            };
-
-            emediaViewModel.SlugsSubjects
-                .AddRange(await _subjectService.GetSlugsDescriptionsAsync(forceReload));
-
-            if (emediaGroups?.Count > 0)
-            {
-                emediaViewModel.GroupedEmedia.AddRange(emediaGroups);
-            }
-
-            return emediaViewModel;
         }
 
         [HttpGet("[action]/{subject}")]
@@ -200,6 +169,73 @@ namespace Ocuda.Promenade.Controllers
             PageTitle = "Digital Library";
 
             return View("Index", emediaViewModel);
+        }
+
+        private async Task<DigitalLibraryViewModel> GetViewModelAsync(bool forceReload)
+        {
+            return await GetViewModelAsync(forceReload, null);
+        }
+
+        private async Task<DigitalLibraryViewModel> GetViewModelAsync(bool forceReload,
+            ICollection<EmediaGroup> emediaGroups)
+        {
+            var emediaSocial = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.Social.EmediaCardId, forceReload);
+
+            var emediaViewModel = new DigitalLibraryViewModel
+            {
+                AllDescription = "A-Z List",
+                IsLocalNetwork = HttpContext.Items[ItemKey.IsLocalNetwork] as bool? == true,
+                PopularDescription = "Popular Items",
+                SocialCard = emediaSocial > -1
+                    ? await _socialCardService.GetByIdAsync(emediaSocial, forceReload)
+                    : null
+            };
+
+            emediaViewModel.SlugsSubjects
+                .AddRange(await _subjectService.GetSlugsDescriptionsAsync(forceReload));
+
+            if (emediaGroups?.Count > 0)
+            {
+                emediaViewModel.GroupedEmedia.AddRange(emediaGroups);
+            }
+
+            return emediaViewModel;
+        }
+
+        private async Task<bool> ValidateRefererAsync(bool forceReload)
+        {
+            var validReferers = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Emedia.ValidReferers, forceReload);
+
+            if (validReferers.Equals("*", StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            var referer = Request.Headers.Referer;
+
+            if (string.IsNullOrWhiteSpace(referer)) { return false; }
+
+            Uri refererUri;
+
+            try
+            {
+                refererUri = new Uri(referer);
+            }
+            catch (UriFormatException)
+            {
+                return false;
+            }
+
+            if (refererUri == null) { return false; }
+
+            if (string.IsNullOrWhiteSpace(validReferers))
+            {
+                _logger.LogError("No configured valid referers for launching electronic resources!");
+            }
+
+            return validReferers.Split(",").Contains(refererUri.Host);
         }
     }
 }

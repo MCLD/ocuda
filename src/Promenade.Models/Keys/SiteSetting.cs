@@ -14,6 +14,14 @@
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
             "CA1815:Override equals and operator equals on value types",
             Justification = "No reason to compare these site setting keys")]
+        public struct Emedia
+        {
+            public const string ValidReferers = "Emedia.ValidReferers";
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
+            "CA1815:Override equals and operator equals on value types",
+            Justification = "No reason to compare these site setting keys")]
         public struct Network
         {
             public const string LocalNetworks = "Network.LocalNetworks";
