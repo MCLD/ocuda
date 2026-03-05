@@ -6,7 +6,12 @@ namespace Ocuda.Ops.Models.Definitions
     public static class ApplicationPermissionDefinitions
     {
         public static readonly ApplicationPermissionDefinition[] ApplicationPermissions =
-            {
+            [
+            new() {
+                Id = ApplicationPermission.CategoryManagement,
+                Info = "Manage categories such as Media Types and Subjects.",
+                Name = "Category Management"
+            },
             new() {
                 Id = ApplicationPermission.CoverIssueManagement,
                 Info = "Able to mark cover issues as resolved.",
@@ -96,6 +101,6 @@ namespace Ocuda.Ops.Models.Definitions
                 Info = "Edit all pages.",
                 Name = "Web Page Content Management"
             }
-        };
+        ];
     }
 }
