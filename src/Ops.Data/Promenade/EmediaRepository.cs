@@ -39,6 +39,11 @@ namespace Ocuda.Ops.Data.Promenade
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<Emedia> FindAsync(string slug)
+        {
+            return await DbSet.AsNoTracking().SingleOrDefaultAsync(_ => _.Slug == slug);
+        }
+
         public async Task<Emedia> FindAsync(int id)
         {
             return await DbSet.AsNoTracking().SingleOrDefaultAsync(_ => _.Id == id);

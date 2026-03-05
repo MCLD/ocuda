@@ -32,16 +32,23 @@
                 </div>
             </div>
         </div>
+    }
+    @if (Model.IsSiteManager || Model.HasCategoryPermissions)
+    {
         <div class="col-12 col-md-4 my-2">
             <div class="card">
                 <div class="card-header lead fw-bold">
-                    @CategoriesController.Name
+                    Categories
                 </div>
                 <div class="card-body">
                     <a asp-area="@CategoriesController.Area"
                        asp-controller="@CategoriesController.Name"
-                       asp-action="@nameof(CategoriesController.Index)"
-                       class="btn btn-outline-primary mt-1">@CategoriesController.Name</a>
+                       asp-action="@nameof(CategoriesController.CategoryIndex)"
+                       class="btn btn-outline-primary mt-1">Media Types</a>
+                    <a asp-area="@CategoriesController.Area"
+                       asp-controller="@CategoriesController.Name"
+                       asp-action="@nameof(CategoriesController.SubjectIndex)"
+                       class="btn btn-outline-primary mt-1">Subjects</a>
                 </div>
             </div>
         </div>

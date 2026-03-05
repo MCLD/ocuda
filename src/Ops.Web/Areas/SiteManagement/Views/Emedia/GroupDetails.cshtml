@@ -203,7 +203,7 @@
          isLarge="true"
          name="Emedia"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
-        <div id="slugWarning" class="alert alert-warning">
+        <div class="alert alert-warning oc-edit-warning d-none">
             <strong>
                 Changing the slug value will change the URL to get to this electronic resource
                 and possibly break user's bookmarks!
@@ -355,6 +355,22 @@
             }
         }
 
+        function showSaveWarning(e) {
+            let currentSlugField = $(e.currentTarget);
+            let priorValue = currentSlugField.data("priorvalue");
+            if(currentSlugField.val() != priorValue) {
+                document.querySelectorAll('.oc-edit-warning').forEach(_ => {
+                    _.classList.remove('d-none');
+                });
+            } else {
+                document.querySelectorAll('.oc-edit-warning').forEach(_ => {
+                    _.classList.add('d-none');
+                });
+            };
+        }
+
+        document.getElementById('editSlug').addEventListener('keyup', showSaveWarning);
+
         function showWarning(e) {
             let currentSlugField = $(e.currentTarget);
             let priorValue = currentSlugField.data("priorvalue");
@@ -369,10 +385,8 @@
         $("#addName").blur(doSlugify);
         $("#editName").blur(doSlugify);
 
-        $("#editSlug").blur(showWarning);
-
         $("#editModal").on("show.bs.modal", function (e) {
-            $("#slugWarning").hide();
+            document.querySelectorAll('.oc-edit-warning').forEach(_ => {_.classList.add('d-none')});
             var button = $(e.relatedTarget);
             $("#editEmedia").val(button.data("id"));
             $("#editName").val(button.data("name"));

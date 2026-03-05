@@ -14,12 +14,14 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<Emedia> FindAsync(int id);
 
+        Task<Emedia> FindAsync(string slug);
+
         Task<Emedia> GetIncludingGroupAsync(int id);
 
         Task<IDictionary<int, string>> GetMissingSlugsAsync();
 
         Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListForGroupAsync(int groupId,
-                    BaseFilter filter);
+            BaseFilter filter);
 
         Task<string> GetUnusedSlugAsync(string slug);
     }

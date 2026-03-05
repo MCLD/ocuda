@@ -1,24 +1,25 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Categories.IndexViewModel
 
-<div class="row mb-2">
-    <div class="col-sm-6">
-        <h1>
-            Categories
-        </h1>
+@section header {
+    <div class="d-flex">
+        <div class="flex-grow-1 align-middle">
+            <h1 class="h2 ps-2 pb-2 flex-grow-1">
+                Media Types
+            </h1>
+        </div>
+        <div>
+            <button class="btn btn-outline-success me-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addModal">
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
+                Add Category
+            </button>
+            <a class="btn btn-outline-dark"
+               asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
+               asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
+        </div>
     </div>
-    <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
-
-        <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
-                data-bs-toggle="modal"
-                data-bs-target="#addModal">
-            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
-            Add Category
-        </button>
-    </div>
-</div>
+}
 
 <div class="row">
     <div class="col-12">
@@ -27,18 +28,25 @@
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>CSS class</th>
+                        <th>Assigned Emedias</th>
                         <th>Languages</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
+
                     @foreach (var category in Model.Categories)
                     {
                         <tr>
                             <td class="align-middle">
-                                <a asp-action="@(nameof(CategoriesController.Details))" asp-route-id="@category.Id">
+                                <a asp-action="@(nameof(CategoriesController.CategoryDetails))" asp-route-id="@category.Id">
                                     @category.Name
                                 </a>
+                            </td>
+                            <td>@category.Class</td>
+                            <td>
+                                @category.CategoryEmedias.Count
                             </td>
                             <td class="align-middle">@string.Join(", ", category.CategoryLanguages)</td>
                             <td class="align-middle">
@@ -53,7 +61,7 @@
                                     <span class="fa-solid fa-gear" aria-hidden="true"></span>
                                 </button>
                                 <a asp-controller="@CategoriesController.Name"
-                                   asp-action="@(nameof(CategoriesController.Details))"
+                                   asp-action="@(nameof(CategoriesController.CategoryDetails))"
                                    asp-route-id="@category.Id"
                                    class="btn btn-outline-primary"
                                    title="Edit category content">
@@ -77,7 +85,7 @@
     </div>
 </div>
 
-<nav paginate="@Model.PaginateModel"></nav>
+<nav paginate="@Model"></nav>
 
 <form id="addForm" role="form">
     <div modal
@@ -85,6 +93,10 @@
          isLarge="true"
          name="Category"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <div class="alert alert-info">
+            Please ensure the class specified is in the stylesheet as a valid CSS class with the
+            desired formatting.
+        </div>
         <input id="addName" asp-for="Category.Name" formgroup />
         <input id="addClass" asp-for="Category.Class" formgroup />
     </div>
@@ -98,13 +110,22 @@
          isLarge="true"
          name="Category"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <div class="alert alert-warning oc-edit-warning d-none">
+            <strong>
+                Please ensure the class specified is in the stylesheet as a valid CSS class with the
+                desired formatting!
+            </strong>
+        </div>
         <input id="editName" asp-for="Category.Name" formgroup />
         <input id="editClass" asp-for="Category.Class" formgroup />
     </div>
 </form>
 
-<form asp-controller="@CategoriesController.Name" asp-action="@(nameof(CategoriesController.DeleteCategory))" method="post" role="form">
-    <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
+<form asp-controller="@CategoriesController.Name"
+      asp-action="@(nameof(CategoriesController.DeleteCategory))"
+      method="post"
+      role="form">
+    <input id="deleteCurrentPage" asp-for="CurrentPage" type="hidden" />
 
     <input id="deleteId" asp-for="Category.Id" type="hidden" />
     <input id="deleteName" asp-for="Category.Name" type="hidden" />
@@ -121,7 +142,7 @@
     <script>
         $("#addForm").submit(function (e) {
             e.preventDefault();
-            var form = $(this);
+            const form = $(this);
             $.post("@(Url.Action(nameof(CategoriesController.CreateCategory), CategoriesController.Name))",
                 form.serialize(),
                 function (response) {
@@ -135,20 +156,34 @@
                 });
         });
 
-        $("#editModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-            var categoryClass = button.data("class");
+        function showSaveWarning(e) {
+            let currentSlugField = $(e.currentTarget);
+            let priorValue = currentSlugField.data("priorvalue");
+            if(currentSlugField.val() != priorValue) {
+                document.querySelectorAll('.oc-edit-warning').forEach(_ => {
+                    _.classList.remove('d-none');
+                });
+            } else {
+                document.querySelectorAll('.oc-edit-warning').forEach(_ => {
+                    _.classList.add('d-none');
+                });
+            };
+        }
 
-            $("#editCategory").val(id);
-            $("#editName").val(name);
-            $("#editClass").val(categoryClass);
+        $("#editModal").on("show.bs.modal", function (e) {
+            const button = $(e.relatedTarget);
+            $("#editCategory").val(button.data("id"));
+            $("#editName").val(button.data("name"));
+            $("#editClass").val(button.data("class"));
+            $("#editClass").data("priorvalue", button.data("class"));
         });
+
+        document.getElementById('editClass').addEventListener('keyup', showSaveWarning);
+
 
         $("#editForm").submit(function (e) {
             e.preventDefault();
-            var form = $(this);
+            const form = $(this);
             $.post("@(Url.Action(nameof(CategoriesController.EditCategory), CategoriesController.Name))",
                 form.serialize(),
                 function (response) {
@@ -163,33 +198,32 @@
         });
 
         $("#deleteModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
+            const button = $(e.relatedTarget);
 
-            var id = button.data("id");
-            var name = button.data("name");
-            var emedia = button.data("emedia");
+            const name = button.data("name");
+            const emedia = button.data("emedia");
 
-            var modal = $(this);
+            const modal = $(this);
 
-            $("#deleteId").val(id);
+            $("#deleteId").val(button.data("id"));
             $("#deleteName").val(name);
 
-            modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
+            modal.find(".modal-text").html(`Are you sure you want to delete <strong>${name}</strong>?`);
 
-            var dependentWarning = modal.find("#dependentWarnings");
+            const dependentWarning = modal.find("#dependentWarnings");
 
             if (emedia) {
                 dependentWarning.text("").removeClass("d-none");
 
-                var emedias = emedia.toString().split("|");
+                const emedias = emedia.toString().split("|");
 
                 dependentWarning.append("<div>The following <strong>emedia</strong> use this category:</div>");
                 dependentWarning.append("<ul id=\"emediaDependents\"></ul>");
 
-                var emediaDependents = dependentWarning.find("#emediaDependents");
+                const emediaDependents = dependentWarning.find("#emediaDependents");
 
                 $.each(emedias, function (index, value) {
-                    emediaDependents.append("<li>" + value + "</li>")
+                    emediaDependents.append(`<li>${value}</li>`)
                 });
             }
             else {

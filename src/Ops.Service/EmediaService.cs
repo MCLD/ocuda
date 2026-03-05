@@ -72,8 +72,17 @@ namespace Ocuda.Ops.Service
         public async Task<Emedia> CreateAsync(Emedia emedia)
         {
             ArgumentNullException.ThrowIfNull(emedia);
+
+            var currentEmedia = await _emediaRepository.FindAsync(emedia.Slug);
+
+            if (currentEmedia != null)
+            {
+                throw new OcudaException($"That emedia slug is already in use for: {currentEmedia.Name}");
+            }
+
             emedia.Name = emedia.Name?.Trim();
             emedia.RedirectUrl = emedia.RedirectUrl?.Trim();
+            emedia.Slug = emedia.Slug?.Trim();
 
             await _emediaRepository.AddAsync(emedia);
             await _emediaRepository.SaveAsync();
@@ -173,7 +182,15 @@ namespace Ocuda.Ops.Service
         public async Task<Emedia> EditAsync(Emedia emedia)
         {
             ArgumentNullException.ThrowIfNull(emedia);
-            var currentEmedia = await _emediaRepository.FindAsync(emedia.Id);
+
+            var currentEmedia = await _emediaRepository.FindAsync(emedia.Slug?.Trim());
+
+            if (currentEmedia != null && currentEmedia.Id != emedia.Id)
+            {
+                throw new OcudaException($"That emedia slug is already in use for: {currentEmedia.Name}");
+            }
+
+            currentEmedia ??= await _emediaRepository.FindAsync(emedia.Id);
 
             currentEmedia.Name = emedia.Name?.Trim();
             currentEmedia.RedirectUrl = emedia.RedirectUrl?.Trim();

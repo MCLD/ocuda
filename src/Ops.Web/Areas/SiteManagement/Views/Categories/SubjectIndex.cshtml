@@ -1,0 +1,241 @@
+﻿@using Ocuda.Ops.Controllers.Areas.SiteManagement
+@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Categories.IndexViewModel
+
+@section header {
+    <div class="d-flex">
+        <div class="flex-grow-1 align-middle">
+            <h1 class="h2 ps-2 pb-2 flex-grow-1">
+                Subjects
+            </h1>
+        </div>
+        <div>
+            <button class="btn btn-outline-success me-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addModal">
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
+                Add Subject
+            </button>
+            <a class="btn btn-outline-dark"
+               asp-controller="@HomeController.Name"
+               asp-action="@nameof(HomeController.Index)">Back</a>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-12">
+        <div>
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Slug</th>
+                        <th>Emedias Assigned</th>
+                        <th>Languages</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var subject in Model.Subjects)
+                    {
+                        <tr>
+                            <td class="align-middle">
+                                <a asp-action="@(nameof(CategoriesController.SubjectDetails))"
+                                   asp-route-id="@subject.Id">
+                                    @subject.Name
+                                </a>
+                            </td>
+                            <td>@subject.Slug</td>
+                            <td>@subject.SubjectEmedias.Count</td>
+                            <td class="align-middle">@string.Join(", ", subject.SubjectLanguages)</td>
+                            <td class="align-middle">
+                                <button type="button"
+                                        class="btn btn-outline-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal"
+                                        data-id="@subject.Id"
+                                        data-name="@subject.Name"
+                                        data-slug="@subject.Slug"
+                                        title="Edit Subject">
+                                    <span class="fa-solid fa-gear" aria-hidden="true"></span>
+                                </button>
+                                <a asp-controller="@CategoriesController.Name"
+                                   asp-action="@(nameof(CategoriesController.SubjectDetails))"
+                                   asp-route-id="@subject.Id"
+                                   class="btn btn-outline-primary"
+                                   title="Edit Subject content">
+                                    <span class="fa-regular fa-file-alt" aria-hidden="true"></span>
+                                </a>
+                                <button type="button"
+                                        class="btn btn-outline-danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal"
+                                        data-id="@subject.Id"
+                                        data-name="@subject.Name"
+                                        data-emedia="@string.Join("|", subject.SubjectEmedias)">
+                                    <span class="fa-solid fa-circle-minus" aria-hidden="true"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<nav paginate="@Model"></nav>
+
+<form id="addForm" role="form">
+    <div modal
+         id="addModal"
+         isLarge="true"
+         name="Subject"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <input id="addName" asp-for="Subject.Name" formgroup data-slugifyto="addSlug" />
+        <input id="addSlug" asp-for="Subject.Slug" formgroup />
+    </div>
+</form>
+
+<form id="editForm" role="form">
+    <input id="editSubject" asp-for="Subject.Id" type="hidden" />
+
+    <div modal
+         id="editModal"
+         isLarge="true"
+         name="Subject"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <div class="alert alert-warning oc-edit-warning d-none">
+            <strong>
+                Changing the slug value will change the URL to get to this subject and possibly
+                break user's bookmarks!
+            </strong>
+        </div>
+        <input id="editName" asp-for="Subject.Name" formgroup data-slugifyto="editSlug" />
+        <input id="editSlug"
+               asp-for="Subject.Slug"
+               formgroup />
+    </div>
+</form>
+
+<form asp-controller="@CategoriesController.Name"
+      asp-action="@(nameof(CategoriesController.DeleteSubject))"
+      method="post"
+      role="form">
+    <input id="deleteCurrentPage" asp-for="CurrentPage" type="hidden" />
+
+    <input id="deleteId" asp-for="Subject.Id" type="hidden" />
+    <input id="deleteName" asp-for="Subject.Name" type="hidden" />
+
+    <div modal
+         id="deleteModal"
+         name="Subject"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
+        <div id="dependentWarnings" class="d-none"></div>
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        $("#addForm").submit(function (e) {
+            e.preventDefault();
+            const form = $(this);
+            $.post("@(Url.Action(nameof(CategoriesController.CreateSubject), CategoriesController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
+        });
+
+        function showSaveWarning(e) {
+            let currentSlugField = $(e.currentTarget);
+            let priorValue = currentSlugField.data("priorvalue");
+            if(currentSlugField.val() != priorValue) {
+                document.querySelectorAll('.oc-edit-warning').forEach(_ => {
+                    _.classList.remove('d-none');
+                });
+            } else {
+                document.querySelectorAll('.oc-edit-warning').forEach(_ => {
+                    _.classList.add('d-none');
+                });
+            };
+        }
+
+        document.getElementById('editSlug').addEventListener('keyup', showSaveWarning);
+
+        $("#editModal").on("show.bs.modal", function (e) {
+            const button = $(e.relatedTarget);
+            $("#editSubject").val(button.data("id"));
+            $("#editName").val(button.data("name"));
+            $("#editSlug").val(button.data("slug"));
+            $("#editSlug").data("priorvalue", button.data("slug"));
+        });
+
+        $("#editForm").submit(function (e) {
+            e.preventDefault();
+            const form = $(this);
+            $.post("@(Url.Action(nameof(CategoriesController.EditSubject), CategoriesController.Name))",
+                form.serialize(),
+                function (response) {
+                if (response.success == true) {
+                    location.reload();
+                }
+                else {
+                    alert(response.message);
+                    ResetSpinners(form.find(".btn-spinner"));
+                }
+            });
+        });
+
+        function doSlugify(e) {
+            let slugFromField = $(e.currentTarget)
+            let slugifyTo = $("#"+slugFromField.data("slugifyto"));
+            if (slugFromField.val().length > 0 && slugifyTo.val().length == 0 && slugify) {
+                slugifyTo.val(slugify(slugFromField.val()).substring(0, 80).toLowerCase());
+            }
+        }
+        $("#addName").blur(doSlugify);
+        $("#editName").blur(doSlugify);
+
+
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            const button = $(e.relatedTarget);
+
+            const name = button.data("name");
+            const emedia = button.data("emedia");
+
+            const modal = $(this);
+
+            $("#deleteId").val(button.data("id"));
+            $("#deleteName").val(name);
+
+            modal.find(".modal-text").html(`Are you sure you want to delete <strong>${name}</strong>?`);
+
+            const dependentWarning = modal.find("#dependentWarnings");
+
+            if (emedia) {
+                dependentWarning.text("").removeClass("d-none");
+
+                const emedias = emedia.toString().split("|");
+
+                dependentWarning.append("<div>The following <strong>emedia</strong> use this subject:</div>");
+                dependentWarning.append("<ul id=\"emediaDependents\"></ul>");
+
+                const emediaDependents = dependentWarning.find("#emediaDependents");
+
+                $.each(emedias, function (index, value) {
+                    emediaDependents.append(`<li>${value}</li>`)
+                });
+            }
+            else {
+                dependentWarning.addClass("d-none");
+            }
+        });
+    </script>
+}

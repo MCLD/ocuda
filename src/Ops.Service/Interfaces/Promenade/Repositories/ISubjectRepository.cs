@@ -10,6 +10,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     {
         Task<Subject> FindAsync(int id);
 
+        Task<Subject> FindAsync(string slug);
+
         Task<ICollection<Subject>> GetAllAsync();
 
         Task<DataWithCount<ICollection<Subject>>> GetPaginatedListAsync(BaseFilter filter);

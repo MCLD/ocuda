@@ -38,7 +38,16 @@ namespace Ocuda.Ops.Service
         public async Task<Subject> CreateAsync(Subject subject)
         {
             ArgumentNullException.ThrowIfNull(subject);
+
+            var currentSubject = await _subjectRepository.FindAsync(subject.Slug.Trim());
+
+            if (currentSubject != null)
+            {
+                throw new OcudaException($"That subject slug is already in use for: {currentSubject.Name}");
+            }
+
             subject.Name = subject.Name?.Trim();
+            subject.Slug = subject.Slug?.Trim();
 
             await _subjectRepository.AddAsync(subject);
             await _subjectRepository.SaveAsync();
@@ -66,9 +75,17 @@ namespace Ocuda.Ops.Service
         public async Task<Subject> EditAsync(Subject subject)
         {
             ArgumentNullException.ThrowIfNull(subject);
-            var currentSubject = await _subjectRepository.FindAsync(subject.Id);
+            var currentSubject = await _subjectRepository.FindAsync(subject.Slug.Trim());
+
+            if (currentSubject != null && currentSubject.Id != subject.Id)
+            {
+                throw new OcudaException($"That subject slug is already in use for: {currentSubject.Name}");
+            }
+
+            currentSubject ??= await _subjectRepository.FindAsync(subject.Id);
 
             currentSubject.Name = subject.Name?.Trim();
+            currentSubject.Slug = subject.Slug?.Trim();
 
             _subjectRepository.Update(currentSubject);
             await _subjectRepository.SaveAsync();

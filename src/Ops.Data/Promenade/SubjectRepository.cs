@@ -18,14 +18,18 @@ namespace Ocuda.Ops.Data.Promenade
             : GenericRepository<PromenadeContext, Subject>(repositoryFacade, logger),
             ISubjectRepository
     {
+        public async Task<Subject> FindAsync(string slug)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .SingleOrDefaultAsync(_ => _.Slug == slug);
+        }
+
         public async Task<Subject> FindAsync(int id)
         {
-            var entity = await DbSet.FindAsync(id);
-            if (entity != null)
-            {
-                _context.Entry(entity).State = EntityState.Detached;
-            }
-            return entity;
+            return await DbSet
+                .AsNoTracking()
+                .SingleOrDefaultAsync(_ => _.Id == id);
         }
 
         public async Task<ICollection<Subject>> GetAllAsync()
