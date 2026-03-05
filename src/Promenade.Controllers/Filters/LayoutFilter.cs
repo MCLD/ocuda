@@ -1,49 +1,45 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Models;
 using Ocuda.Utility.Services.Interfaces;
+using Serilog.Context;
 
 namespace Ocuda.Promenade.Controllers.Filters
 {
-    public class LayoutFilter : IAsyncResourceFilter
+    public class LayoutFilter(ExternalResourceService externalResourceService,
+        ILogger<LayoutFilter> logger,
+        IPathResolverService pathResolverService,
+        NavigationService navigationService,
+        SiteSettingService siteSettingService) : IAsyncResourceFilter
     {
-        private readonly ExternalResourceService _externalResourceService;
-        private readonly NavigationService _navigationService;
-        private readonly IPathResolverService _pathResolverService;
-        private readonly SiteSettingService _siteSettingService;
+        private readonly ExternalResourceService _externalResourceService = externalResourceService
+            ?? throw new ArgumentNullException(nameof(externalResourceService));
 
-        public LayoutFilter(ExternalResourceService externalResourceService,
-            NavigationService navigationService,
-            IPathResolverService pathResolverService,
-            SiteSettingService siteSettingService)
-        {
-            _externalResourceService = externalResourceService
-                ?? throw new ArgumentNullException(nameof(externalResourceService));
-            _navigationService = navigationService
-                ?? throw new ArgumentNullException(nameof(navigationService));
-            _pathResolverService = pathResolverService
-                ?? throw new ArgumentNullException(nameof(pathResolverService));
-            _siteSettingService = siteSettingService
-                ?? throw new ArgumentNullException(nameof(siteSettingService));
-        }
+        private readonly ILogger<LayoutFilter> _logger = logger
+            ?? throw new ArgumentNullException(nameof(logger));
+
+        private readonly NavigationService _navigationService = navigationService
+            ?? throw new ArgumentNullException(nameof(navigationService));
+
+        private readonly IPathResolverService _pathResolverService = pathResolverService
+            ?? throw new ArgumentNullException(nameof(pathResolverService));
+
+        private readonly SiteSettingService _siteSettingService = siteSettingService
+            ?? throw new ArgumentNullException(nameof(siteSettingService));
 
         public Task OnResourceExecutionAsync(ResourceExecutingContext context,
-                        ResourceExecutionDelegate next)
+            ResourceExecutionDelegate next)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            ArgumentNullException.ThrowIfNull(context);
 
-            if (next == null)
-            {
-                throw new ArgumentNullException(nameof(next));
-            }
-
-            return OnResourceExecutionInternalAsync(context, next);
+            return next == null
+                ? throw new ArgumentNullException(nameof(next))
+                : OnResourceExecutionInternalAsync(context, next);
         }
 
         private async Task OnResourceExecutionInternalAsync(ResourceExecutingContext context,
@@ -56,18 +52,50 @@ namespace Ocuda.Promenade.Controllers.Filters
                 context.HttpContext.Items[ItemKey.ForceReload] = true;
             }
 
+            var localNetworksCsv = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Network.LocalNetworks, forceReload);
+
+            var isLocal = false;
+
+            if (localNetworksCsv?.Length > 0)
+            {
+                foreach (var networkAddress in localNetworksCsv.Split(","))
+                {
+                    IPNetwork2 network = null;
+                    try
+                    {
+                        network = IPNetwork2.Parse(networkAddress);
+                    }
+                    catch (ArgumentException aex)
+                    {
+                        _logger.LogError(aex,
+                            "Error parsing network address: {Message}",
+                            aex.Message);
+                    }
+                    if (network != null)
+                    {
+                        isLocal = network.Contains(context.HttpContext.Connection.RemoteIpAddress);
+                        if (isLocal)
+                        {
+                            break;
+                        }
+                    }
+                }
+                context.HttpContext.Items[ItemKey.IsLocalNetwork] = isLocal;
+            }
+
             context.HttpContext.Items[ItemKey.PublicContentPath]
-                = _pathResolverService.GetPublicContentLink();
+                    = _pathResolverService.GetPublicContentLink();
 
             var externalResources = await _externalResourceService.GetAllAsync(forceReload);
 
             context.HttpContext.Items[ItemKey.ExternalCSS] = externalResources
                 .Where(_ => _.Type == ExternalResourceType.CSS)
-                .Select(_ => _.Url).ToList();
+                    .Select(_ => _.Url).ToList();
 
             context.HttpContext.Items[ItemKey.ExternalJS] = externalResources
                 .Where(_ => _.Type == ExternalResourceType.JS)
-                .Select(_ => _.Url).ToList();
+                    .Select(_ => _.Url).ToList();
 
             context.HttpContext.Items[ItemKey.PageTitleSuffix] = await _siteSettingService
                 .GetSettingStringAsync(Models.Keys.SiteSetting.Site.PageTitleSuffix, forceReload);
@@ -148,7 +176,10 @@ namespace Ocuda.Promenade.Controllers.Filters
             context.HttpContext.Items[ItemKey.ContactLink] = await _siteSettingService
                 .GetSettingStringAsync(Models.Keys.SiteSetting.Contact.Link, forceReload);
 
-            await next();
+            using (LogContext.PushProperty(Utility.Logging.Enrichment.IsLocalNetwork, isLocal))
+            {
+                await next();
+            }
         }
     }
 }
