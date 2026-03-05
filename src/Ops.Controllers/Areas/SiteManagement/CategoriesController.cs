@@ -23,7 +23,6 @@ using Ocuda.Utility.Keys;
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
     [Area("SiteManagement")]
-    [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
     public class CategoriesController(ServiceFacades.Controller<CategoriesController> context,
         ICategoryService categoryService,
@@ -53,7 +52,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [RestoreModelState]
         public async Task<IActionResult> CategoryDetails(int id, string language)
         {
-            if (!await HasPermissionsAsync()) { return RedirectToUnauthorized(); }
+            if (!await HasAreaPermissionsAsync()) { return RedirectToUnauthorized(); }
 
             var category = await _categoryService.GetByIdAsync(id);
 
@@ -85,7 +84,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> CategoryDetails(int id, CategoryDetailsViewModel model)
         {
-            if (!await HasPermissionsAsync()) { return RedirectToUnauthorized(); }
+            if (!await HasAreaPermissionsAsync()) { return RedirectToUnauthorized(); }
 
             ArgumentNullException.ThrowIfNull(model);
             if (model.CategoryText == null)
@@ -131,7 +130,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> CategoryIndex(int page)
         {
-            if (!await HasPermissionsAsync()) { return RedirectToUnauthorized(); }
+            if (!await HasAreaPermissionsAsync()) { return RedirectToUnauthorized(); }
 
             page = page > 0 ? page : 1;
 
@@ -171,7 +170,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> CreateCategory(IndexViewModel model)
         {
-            if (!await HasPermissionsAsync()) { return RedirectToUnauthorized(); }
+            if (!await HasAreaPermissionsAsync()) { return RedirectToUnauthorized(); }
 
             ArgumentNullException.ThrowIfNull(model);
             JsonResponse response;
@@ -216,7 +215,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> CreateSubject(IndexViewModel model)
         {
-            if (!await HasPermissionsAsync()) { return RedirectToUnauthorized(); }
+            if (!await HasAreaPermissionsAsync()) { return RedirectToUnauthorized(); }
 
             ArgumentNullException.ThrowIfNull(model);
             JsonResponse response;
@@ -261,7 +260,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteCategory(IndexViewModel model)
         {
-            if (!await HasPermissionsAsync()) { return RedirectToUnauthorized(); }
+            if (!await HasAreaPermissionsAsync()) { return RedirectToUnauthorized(); }
 
             ArgumentNullException.ThrowIfNull(model);
             try
@@ -301,7 +300,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> EditCategory(IndexViewModel model)
         {
-            if (!await HasPermissionsAsync()) { return RedirectToUnauthorized(); }
+            if (!await HasAreaPermissionsAsync()) { return RedirectToUnauthorized(); }
 
             ArgumentNullException.ThrowIfNull(model);
             JsonResponse response;
@@ -347,7 +346,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> EditSubject(IndexViewModel model)
         {
-            if (!await HasPermissionsAsync()) { return RedirectToUnauthorized(); }
+            if (!await HasAreaPermissionsAsync()) { return RedirectToUnauthorized(); }
 
             ArgumentNullException.ThrowIfNull(model);
             JsonResponse response;
@@ -393,7 +392,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [RestoreModelState]
         public async Task<IActionResult> SubjectDetails(int id, string language)
         {
-            if (!await HasPermissionsAsync()) { return RedirectToUnauthorized(); }
+            if (!await HasAreaPermissionsAsync()) { return RedirectToUnauthorized(); }
 
             var subject = await _subjectService.GetByIdAsync(id);
 
@@ -425,7 +424,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> SubjectDetails(int id, SubjectDetailsViewModel model)
         {
-            if (!await HasPermissionsAsync()) { return RedirectToUnauthorized(); }
+            if (!await HasAreaPermissionsAsync()) { return RedirectToUnauthorized(); }
 
             ArgumentNullException.ThrowIfNull(model);
             if (model.SubjectText == null)
@@ -471,7 +470,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> SubjectIndex(int page)
         {
-            if (!await HasPermissionsAsync()) { return RedirectToUnauthorized(); }
+            if (!await HasAreaPermissionsAsync()) { return RedirectToUnauthorized(); }
 
             page = page > 0 ? page : 1;
             var itemsPerPage = await _siteSettingService
@@ -505,11 +504,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return View(viewModel);
         }
 
-        private async Task<bool> HasPermissionsAsync()
+        private async Task<bool> HasAreaPermissionsAsync()
         {
-            return !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
-                || await HasAppPermissionAsync(_permissionGroupService,
-                    ApplicationPermission.CategoryManagement);
+            return await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.CategoryManagement);
         }
     }
 }
