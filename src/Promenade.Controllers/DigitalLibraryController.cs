@@ -186,7 +186,7 @@ namespace Ocuda.Promenade.Controllers
             {
                 AllDescription = "A-Z List",
                 IsLocalNetwork = HttpContext.Items[ItemKey.IsLocalNetwork] as bool? == true,
-                PopularDescription = "Popular Items",
+                PopularDescription = "Popular Items First",
                 SocialCard = emediaSocial > -1
                     ? await _socialCardService.GetByIdAsync(emediaSocial, forceReload)
                     : null
