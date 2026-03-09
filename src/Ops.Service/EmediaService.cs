@@ -229,6 +229,45 @@ namespace Ocuda.Ops.Service
             }
         }
 
+        public async Task<IEnumerable<ESourceImport>> ExportItemsAsync(int groupId)
+        {
+            var defaultLanguageId = await _languageRepository.GetDefaultLanguageId();
+
+            var subjects = await _subjectRepository.GetAllAsync();
+
+            var emedias = await _emediaRepository.GetPaginatedListForGroupAsync(groupId,
+                new BaseFilter(1, await _emediaRepository.CountAsync()));
+
+            var esourceExport = new List<ESourceImport>();
+
+            foreach (var emedia in emedias.Data)
+            {
+                var emediaText = await _emediaTextReposiory
+                    .GetByEmediaAndLanguageAsync(emedia.Id, defaultLanguageId);
+
+                var emediaSubjects = await _emediaSubjectRepository.GetAllForEmediaAsync(emedia.Id);
+
+                esourceExport.Add(new ESourceImport
+                {
+                    Categories = subjects
+                        .Where(_ => emediaSubjects.Select(_ => _.SubjectId).Contains(_.Id))
+                        .Select(_ => _.Name)
+                        .ToArray(),
+                    Description = emediaText.Description,
+                    InHouseAccess = ESourceAccessLevel.NoLoginRequired,
+                    IsHttpPost = emedia.IsHttpPost,
+                    Link = emedia.RedirectUrl,
+                    Message = emediaText.Details,
+                    Name = emedia.Name,
+                    RemoteAccess = emedia.IsAvailableExternally
+                        ? ESourceAccessLevel.NoLoginRequired
+                        : ESourceAccessLevel.LoginRequired
+                });
+            }
+
+            return esourceExport;
+        }
+
         public async Task<ICollection<Category>> GetCategoriesForEmediaAsync(int emediaId)
         {
             return await _emediaCategoryRepository.GetCategoriesForEmediaAsync(emediaId);
@@ -277,8 +316,7 @@ namespace Ocuda.Ops.Service
             return await _emediaSubjectRepository.GetSubjectsForEmediaAsync(emediaId);
         }
 
-        public async Task<EmediaText> GetTextByEmediaAndLanguageAsync(int emediaId,
-            int languageId)
+        public async Task<EmediaText> GetTextByEmediaAndLanguageAsync(int emediaId, int languageId)
         {
             return await _emediaTextReposiory.GetByEmediaAndLanguageAsync(emediaId, languageId);
         }
@@ -323,7 +361,8 @@ namespace Ocuda.Ops.Service
                 }
                 else
                 {
-                    _logger.LogInformation("Subject {Subject} already present", importSubject.Trim());
+                    _logger.LogInformation("Subject {Subject} already present",
+                        importSubject.Trim());
                 }
             }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ocuda.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Models;
@@ -25,6 +26,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<EmediaGroup> EditGroupAsync(EmediaGroup group);
 
         Task EnsureSlugsAsync();
+
+        Task<IEnumerable<ESourceImport>> ExportItemsAsync(int groupId);
 
         Task<ICollection<Category>> GetCategoriesForEmediaAsync(int emediaId);
 

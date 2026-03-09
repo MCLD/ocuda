@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Ocuda.Models;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Emedia;
 using Ocuda.Ops.Controllers.Filters;
@@ -18,6 +19,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility;
+using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Filters;
@@ -29,6 +31,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class EmediaController(ServiceFacades.Controller<EmediaController> context,
         ICategoryService categoryService,
+        IDateTimeProvider dateTimeProvider,
         IEmediaService emediaService,
         ILanguageService languageService,
         IPermissionGroupService permissionGroupService,
@@ -37,6 +40,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly ICategoryService _categoryService = categoryService
             ?? throw new ArgumentNullException(nameof(categoryService));
+
+        private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider
+            ?? throw new ArgumentNullException(nameof(dateTimeProvider));
 
         private readonly IEmediaService _emediaService = emediaService
             ?? throw new ArgumentNullException(nameof(emediaService));
@@ -52,7 +58,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         private readonly ISubjectService _subjectService = subjectService
             ?? throw new ArgumentNullException(nameof(subjectService));
-
 
         public static string Area
         { get { return nameof(SiteManagement); } }
@@ -98,6 +103,43 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<JsonResult> ChangeGroupSort(int id, bool increase)
+        {
+            JsonResponse response;
+
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else
+            {
+                try
+                {
+                    await _emediaService.UpdateGroupSortOrder(id, increase);
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Message = ex.Message,
+                        Success = false
+                    };
+                }
+            }
+
+            return Json(response);
+        }
 
         [HttpPost]
         [Route("[action]")]
@@ -119,45 +161,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 try
                 {
                     await _emediaService.UpdateSubjectsAsync(id, subjects);
-                    response = new JsonResponse
-                    {
-                        Success = true
-                    };
-                }
-                catch (OcudaException ex)
-                {
-                    response = new JsonResponse
-                    {
-                        Message = ex.Message,
-                        Success = false
-                    };
-                }
-            }
-
-            return Json(response);
-        }
-
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<JsonResult> ChangeGroupSort(int id, bool increase)
-        {
-            JsonResponse response;
-
-            if (!await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.EmediaManagement))
-            {
-                response = new JsonResponse
-                {
-                    Message = "Unauthorized",
-                    Success = false
-                };
-            }
-            else
-            {
-                try
-                {
-                    await _emediaService.UpdateGroupSortOrder(id, increase);
                     response = new JsonResponse
                     {
                         Success = true
@@ -591,6 +594,34 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
+        [HttpGet("[action]/{id}")]
+        public async Task<IActionResult> Export(int id)
+        {
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            string publicSitePath = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl);
+
+            string intranetPath = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.UserInterface.BaseIntranetLink);
+
+            return File(JsonSerializer.SerializeToUtf8Bytes(new PortableList<ESourceImport>
+            {
+                ExportedAt = _dateTimeProvider.Now,
+                ExportedBy = CurrentUsername,
+                Items = await _emediaService.ExportItemsAsync(id),
+                Source = $"{publicSitePath} (via {intranetPath})",
+                Type = nameof(Navigation),
+                Version = 1
+            }),
+                System.Net.Mime.MediaTypeNames.Application.Json,
+                $"{_dateTimeProvider.Now:yyyyMMdd}-{nameof(Emedia)}.json");
+        }
+
         [Route("[action]/{id}")]
         public async Task<IActionResult> GroupDetails(int id, int page = 1)
         {
@@ -669,7 +700,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var jsonStream = jsonImportFile.OpenReadStream();
 
             var dataFromFile = await JsonSerializer
-                .DeserializeAsync<PortableList<Ocuda.Models.ESourceImport>>(jsonStream);
+                .DeserializeAsync<PortableList<ESourceImport>>(jsonStream);
 
             await _emediaService.ImportItemsAsync(groupId, dataFromFile.Items);
 

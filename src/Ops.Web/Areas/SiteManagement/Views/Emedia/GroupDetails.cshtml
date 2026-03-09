@@ -8,9 +8,12 @@
     <div>
         <button data-bs-toggle="modal"
                 data-bs-target="#importJsonModal"
-                class="btn btn-outline-info me-2">
+                class="btn btn-outline-info">
             Import
         </button>
+        <a asp-action="@nameof(EmediaController.Export)"
+           asp-route-id="@Model.EmediaGroupId"
+           class="btn btn-outline-info me-2">Export</a>
         @if (!Model.EmediaGroup.SegmentId.HasValue)
         {
             <button class="btn btn-outline-success"
