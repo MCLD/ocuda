@@ -3,9 +3,9 @@ using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.RenewCard
 {
-    public class ResponsesViewModel
+    public class RenewCardResponsesViewModel
     {
-        public IEnumerable<RenewCardResponse> Responses { get; set; }
         public RenewCardResponse Response { get; set; }
+        public IEnumerable<RenewCardResponse> Responses { get; set; }
     }
 }

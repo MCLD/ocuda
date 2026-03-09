@@ -4,9 +4,6 @@
 	  asp-action="@nameof(EmployeeSignupController.Pending)"
 	  method="post"
 	  role="form">
-	<input asp-for="RequestId" value="@Model.CardRequest.Id" type="hidden" />
-	<input asp-for="Note.EmployeeCardRequestId" value="@Model.CardRequest.Id" type="hidden" />
-
 	<div class="d-flex flex-wrap justify-content-between mb-2">
 		<h1 class="mb-0">
 			Employee Card Request

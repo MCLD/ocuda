@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.RenewCard.ResponseViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.RenewCard.RenewCardResponseViewModel
 
 <div class="d-flex justify-content-between">
 	<h1>
@@ -6,7 +6,7 @@
 		<small class="text-muted">@Model.Response.Name</small>
 	</h1>
 	<div>
-		<a asp-action="@(nameof(RenewCardController.Responses))"
+		<a asp-action="@(nameof(RenewCardController.RenewalResponses))"
 		   class="btn btn-outline-dark">Back</a>
 	</div>
 </div>
@@ -14,11 +14,9 @@
 
 
 <form asp-controller="@RenewCardController.Name"
-	  asp-action="@nameof(RenewCardController.Response)"
+	  asp-action="@nameof(RenewCardController.RenewalResponse)"
 	  method="post"
 	  role="form">
-	<input asp-for="Response.Id" type="hidden" />
-
 	<input asp-for="Response.Type" disabled formgroup hide-required />
 	<input asp-for="Response.Name" formgroup />
 	<select asp-for="Response.EmailSetupId" asp-items="Model.EmailSetups" formgroup>

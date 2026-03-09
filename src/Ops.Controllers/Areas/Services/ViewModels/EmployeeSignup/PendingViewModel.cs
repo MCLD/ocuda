@@ -7,14 +7,15 @@ namespace Ocuda.Ops.Controllers.Areas.Services.ViewModels.EmployeeSignup
 {
     public class PendingViewModel
     {
-        public EmployeeCardRequest CardRequest { get; set; }
-        public EmployeeCardNote Note { get; set; }
         public bool APIConfigured { get; set; }
 
         [DisplayName("Card Number")]
         [MaxLength(13)]
         public string CardNumber { get; set; }
 
+        public EmployeeCardRequest CardRequest { get; set; }
+        public bool HasAccess { get; set; }
+        public EmployeeCardNote Note { get; set; }
         public bool Renewing { get; set; }
         public int RequestId { get; set; }
         public EmployeeCardResult.ResultType? Type { get; set; }

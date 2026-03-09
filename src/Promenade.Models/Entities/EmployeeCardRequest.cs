@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Ocuda.Promenade.Models.Abstract;
+using Ocuda.Models;
 
 namespace Ocuda.Promenade.Models.Entities
 {

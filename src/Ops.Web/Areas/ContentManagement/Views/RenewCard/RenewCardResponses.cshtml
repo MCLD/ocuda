@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.RenewCard.ResponsesViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.RenewCard.RenewCardResponsesViewModel
 
 <div class="d-flex justify-content-between">
 	<h1>
@@ -39,7 +39,7 @@
 				<tr>
 					<td>@response.Type</td>
 					<td>
-						<a asp-action="@nameof(RenewCardController.Response)"
+						<a asp-action="@nameof(RenewCardController.RenewalResponse)"
 						   asp-route-id="@response.Id">
 							@response.Name
 						</a>

@@ -7,6 +7,7 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Services.ViewModels.EmployeeSignup;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -22,22 +23,29 @@ namespace Ocuda.Ops.Controllers.Areas.Services
     {
         private readonly IEmployeeCardRequestService _employeeCardRequestService;
         private readonly IEmployeeCardService _employeeCardService;
+        private readonly IPermissionGroupService _permissionGroupService;
         private readonly IPolarisHelper _polarisHelper;
 
         public EmployeeSignupController(ServiceFacades.Controller<EmployeeSignupController> context,
             IEmployeeCardRequestService employeeCardRequestService,
             IEmployeeCardService employeeCardService,
+            IPermissionGroupService permissionGroupService,
             IPolarisHelper polarisHelper)
             : base(context)
         {
             ArgumentNullException.ThrowIfNull(employeeCardRequestService);
             ArgumentNullException.ThrowIfNull(employeeCardService);
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
             ArgumentNullException.ThrowIfNull(polarisHelper);
 
             _employeeCardRequestService = employeeCardRequestService;
             _employeeCardService = employeeCardService;
+            _permissionGroupService = permissionGroupService;
             _polarisHelper = polarisHelper;
         }
+
+        public static string Area
+        { get { return nameof(Services); } }
 
         public static string Name
         { get { return "EmployeeSignup"; } }
@@ -52,6 +60,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
             var viewModel = new IndexViewModel
             {
                 CurrentPage = page.Value,
+                HasAccess = await HasAreaPermissionAsync(),
                 IsProcessed = processed,
                 ItemsPerPage = filter.Take.Value
             };
@@ -115,6 +124,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 APIConfigured = _polarisHelper.IsConfigured,
                 CardNumber = request.CardNumber,
                 CardRequest = request,
+                HasAccess = await HasAreaPermissionAsync(),
                 Renewing = !string.IsNullOrWhiteSpace(request.CardNumber),
                 Note = await _employeeCardService.GetRequestNoteAsync(id)
             };
@@ -124,9 +134,14 @@ namespace Ocuda.Ops.Controllers.Areas.Services
 
         [HttpPost("[action]/{id}")]
         [SaveModelState]
-        public async Task<IActionResult> Pending(PendingViewModel viewModel)
+        public async Task<IActionResult> Pending(int id, PendingViewModel viewModel)
         {
+            if (!await HasAreaPermissionAsync()) { return RedirectToUnauthorized(); }
+
             ArgumentNullException.ThrowIfNull(viewModel);
+
+            viewModel.RequestId = id;
+            if (viewModel.Note != null) { viewModel.Note.EmployeeCardRequestId = id; }
 
             if (string.IsNullOrWhiteSpace(viewModel.CardNumber)
                 && (viewModel.Type == EmployeeCardResult.ResultType.CardCreated
@@ -195,6 +210,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
         [HttpGet("[action]/{id}")]
         public async Task<IActionResult> Processed(int id)
         {
+            if (!await HasAreaPermissionAsync()) { return RedirectToUnauthorized(); }
             var result = await _employeeCardService.GetResultAsync(id);
 
             if (result == null)
@@ -213,9 +229,12 @@ namespace Ocuda.Ops.Controllers.Areas.Services
         }
 
         [HttpPost("[action]/{id}")]
-        public async Task<IActionResult> Processed(ProcessedViewModel viewModel)
+        public async Task<IActionResult> Processed(int id, ProcessedViewModel viewModel)
         {
+            if (!await HasAreaPermissionAsync()) { return RedirectToUnauthorized(); }
             ArgumentNullException.ThrowIfNull(viewModel);
+
+            if (viewModel.Note != null) { viewModel.Note.EmployeeCardRequestId = id; }
 
             if (ModelState.IsValid)
             {
@@ -225,5 +244,9 @@ namespace Ocuda.Ops.Controllers.Areas.Services
             return RedirectToAction(nameof(Processed),
                 new { id = viewModel.Note.EmployeeCardRequestId });
         }
+
+        private async Task<bool> HasAreaPermissionAsync()
+            => await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmployeeCardAccess);
     }
 }

@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Ocuda.Promenade.Models.Abstract
+namespace Ocuda.Models
 {
     public abstract class BaseEmployeeCard
     {

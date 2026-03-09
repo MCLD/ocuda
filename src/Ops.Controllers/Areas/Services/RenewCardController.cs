@@ -412,7 +412,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
         {
             return !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
                 || await HasAppPermissionAsync(_permissionGroupService,
-                    ApplicationPermission.RenewCard);
+                    ApplicationPermission.RenewCardAccess);
         }
     }
 }

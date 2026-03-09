@@ -7,8 +7,9 @@ namespace Ocuda.Ops.Controllers.Areas.Services.ViewModels.EmployeeSignup
 {
     public class IndexViewModel : PaginateModel
     {
-        public ICollection<EmployeeCardRequest> CardRequests { get; set; }
-        public ICollection<EmployeeCardResult> CardResults { get; set; }
+        public IEnumerable<EmployeeCardRequest> CardRequests { get; set; }
+        public IEnumerable<EmployeeCardResult> CardResults { get; set; }
+        public bool HasAccess { get; set; }
         public bool IsProcessed { get; set; }
         public int PendingCount { get; set; }
         public int ProcessedCount { get; set; }
