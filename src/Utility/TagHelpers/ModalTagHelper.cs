@@ -18,11 +18,13 @@ namespace Ocuda.Utility.TagHelpers
     [HtmlTargetElement("div", Attributes = attributeName)]
     public class ModalTagHelper : TagHelper
     {
+        private const string attributeModalDialogCentered = "modal-dialog-centered";
         private const string attributeName = "modal";
         private const string bodyClass = "modal-body";
         private const string bodyDeleteTextClass = "modal-text";
         private const string buttonSpinnerClass = "fa-solid fa-spinner fa-lg fa-pulse fa-fw ms-1 d-none";
         private const string cancelButtonClass = "btn btn-outline-secondary";
+        private const string classModalDialogCentered = "modal-dialog-centered";
         private const string confirmButtonClass = "modal-btn-confirm";
         private const string containerClass = "row";
         private const string contentClass = "modal-content";
@@ -51,6 +53,9 @@ namespace Ocuda.Utility.TagHelpers
         [HtmlAttributeName(isLargeAttributeName)]
         public bool IsLarge { get; set; }
 
+        [HtmlAttributeName(attributeModalDialogCentered)]
+        public bool IsModalDialogCentered { get; set; }
+
         [HtmlAttributeName(isNonSubmitAttributeName)]
         public bool IsNonSubmit { get; set; }
 
@@ -72,7 +77,7 @@ namespace Ocuda.Utility.TagHelpers
 
         public async Task<TagBuilder> CreateBody(TagHelperOutput output)
         {
-            if (output == null) { throw new ArgumentNullException(nameof(output)); }
+            ArgumentNullException.ThrowIfNull(output);
 
             var body = new TagBuilder("div");
             body.AddCssClass(bodyClass);
@@ -187,8 +192,8 @@ namespace Ocuda.Utility.TagHelpers
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
-            if (context == null) { throw new ArgumentNullException(nameof(context)); }
-            if (output == null) { throw new ArgumentNullException(nameof(output)); }
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(output);
 
             var content = new TagBuilder("div");
             content.AddCssClass(contentClass);
@@ -205,6 +210,10 @@ namespace Ocuda.Utility.TagHelpers
             if (IsLarge)
             {
                 appenededDialogClass.Append(' ').Append(modalLargeClass);
+            }
+            if (IsModalDialogCentered)
+            {
+                appenededDialogClass.Append(' ').Append(classModalDialogCentered);
             }
             dialog.AddCssClass(appenededDialogClass.ToString());
             dialog.Attributes.Add("role", "document");
