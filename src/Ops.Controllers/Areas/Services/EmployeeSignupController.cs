@@ -17,10 +17,12 @@ using Ocuda.Utility.Filters;
 
 namespace Ocuda.Ops.Controllers.Areas.Services
 {
-    [Area("Services")]
+    [Area(nameof(Services))]
     [Route("[area]/[controller]")]
     public class EmployeeSignupController : BaseController<EmployeeSignupController>
     {
+        private const string PageTitle = "Employee Card Signup";
+
         private readonly IEmployeeCardRequestService _employeeCardRequestService;
         private readonly IEmployeeCardService _employeeCardService;
         private readonly IPermissionGroupService _permissionGroupService;
@@ -42,6 +44,8 @@ namespace Ocuda.Ops.Controllers.Areas.Services
             _employeeCardService = employeeCardService;
             _permissionGroupService = permissionGroupService;
             _polarisHelper = polarisHelper;
+
+            SetPageTitle(PageTitle);
         }
 
         public static string Area
