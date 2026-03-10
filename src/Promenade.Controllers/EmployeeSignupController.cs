@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CommonMark;
@@ -22,6 +21,7 @@ namespace Ocuda.Promenade.Controllers
     {
         private readonly EmployeeCardService _employeeCardService;
         private readonly SegmentService _segmentService;
+
         public EmployeeSignupController(ServiceFacades.Controller<EmployeeSignupController> context,
             EmployeeCardService employeeCardService,
             SegmentService segmentService)
@@ -43,7 +43,7 @@ namespace Ocuda.Promenade.Controllers
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
-            var viewModel = new EmployeeSignupViewModel()
+            var viewModel = new EmployeeSignupViewModel
             {
                 Departments = new SelectList(await _employeeCardService.GetDepartmentsAsync(),
                     nameof(EmployeeCardDepartment.Id),

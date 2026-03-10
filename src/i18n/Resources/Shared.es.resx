@@ -165,9 +165,17 @@
     <value>Volver a {0}</value>
     <comment>Button: return to the page detailing a location; {0} is the name of the location</comment>
   </data>
+  <data name="Birth Date" xml:space="preserve">
+    <value></value>
+    <comment>Label prompting a customer to enter their birth date</comment>
+  </data>
   <data name="Call us at {0}" xml:space="preserve">
     <value>Llámanos al {0}</value>
     <comment>Call to action: message to call us; {0} is replaced with the telephone number</comment>
+  </data>
+  <data name="City" xml:space="preserve">
+    <value></value>
+    <comment>Label prompting a customer to enter their city name</comment>
   </data>
   <data name="Closed" xml:space="preserve">
     <value>Cerrado</value>
@@ -193,12 +201,17 @@
     <value>Contáctenos</value>
     <comment>Link to instructions on how to contact the site owner</comment>
   </data>
+  <data name="County Department" xml:space="preserve">
+    <value></value>
+    <comment>Label prompting a customer to select their county department</comment>
+  </data>
   <data name="Details" xml:space="preserve">
     <value>Detalles</value>
     <comment>Button: view details</comment>
   </data>
   <data name="Do you still live at an address listed below?" xml:space="preserve">
     <value>¿Todavía vives en el domicilio listado abajo?</value>
+    <comment>Label asking if a customer lives at an address in the list</comment>
   </data>
   <data name="Does not have {0}" xml:space="preserve">
     <value>No Tiene {0}</value>
@@ -207,6 +220,18 @@
   <data name="Email" xml:space="preserve">
     <value>Correo electrónico</value>
     <comment>Label prompting a customer to enter their email address</comment>
+  </data>
+  <data name="Employee Information" xml:space="preserve">
+    <value></value>
+    <comment>Label prompting a customer to enter their employee information</comment>
+  </data>
+  <data name="Employee Number" xml:space="preserve">
+    <value></value>
+    <comment>Label prompting a customer to enter their employee number</comment>
+  </data>
+  <data name="Employee Signup" xml:space="preserve">
+    <value></value>
+    <comment>Page header for employee card signups</comment>
   </data>
   <data name="Enter a 5 digit ZIP code" xml:space="preserve">
     <value>Ingrese un código postal de 5 dígitos</value>
@@ -228,8 +253,13 @@
     <value>Encuentra mi biblioteca</value>
     <comment>Title of the page to locate the nearest library</comment>
   </data>
+  <data name="First Name" xml:space="preserve">
+    <value></value>
+    <comment>Label prompting a customer to enter their first name</comment>
+  </data>
   <data name="Forgot your password?" xml:space="preserve">
     <value>¿Olvidaste su contraseña?</value>
+    <comment>Link for a customer to click if they've forgotten their password</comment>
   </data>
   <data name="Go" xml:space="preserve">
     <value>Ir</value>
@@ -242,6 +272,10 @@
   <data name="Here are the details of your appointment:" xml:space="preserve">
     <value>Aquí están los detalles de su cita:</value>
     <comment>Label indicating the details for a customer's service appointment</comment>
+  </data>
+  <data name="Home Address" xml:space="preserve">
+    <value></value>
+    <comment>Label prompting a customer to enter their home address</comment>
   </data>
   <data name="Hours" xml:space="preserve">
     <value>Horario</value>
@@ -257,9 +291,11 @@
   </data>
   <data name="It appears that the barcode you've entered belongs to a staff account. Please speak to your branch manager or supervisor for instructions on how to renew your account." xml:space="preserve">
     <value>Se mira que el código de barras que entraste es para una cuenta de un empleado. Por favor habla con el gerente de la sucursal o supervisor para instrucciones para como renovar su cuenta.</value>
+    <comment>Error message: account belongs to a staff member</comment>
   </data>
   <data name="It looks like you're trying to renew a juvenile account, please have a parent or guardian complete the rest of the process." xml:space="preserve">
     <value>Estas tratando de renovar una tarjeta para una cuenta juvenil, Por favor haz que su padre o guardián completen el resto de este proceso.</value>
+    <comment>Label indicating how to proceed with the form</comment>
   </data>
   <data name="Keywords: {0}" xml:space="preserve">
     <value>Palabras clave: {0}</value>
@@ -268,6 +304,10 @@
   <data name="Language" xml:space="preserve">
     <value>Idioma</value>
     <comment>Label prompting a customer to select a language</comment>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value></value>
+    <comment>Label prompting a customer to enter their last name</comment>
   </data>
   <data name="Last Update" xml:space="preserve">
     <value>Última Actualización</value>
@@ -279,6 +319,7 @@
   </data>
   <data name="Library Card Number" xml:space="preserve">
     <value>Numero de tarjeta de biblioteca</value>
+    <comment>Label prompting a customer to enter their library card number</comment>
   </data>
   <data name="Library Information" xml:space="preserve">
     <value>Información de la biblioteca</value>
@@ -304,12 +345,17 @@
     <value>Próximo</value>
     <comment>Navigation button: go forward to the next page in a process</comment>
   </data>
+  <data name="No" xml:space="preserve">
+    <value></value>
+    <comment>Label for the no option</comment>
+  </data>
   <data name="No available times for scheduling could be found." xml:space="preserve">
     <value>No se pudieron encontrar horarios disponibles para la programación.</value>
     <comment>Error message: there are no times available to schedule</comment>
   </data>
   <data name="No, I have moved." xml:space="preserve">
     <value>No, me he mudado.</value>
+    <comment>Button: responding in the negative to the question of if the customer still lives at a listed address</comment>
   </data>
   <data name="Notes" xml:space="preserve">
     <value>Notas</value>
@@ -345,6 +391,7 @@
   </data>
   <data name="Parent/Guardian Barcode" xml:space="preserve">
     <value>Padre/Guardián código de barras</value>
+    <comment>Label prompting a customer to entier the parent or guardian's barcode number</comment>
   </data>
   <data name="Parent/Guardian Email" xml:space="preserve">
     <value>Correo Electrónico del Padre/Tutor</value>
@@ -360,6 +407,11 @@
   </data>
   <data name="Password" xml:space="preserve">
     <value>Contraseña</value>
+    <comment>Label prompting a customer to enter their password</comment>
+  </data>
+  <data name="Personal Information" xml:space="preserve">
+    <value></value>
+    <comment>Label informing that the following section is to enter personal information</comment>
   </data>
   <data name="Phone" xml:space="preserve">
     <value>Teléfono</value>
@@ -371,6 +423,11 @@
   </data>
   <data name="Please contact &lt;a href=&quot;{0}&quot;&gt;your library&lt;/a&gt; to renew your library card." xml:space="preserve">
     <value>Por favor contacta &lt;a href="{0}"&gt;su biblioteca&lt;/a&gt; para renovar su tarjeta de la biblioteca.</value>
+    <comment>Message informing where to renew a library card; {0} is replaced with a link to the locations</comment>
+  </data>
+  <data name="please do not enter your work address here" xml:space="preserve">
+    <value></value>
+    <comment>Message reminding the customer to not enter their work address</comment>
   </data>
   <data name="Please enter a 5 digit numeric ZIP code." xml:space="preserve">
     <value>Ingrese un código postal numérico de 5 dígitos.</value>
@@ -384,12 +441,21 @@
     <value>Ayúdenos contándonos un poco sobre su solicitud.</value>
     <comment>Label encouraging customer to describe their help request</comment>
   </data>
+  <data name="Please select yes if you already have a library card!" xml:space="preserve">
+    <value></value>
+    <comment>Message reminding the customer to select yes if they already have a library card</comment>
+  </data>
   <data name="Podcasts" xml:space="preserve">
     <value>Podcasts</value>
     <comment>Page header for podcasts</comment>
   </data>
+  <data name="Renew an existing Account?" xml:space="preserve">
+    <value></value>
+    <comment>Label prompting a customer to select if they are renewing an existing account</comment>
+  </data>
   <data name="Renew your library card" xml:space="preserve">
     <value>Renovar su tarjeta de biblioteca</value>
+    <comment>Default header for card renewal request pages</comment>
   </data>
   <data name="Request a different time" xml:space="preserve">
     <value>Solicite una hora diferente</value>
@@ -451,6 +517,10 @@
     <value>Estatus</value>
     <comment>Column header with product inventory status</comment>
   </data>
+  <data name="Street Address" xml:space="preserve">
+    <value></value>
+    <comment>Label prompting a customer to enter their street address</comment>
+  </data>
   <data name="Subject" xml:space="preserve">
     <value>Tema</value>
     <comment>Label next to a drop-down with a list of subjects</comment>
@@ -471,8 +541,13 @@
     <value>Suscríbase para recibir actualizaciones de: {0}</value>
     <comment>Link to subscribe to a mailing list for a location; {0} is the name of the location</comment>
   </data>
+  <data name="Thank you for submitting your request!" xml:space="preserve">
+    <value></value>
+    <comment>Default follow-up shown to customer after submitting employee card form</comment>
+  </data>
   <data name="Thank you for using our online renewal service!" xml:space="preserve">
     <value>¡Gracias por usar nuestro servicio de renovación en línea!</value>
+    <comment>Default follow-up shown to customer after submitting card renewal form.</comment>
   </data>
   <data name="Thank you for your interest! Someone will be in touch with you very soon." xml:space="preserve">
     <value>¡Gracias por su interés! Una persona de nuestro equipo se pondrá en contacto con usted muy pronto.</value>
@@ -480,6 +555,7 @@
   </data>
   <data name="Thanks for your submission! Your card has more than {0} days until it expires, please come back to renew it any time after {1}." xml:space="preserve">
     <value>¡Gracias por su envío! Su tarjeta tiene más de {0} días antes que se expira. Por favor vuelve para renovar su tarjeta cualquier tiempo después de {1}.</value>
+    <comment>Error message: the library card is not near expiration; {0} is how many days before expiration, {1} is the earliest date</comment>
   </data>
   <data name="That date is not available for scheduling: {0}" xml:space="preserve">
     <value>Esa fecha no está disponible para programación: {0}</value>
@@ -492,6 +568,10 @@
   <data name="The furthest date you can schedule a call is: {0}" xml:space="preserve">
     <value>La fecha más lejana en la que puede programar una llamada es: {0}</value>
     <comment>Error message: the latest date that a telephone call can be scheduled; {0} is the furthest date a call can be scheduled</comment>
+  </data>
+  <data name="The {0} field is in an invalid format." xml:space="preserve">
+    <value></value>
+    <comment>Error message: an entered value is in an invalid format, {0} is replaced with the field name</comment>
   </data>
   <data name="The {0} field is required." xml:space="preserve">
     <value>El área {0} es obligatorio.</value>
@@ -582,9 +662,11 @@
   </data>
   <data name="We are still working on a request you submitted on {0} at {1}. You'll be hearing from us soon." xml:space="preserve">
     <value>Todavía estamos trabajando en la solicitud que envió el {0} a las {1}. Pronto escucharás de nosotros.</value>
+    <comment>Error message: there's a pending request for the account; {0} is replace with the date of the request, {1} with the time</comment>
   </data>
   <data name="We are unable to renew your card at this time. Please contact &lt;a href=&quot;{0}&quot;&gt;your library&lt;/a&gt; to renew your library card." xml:space="preserve">
     <value>No podemos renovar su tarjeta aún. Por favor contacta &lt;a href="{0}"&gt;su biblioteca&lt;/a&gt; para renovar su tarjeta de la biblioteca.</value>
+    <comment>Message informing the card cannot be renewed and how to proceed; {0} is replaced with a link to the locations</comment>
   </data>
   <data name="Weekly Availability" xml:space="preserve">
     <value>Disponibilidad Semanal</value>
@@ -596,9 +678,15 @@
   </data>
   <data name="With no valid address on file your renewal request may not be eligible for a full renewal." xml:space="preserve">
     <value>Sin un domicilio valido en su cuenta su recuesto para renovar no es eligible para una completa renovación.</value>
+    <comment>Label informing how the request may be processed</comment>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value></value>
+    <comment>Label for the yes option</comment>
   </data>
   <data name="Yes, this is my address." xml:space="preserve">
     <value>10. Si, este es mi domicilio.</value>
+    <comment>Button: responding in the affirmative to the question of if the customer still lives at a listed address</comment>
   </data>
   <data name="You can listen to our podcast on:" xml:space="preserve">
     <value>Puede escuchar nuestro podcast en:</value>
@@ -606,6 +694,7 @@
   </data>
   <data name="You have entered an invalid card number or password." xml:space="preserve">
     <value>Ha entrado un numero de tarjeta o contraseña invalido.</value>
+    <comment>Error message: invalid login information</comment>
   </data>
   <data name="You must request a date on or after: {0}" xml:space="preserve">
     <value>Debe solicitar una fecha a partir del: {0}</value>
@@ -622,6 +711,10 @@
   <data name="Your time is scheduled" xml:space="preserve">
     <value>Su tiempo está programado</value>
     <comment>Header for success page once a customer's time is scheduled</comment>
+  </data>
+  <data name="Zip Code" xml:space="preserve">
+    <value></value>
+    <comment>Label prompting a customer to enter their zip code</comment>
   </data>
   <data name="{0} (opens in a new window)" xml:space="preserve">
     <value>{0} (se abre en una nueva ventana)</value>
