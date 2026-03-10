@@ -166,7 +166,7 @@
     <comment>Button: return to the page detailing a location; {0} is the name of the location</comment>
   </data>
   <data name="Birth Date" xml:space="preserve">
-    <value></value>
+    <value>Fecha de Nacimiento</value>
     <comment>Label prompting a customer to enter their birth date</comment>
   </data>
   <data name="Call us at {0}" xml:space="preserve">
@@ -174,7 +174,7 @@
     <comment>Call to action: message to call us; {0} is replaced with the telephone number</comment>
   </data>
   <data name="City" xml:space="preserve">
-    <value></value>
+    <value>Ciudad</value>
     <comment>Label prompting a customer to enter their city name</comment>
   </data>
   <data name="Closed" xml:space="preserve">
@@ -202,7 +202,7 @@
     <comment>Link to instructions on how to contact the site owner</comment>
   </data>
   <data name="County Department" xml:space="preserve">
-    <value></value>
+    <value>Condado Departmento</value>
     <comment>Label prompting a customer to select their county department</comment>
   </data>
   <data name="Details" xml:space="preserve">
@@ -222,15 +222,15 @@
     <comment>Label prompting a customer to enter their email address</comment>
   </data>
   <data name="Employee Information" xml:space="preserve">
-    <value></value>
+    <value>Información de Empleado</value>
     <comment>Label prompting a customer to enter their employee information</comment>
   </data>
   <data name="Employee Number" xml:space="preserve">
-    <value></value>
+    <value>Número de Empleado</value>
     <comment>Label prompting a customer to enter their employee number</comment>
   </data>
   <data name="Employee Signup" xml:space="preserve">
-    <value></value>
+    <value>Registro para Empleados</value>
     <comment>Page header for employee card signups</comment>
   </data>
   <data name="Enter a 5 digit ZIP code" xml:space="preserve">
@@ -254,7 +254,7 @@
     <comment>Title of the page to locate the nearest library</comment>
   </data>
   <data name="First Name" xml:space="preserve">
-    <value></value>
+    <value>Nombre</value>
     <comment>Label prompting a customer to enter their first name</comment>
   </data>
   <data name="Forgot your password?" xml:space="preserve">
@@ -274,7 +274,7 @@
     <comment>Label indicating the details for a customer's service appointment</comment>
   </data>
   <data name="Home Address" xml:space="preserve">
-    <value></value>
+    <value>Domicilio</value>
     <comment>Label prompting a customer to enter their home address</comment>
   </data>
   <data name="Hours" xml:space="preserve">
@@ -306,7 +306,7 @@
     <comment>Label prompting a customer to select a language</comment>
   </data>
   <data name="Last Name" xml:space="preserve">
-    <value></value>
+    <value>Apellido</value>
     <comment>Label prompting a customer to enter their last name</comment>
   </data>
   <data name="Last Update" xml:space="preserve">
@@ -346,7 +346,7 @@
     <comment>Navigation button: go forward to the next page in a process</comment>
   </data>
   <data name="No" xml:space="preserve">
-    <value></value>
+    <value>No</value>
     <comment>Label for the no option</comment>
   </data>
   <data name="No available times for scheduling could be found." xml:space="preserve">
@@ -410,7 +410,7 @@
     <comment>Label prompting a customer to enter their password</comment>
   </data>
   <data name="Personal Information" xml:space="preserve">
-    <value></value>
+    <value>Información Personal</value>
     <comment>Label informing that the following section is to enter personal information</comment>
   </data>
   <data name="Phone" xml:space="preserve">
@@ -426,7 +426,7 @@
     <comment>Message informing where to renew a library card; {0} is replaced with a link to the locations</comment>
   </data>
   <data name="please do not enter your work address here" xml:space="preserve">
-    <value></value>
+    <value>por favor no ingrese la dirección de su trabajo aquí</value>
     <comment>Message reminding the customer to not enter their work address</comment>
   </data>
   <data name="Please enter a 5 digit numeric ZIP code." xml:space="preserve">
@@ -442,7 +442,7 @@
     <comment>Label encouraging customer to describe their help request</comment>
   </data>
   <data name="Please select yes if you already have a library card!" xml:space="preserve">
-    <value></value>
+    <value>¡Por favor selecciona si, si ya tienes una tarjeta de la biblioteca!</value>
     <comment>Message reminding the customer to select yes if they already have a library card</comment>
   </data>
   <data name="Podcasts" xml:space="preserve">
@@ -450,7 +450,7 @@
     <comment>Page header for podcasts</comment>
   </data>
   <data name="Renew an existing Account?" xml:space="preserve">
-    <value></value>
+    <value>¿Renovando una cuenta existente?</value>
     <comment>Label prompting a customer to select if they are renewing an existing account</comment>
   </data>
   <data name="Renew your library card" xml:space="preserve">
@@ -518,7 +518,7 @@
     <comment>Column header with product inventory status</comment>
   </data>
   <data name="Street Address" xml:space="preserve">
-    <value></value>
+    <value>Dirección</value>
     <comment>Label prompting a customer to enter their street address</comment>
   </data>
   <data name="Subject" xml:space="preserve">
@@ -542,7 +542,7 @@
     <comment>Link to subscribe to a mailing list for a location; {0} is the name of the location</comment>
   </data>
   <data name="Thank you for submitting your request!" xml:space="preserve">
-    <value></value>
+    <value>¡Gracias por enviando su solicitud!</value>
     <comment>Default follow-up shown to customer after submitting employee card form</comment>
   </data>
   <data name="Thank you for using our online renewal service!" xml:space="preserve">
@@ -570,7 +570,7 @@
     <comment>Error message: the latest date that a telephone call can be scheduled; {0} is the furthest date a call can be scheduled</comment>
   </data>
   <data name="The {0} field is in an invalid format." xml:space="preserve">
-    <value></value>
+    <value>El {0} campo está en un formato invalido.</value>
     <comment>Error message: an entered value is in an invalid format, {0} is replaced with the field name</comment>
   </data>
   <data name="The {0} field is required." xml:space="preserve">
@@ -681,7 +681,7 @@
     <comment>Label informing how the request may be processed</comment>
   </data>
   <data name="Yes" xml:space="preserve">
-    <value></value>
+    <value>Si</value>
     <comment>Label for the yes option</comment>
   </data>
   <data name="Yes, this is my address." xml:space="preserve">
@@ -713,7 +713,7 @@
     <comment>Header for success page once a customer's time is scheduled</comment>
   </data>
   <data name="Zip Code" xml:space="preserve">
-    <value></value>
+    <value>Código Postal</value>
     <comment>Label prompting a customer to enter their zip code</comment>
   </data>
   <data name="{0} (opens in a new window)" xml:space="preserve">
