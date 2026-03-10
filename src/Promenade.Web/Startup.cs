@@ -155,19 +155,15 @@ namespace Ocuda.Promenade.Web
         {
             ArgumentNullException.ThrowIfNull(services);
 
-            if (_isDevelopment)
-            {
-                services.AddApplicationInsightsTelemetry();
-            }
-            else
+            if (!_isDevelopment)
             {
                 services.AddResponseCompression(_ =>
                 {
                     _.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                            new[] {
+                            [
                                 "application/rss+xml",
                                 "image/svg+xml"
-                            });
+                            ]);
                 });
             }
 

@@ -6,8 +6,9 @@ namespace Ocuda.Promenade.Models.Defaults
 {
     public static class SiteSettings
     {
-        public static IEnumerable<SiteSetting> Get { get; } = new[]
-        {
+        public static IEnumerable<SiteSetting> Get { get; } =
+        [
+
             #region Contact
 
             new SiteSetting
@@ -30,6 +31,7 @@ namespace Ocuda.Promenade.Models.Defaults
             #endregion Contact
 
             #region EmployeeSignup
+
             new SiteSetting
             {
                 Category = nameof(Keys.SiteSetting.EmployeeSignup),
@@ -56,7 +58,22 @@ namespace Ocuda.Promenade.Models.Defaults
                 Type = SiteSettingType.Int,
                 Value = "-1"
             },
+
             #endregion EmployeeSignup
+
+            #region Network
+
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Network),
+                Description = "Networks considered local, comma-separated netblocks",
+                Id= Keys.SiteSetting.Network.LocalNetworks,
+                Name="Local Networks",
+                Type=SiteSettingType.String,
+                Value="10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+            },
+
+            #endregion Network
 
             #region RenewCard
 
@@ -389,7 +406,7 @@ namespace Ocuda.Promenade.Models.Defaults
                 Name = "Services at all link",
                 Type = SiteSettingType.StringNullable
             },
-            
+
             #endregion Site
 
             #region Social
@@ -453,6 +470,7 @@ namespace Ocuda.Promenade.Models.Defaults
             },
 
             #endregion Social
-        };
+
+        ];
     }
 }
