@@ -31,6 +31,7 @@
     }
     if (!navDisplayed)
     {
+        navDisplayed = true;
         <partial name="_DigitalLibraryPartial" />
     }
     if (group.Emedias.Any())
@@ -64,7 +65,7 @@
                                 @if (!emedia.IsAvailableExternally && !Model.IsLocalNetwork)
                                 {
                                     <a href="#"
-                                       class="digital-library-card-header text-danger"
+                                       class="digital-library-card-header text-danger text-decoration-none"
                                        data-bs-target="#inLibraryOnlyModal"
                                        data-bs-toggle="modal"
                                        data-name="Only Available In a Library"
@@ -76,7 +77,7 @@
                                 @if (!string.IsNullOrEmpty(emedia.EmediaText?.Details))
                                 {
                                     <a href="#"
-                                       class="digital-library-card-header text-dark"
+                                       class="digital-library-card-header text-dark text-decoration-none"
                                        data-bs-target="#infoModal"
                                        data-bs-toggle="modal"
                                        data-name="@Localizer[Promenade.HelpItem, emedia.Name]"

@@ -31,6 +31,26 @@ namespace Ocuda.Promenade.Controllers
         private readonly SubjectService _subjectService = subjectService
             ?? throw new ArgumentNullException(nameof(subjectService));
 
+        public static void ApplyCommonMarkFormatting(IEnumerable<Emedia> emedias)
+        {
+            if (emedias?.Count() > 0)
+            {
+                foreach (var emedia in emedias)
+                {
+                    if (!string.IsNullOrWhiteSpace(emedia.EmediaText?.Description))
+                    {
+                        emedia.EmediaText.Description = CommonMark.CommonMarkConverter
+                            .Convert(emedia.EmediaText.Description);
+                    }
+                    if (!string.IsNullOrWhiteSpace(emedia.EmediaText?.Details))
+                    {
+                        emedia.EmediaText.Details = CommonMark.CommonMarkConverter
+                            .Convert(emedia.EmediaText?.Details);
+                    }
+                }
+            }
+        }
+
         [HttpGet("[action]")]
         public async Task<IActionResult> All()
         {
@@ -40,9 +60,21 @@ namespace Ocuda.Promenade.Controllers
 
             emediaViewModel.GroupedEmedia.Add(new EmediaGroup
             {
-                SortOrder = 1,
-                Emedias = await _emediaService.GetEmediaAsync(forceReload)
+                Emedias = await _emediaService.GetEmediaAsync(forceReload),
+                Segment = new Segment
+                {
+                    SegmentText = new SegmentText
+                    {
+                        Header = _localizer[i18n.Keys.Promenade.EmediaAll]
+                    }
+                },
+                SortOrder = 1
             });
+
+            foreach (var group in emediaViewModel.GroupedEmedia)
+            {
+                ApplyCommonMarkFormatting(group.Emedias);
+            }
 
             PageTitle = "Digital Library";
 
@@ -56,26 +88,28 @@ namespace Ocuda.Promenade.Controllers
 
             var groupedEmedia = await _emediaService.GetGroupedEmediaAsync(forceReload);
 
+            var firstGroup = true;
+
             foreach (var group in groupedEmedia)
             {
+                ApplyCommonMarkFormatting(group.Emedias);
+
                 if (!string.IsNullOrWhiteSpace(group.Segment?.SegmentText?.Text))
                 {
                     group.Segment.SegmentText.Text = FormatForDisplay(group.Segment.SegmentText);
                 }
-
-                foreach (var emedia in group.Emedias)
+                else if (firstGroup)
                 {
-                    if (!string.IsNullOrWhiteSpace(emedia.EmediaText?.Description))
+                    // no segment text on first group, use button text
+                    group.Segment = new Segment
                     {
-                        emedia.EmediaText.Description = CommonMark.CommonMarkConverter
-                            .Convert(emedia.EmediaText.Description);
-                    }
-                    if (!string.IsNullOrWhiteSpace(emedia.EmediaText?.Details))
-                    {
-                        emedia.EmediaText.Details = CommonMark.CommonMarkConverter
-                            .Convert(emedia.EmediaText?.Details);
-                    }
+                        SegmentText = new SegmentText
+                        {
+                            Header = _localizer[i18n.Keys.Promenade.EmediaGroups]
+                        }
+                    };
                 }
+                firstGroup = false;
             }
 
             var emediaViewModel = await GetViewModelAsync(forceReload, groupedEmedia);
@@ -166,6 +200,11 @@ namespace Ocuda.Promenade.Controllers
                 }
             });
 
+            foreach (var group in emediaViewModel.GroupedEmedia)
+            {
+                ApplyCommonMarkFormatting(group.Emedias);
+            }
+
             PageTitle = "Digital Library";
 
             return View("Index", emediaViewModel);
@@ -184,9 +223,9 @@ namespace Ocuda.Promenade.Controllers
 
             var emediaViewModel = new DigitalLibraryViewModel
             {
-                AllDescription = "A-Z List",
+                AllDescription = _localizer[i18n.Keys.Promenade.EmediaAll],
                 IsLocalNetwork = HttpContext.Items[ItemKey.IsLocalNetwork] as bool? == true,
-                PopularDescription = "Popular Items First",
+                PopularDescription = _localizer[i18n.Keys.Promenade.EmediaGroups],
                 SocialCard = emediaSocial > -1
                     ? await _socialCardService.GetByIdAsync(emediaSocial, forceReload)
                     : null
