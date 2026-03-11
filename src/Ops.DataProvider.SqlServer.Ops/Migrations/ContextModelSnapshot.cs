@@ -17,7 +17,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.24")
+                .HasAnnotation("ProductVersion", "8.0.25")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -608,6 +608,101 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.HasKey("EmailTemplateId", "PromenadeLanguageName");
 
                     b.ToTable("EmailTemplateTexts");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmployeeCardNote", b =>
+                {
+                    b.Property<int>("EmployeeCardRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StaffNote")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.HasKey("EmployeeCardRequestId");
+
+                    b.ToTable("EmployeeCardNotes");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmployeeCardResult", b =>
+                {
+                    b.Property<int>("EmployeeCardRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("BirthDate")
+                        .IsRequired()
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CardNumber")
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("EmployeeNumber")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ProcessedBy")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Renewal")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("StreetAddress")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ZipCode")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.HasKey("EmployeeCardRequestId");
+
+                    b.HasIndex("ProcessedBy");
+
+                    b.ToTable("EmployeeCardResults");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ExternalResource", b =>
@@ -2567,6 +2662,16 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .IsRequired();
 
                     b.Navigation("EmailTemplate");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmployeeCardResult", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.User", "ProcessedByUser")
+                        .WithMany()
+                        .HasForeignKey("ProcessedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ProcessedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ExternalResource", b =>

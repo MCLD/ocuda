@@ -2,16 +2,6 @@
 {
     namespace SiteSetting
     {
-        public static class RenewCard
-        {
-            public static readonly string AcceptedCounty = "RenewCard.AcceptedCounty";
-            public static readonly string AddressLookupUrl = "RenewCard.AddressLookupUrl";
-            public static readonly string AssessorLookupUrl = "RenewCard.AssessorLookupUrl";
-            public static readonly string ChargesLimit = "RenewCard.ChargesLimit";
-            public static readonly string IgnoredBlockIds = "RenewCard.IgnoredBlockIds";
-            public static readonly string LeapPatronUrl = "RenewCard.LeapPatronUrl";
-        }
-
         public static class Carousel
         {
             public static readonly string AltTextEnglish = "Carousel.AltTextEnglish";
@@ -39,6 +29,17 @@
             public static readonly string RestrictToDomain = "Email.RestrictToDomain";
         }
 
+        public static class EmployeeSignup
+        {
+            public static readonly string NewEmailSetupId = "EmployeeSignup.NewEmailSetupId";
+            public static readonly string RegistrationCountryId = "EmployeeSignup.RegistrationCountryId";
+            public static readonly string RegistrationCounty = "EmployeeSignup.RegistrationCounty";
+            public static readonly string RegistrationCustomerCode = "EmployeeSignup.RegistrationCustomerCode";
+            public static readonly string RegistrationState = "EmployeeSignup.RegistrationState";
+            public static readonly string RegistrationUserField = "EmployeeSignup.RegistrationUserField";
+            public static readonly string RenewEmailSetupId = "EmployeeSignup.RenewEmailSetupId";
+        }
+
         public static class FileManagement
         {
             public static readonly string MaxThumbnailCount = "FileManagement.MaxThumbnailCount";
@@ -53,6 +54,16 @@
             public static readonly string LawEnforcementAddresses = "Incident.LawEnforcementAddresses";
             public static readonly string NotifyTitleClassificationIds = "Incident.NotifyTitleClassificationIds";
             public static readonly string NotifyUserIds = "Incident.NotifyUserIds";
+        }
+
+        public static class RenewCard
+        {
+            public static readonly string AcceptedCounty = "RenewCard.AcceptedCounty";
+            public static readonly string AddressLookupUrl = "RenewCard.AddressLookupUrl";
+            public static readonly string AssessorLookupUrl = "RenewCard.AssessorLookupUrl";
+            public static readonly string ChargesLimit = "RenewCard.ChargesLimit";
+            public static readonly string IgnoredBlockIds = "RenewCard.IgnoredBlockIds";
+            public static readonly string LeapPatronUrl = "RenewCard.LeapPatronUrl";
         }
 
         public static class Scheduling

@@ -1,13 +1,20 @@
-﻿@model Ocuda.Ops.Controllers.Areas.Services.ViewModels.RenewCard.IndexViewModel
+﻿@using Ocuda.Ops.Controllers
+@model Ocuda.Ops.Controllers.Areas.Services.ViewModels.RenewCard.IndexViewModel
 
-<div class="row">
-    <div class="col-12 col-md-6 mb-2">
+@section header {
+    <div class="d-flex justify-content-between mb-2">
         <h1>
             Card Renewal Requests
             <small class="text-muted d-print-block">@(Model.IsProcessed ? "Processed" : "Pending")</small>
         </h1>
+        <div>
+            <a asp-action="@nameof(HomeController.Index)"
+               asp-area=""
+               asp-controller="@HomeController.Name"
+               class="btn btn-outline-dark ms-2">Back</a>
+        </div>
     </div>
-</div>
+}
 
 @if (!Model.APIConfigured)
 {

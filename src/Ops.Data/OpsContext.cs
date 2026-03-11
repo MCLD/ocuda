@@ -32,6 +32,8 @@ namespace Ocuda.Ops.Data
         public DbSet<EmailSetupText> EmailSetupTexts { get; set; }
         public DbSet<EmailTemplate> EmailTemplates { get; set; }
         public DbSet<EmailTemplateText> EmailTemplateTexts { get; set; }
+        public DbSet<EmployeeCardNote> EmployeeCardNotes { get; set; }
+        public DbSet<EmployeeCardResult> EmployeeCardResults { get; set; }
         public DbSet<ExternalResource> ExternalResources { get; set; }
         public DbSet<FileLibrary> FileLibraries { get; set; }
         public DbSet<FileLibraryFileType> FileLibraryFileTypes { get; set; }

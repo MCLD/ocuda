@@ -29,6 +29,12 @@ namespace Ocuda.Ops.Models.Definitions
             },
             new()
             {
+                Id = ApplicationPermission.EmployeeCardAccess,
+                Info = "Access customer details in employee card management",
+                Name="Employee Card Management"
+            },
+            new()
+            {
                 Id = ApplicationPermission.FeatureManagement,
                 Info = "Manage features which can be applied to locations",
                 Name="Feature Management"
@@ -66,8 +72,8 @@ namespace Ocuda.Ops.Models.Definitions
             },
             new()
             {
-                Id = ApplicationPermission.RenewCard,
-                Info = "Access card renewal.",
+                Id = ApplicationPermission.RenewCardAccess,
+                Info = "Access customer details in card renewal.",
                 Name = "Card Renewal"
             },
             new()

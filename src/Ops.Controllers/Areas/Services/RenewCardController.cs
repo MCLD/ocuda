@@ -24,7 +24,7 @@ using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Areas.Services
 {
-    [Area("Services")]
+    [Area(nameof(Services))]
     [Route("[area]/[controller]")]
     public class RenewCardController : BaseController<RenewCardController>
     {
@@ -58,6 +58,9 @@ namespace Ocuda.Ops.Controllers.Areas.Services
 
             SetPageTitle(PageTitle);
         }
+
+        public static string Area
+        { get { return nameof(Services); } }
 
         public static string Name
         { get { return "RenewCard"; } }
@@ -412,7 +415,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
         {
             return !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
                 || await HasAppPermissionAsync(_permissionGroupService,
-                    ApplicationPermission.RenewCard);
+                    ApplicationPermission.RenewCardAccess);
         }
     }
 }

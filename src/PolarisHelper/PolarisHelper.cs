@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Clc.Polaris.Api;
 using Clc.Polaris.Api.Configuration;
 using Clc.Polaris.Api.Models;
+using Clc.Polaris.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -85,6 +86,86 @@ namespace Ocuda.PolarisHelper
             }
 
             return validateResult?.Data != null;
+        }
+
+        public CreateRegistrationResult CreateCustomerRegistration(Customer customer)
+        {
+            ArgumentNullException.ThrowIfNull(customer);
+
+            // Set password to last 4 digits of phone number
+            var password = customer.PhoneNumber[^4..];
+
+            var registrationData = new PatronRegistrationData
+            {
+                AddrCheckDate = customer.AddressVerificationDate,
+                Barcode = customer.CustomerIdNumber,
+                Birthdate = customer.BirthDate,
+                // Set delivery to email
+                DeliveryOptionID = 2,
+                EmailAddress = customer.EmailAddress,
+                ExpirationDate = customer.ExpirationDate,
+                LogonBranchID = _papiClient.OrganizationId,
+                LogonUserID = _papiClient.UserId,
+                LogonWorkstationID = _papiClient.WorkstationId,
+                NameFirst = customer.NameFirst,
+                NameLast = customer.NameLast,
+                Password = password,
+                Password2 = password,
+                PatronBranchID = _papiClient.OrganizationId,
+                PatronCode = customer.CustomerCodeId,
+                PhoneVoice1 = customer.PhoneNumber,
+                User1 = customer.UserDefinedField1,
+                User4 = customer.UserDefinedField4,
+                User5 = customer.UserDefinedField5
+            };
+
+            foreach (var address in customer.Addresses)
+            {
+                registrationData.Addresses.Add(
+                    new PatronRegistrationData.PatronRegistrationAddressData
+                {
+                    City = address.City,
+                    CountryID = address.CountryId,
+                    County = address.County,
+                    PostalCode = address.PostalCode,
+                    State = address.State,
+                    StreetOne = address.StreetAddressOne
+                });
+            }
+
+            var createResult = new CreateRegistrationResult();
+
+            var registrationResults = _papiClient.PatronRegistrationCreateV2(registrationData);
+
+            if (registrationResults.Exception != null)
+            {
+                _logger.LogError("PatronRegistrationCreate PAPI call was not successful: {ErrorMessage}",
+                    registrationResults.Exception.Message);
+            }
+            else if (!registrationResults.Response.IsSuccessStatusCode)
+            {
+                _logger.LogError("PatronRegistrationCreate PAPI call was not successful after {Elapsed} ms: {StatusCode}",
+                    registrationResults.ResponseTime,
+                    registrationResults.Response.StatusCode);
+            }
+            else
+            {
+                if (registrationResults.Data.PAPIErrorCode != 0)
+                {
+                    _logger.LogError("PAPI error after {Elapsed} ms: {PAPIErrorCode} {PAPIErrorMessage}",
+                        registrationResults.ResponseTime,
+                        registrationResults.Data.PAPIErrorCode,
+                        registrationResults.Data.ErrorMessage);
+
+                    createResult.ErrorMessage = registrationResults.Data.ErrorMessage;
+                }
+                else if (registrationResults.Data.PAPIErrorCode == 0)
+                {
+                    createResult.Success = true;
+                }
+            }
+
+            return createResult;
         }
 
         public async Task<List<CustomerBlock>> GetCustomerBlocksAsync(int customerId)

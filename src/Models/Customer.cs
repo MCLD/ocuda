@@ -19,6 +19,7 @@ namespace Ocuda.Models
         public string NameFirst { get; set; }
         public string NameLast { get; set; }
         public string Notes { get; set; }
+        public string PhoneNumber { get; set; }
         public string UserDefinedField1 { get; set; }
         public string UserDefinedField2 { get; set; }
         public string UserDefinedField3 { get; set; }
