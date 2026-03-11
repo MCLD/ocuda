@@ -165,9 +165,17 @@
     <value>Back to {0}</value>
     <comment>Button: return to the page detailing a location; {0} is the name of the location</comment>
   </data>
+  <data name="Birth Date" xml:space="preserve">
+    <value>Birth Date</value>
+    <comment>Label prompting a customer to enter their birth date</comment>
+  </data>
   <data name="Call us at {0}" xml:space="preserve">
     <value>Call us at {0}</value>
     <comment>Call to action: message to call us; {0} is replaced with the telephone number</comment>
+  </data>
+  <data name="City" xml:space="preserve">
+    <value>City</value>
+    <comment>Label prompting a customer to enter their city name</comment>
   </data>
   <data name="Closed" xml:space="preserve">
     <value>Closed</value>
@@ -193,6 +201,10 @@
     <value>Contact Us</value>
     <comment>Link to instructions on how to contact the site owner</comment>
   </data>
+  <data name="County Department" xml:space="preserve">
+    <value>County Department</value>
+    <comment>Label prompting a customer to select their county department</comment>
+  </data>
   <data name="Details" xml:space="preserve">
     <value>Details</value>
     <comment>Button: view details</comment>
@@ -208,6 +220,18 @@
   <data name="Email" xml:space="preserve">
     <value>Email</value>
     <comment>Label prompting a customer to enter their email address</comment>
+  </data>
+  <data name="Employee Information" xml:space="preserve">
+    <value>Employee Information</value>
+    <comment>Label prompting a customer to enter their employee information</comment>
+  </data>
+  <data name="Employee Number" xml:space="preserve">
+    <value>Employee Number</value>
+    <comment>Label prompting a customer to enter their employee number</comment>
+  </data>
+  <data name="Employee Signup" xml:space="preserve">
+    <value>Employee Signup</value>
+    <comment>Page header for employee card signups</comment>
   </data>
   <data name="Enter a 5 digit ZIP code" xml:space="preserve">
     <value>Enter a 5 digit ZIP code</value>
@@ -229,6 +253,10 @@
     <value>Find my Library</value>
     <comment>Title of the page to locate the nearest library</comment>
   </data>
+  <data name="First Name" xml:space="preserve">
+    <value>First Name</value>
+    <comment>Label prompting a customer to enter their first name</comment>
+  </data>
   <data name="Forgot your password?" xml:space="preserve">
     <value>Forgot your password?</value>
     <comment>Link for a customer to click if they've forgotten their password</comment>
@@ -244,6 +272,10 @@
   <data name="Here are the details of your appointment:" xml:space="preserve">
     <value>Here are the details of your appointment:</value>
     <comment>Label indicating the details for a customer's service appointment</comment>
+  </data>
+  <data name="Home Address" xml:space="preserve">
+    <value>Home Address</value>
+    <comment>Label prompting a customer to enter their home address</comment>
   </data>
   <data name="Hours" xml:space="preserve">
     <value>Hours</value>
@@ -272,6 +304,10 @@
   <data name="Language" xml:space="preserve">
     <value>Language</value>
     <comment>Label prompting a customer to select a language</comment>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>Last Name</value>
+    <comment>Label prompting a customer to enter their last name</comment>
   </data>
   <data name="Last Update" xml:space="preserve">
     <value>Last Update</value>
@@ -308,6 +344,10 @@
   <data name="Next" xml:space="preserve">
     <value>Next</value>
     <comment>Navigation button: go forward to the next page in a process</comment>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+    <comment>Label for the no option</comment>
   </data>
   <data name="No available times for scheduling could be found." xml:space="preserve">
     <value>No available times for scheduling could be found.</value>
@@ -369,6 +409,10 @@
     <value>Password</value>
     <comment>Label prompting a customer to enter their password</comment>
   </data>
+  <data name="Personal Information" xml:space="preserve">
+    <value>Personal Information</value>
+    <comment>Label informing that the following section is to enter personal information</comment>
+  </data>
   <data name="Phone" xml:space="preserve">
     <value>Phone</value>
     <comment>Label prompting a customer to enter their telephone number</comment>
@@ -380,6 +424,10 @@
   <data name="Please contact &lt;a href=&quot;{0}&quot;&gt;your library&lt;/a&gt; to renew your library card." xml:space="preserve">
     <value>Please contact &lt;a href="{0}"&gt;your library&lt;/a&gt; to renew your library card.</value>
     <comment>Message informing where to renew a library card; {0} is replaced with a link to the locations</comment>
+  </data>
+  <data name="please do not enter your work address here" xml:space="preserve">
+    <value>please do not enter your work address here</value>
+    <comment>Message reminding the customer to not enter their work address</comment>
   </data>
   <data name="Please enter a 5 digit numeric ZIP code." xml:space="preserve">
     <value>Please enter a 5 digit numeric ZIP code.</value>
@@ -393,9 +441,17 @@
     <value>Please help us out by telling us a little about your request.</value>
     <comment>Label encouraging customer to describe their help request</comment>
   </data>
+  <data name="Please select yes if you already have a library card!" xml:space="preserve">
+    <value>Please select yes if you already have a library card!</value>
+    <comment>Message reminding the customer to select yes if they already have a library card</comment>
+  </data>
   <data name="Podcasts" xml:space="preserve">
     <value>Podcasts</value>
     <comment>Page header for podcasts</comment>
+  </data>
+  <data name="Renew an existing Account?" xml:space="preserve">
+    <value>Renew an existing Account?</value>
+    <comment>Label prompting a customer to select if they are renewing an existing account</comment>
   </data>
   <data name="Renew your library card" xml:space="preserve">
     <value>Renew your library card</value>
@@ -461,6 +517,10 @@
     <value>Status</value>
     <comment>Column header with product inventory status</comment>
   </data>
+  <data name="Street Address" xml:space="preserve">
+    <value>Street Address</value>
+    <comment>Label prompting a customer to enter their street address</comment>
+  </data>
   <data name="Subject" xml:space="preserve">
     <value>Subject</value>
     <comment>Label next to a drop-down with a list of subjects</comment>
@@ -480,6 +540,10 @@
   <data name="Subscribe to updates from: {0}" xml:space="preserve">
     <value>Subscribe to updates from: {0}</value>
     <comment>Link to subscribe to a mailing list for a location; {0} is the name of the location</comment>
+  </data>
+  <data name="Thank you for submitting your request!" xml:space="preserve">
+    <value>Thank you for submitting your request!</value>
+    <comment>Default follow-up shown to customer after submitting employee card form</comment>
   </data>
   <data name="Thank you for using our online renewal service!" xml:space="preserve">
     <value>Thank you for using our online renewal service!</value>
@@ -504,6 +568,10 @@
   <data name="The furthest date you can schedule a call is: {0}" xml:space="preserve">
     <value>The furthest date you can schedule a call is: {0}</value>
     <comment>Error message: the latest date that a telephone call can be scheduled; {0} is the furthest date a call can be scheduled</comment>
+  </data>
+  <data name="The {0} field is in an invalid format." xml:space="preserve">
+    <value>The {0} field is in an invalid format.</value>
+    <comment>Error message: an entered value is in an invalid format, {0} is replaced with the field name</comment>
   </data>
   <data name="The {0} field is required." xml:space="preserve">
     <value>The {0} field is required.</value>
@@ -613,6 +681,10 @@
     <value>With no valid address on file your renewal request may not be eligible for a full renewal.</value>
     <comment>Label informing how the request may be processed</comment>
   </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+    <comment>Label for the yes option</comment>
+  </data>
   <data name="Yes, this is my address." xml:space="preserve">
     <value>Yes, this is my address.</value>
     <comment>Button: responding in the affirmative to the question of if the customer still lives at a listed address</comment>
@@ -640,6 +712,10 @@
   <data name="Your time is scheduled" xml:space="preserve">
     <value>Your time is scheduled</value>
     <comment>Header for success page once a customer's time is scheduled</comment>
+  </data>
+  <data name="Zip Code" xml:space="preserve">
+    <value>Zip Code</value>
+    <comment>Label prompting a customer to enter their zip code</comment>
   </data>
   <data name="{0} (opens in a new window)" xml:space="preserve">
     <value>{0} (opens in a new window)</value>

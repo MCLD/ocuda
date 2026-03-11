@@ -383,6 +383,10 @@ namespace Ocuda.Ops.Web
                 Data.Ops.EmailSetupTextRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailTemplateTextRepository,
                 Data.Ops.EmailTemplateTextRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IEmployeeCardNoteRepository,
+                Data.Ops.EmployeeCardNoteRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IEmployeeCardResultRepository,
+                Data.Ops.EmployeeCardResultRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IExternalResourceRepository,
                 Data.Ops.ExternalResourceRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileLibraryRepository,
@@ -498,6 +502,10 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.EmediaRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaTextRepository,
                 Data.Promenade.EmediaTextRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmployeeCardDepartmentRepository,
+                Data.Promenade.EmployeeCardDepartmentRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmployeeCardRequestRepository,
+                Data.Promenade.EmployeeCardRequestRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IExternalResourcePromRepository,
                 Data.Promenade.ExternalResourcePromRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IFeatureRepository,
@@ -597,6 +605,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IDigitalDisplaySyncService, DigitalDisplaySyncService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IEmediaService, EmediaService>();
+            services.AddScoped<IEmployeeCardRequestService, EmployeeCardRequestService>();
+            services.AddScoped<IEmployeeCardService, EmployeeCardService>();
             services.AddScoped<IExternalResourcePromService, ExternalResourcePromService>();
             services.AddScoped<IExternalResourceService, ExternalResourceService>();
             services.AddScoped<IFeatureService, FeatureService>();

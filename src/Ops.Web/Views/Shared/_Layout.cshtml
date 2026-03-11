@@ -159,6 +159,13 @@
 									Card Renewal
 								</a>
 								<a class="dropdown-item"
+								   asp-controller="@Ocuda.Ops.Controllers.Areas.Services.EmployeeSignupController.Name"
+								   asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Services))"
+								   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Services.EmployeeSignupController.Index))">
+									<span class="fa-solid fa-clipboard-user fa-fw"></span>
+									Employee Signup
+								</a>
+								<a class="dropdown-item"
 								   asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
 								   asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Incident))"
 								   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine))">

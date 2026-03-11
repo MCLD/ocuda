@@ -6,7 +6,7 @@ namespace Ocuda.Ops.Models.Definitions
     public static class ApplicationPermissionDefinitions
     {
         public static readonly ApplicationPermissionDefinition[] ApplicationPermissions =
-            {
+            [
             new() {
                 Id = ApplicationPermission.CoverIssueManagement,
                 Info = "Able to mark cover issues as resolved.",
@@ -21,6 +21,12 @@ namespace Ocuda.Ops.Models.Definitions
                 Id = ApplicationPermission.EmediaManagement,
                 Info = "Manage the Promenade Emedia page.",
                 Name = "Emedia Management"
+            },
+            new()
+            {
+                Id = ApplicationPermission.EmployeeCardAccess,
+                Info = "Access customer details in employee card management",
+                Name="Employee Card Management"
             },
             new()
             {
@@ -61,8 +67,8 @@ namespace Ocuda.Ops.Models.Definitions
             },
             new()
             {
-                Id = ApplicationPermission.RenewCard,
-                Info = "Access card renewal.",
+                Id = ApplicationPermission.RenewCardAccess,
+                Info = "Access customer details in card renewal.",
                 Name = "Card Renewal"
             },
             new()
@@ -96,6 +102,6 @@ namespace Ocuda.Ops.Models.Definitions
                 Info = "Edit all pages.",
                 Name = "Web Page Content Management"
             }
-        };
+        ];
     }
 }
