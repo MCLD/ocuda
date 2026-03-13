@@ -12,10 +12,10 @@ namespace Ocuda.Promenade.Controllers.ViewModels.DigitalLibrary
         }
 
         public string ActiveKey { get; set; }
-        public string AllDescription { get; set; }
+        public string ButtonAll { get; set; }
+        public string ButtonGrouped { get; set; }
         public ICollection<EmediaGroup> GroupedEmedia { get; }
         public bool IsLocalNetwork { get; set; }
-        public string PopularDescription { get; set; }
         public Dictionary<string, string> SlugsSubjects { get; }
         public SocialCard SocialCard { get; set; }
 

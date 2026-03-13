@@ -16,6 +16,9 @@
             Justification = "No reason to compare these site setting keys")]
         public struct Emedia
         {
+            public const string AllSegment = "Emedia.AllSegment";
+            public const string ButtonAllSegment = "Emedia.ButtonAllSegment";
+            public const string ButtonGroupSegment = "Emedia.ButtonGroupSegment";
             public const string ValidReferers = "Emedia.ValidReferers";
         }
 

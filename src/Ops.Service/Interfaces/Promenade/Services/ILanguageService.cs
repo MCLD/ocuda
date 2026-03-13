@@ -8,6 +8,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
     {
         Task<ICollection<Language>> GetActiveAsync();
 
+        Task<Language> GetActiveByCulture(string culture);
+
         Task<Language> GetActiveByIdAsync(int id);
 
         Task<IDictionary<int, string>> GetActiveNamesAsync();

@@ -32,9 +32,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class SegmentsController : BaseController<SegmentsController>
     {
+        private static readonly string[] suppressHeadersForSiteSettings = [
+            Promenade.Models.Keys.SiteSetting.Emedia.ButtonAllSegment,
+            Promenade.Models.Keys.SiteSetting.Emedia.ButtonGroupSegment];
+
         private readonly IEmediaService _emediaService;
         private readonly IFeatureService _featureService;
-        private readonly IVolunteerFormService _formService;
         private readonly ILanguageService _languageService;
         private readonly ILocationFeatureService _locationFeatureService;
         private readonly ILocationService _locationService;
@@ -43,6 +46,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly IProductService _productService;
         private readonly ISegmentService _segmentService;
         private readonly ISegmentWrapService _segmentWrapService;
+        private readonly ISiteSettingPromService _siteSettingPromService;
+        private readonly IVolunteerFormService _volunteerFormService;
 
         public SegmentsController(ServiceFacades.Controller<SegmentsController> context,
             IEmediaService emediaService,
@@ -55,11 +60,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             IProductService productService,
             ISegmentService segmentService,
             ISegmentWrapService segmentWrapService,
-            IVolunteerFormService formService) : base(context)
+            ISiteSettingPromService siteSettingPromService,
+            IVolunteerFormService volunteerFormService) : base(context)
         {
             ArgumentNullException.ThrowIfNull(emediaService);
             ArgumentNullException.ThrowIfNull(featureService);
-            ArgumentNullException.ThrowIfNull(formService);
             ArgumentNullException.ThrowIfNull(languageService);
             ArgumentNullException.ThrowIfNull(locationFeatureService);
             ArgumentNullException.ThrowIfNull(locationService);
@@ -67,11 +72,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ArgumentNullException.ThrowIfNull(podcastService);
             ArgumentNullException.ThrowIfNull(productService);
             ArgumentNullException.ThrowIfNull(segmentService);
-            ArgumentNullException.ThrowIfNull(segmentService);
+            ArgumentNullException.ThrowIfNull(segmentWrapService);
+            ArgumentNullException.ThrowIfNull(siteSettingPromService);
+            ArgumentNullException.ThrowIfNull(volunteerFormService);
 
             _emediaService = emediaService;
             _featureService = featureService;
-            _formService = formService;
             _languageService = languageService;
             _locationFeatureService = locationFeatureService;
             _locationService = locationService;
@@ -80,6 +86,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             _productService = productService;
             _segmentService = segmentService;
             _segmentWrapService = segmentWrapService;
+            _siteSettingPromService = siteSettingPromService;
+            _volunteerFormService = volunteerFormService;
         }
 
         public static string Area
@@ -230,6 +238,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("[action]/{id}")]
+        [Route("[action]/{id}/{language}")]
         [RestoreModelState]
         public async Task<IActionResult> Detail(int id, string language)
         {
@@ -308,11 +317,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return View(viewModel);
         }
 
-        [HttpPost("[action]/{id}")]
+        [HttpPost("[action]/{id}/{language}")]
         [SaveModelState]
-        public async Task<IActionResult> Detail(DetailViewModel model)
+        public async Task<IActionResult> Detail(int id, string language, DetailViewModel model)
         {
             ArgumentNullException.ThrowIfNull(model);
+
+            model.SegmentId = id;
 
             if (!await HasSegmentPermissionAsync(model.SegmentId))
             {
@@ -326,7 +337,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     "You must supply text to save a segment.");
             }
 
-            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+            var languageObject = await _languageService.GetActiveByCulture(language);
 
             if (ModelState.IsValid)
             {
@@ -341,11 +352,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
 
                 var segmentText = model.SegmentText;
-                segmentText.LanguageId = language.Id;
+                segmentText.LanguageId = languageObject.Id;
                 segmentText.SegmentId = model.SegmentId;
 
                 var currentSegmentText = await _segmentService.GetBySegmentAndLanguageAsync(
-                    model.SegmentId, language.Id);
+                    model.SegmentId, languageObject.Id);
 
                 if (currentSegmentText != null
                     && string.IsNullOrWhiteSpace(model.SegmentText.Text)
@@ -369,7 +380,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                 // if this was an update to the name of a feature then update the name item as well
                 var defaultLanguage = await _languageService.GetDefaultLanguageId();
-                if (language.Id == defaultLanguage)
+                if (languageObject.Id == defaultLanguage)
                 {
                     var feature = await _featureService.GetFeatureBySegmentIdAsync(segment.Id);
                     if (feature?.NameSegmentId == segment.Id)
@@ -397,7 +408,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Detail), new
             {
                 id = model.SegmentId,
-                language = language.Name
+                language = languageObject.Name
             });
         }
 
@@ -502,7 +513,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 PaginateModel = paginateModel,
                 LanguageList = new SelectList(languages, nameof(Language.Id),
                     nameof(Language.Description), selectedLanguage.Id),
-                AvailableLanguages = languages.Select(_ => _.Name).ToList()
+                AvailableLanguages = [.. languages.Select(_ => _.Name)]
             };
             return View(viewModel);
         }
@@ -553,8 +564,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
         }
 
-        private async Task PopulateRelationshipInformation(int segmentId,
-            DetailViewModel viewModel)
+        private async Task PopulateRelationshipInformation(int segmentId, DetailViewModel viewModel)
         {
             var emediaGroup = await _emediaService.GetGroupUsingSegmentAsync(segmentId);
             if (emediaGroup != null)
@@ -659,7 +669,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return;
             }
 
-            var forms = await _formService.GetFormBySegmentIdAsync(segmentId);
+            var forms = await _volunteerFormService.GetFormBySegmentIdAsync(segmentId);
             if (forms?.Count == 1)
             {
                 viewModel.BackLink = Url.Action(nameof(VolunteerController.Form),
@@ -687,12 +697,36 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     = $"This segment is used for product: {products.First().Name}";
                 viewModel.AutomatedHeaderMarkup
                     = $"<strong>{products.First().Name}</strong>";
+                return;
             }
             else if (products?.Count > 1)
             {
                 viewModel.Relationship = string.Format(CultureInfo.InvariantCulture,
                     "This segment is used for multiple products: {0}",
                     string.Join(", ", products.Select(_ => _.Name)));
+                return;
+            }
+
+            var promSettings = await _siteSettingPromService.GetAllAsync();
+            var segmentSetting = promSettings.FirstOrDefault(_ => _.Id.EndsWith("Segment")
+                && _.Value == segmentId.ToString(CultureInfo.InvariantCulture));
+
+            if (segmentSetting != null)
+            {
+                viewModel.Relationship
+                    = $"This segment is used for site setting: {segmentSetting.Name}";
+                viewModel.SuppressHeader = suppressHeadersForSiteSettings
+                    .Contains(segmentSetting.Id);
+                viewModel.SuppressWrap = true;
+
+                switch (segmentSetting.Category)
+                {
+                    case nameof(Promenade.Models.Keys.SiteSetting.Emedia):
+                        viewModel.BackLink = Url.Action(nameof(EmediaController.Configure),
+                            EmediaController.Name,
+                            new { area = EmediaController.Area });
+                        break;
+                }
             }
         }
     }

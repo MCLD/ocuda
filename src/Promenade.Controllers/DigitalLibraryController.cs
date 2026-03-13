@@ -19,11 +19,15 @@ namespace Ocuda.Promenade.Controllers
     public class DigitalLibraryController(
         ServiceFacades.Controller<DigitalLibraryController> context,
         EmediaService emediaService,
+        SegmentService segmentService,
         SocialCardService socialCardService,
         SubjectService subjectService) : BaseController<DigitalLibraryController>(context)
     {
         private readonly EmediaService _emediaService = emediaService
             ?? throw new ArgumentNullException(nameof(emediaService));
+
+        private readonly SegmentService _segmentService = segmentService
+            ?? throw new ArgumentNullException(nameof(segmentService));
 
         private readonly SocialCardService _socialCardService = socialCardService
             ?? throw new ArgumentNullException(nameof(socialCardService));
@@ -56,7 +60,19 @@ namespace Ocuda.Promenade.Controllers
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
+            var allButtonSegmentId = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.Emedia.ButtonAllSegment, forceReload);
+
+            if (allButtonSegmentId <= 0)
+            {
+                return NotFound();
+            }
+
             var emediaViewModel = await GetViewModelAsync(forceReload);
+
+            var allSegmentText
+                = await GetBySiteSettingAsync(Models.Keys.SiteSetting.Emedia.AllSegment,
+                    forceReload);
 
             emediaViewModel.GroupedEmedia.Add(new EmediaGroup
             {
@@ -65,7 +81,8 @@ namespace Ocuda.Promenade.Controllers
                 {
                     SegmentText = new SegmentText
                     {
-                        Header = _localizer[i18n.Keys.Promenade.EmediaAll]
+                        Header = allSegmentText.Header,
+                        Text = FormatForDisplay(allSegmentText)
                     }
                 },
                 SortOrder = 1
@@ -88,8 +105,6 @@ namespace Ocuda.Promenade.Controllers
 
             var groupedEmedia = await _emediaService.GetGroupedEmediaAsync(forceReload);
 
-            var firstGroup = true;
-
             foreach (var group in groupedEmedia)
             {
                 ApplyCommonMarkFormatting(group.Emedias);
@@ -98,18 +113,6 @@ namespace Ocuda.Promenade.Controllers
                 {
                     group.Segment.SegmentText.Text = FormatForDisplay(group.Segment.SegmentText);
                 }
-                else if (firstGroup)
-                {
-                    // no segment text on first group, use button text
-                    group.Segment = new Segment
-                    {
-                        SegmentText = new SegmentText
-                        {
-                            Header = _localizer[i18n.Keys.Promenade.EmediaGroups]
-                        }
-                    };
-                }
-                firstGroup = false;
             }
 
             var emediaViewModel = await GetViewModelAsync(forceReload, groupedEmedia);
@@ -210,6 +213,23 @@ namespace Ocuda.Promenade.Controllers
             return View("Index", emediaViewModel);
         }
 
+        private async Task<SegmentText> GetBySiteSettingAsync(string siteSettingKey,
+            bool forceReload)
+        {
+            SegmentText segmentText = null;
+
+            var segmentId = await _siteSettingService
+                .GetSettingIntAsync(siteSettingKey, forceReload);
+
+            if (segmentId > 0)
+            {
+                segmentText = await _segmentService
+                    .GetSegmentTextBySegmentIdAsync(segmentId, forceReload);
+            }
+
+            return segmentText;
+        }
+
         private async Task<DigitalLibraryViewModel> GetViewModelAsync(bool forceReload)
         {
             return await GetViewModelAsync(forceReload, null);
@@ -221,11 +241,19 @@ namespace Ocuda.Promenade.Controllers
             var emediaSocial = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.Social.EmediaCardId, forceReload);
 
+            var allButtonSegmentText
+                = await GetBySiteSettingAsync(Models.Keys.SiteSetting.Emedia.ButtonAllSegment,
+                    forceReload);
+
+            var groupButtonSegmentText
+                = await GetBySiteSettingAsync(Models.Keys.SiteSetting.Emedia.ButtonGroupSegment,
+                    forceReload);
+
             var emediaViewModel = new DigitalLibraryViewModel
             {
-                AllDescription = _localizer[i18n.Keys.Promenade.EmediaAll],
+                ButtonAll = allButtonSegmentText?.Text,
+                ButtonGrouped = groupButtonSegmentText?.Text,
                 IsLocalNetwork = HttpContext.Items[ItemKey.IsLocalNetwork] as bool? == true,
-                PopularDescription = _localizer[i18n.Keys.Promenade.EmediaGroups],
                 SocialCard = emediaSocial > -1
                     ? await _socialCardService.GetByIdAsync(emediaSocial, forceReload)
                     : null

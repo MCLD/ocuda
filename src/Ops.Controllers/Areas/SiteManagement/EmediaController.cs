@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -36,6 +37,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         ILanguageService languageService,
         IPermissionGroupService permissionGroupService,
         ISegmentService segmentService,
+        ISiteSettingPromService siteSettingPromService,
         ISubjectService subjectService) : BaseController<EmediaController>(context)
     {
         private readonly ICategoryService _categoryService = categoryService
@@ -56,6 +58,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ISegmentService _segmentService = segmentService
             ?? throw new ArgumentNullException(nameof(segmentService));
 
+        private readonly ISiteSettingPromService _siteSettingPromService = siteSettingPromService
+            ?? throw new ArgumentNullException(nameof(siteSettingPromService));
+
         private readonly ISubjectService _subjectService = subjectService
             ?? throw new ArgumentNullException(nameof(subjectService));
 
@@ -65,8 +70,48 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         public static string Name
         { get { return "Emedia"; } }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
+        public async Task<IActionResult> AddReferer(ConfigureViewModel viewModel)
+        {
+            ArgumentNullException.ThrowIfNull(viewModel);
+
+            if (string.IsNullOrWhiteSpace(viewModel.Referer))
+            {
+                ShowAlertWarning("Unable to add empty referer.");
+                return RedirectToAction(nameof(Configure));
+            }
+
+            string referer = viewModel.Referer.Trim();
+
+            var current = await _siteSettingPromService
+                .GetSettingStringAsync(Promenade.Models.Keys.SiteSetting.Emedia.ValidReferers);
+
+            var asList = current.Split(',').ToList();
+
+            if (asList.Contains(referer))
+            {
+                ShowAlertWarning("Referer is already present in list");
+                return RedirectToAction(nameof(Configure));
+            }
+
+            var hostnameType = Uri.CheckHostName(referer);
+
+            if (hostnameType != UriHostNameType.Dns)
+            {
+                ShowAlertWarning("Referer added, though it does not appear to be a valid hostname");
+            }
+
+            asList.Add(referer);
+
+            await _siteSettingPromService
+                .UpdateAsync(Promenade.Models.Keys.SiteSetting.Emedia.ValidReferers,
+                    string.Join(',', asList).Trim(','));
+
+            ShowAlertSuccess($"Added referer: {referer}");
+            return RedirectToAction(nameof(Configure));
+        }
+
+        [HttpPost("[action]")]
         public async Task<IActionResult> ChangeCategories(int id, ICollection<int> categories)
         {
             JsonResponse response;
@@ -103,8 +148,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<JsonResult> ChangeGroupSort(int id, bool increase)
         {
             JsonResponse response;
@@ -141,8 +185,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> ChangeSubjects(int id, ICollection<int> subjects)
         {
             JsonResponse response;
@@ -179,8 +222,61 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Configure()
+        {
+            var validReferers = await _siteSettingPromService
+                .GetSettingStringAsync(Promenade.Models.Keys.SiteSetting.Emedia.ValidReferers);
+
+            var viewModel = new ConfigureViewModel
+            {
+                AllSegmentId = await _siteSettingPromService
+                    .GetSettingIntAsync(Promenade.Models.Keys.SiteSetting.Emedia.AllSegment),
+                ButtonAllSegmentId = await _siteSettingPromService
+                    .GetSettingIntAsync(Promenade.Models.Keys.SiteSetting.Emedia.ButtonAllSegment),
+                ButtonGroupSegmentId = await _siteSettingPromService
+                    .GetSettingIntAsync(Promenade.Models.Keys.SiteSetting.Emedia.ButtonGroupSegment),
+                HasReferers = !string.IsNullOrEmpty(validReferers),
+                ValidReferers = validReferers.Split(',')
+            };
+
+            foreach (var language in await _languageService.GetActiveAsync())
+            {
+                viewModel.Languages.Add(language.Name, language.Description);
+            }
+
+            viewModel.AllSegmentLanguages = viewModel.AllSegmentId > 0
+                ? await _segmentService.GetSegmentLanguagesByIdAsync(viewModel.AllSegmentId)
+                : null;
+            viewModel.ButtonAllSegmentLanguages = viewModel.ButtonAllSegmentId > 0
+                ? await _segmentService.GetSegmentLanguagesByIdAsync(viewModel.ButtonAllSegmentId)
+                : null;
+            viewModel.ButtonGroupSegmentLanguages = viewModel.ButtonGroupSegmentId > 0
+                ? await _segmentService.GetSegmentLanguagesByIdAsync(viewModel.ButtonGroupSegmentId)
+                : null;
+
+            return View(viewModel);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> CreateAllSegment()
+        {
+            return await RedirectToNewSegmentAsync("Emedia All Page Header",
+                i18n.Keys.Promenade.EmediaAll,
+                null,
+                Promenade.Models.Keys.SiteSetting.Emedia.AllSegment);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> CreateAllViewButton()
+        {
+            return await RedirectToNewSegmentAsync("Emedia All View Button",
+                null,
+                i18n.Keys.Promenade.EmediaAll,
+                Promenade.Models.Keys.SiteSetting.Emedia.ButtonAllSegment);
+        }
+
+        [HttpPost("[action]")]
         public async Task<IActionResult> CreateEmedia(GroupDetailsViewModel model)
         {
             JsonResponse response;
@@ -238,8 +334,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> CreateGroup(IndexViewModel model)
         {
             JsonResponse response;
@@ -297,8 +392,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
+        public async Task<IActionResult> CreateGroupViewButton()
+        {
+            return await RedirectToNewSegmentAsync("Emedia Group View Button",
+                null,
+                i18n.Keys.Promenade.EmediaGroups,
+                Promenade.Models.Keys.SiteSetting.Emedia.ButtonGroupSegment);
+        }
+
+        [HttpPost("[action]")]
         public async Task<IActionResult> DeleteEmedia(GroupDetailsViewModel model)
         {
             ArgumentNullException.ThrowIfNull(model);
@@ -328,8 +431,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 });
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> DeleteGroup(IndexViewModel model)
         {
             ArgumentNullException.ThrowIfNull(model);
@@ -354,8 +456,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> DeleteGroupSegment(GroupDetailsViewModel model)
         {
             ArgumentNullException.ThrowIfNull(model);
@@ -384,7 +485,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             });
         }
 
-        [Route("[action]/{id}")]
+        [HttpGet("[action]/{id}")]
         [RestoreModelState]
         public async Task<IActionResult> Details(int id, string language)
         {
@@ -430,26 +531,28 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             };
 
             viewModel.CategoryList.AddRange(await _categoryService.GetAllAsync());
-            viewModel.CategorySelection.AddRange(selectedCategories.Select(_ => _.Id).ToList());
+            viewModel.CategorySelection.AddRange([.. selectedCategories.Select(_ => _.Id)]);
 
             viewModel.SubjectList.AddRange(await _subjectService.GetAllAsync());
-            viewModel.SubjectSelection.AddRange(selectedTopics.Select(_ => _.Id).ToList());
+            viewModel.SubjectSelection.AddRange([.. selectedTopics.Select(_ => _.Id)]);
 
             return View(viewModel);
         }
 
-        [HttpPost]
-        [Route("[action]/{id}")]
+        [HttpPost("[action]/{id}")]
         [SaveModelState]
-        public async Task<IActionResult> Details(DetailsViewModel model)
+        public async Task<IActionResult> Details(int id, DetailsViewModel model)
         {
-            ArgumentNullException.ThrowIfNull(model);
+            //    <input asp-for="EmediaText.EmediaId" value="@Model.Emedia.Id" type="hidden" />
+            ArgumentNullException.ThrowIfNull(model?.EmediaText);
 
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
                 return RedirectToUnauthorized();
             }
+
+            model.EmediaText.EmediaId = id;
 
             if (ModelState.IsValid)
             {
@@ -474,8 +577,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             });
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> EditEmedia(GroupDetailsViewModel model)
         {
             JsonResponse response;
@@ -534,8 +636,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> EditGroup(IndexViewModel model)
         {
             JsonResponse response;
@@ -622,7 +723,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 $"{_dateTimeProvider.Now:yyyyMMdd}-{nameof(Emedia)}.json");
         }
 
-        [Route("[action]/{id}")]
+        [HttpGet("[action]/{id}")]
         public async Task<IActionResult> GroupDetails(int id, int page = 1)
         {
             if (!await HasAppPermissionAsync(_permissionGroupService,
@@ -707,10 +808,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Index));
         }
 
-        [Route("")]
-        [Route("[action]")]
-        public async Task<IActionResult> Index(int page = 1)
+        [HttpGet("")]
+        public async Task<IActionResult> Index(int? page)
         {
+            page ??= 1;
+
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
@@ -727,7 +829,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var paginateModel = new PaginateModel
             {
                 ItemCount = groupList.Count,
-                CurrentPage = page,
+                CurrentPage = page.Value,
                 ItemsPerPage = filter.Take.Value
             };
             if (paginateModel.PastMaxPage)
@@ -748,8 +850,58 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return View(viewModel);
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RemoveAllSegment()
+        {
+            await RemoveSegment(Promenade.Models.Keys.SiteSetting.Emedia.AllSegment);
+            return RedirectToAction(nameof(Configure));
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RemoveAllViewButton()
+        {
+            await RemoveSegment(Promenade.Models.Keys.SiteSetting.Emedia.ButtonAllSegment);
+            return RedirectToAction(nameof(Configure));
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RemoveGroupViewButton()
+        {
+            await RemoveSegment(Promenade.Models.Keys.SiteSetting.Emedia.ButtonGroupSegment);
+            return RedirectToAction(nameof(Configure));
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RemoveReferer(string referer)
+        {
+            if (string.IsNullOrWhiteSpace(referer))
+            {
+                ShowAlertWarning("Unable to remove empty referer.");
+                return RedirectToAction(nameof(Configure));
+            }
+
+            var current = await _siteSettingPromService
+                .GetSettingStringAsync(Promenade.Models.Keys.SiteSetting.Emedia.ValidReferers);
+
+            var asList = current.Split(',').ToList();
+
+            if (!asList.Contains(referer))
+            {
+                ShowAlertWarning("Referer is not present in list");
+                return RedirectToAction(nameof(Configure));
+            }
+
+            asList.Remove(referer);
+
+            await _siteSettingPromService
+                .UpdateAsync(Promenade.Models.Keys.SiteSetting.Emedia.ValidReferers,
+                    string.Join(',', asList).Trim(','));
+
+            ShowAlertSuccess($"Removed referer: {referer}");
+            return RedirectToAction(nameof(Configure));
+        }
+
+        [HttpPost("[action]")]
         public async Task<IActionResult> UpdateGroupSegment(GroupDetailsViewModel model)
         {
             JsonResponse response;
@@ -825,6 +977,67 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             return Json(response);
+        }
+
+        private async Task<IActionResult> RedirectToNewSegmentAsync(string name,
+            string header,
+            string text,
+            string promSiteSettingKey)
+        {
+            ArgumentNullException.ThrowIfNull(name);
+
+            if (string.IsNullOrWhiteSpace(text) && string.IsNullOrWhiteSpace(header))
+            {
+                throw new ArgumentException("Header or text must be provided to create a segment.");
+            }
+
+            var segment = await _segmentService.CreateAsync(new Segment
+            {
+                IsActive = true,
+                Name = name
+            });
+
+            var defaultLanguageId = await _languageService.GetDefaultLanguageId();
+
+            await _segmentService.CreateSegmentTextAsync(new SegmentText
+            {
+                Header = string.IsNullOrWhiteSpace(header) ? null : header.Trim(),
+                LanguageId = defaultLanguageId,
+                SegmentId = segment.Id,
+                Text = string.IsNullOrWhiteSpace(text) ? null : text.Trim(),
+            });
+
+            if (!string.IsNullOrWhiteSpace(promSiteSettingKey))
+            {
+                await _siteSettingPromService.UpdateAsync(promSiteSettingKey,
+                    segment.Id.ToString(CultureInfo.InvariantCulture));
+            }
+
+            var defaultLanguage = await _languageService.GetActiveByIdAsync(defaultLanguageId);
+
+            return RedirectToAction(nameof(SegmentsController.Detail),
+                SegmentsController.Name,
+                new
+                {
+                    area = SegmentsController.Area,
+                    id = segment.Id,
+                    language = defaultLanguage.Name
+                });
+        }
+
+        private async Task RemoveSegment(string promSiteSettingKey)
+        {
+            var segmentId = await _siteSettingPromService.GetSettingIntAsync(promSiteSettingKey);
+
+            if (segmentId > 0)
+            {
+                await _siteSettingPromService.UpdateAsync(promSiteSettingKey, "-1");
+                await _segmentService.DeleteWithTextsAlreadyVerifiedAsync(segmentId);
+            }
+            else
+            {
+                ShowAlertWarning("Unable to delete invalid text segment.");
+            }
         }
     }
 }

@@ -8,14 +8,11 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class LanguageRepository
-        : GenericRepository<PromenadeContext, Language>, ILanguageRepository
+    public class LanguageRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
+        ILogger<LanguageRepository> logger)
+            : GenericRepository<PromenadeContext, Language>(repositoryFacade, logger),
+            ILanguageRepository
     {
-        public LanguageRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
-            ILogger<LanguageRepository> logger) : base(repositoryFacade, logger)
-        {
-        }
-
         public async Task<ICollection<Language>> GetActiveAsync()
         {
             return await DbSet
@@ -24,6 +21,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .OrderByDescending(_ => _.IsDefault)
                 .ThenBy(_ => _.Name)
                 .ToListAsync();
+        }
+
+        public async Task<Language> GetActiveByCulture(string culture)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.IsActive && _.Name == culture)
+                .SingleOrDefaultAsync();
         }
 
         public async Task<Language> GetActiveByIdAsync(int id)

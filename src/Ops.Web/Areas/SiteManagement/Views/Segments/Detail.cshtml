@@ -58,8 +58,6 @@
 }
 
 <form asp-action="@nameof(SegmentsController.Detail)" method="post" role="form">
-    <input asp-for="SegmentId" type="hidden" />
-    <input asp-for="LanguageId" type="hidden" />
     <span class="d-none"><input asp-for="SegmentName" formgroup readonly /></span>
     @if (Model.CanBeDeactivated)
     {

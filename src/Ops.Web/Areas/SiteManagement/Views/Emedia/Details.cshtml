@@ -4,19 +4,23 @@
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
-<div class="row mb-2">
-    <div class="col-sm-6">
+@section header {
+    <div class="d-flex justify-content-between mb-2">
         <h1>
             Emedia
             <small class="text-muted">@Model.Emedia.Name</small>
         </h1>
+        <div>
+            <a class="btn btn-outline-dark ms-2"
+               asp-action="@nameof(EmediaController.GroupDetails)"
+               asp-area="@EmediaController.Area"
+               asp-controller="@EmediaController.Name"
+               asp-route-id="@Model.Emedia.GroupId">
+                Back
+            </a>
+        </div>
     </div>
-    <div class="col-sm-6">
-        <a asp-action="@(nameof(EmediaController.GroupDetails))"
-           asp-route-id="@Model.Emedia.GroupId"
-           class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
-    </div>
-</div>
+}
 
 <div class="row pt-3">
     <div class="col-12">
@@ -71,10 +75,37 @@
     </div>
 </div>
 
-<select asp-for="SelectedLanguage" asp-items="Model.LanguageList" formgroup></select>
+@if (Model.LanguageList?.Count() > 1)
+{
+    <div class="row mb-2">
+        <div class="col-md-3 text-md-end">
+            <label asp-for="SelectedLanguage" class="col-form-label"></label>
+        </div>
+        <div class="col-md-9">
+            @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
+            {
+                <a asp-action="@nameof(EmediaController.Details)"
+                   asp-route-id="@Model.Emedia.Id"
+                   asp-route-language="@item.Value"
+                   class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">
+                    @item.Text
+                </a>
+            }
+        </div>
+    </div>
+}
+
+<hr />
+
+<div class="d-none oc-save-warning offset-md-3 col-md-9 mt-2">
+    <div class="alert alert-warning py-2">
+        <span class="fa-solid fa-circle-arrow-up"></span>
+        Unsaved changes will be lost if you modify media types, subjects, or change languages.
+    </div>
+</div>
+
 
 <form asp-action="@nameof(EmediaController.Details)" method="post" role="form">
-    <input asp-for="EmediaText.EmediaId" value="@Model.Emedia.Id" type="hidden" />
     <input asp-for="EmediaText.LanguageId" value="@Model.LanguageId" type="hidden" />
     <input asp-for="LanguageId" type="hidden" />
 
@@ -101,6 +132,13 @@
         </div>
     </div>
 
+    <div class="d-none oc-save-warning offset-md-3 col-md-9 mt-2">
+        <div class="alert alert-warning py-2">
+            <span class="fa-solid fa-circle-arrow-up"></span>
+            Unsaved changes will be lost if you modify media types, subjects, or change languages.
+        </div>
+    </div>
+
     <div class="row">
         <div class="offset-md-3 col-md-9">
             <button type="submit"
@@ -115,12 +153,10 @@
 
 <form id="categoryForm" role="form">
     <input asp-for="Emedia.Id" type="hidden" />
-
     <div modal
          id="categoryModal"
-         name="Categories"
+         name="Media Types"
          type="ModalTypes.Edit">
-
         @foreach (var category in Model.CategoryList)
         {
             <div>
@@ -139,7 +175,6 @@
 
 <form id="subjectForm" role="form">
     <input asp-for="Emedia.Id" type="hidden" />
-
     <div modal
          id="subjectModal"
          name="Subjects"
@@ -161,8 +196,6 @@
     </div>
 </form>
 
-
-
 @section scripts {
     <script src="~/js/md.min.js" asp-append-version="true"></script>
 
@@ -179,6 +212,15 @@
         $("#SelectedLanguage").on("change", function () {
             window.location.href = emediaDetailsUrl + "?language=" + $(this).val();
         });
+
+        function showSaveWarning() {
+            document.querySelectorAll('.oc-save-warning').forEach(_ => {
+                _.classList.remove('d-none');
+            });
+        }
+
+        document.getElementById('EmediaText_Details').addEventListener('keydown', showSaveWarning);
+        document.getElementById('EmediaText_Description').addEventListener('keydown', showSaveWarning);
 
         $("#categoryForm").submit(function (e) {
             e.preventDefault();
@@ -223,3 +265,4 @@
         });
     </script>
 }
+>

@@ -2,17 +2,17 @@
 @model Ocuda.Promenade.Controllers.ViewModels.DigitalLibrary.DigitalLibraryViewModel
 
 <nav class="mb-2">
-    @if (!string.IsNullOrEmpty(Model.PopularDescription))
+    @if (!string.IsNullOrEmpty(Model.ButtonGrouped))
     {
         <a asp-action="@nameof(DigitalLibraryController.Index)"
            auto-active
-           class="btn btn-outline-primary mb-2">@Model.PopularDescription</a>
+           class="btn btn-outline-primary mb-2">@Model.ButtonGrouped</a>
     }
-    @if (!string.IsNullOrEmpty(Model.AllDescription))
+    @if (!string.IsNullOrEmpty(Model.ButtonAll))
     {
         <a asp-action="@nameof(DigitalLibraryController.All)"
            auto-active
-           class="btn btn-outline-primary mb-2">@Model.AllDescription</a>
+           class="btn btn-outline-primary mb-2">@Model.ButtonAll</a>
     }
     @if (Model.SlugsSubjects?.Count > 0)
     {

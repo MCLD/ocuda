@@ -1,0 +1,235 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Emedia.ConfigureViewModel
+
+@section header {
+    <div class="d-flex justify-content-between mb-2">
+        <h1>
+            Emedia
+            <small class="text-muted">Configure</small>
+        </h1>
+        <div>
+            <a class="btn btn-outline-dark ms-2"
+               asp-action="@nameof(EmediaController.Index)"
+               asp-area="@EmediaController.Area"
+               asp-controller="@EmediaController.Name">
+                Back
+            </a>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-12 col-md-4 my-2">
+        <div class="card">
+            <div class="card-header h5">
+                "Group View" Button
+            </div>
+            <div class="card-body">
+                The default view for emedias is by group, the way they are configured. If you
+                wish to show a button to go back to this default view, configure that below. To
+                configure header text, configure it for each group.
+                @if (Model.ButtonGroupSegmentLanguages != null)
+                {
+                    <div class="mt-2">
+                        @foreach (var lang in Model.ButtonGroupSegmentLanguages)
+                        {
+                            <a asp-action="@nameof(SegmentsController.Detail)"
+                               asp-area="@SegmentsController.Area"
+                               asp-controller="@SegmentsController.Name"
+                               asp-route-id="@Model.ButtonGroupSegmentId"
+                               asp-route-language="@lang"
+                               class="btn btn-sm btn-outline-primary">@Model.Languages[lang]</a>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                @if (Model.ButtonGroupSegmentLanguages == null)
+                {
+                    <form asp-action="@nameof(EmediaController.CreateGroupViewButton)"
+                          class="d-inline"
+                          method="post">
+                        <button class="btn btn-sm btn-outline-success my-1">
+                            <span class="fa-solid fa-circle-plus fa-fw"></span>
+                            Create "Group View" button
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-action="@nameof(EmediaController.RemoveGroupViewButton)"
+                          class="d-inline"
+                          method="post">
+                        <button class="btn btn-sm btn-outline-danger my-1">
+                            <span class="fa-solid fa-circle-minus fa-fw"></span>
+                            Remove "Group View" button in all languages
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-4 my-2">
+        <div class="card">
+            <div class="card-header h5">
+                "All View" Button
+            </div>
+            <div class="card-body">
+                <p>
+                    In addition to the "Group View", the site can provide a view of all resources
+                    in an alphabetical list. In order to activate it, configure a button below to
+                    link to it.
+                </p>
+                @if (Model.ButtonAllSegmentLanguages != null)
+                {
+                    <div class="mt-2">
+                        @foreach (var lang in Model.ButtonAllSegmentLanguages)
+                        {
+                            <a asp-action="@nameof(SegmentsController.Detail)"
+                               asp-area="@SegmentsController.Area"
+                               asp-controller="@SegmentsController.Name"
+                               asp-route-id="@Model.ButtonAllSegmentId"
+                               asp-route-language="@lang"
+                               class="btn btn-sm btn-outline-primary">@Model.Languages[lang]</a>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                @if (Model.ButtonAllSegmentLanguages == null)
+                {
+                    <form asp-action="@nameof(EmediaController.CreateAllViewButton)"
+                          class="d-inline"
+                          method="post">
+                        <button class="btn btn-sm btn-outline-success my-1">
+                            <span class="fa-solid fa-circle-plus fa-fw"></span>
+                            Create "All View" button
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-action="@nameof(EmediaController.RemoveAllViewButton)"
+                          class="d-inline"
+                          method="post">
+                        <button class="btn btn-sm btn-outline-danger my-1">
+                            <span class="fa-solid fa-circle-minus fa-fw"></span>
+                            Remove "All View" button in all languages
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-4 my-2">
+        <div class="card">
+            <div class="card-header h5">
+                "All View" page header
+            </div>
+            <div class="card-body">
+                The "All View" can include header text. That can be configured here.
+                @if (Model.AllSegmentLanguages != null)
+                {
+                    <div class="mt-2">
+                        @foreach (var lang in Model.AllSegmentLanguages)
+                        {
+                            <a asp-action="@nameof(SegmentsController.Detail)"
+                               asp-area="@SegmentsController.Area"
+                               asp-controller="@SegmentsController.Name"
+                               asp-route-id="@Model.AllSegmentId"
+                               asp-route-language="@lang"
+                               class="btn btn-sm btn-outline-primary">@Model.Languages[lang]</a>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                @if (Model.AllSegmentLanguages == null)
+                {
+                    <form asp-action="@nameof(EmediaController.CreateAllSegment)"
+                          class="d-inline"
+                          method="post">
+                        <button class="btn btn-sm btn-outline-success my-1">
+                            <span class="fa-solid fa-circle-plus fa-fw"></span>
+                            Create "All View" header text
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-action="@nameof(EmediaController.RemoveAllSegment)"
+                          class="d-inline"
+                          method="post">
+                        <button class="btn btn-sm btn-outline-danger my-1">
+                            <span class="fa-solid fa-circle-minus fa-fw"></span>
+                            Remove "All View" header text in all languages
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-4 my-2">
+        <div class="card">
+            <div class="card-header h5">
+                Referer restriction
+            </div>
+            <div class="card-body">
+                <p>
+                    The ability to launch emedia links is restricted to the referers specified in
+                    this setting. If you do not wish to restrict the links you may enter "*" to
+                    allow any referer - this is not recommended as other sites could link directly
+                    to launching your electronic resources.
+                </p>
+                @if (!Model.HasReferers)
+                {
+                    <div class="alert alert-danger">
+                        Currently there are no valid referers. Users will not be able to access
+                        configured electronic resources.
+                    </div>
+                }
+            </div>
+            @if (Model.HasReferers)
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var referer in Model.ValidReferers)
+                    {
+                        <li class="list-group-item d-flex">
+                            <form asp-action="@nameof(EmediaController.RemoveReferer)"
+                                  class="d-inline"
+                                  method="post">
+                                <input type="hidden" name="referer" value="@referer" />
+                                <button class="btn btn-sm btn-outline-danger me-2">
+                                    <span class="fa-solid fa-circle-minus fa-fw"></span>
+                                </button>
+                            </form>
+                            <div>@referer</div>
+                        </li>
+                    }
+                </ul>
+            }
+            <div class="card-footer">
+                <button class="btn btn-sm btn-outline-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addRefererModal">
+                    <span class="fa-solid fa-circle-plus fa-fw"></span>
+                    Add Referer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form asp-action="@nameof(EmediaController.AddReferer)"
+      id="addRefererForm"
+      role="form">
+    <div id="addRefererModal"
+         modal
+         name="Add Referer"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <input id="addReferer" asp-for="Referer" formgroup autocomplete="off" />
+    </div>
+</form>
+
