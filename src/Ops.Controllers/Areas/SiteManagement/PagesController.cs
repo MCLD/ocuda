@@ -1185,6 +1185,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     nameof(Language.Name),
                     nameof(Language.Description),
                     selectedLanguage.Name),
+                LanguageName = selectedLanguage.Name,
                 PageLayout = pageLayout,
                 PageLayoutId = pageLayout.Id,
                 PreviewLink = await GetPreviewLink(pageHeader)

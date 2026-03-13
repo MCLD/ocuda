@@ -237,7 +237,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 });
         }
 
+        [Obsolete("Please call the method with a culture (language name)")]
         [Route("[action]/{id}")]
+        public async Task<IActionResult> Detail(int id)
+        {
+            if (!await HasSegmentPermissionAsync(id)) { return RedirectToUnauthorized(); }
+
+            return RedirectToAction(nameof(Detail), new
+            {
+                id,
+                language = await _languageService.GetDefaultLanguageNameAsync()
+            });
+        }
+
         [Route("[action]/{id}/{language}")]
         [RestoreModelState]
         public async Task<IActionResult> Detail(int id, string language)
