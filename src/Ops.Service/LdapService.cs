@@ -17,7 +17,7 @@ using Serilog.Context;
 
 namespace Ocuda.Ops.Service
 {
-    public class LdapService : ILdapService
+    public class LdapService(ILogger<LdapService> logger, IConfiguration config) : ILdapService
     {
         private const string ADDepartment = "department";
 
@@ -78,8 +78,11 @@ namespace Ocuda.Ops.Service
         /// </summary>
         private const string BaseADFilterEnabledUsername = "({0}={1})(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2))";
 
-        private readonly IConfiguration _config;
-        private readonly ILogger _logger;
+        private readonly IConfiguration _config = config
+            ?? throw new ArgumentNullException(nameof(config));
+
+        private readonly ILogger _logger = logger
+            ?? throw new ArgumentNullException(nameof(logger));
 
         /// <summary>
         /// Default set of attributes to return on an LDAP query
@@ -104,15 +107,6 @@ namespace Ocuda.Ops.Service
         ];
 
         private readonly string[] LoginAttributesToReturn = [ADsAMAccountName];
-
-        public LdapService(ILogger<LdapService> logger, IConfiguration config)
-        {
-            ArgumentNullException.ThrowIfNull(config);
-            ArgumentNullException.ThrowIfNull(logger);
-
-            _config = config;
-            _logger = logger;
-        }
 
         /// <summary>
         /// The kinds of AD groups we want to potentially carry back to users
@@ -265,13 +259,16 @@ namespace Ocuda.Ops.Service
                     }
                     else if (element.ComponentType.Equals("OU", StringComparison.OrdinalIgnoreCase))
                     {
-                        if (ouCount == 0 && !element.ComponentValue.Equals(groupParent, StringComparison.OrdinalIgnoreCase))
+                        if (ouCount == 0
+                            && !element.ComponentValue.Equals(groupParent,
+                                                              StringComparison.OrdinalIgnoreCase))
                         {
                             throw new InvalidDataException($"Invalid group: does not have required parent group: {groupParent}");
                         }
                         else if (ouCount == 1)
                         {
-                            if (element.ComponentValue.Equals(ADGroupDistributionGroup, StringComparison.OrdinalIgnoreCase))
+                            if (element.ComponentValue.Equals(ADGroupDistributionGroup,
+                                                              StringComparison.OrdinalIgnoreCase))
                             {
                                 if (adGroup.GroupType.HasValue)
                                 {
@@ -282,7 +279,9 @@ namespace Ocuda.Ops.Service
                                     adGroup.GroupType = AdGroupType.DistributionGroup;
                                 }
                             }
-                            else if (element.ComponentValue.Equals(ADGroupSecurityGroup, StringComparison.OrdinalIgnoreCase))
+                            else if (element.ComponentValue
+                                     .Equals(ADGroupSecurityGroup,
+                                             StringComparison.OrdinalIgnoreCase))
                             {
                                 if (adGroup.GroupType.HasValue)
                                 {
@@ -304,6 +303,14 @@ namespace Ocuda.Ops.Service
             }
 
             return adGroup;
+        }
+
+        private static string ParseStringAttribute(object attribute)
+        {
+            var stringValue = attribute is byte[] bytes
+                ? Encoding.UTF8.GetString(bytes)
+                : attribute.ToString();
+            return stringValue?.Trim()?.TruncateTo(255);
         }
 
         /// <summary>
@@ -333,41 +340,38 @@ namespace Ocuda.Ops.Service
                 switch (attributeEntry.Key)
                 {
                     case ADDepartment:
-                        user.Department = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
+                        user.Department = ParseStringAttribute(attribute[0]);
                         break;
 
                     case ADDescription:
-                        user.Description = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
+                        user.Description = ParseStringAttribute(attribute[0]);
                         break;
 
                     case ADDirectReports:
                         for (int i = 0; i < attribute.Count; i++)
                         {
-                            user.DirectReportDNs.Add(attribute[i]?
-                                .ToString()?
-                                .Trim()?
-                                .TruncateTo(255));
+                            user.DirectReportDNs.Add(ParseStringAttribute(attribute[i]));
                         }
                         break;
 
                     case ADDisplayName:
-                        user.Name = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
+                        user.Name = ParseStringAttribute(attribute[0]);
                         break;
 
                     case ADDistinguishedName:
-                        user.DistinguishedName = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
+                        user.DistinguishedName = ParseStringAttribute(attribute[0]);
                         break;
 
                     case ADEmployeeNumber:
-                        if (int.TryParse(attribute[0]?.ToString()?.Trim()?.TruncateTo(255),
-                                out var employeeNumber))
+                        if (int.TryParse(ParseStringAttribute(attribute[0]),
+                            out var employeeNumber))
                         {
                             user.EmployeeId = employeeNumber;
                         }
                         break;
 
                     case ADExtensionDate:
-                        if (DateTime.TryParse(attribute[0]?.ToString()?.Trim()?.TruncateTo(255),
+                        if (DateTime.TryParse(ParseStringAttribute(attribute[0]),
                                 out var dateValue))
                         {
                             user.ServiceStartDate = dateValue;
@@ -377,44 +381,41 @@ namespace Ocuda.Ops.Service
                     case ADGivenName:
                         if (string.IsNullOrWhiteSpace(user.Nickname))
                         {
-                            user.Nickname = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
+                            user.Nickname = ParseStringAttribute(attribute[0]);
                         }
                         break;
 
                     case ADMail:
-                        user.Email = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
+                        user.Email = ParseStringAttribute(attribute[0]);
                         break;
 
                     case ADMobileNumber:
-                        user.Mobile = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
+                        user.Mobile = ParseStringAttribute(attribute[0]);
                         break;
 
                     case ADPhysicalDeliveryOfficeName:
-                        user.PhysicalDeliveryOfficeName = attribute[0]?
-                            .ToString()?
-                            .Trim()?
-                            .TruncateTo(255);
+                        user.PhysicalDeliveryOfficeName = ParseStringAttribute(attribute[0]);
                         break;
 
                     case ADsAMAccountName:
                         if (string.IsNullOrEmpty(user.Username))
                         {
-                            user.Username = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
+                            user.Username = ParseStringAttribute(attribute[0]);
                         }
                         break;
 
                     case ADTelephoneNumber:
-                        user.Phone = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
+                        user.Phone = ParseStringAttribute(attribute[0]);
                         break;
 
                     case ADTitle:
-                        user.Title = attribute[0]?.ToString()?.Trim()?.TruncateTo(255);
+                        user.Title = ParseStringAttribute(attribute[0]);
                         break;
 
                     case ADMemberOf:
                         for (int i = 0; i < attribute.Count; i++)
                         {
-                            var attributeString = attribute[i] as string;
+                            var attributeString = ParseStringAttribute(attribute[i]);
 
                             if (string.IsNullOrEmpty(attributeString))
                             {
@@ -461,7 +462,8 @@ namespace Ocuda.Ops.Service
                         break;
 
                     default:
-                        _logger.LogTrace("Unused LDAP property supplied: {Key} = {Value}",
+                        _logger.LogTrace("Unused LDAP property supplied (type {Type}): {Key} = {Value}",
+                            attribute[0].GetType(),
                             attributeEntry.Key,
                             attribute[0]);
                         break;
@@ -520,6 +522,10 @@ namespace Ocuda.Ops.Service
                     using var connection = new LdapConnection(endpoint, credential)
                     {
                         AuthType = AuthType.Basic,
+                        SessionOptions =
+                        {
+                            ProtocolVersion = 3
+                        }
                     };
 
                     try
