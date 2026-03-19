@@ -20,35 +20,29 @@ namespace Ocuda.Promenade.Controllers
 {
     [Route("")]
     [Route("{culture:cultureConstraint?}")]
-    public class HomeController : GeneralBasePageController<HomeController>
+    public class HomeController(IDateTimeProvider dateTimeProvider,
+       IPathResolverService pathResolverService,
+       LocationService locationService,
+       PageService pageService,
+       ServiceFacades.Controller<HomeController> context,
+       ServiceFacades.PageController pageContext,
+       VolunteerFormService volunteerFormService)
+       : GeneralBasePageController<HomeController>(context, pageContext)
     {
-        private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly LocationService _locationService;
-        private readonly PageService _pageService;
-        private readonly IPathResolverService _pathResolverService;
-        private readonly VolunteerFormService _volunteerFormService;
+        private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider
+            ?? throw new ArgumentNullException(nameof(dateTimeProvider));
 
-        public HomeController(IDateTimeProvider dateTimeProvider,
-           IPathResolverService pathResolverService,
-           LocationService locationService,
-           PageService pageService,
-           ServiceFacades.Controller<HomeController> context,
-           ServiceFacades.PageController pageContext,
-           VolunteerFormService volunteerFormService)
-            : base(context, pageContext)
-        {
-            ArgumentNullException.ThrowIfNull(dateTimeProvider);
-            ArgumentNullException.ThrowIfNull(locationService);
-            ArgumentNullException.ThrowIfNull(pageService);
-            ArgumentNullException.ThrowIfNull(pathResolverService);
-            ArgumentNullException.ThrowIfNull(volunteerFormService);
+        private readonly LocationService _locationService = locationService
+            ?? throw new ArgumentNullException(nameof(locationService));
 
-            _dateTimeProvider = dateTimeProvider;
-            _locationService = locationService;
-            _pageService = pageService;
-            _pathResolverService = pathResolverService;
-            _volunteerFormService = volunteerFormService;
-        }
+        private readonly PageService _pageService = pageService
+            ?? throw new ArgumentNullException(nameof(pageService));
+
+        private readonly IPathResolverService _pathResolverService = pathResolverService
+            ?? throw new ArgumentNullException(nameof(pathResolverService));
+
+        private readonly VolunteerFormService _volunteerFormService = volunteerFormService
+            ?? throw new ArgumentNullException(nameof(volunteerFormService));
 
         public static string Name
         { get { return "Home"; } }
@@ -89,10 +83,7 @@ namespace Ocuda.Promenade.Controllers
                 {
                     CanonicalLink = await GetCanonicalLinkAsync(),
                     DayOfWeek = _dateTimeProvider.Now.DayOfWeek,
-                    LocationFeatures = new List<LocationsFeaturesViewModel>
-                    {
-                        new(locationFeature)
-                    },
+                    LocationFeatures = [new(locationFeature)],
                     Location = location
                 });
             }
@@ -246,7 +237,9 @@ namespace Ocuda.Promenade.Controllers
                 .Select(_ => new LocationsFeaturesViewModel(_));
 
             viewModel.AtThisLocation = viewModel.LocationFeatures.Where(_ => _.IsAtThisLocation);
-            viewModel.ServicesAvailable = viewModel.LocationFeatures.Where(_ => !_.IsAtThisLocation);
+            viewModel.ServicesAvailable = viewModel
+                .LocationFeatures
+                .Where(_ => !_.IsAtThisLocation);
 
             if (viewModel.Location.DisplayGroupId.HasValue)
             {
@@ -701,7 +694,8 @@ namespace Ocuda.Promenade.Controllers
             return viewModel;
         }
 
-        private async Task<IActionResult> ReturnThanks(string locationSlug, VolunteerFormType volunteerFormType)
+        private async Task<IActionResult> ReturnThanks(string locationSlug,
+            VolunteerFormType volunteerFormType)
         {
             var locationId = await _locationService.GetLocationIdAsync(locationSlug, false);
 
@@ -715,16 +709,16 @@ namespace Ocuda.Promenade.Controllers
 
             if (locationMapping.Form.ThanksPageHeaderId.HasValue)
             {
-                var pageStub = await _pageService
+                var pageSlug = await _pageService
                     .GetStubByHeaderIdTypeAsync(locationMapping.Form.ThanksPageHeaderId.Value,
                         PageType.Thanks,
                         false);
 
-                if (!string.IsNullOrEmpty(pageStub))
+                if (!string.IsNullOrEmpty(pageSlug))
                 {
                     return RedirectToAction(nameof(ThanksController.Page),
                         ThanksController.Name,
-                        new { stub = pageStub });
+                        new { slug = pageSlug });
                 }
             }
 
