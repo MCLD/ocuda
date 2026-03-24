@@ -11,14 +11,11 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class EmediaGroupRepository
-        : GenericRepository<PromenadeContext, EmediaGroup>, IEmediaGroupRepository
+    public class EmediaGroupRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
+        ILogger<EmediaRepository> logger)
+            : GenericRepository<PromenadeContext, EmediaGroup>(repositoryFacade, logger),
+            IEmediaGroupRepository
     {
-        public EmediaGroupRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
-            ILogger<EmediaRepository> logger) : base(repositoryFacade, logger)
-        {
-        }
-
         public async Task<EmediaGroup> FindAsync(int id)
         {
             var entity = await DbSet.FindAsync(id);
@@ -29,11 +26,19 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
+        public async Task<EmediaGroup> GetByOrderAsync(int order)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.SortOrder == order)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<EmediaGroup> GetIncludingEmediaAsync(int id)
         {
             return await DbSet
                 .Where(_ => _.Id == id)
-                .Include(_ => _.Emedias)
+                .Include(_ => _.Emedias.Where(_ => _.IsActive))
                 .AsNoTracking()
                 .SingleOrDefaultAsync();
         }
@@ -47,16 +52,15 @@ namespace Ocuda.Ops.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<EmediaGroup> GetByOrderAsync(int order)
+        public async Task<int?> GetMaxSortOrderAsync()
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.SortOrder == order)
-                .FirstOrDefaultAsync();
+                .MaxAsync(_ => (int?)_.SortOrder);
         }
 
-        public async Task<DataWithCount<ICollection<EmediaGroup>>> GetPaginatedListAsync(
-            BaseFilter filter)
+        public async Task<DataWithCount<ICollection<EmediaGroup>>>
+            GetPaginatedListAsync(BaseFilter filter)
         {
             return new DataWithCount<ICollection<EmediaGroup>>
             {
@@ -64,17 +68,10 @@ namespace Ocuda.Ops.Data.Promenade
                 Data = await DbSet
                     .OrderBy(_ => _.SortOrder)
                     .ApplyPagination(filter)
-                    .Include(_ => _.Emedias)
+                    .Include(_ => _.Emedias.Where(_ => _.IsActive))
                     .AsNoTracking()
                     .ToListAsync()
             };
-        }
-
-        public async Task<int?> GetMaxSortOrderAsync()
-        {
-            return await DbSet
-                .AsNoTracking()
-                .MaxAsync(_ => (int?)_.SortOrder);
         }
 
         public async Task<List<EmediaGroup>> GetSubsequentGroupsAsync(int order)

@@ -18,7 +18,7 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId)
+                .Where(_ => _.Emedia.IsActive && _.EmediaId == emediaId)
                 .ToListAsync();
         }
 
@@ -26,7 +26,7 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Emedia.GroupId == groupId)
+                .Where(_ => _.Emedia.IsActive && _.Emedia.GroupId == groupId)
                 .ToListAsync();
         }
 
@@ -42,7 +42,7 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.SubjectId == subjectId)
+                .Where(_ => _.Emedia.IsActive && _.SubjectId == subjectId)
                 .Select(_ => _.Emedia.Name)
                 .OrderBy(_ => _)
                 .ToListAsync();
@@ -52,7 +52,7 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId)
+                .Where(_ => _.Emedia.IsActive && _.EmediaId == emediaId)
                 .Select(_ => _.SubjectId)
                 .ToListAsync();
         }
@@ -61,7 +61,7 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId)
+                .Where(_ => _.Emedia.IsActive && _.EmediaId == emediaId)
                 .Select(_ => _.Subject)
                 .ToListAsync();
         }
@@ -70,7 +70,9 @@ namespace Ocuda.Ops.Data.Promenade
         {
             var emediaSubjects = DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId && subjectIds.Contains(_.SubjectId));
+                .Where(_ => _.Emedia.IsActive
+                    && _.EmediaId == emediaId
+                    && subjectIds.Contains(_.SubjectId));
 
             DbSet.RemoveRange(emediaSubjects);
         }

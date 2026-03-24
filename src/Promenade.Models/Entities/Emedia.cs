@@ -25,7 +25,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         public EmediaGroup Group { get; set; }
 
-        public int GroupId { get; set; }
+        public int? GroupId { get; set; }
 
         [Key]
         [Required]
@@ -50,6 +50,9 @@ namespace Ocuda.Promenade.Models.Entities
         [DisplayName("Redirect Url")]
         [MaxLength(255)]
         [Required]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1056:URI-like properties should not be strings",
+            Justification = "URL stored as string in database server")]
         public string RedirectUrl { get; set; }
 
         [MaxLength(255)]

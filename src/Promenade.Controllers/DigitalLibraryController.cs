@@ -275,7 +275,7 @@ namespace Ocuda.Promenade.Controllers
             var validReferers = await _siteSettingService
                 .GetSettingStringAsync(Models.Keys.SiteSetting.Emedia.ValidReferers, forceReload);
 
-            if (validReferers.Equals("*", StringComparison.Ordinal))
+            if (validReferers?.Equals("*", StringComparison.Ordinal) == true)
             {
                 return true;
             }
@@ -302,7 +302,7 @@ namespace Ocuda.Promenade.Controllers
                 _logger.LogError("No configured valid referers for launching electronic resources!");
             }
 
-            return validReferers.Split(",").Contains(refererUri.Host);
+            return validReferers?.Split(",")?.Contains(refererUri.Host) == true;
         }
     }
 }

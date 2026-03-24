@@ -38,7 +38,20 @@ namespace Ocuda.Ops.Data.Promenade
                 ?? throw new OcudaException($"Unable to find Emedia with id {emediaId}");
             emedia.IsActive = false;
             DbSet.Update(emedia);
-            await _context.SaveChangesAsync();
+        }
+
+        public void DeactivateRange(IEnumerable<Emedia> emedias, bool clearGroup)
+        {
+            ArgumentNullException.ThrowIfNull(emedias);
+            foreach (var emedia in emedias)
+            {
+                emedia.IsActive = false;
+                if (clearGroup)
+                {
+                    emedia.GroupId = default;
+                }
+            }
+            DbSet.UpdateRange(emedias);
         }
 
         public async Task<Emedia> FindAsync(string name, string link)
@@ -123,11 +136,13 @@ namespace Ocuda.Ops.Data.Promenade
 
         public override void Remove(Emedia entity)
         {
+            // do not delete records, mark them as inactive
             throw new InvalidOperationException();
         }
 
         public override void RemoveRange(ICollection<Emedia> entities)
         {
+            // do not delete records, mark them as inactive
             throw new InvalidOperationException();
         }
     }

@@ -18,6 +18,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<ICollection<Subject>> GetSubjectsForEmediaAsync(int emediaId);
 
-        void RemoveByEmediaAndSubjects(int emediaId, ICollection<int> subjectId);
+        void RemoveByEmediaAndSubjects(int emediaId, ICollection<int> subjectIds);
     }
 }

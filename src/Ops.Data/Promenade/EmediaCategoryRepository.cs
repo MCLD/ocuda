@@ -8,29 +8,24 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class EmediaCategoryRepository
-        : GenericRepository<PromenadeContext, EmediaCategory>, IEmediaCategoryRepository
+    public class EmediaCategoryRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
+        ILogger<EmediaCategoryRepository> logger)
+            : GenericRepository<PromenadeContext, EmediaCategory>(repositoryFacade, logger),
+            IEmediaCategoryRepository
     {
-        public EmediaCategoryRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
-            ILogger<EmediaCategoryRepository> logger) : base(repositoryFacade, logger)
-        {
-        }
-
-        public async Task<ICollection<Category>> GetCategoriesForEmediaAsync(int emediaId)
+        public async Task<ICollection<EmediaCategory>> GetAllForEmediaAsync(int emediaId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId)
-                .Select(_ => _.Category)
+                .Where(_ => _.Emedia.IsActive && _.EmediaId == emediaId)
                 .ToListAsync();
         }
 
-        public async Task<ICollection<int>> GetCategoryIdsForEmediaAsync(int emediaId)
+        public async Task<ICollection<EmediaCategory>> GetAllForGroupAsync(int groupId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId)
-                .Select(_ => _.CategoryId)
+                .Where(_ => _.Emedia.IsActive && _.Emedia.GroupId == groupId)
                 .ToListAsync();
         }
 
@@ -42,19 +37,21 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<ICollection<EmediaCategory>> GetAllForEmediaAsync(int emediaId)
+        public async Task<ICollection<Category>> GetCategoriesForEmediaAsync(int emediaId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId)
+                .Where(_ => _.Emedia.IsActive && _.EmediaId == emediaId)
+                .Select(_ => _.Category)
                 .ToListAsync();
         }
 
-        public async Task<ICollection<EmediaCategory>> GetAllForGroupAsync(int groupId)
+        public async Task<ICollection<int>> GetCategoryIdsForEmediaAsync(int emediaId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Emedia.GroupId == groupId)
+                .Where(_ => _.Emedia.IsActive && _.EmediaId == emediaId)
+                .Select(_ => _.CategoryId)
                 .ToListAsync();
         }
 
@@ -62,7 +59,7 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.CategoryId == categoryId)
+                .Where(_ => _.Emedia.IsActive && _.CategoryId == categoryId)
                 .Select(_ => _.Emedia.Name)
                 .OrderBy(_ => _)
                 .ToListAsync();
@@ -72,7 +69,9 @@ namespace Ocuda.Ops.Data.Promenade
         {
             var emediaCategories = DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId && categoryIds.Contains(_.CategoryId));
+                .Where(_ => _.Emedia.IsActive
+                    && _.EmediaId == emediaId
+                    && categoryIds.Contains(_.CategoryId));
 
             DbSet.RemoveRange(emediaCategories);
         }

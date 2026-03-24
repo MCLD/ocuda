@@ -12,6 +12,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task DeactivateAsync(int emediaId);
 
+        void DeactivateRange(IEnumerable<Emedia> emedias, bool clearGroup);
+
         Task<Emedia> FindAsync(string name, string link);
 
         Task<Emedia> FindAsync(int id);
@@ -22,8 +24,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<IDictionary<int, string>> GetMissingSlugsAsync();
 
-        Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListForGroupAsync(int groupId,
-            BaseFilter filter);
+        Task<DataWithCount<ICollection<Emedia>>>
+            GetPaginatedListForGroupAsync(int groupId, BaseFilter filter);
 
         Task<string> GetUnusedSlugAsync(string slug);
     }

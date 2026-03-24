@@ -83,6 +83,7 @@ namespace Ocuda.Ops.Service
             emedia.Name = emedia.Name?.Trim();
             emedia.RedirectUrl = emedia.RedirectUrl?.Trim();
             emedia.Slug = emedia.Slug?.Trim();
+            emedia.IsActive = true;
 
             await _emediaRepository.AddAsync(emedia);
             await _emediaRepository.SaveAsync();
@@ -148,6 +149,8 @@ namespace Ocuda.Ops.Service
                 await _segmentService.DeleteNoSaveAsync(group.SegmentId.Value);
             }
 
+            _emediaRepository.DeactivateRange(group.Emedias, true);
+
             var emediaCategories = await _emediaCategoryRepository.GetAllForGroupAsync(id);
             _emediaCategoryRepository.RemoveRange(emediaCategories);
 
@@ -157,10 +160,9 @@ namespace Ocuda.Ops.Service
             var emediaTexts = await _emediaTextReposiory.GetAllForGroupAsync(group.Id);
             _emediaTextReposiory.RemoveRange(emediaTexts);
 
-            _emediaRepository.RemoveRange(group.Emedias);
             _emediaGroupRepository.Remove(group);
 
-            await _emediaGroupRepository.SaveAsync();
+            await _emediaRepository.SaveAsync();
         }
 
         public async Task DeleteGroupSegmentAsync(int groupId)
@@ -386,6 +388,7 @@ namespace Ocuda.Ops.Service
                     emedia = new Emedia
                     {
                         GroupId = groupId,
+                        IsActive = true,
                         IsHttpPost = importEsource.IsHttpPost,
                         IsAvailableExternally
                             = importEsource.RemoteAccess == ESourceAccessLevel.NoLoginRequired,
