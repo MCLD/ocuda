@@ -1,0 +1,94 @@
+﻿@using Ocuda.Ops.Controllers.Areas.Services
+@model Ocuda.Ops.Controllers.Areas.Services.ViewModels.RenewCard.DetailsViewModel
+
+@section header {
+    <div class="d-flex justify-content-between mb-2">
+        <h1>
+            Card Renewal Request
+        </h1>
+        <div>
+            <a asp-action="@nameof(RenewCardController.Index)"
+               asp-area="@RenewCardController.Area"
+               asp-controller="@RenewCardController.Name"
+               class="btn btn-outline-dark ms-2">Back</a>
+        </div>
+    </div>
+}
+<div class="row">
+    <div class="col-12 col-md-6 offset-md-3 alert alert-warning">
+        <p>
+            Something has gone wrong. A customer submitted a renewal request through the Web site,
+            providing their barcode and PIN/password - but since they made that submission their
+            barcode has been removed from Polaris. It is likely they went into a library and had
+            their barcode changed for whatever reason.
+        </p>
+
+        <p>
+            Please investigate this before clearing this renewal request.
+        </p>
+
+        <button type="button"
+                class="btn btn-warning"
+                data-bs-toggle="modal"
+                data-bs-target="#discardModal">
+            <span class="fa-solid fa-trash-can"></span>
+            Discard Request, do not send email
+        </button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 col-md-6 offset-md-3">
+        <table class="table table-sm table-bordered">
+            <tr>
+                <th style="width: 10rem;">Record id</th>
+                <td>
+                    @Model.Request.CustomerId
+                    @if (!string.IsNullOrEmpty(Model.LeapPath))
+                    {
+                        <a href="@Model.LeapPath" target="_blank" title="View in Leap">
+                            <span class="fa-solid fa-arrow-up-right-from-square fa-fw"></span>
+                        </a>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>Request barcode</th>
+                <td>@Model.Request.Barcode</td>
+            </tr>
+            <tr>
+                <th>Request language</th>
+                <td>@Model.Request.Language.Description</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<form asp-action="@nameof(RenewCardController.Discard)"
+      enctype="multipart/form-data"
+      method="post"
+      role="form">
+    <input id="discardId" asp-for="RequestId" value="@Model.Request.Id" type="hidden" />
+
+    <div class="modal" tabindex="-1" id="discardModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Discard Request</h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to discard this request?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-outline-warning">
+                        <span class="fa fa-trash" aria-hidden="true"></span>
+                        Discard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
