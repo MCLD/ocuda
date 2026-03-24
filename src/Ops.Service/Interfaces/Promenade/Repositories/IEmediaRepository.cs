@@ -10,6 +10,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     {
         Task ApplySlugAsync(int id, string slug);
 
+        Task DeactivateAsync(int emediaId);
+
         Task<Emedia> FindAsync(string name, string link);
 
         Task<Emedia> FindAsync(int id);

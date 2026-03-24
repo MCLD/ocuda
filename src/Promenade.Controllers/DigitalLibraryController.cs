@@ -132,7 +132,7 @@ namespace Ocuda.Promenade.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var emedia = await _emediaService.GetAsync(forceReload, id);
+            var emedia = await _emediaService.GetAsync(forceReload, id, true);
 
             if (emedia == null)
             {

@@ -124,7 +124,7 @@ namespace Ocuda.Ops.Service
             var emediaTexts = await _emediaTextReposiory.GetAllForEmediaAsync(emedia.Id);
             _emediaTextReposiory.RemoveRange(emediaTexts);
 
-            _emediaRepository.Remove(emedia);
+            await _emediaRepository.DeactivateAsync(emedia.Id);
 
             await _emediaRepository.SaveAsync();
         }

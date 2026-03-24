@@ -8,6 +8,7 @@ using Ocuda.Ops.Data.Extensions;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Promenade
@@ -21,7 +22,7 @@ namespace Ocuda.Ops.Data.Promenade
         {
             ArgumentNullException.ThrowIfNull(slug);
             var revisedSlug = await GetUnusedSlugAsync(slug);
-            var item = await DbSet.SingleAsync(_ => _.Id == id);
+            var item = await DbSet.SingleAsync(_ => _.IsActive && _.Id == id);
             _logger.LogInformation("Updating slug for emedia {Name} ({Id}) to {Slug}",
                 item.Name,
                 item.Id,
@@ -31,29 +32,42 @@ namespace Ocuda.Ops.Data.Promenade
             await SaveAsync();
         }
 
+        public async Task DeactivateAsync(int emediaId)
+        {
+            var emedia = await DbSet.SingleOrDefaultAsync(_ => _.IsActive && _.Id == emediaId)
+                ?? throw new OcudaException($"Unable to find Emedia with id {emediaId}");
+            emedia.IsActive = false;
+            DbSet.Update(emedia);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<Emedia> FindAsync(string name, string link)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Name == name && _.RedirectUrl == link)
+                .Where(_ => _.IsActive && _.Name == name && _.RedirectUrl == link)
                 .FirstOrDefaultAsync();
         }
 
         public async Task<Emedia> FindAsync(string slug)
         {
-            return await DbSet.AsNoTracking().SingleOrDefaultAsync(_ => _.Slug == slug);
+            return await DbSet
+                .AsNoTracking()
+                .SingleOrDefaultAsync(_ => _.IsActive && _.Slug == slug);
         }
 
         public async Task<Emedia> FindAsync(int id)
         {
-            return await DbSet.AsNoTracking().SingleOrDefaultAsync(_ => _.Id == id);
+            return await DbSet
+                .AsNoTracking()
+                .SingleOrDefaultAsync(_ => _.IsActive && _.Id == id);
         }
 
         public async Task<Emedia> GetIncludingGroupAsync(int id)
         {
             return await DbSet
                 .Include(_ => _.Group)
-                .Where(_ => _.Id == id)
+                .Where(_ => _.IsActive && _.Id == id)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
         }
@@ -62,14 +76,14 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Slug.Length == 0)
+                .Where(_ => _.IsActive && _.Slug.Length == 0)
                 .ToDictionaryAsync(k => k.Id, v => v.Name);
         }
 
         public async Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListForGroupAsync(
             int groupId, BaseFilter filter)
         {
-            var query = DbSet.AsNoTracking().Where(_ => _.GroupId == groupId);
+            var query = DbSet.AsNoTracking().Where(_ => _.IsActive && _.GroupId == groupId);
 
             return new DataWithCount<ICollection<Emedia>>
             {
@@ -85,7 +99,9 @@ namespace Ocuda.Ops.Data.Promenade
         {
             ArgumentNullException.ThrowIfNull(slug);
             var revisedSlug = slug.Trim().Length > 255 ? slug.Trim()[..255] : slug.Trim();
-            var slugInUse = await DbSet.AsNoTracking().AnyAsync(_ => _.Slug == revisedSlug);
+            var slugInUse = await DbSet
+                .AsNoTracking()
+                .AnyAsync(_ => _.IsActive && _.Slug == revisedSlug);
             if (slugInUse)
             {
                 int count = 1;
@@ -93,7 +109,9 @@ namespace Ocuda.Ops.Data.Promenade
                 while (slugInUse)
                 {
                     revisedSlug = $"{baseSlug.Trim()}-{count++}";
-                    slugInUse = await DbSet.AsNoTracking().AnyAsync(_ => _.Slug == revisedSlug);
+                    slugInUse = await DbSet
+                        .AsNoTracking()
+                        .AnyAsync(_ => _.IsActive && _.Slug == revisedSlug);
                 }
                 if (count > 100)
                 {
@@ -101,6 +119,16 @@ namespace Ocuda.Ops.Data.Promenade
                 }
             }
             return revisedSlug;
+        }
+
+        public override void Remove(Emedia entity)
+        {
+            throw new InvalidOperationException();
+        }
+
+        public override void RemoveRange(ICollection<Emedia> entities)
+        {
+            throw new InvalidOperationException();
         }
     }
 }

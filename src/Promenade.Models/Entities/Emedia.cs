@@ -32,6 +32,10 @@ namespace Ocuda.Promenade.Models.Entities
         public int Id { get; set; }
 
         [Required]
+        [DefaultValue(true)]
+        public bool IsActive { get; set; }
+
+        [Required]
         [DisplayName("Available outside our network")]
         public bool IsAvailableExternally { get; set; }
 

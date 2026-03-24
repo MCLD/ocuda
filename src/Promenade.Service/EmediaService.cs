@@ -16,63 +16,60 @@ using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
-    public class EmediaService : BaseService<EmediaService>
+    public class EmediaService(ILogger<EmediaService> logger,
+        IDateTimeProvider dateTimeProvider,
+        ICategoryRepository categoryRepository,
+        ICategoryTextRepository categoryTextRepository,
+        IConfiguration config,
+        IEmediaAccessRepository emediaAccessRepository,
+        IEmediaCategoryRepository emediaCategoryRepository,
+        IEmediaGroupRepository emediaGroupRepository,
+        IEmediaRepository emediaRepository,
+        IEmediaSubjectRepository emediaSubjectRepository,
+        IEmediaTextRepository emediaTextRepository,
+        IHttpContextAccessor httpContextAccessor,
+        IOcudaCache cache,
+        LanguageService languageService,
+        SegmentService segmentService) : BaseService<EmediaService>(logger, dateTimeProvider)
     {
-        private readonly IOcudaCache _cache;
-        private readonly ICategoryRepository _categoryRepository;
-        private readonly ICategoryTextRepository _categoryTextRepository;
-        private readonly IConfiguration _config;
-        private readonly IEmediaCategoryRepository _emediaCategoryRepository;
-        private readonly IEmediaGroupRepository _emediaGroupRepository;
-        private readonly IEmediaRepository _emediaRepository;
-        private readonly IEmediaSubjectRepository _emediaSubjectRepository;
-        private readonly IEmediaTextRepository _emediaTextRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly LanguageService _languageService;
-        private readonly SegmentService _segmentService;
+        private readonly IOcudaCache _cache = cache
+            ?? throw new ArgumentNullException(nameof(cache));
 
-        public EmediaService(ILogger<EmediaService> logger,
-            IDateTimeProvider dateTimeProvider,
-            ICategoryRepository categoryRepository,
-            ICategoryTextRepository categoryTextRepository,
-            IConfiguration config,
-            IEmediaCategoryRepository emediaCategoryRepository,
-            IEmediaGroupRepository emediaGroupRepository,
-            IEmediaRepository emediaRepository,
-            IEmediaSubjectRepository emediaSubjectRepository,
-            IEmediaTextRepository emediaTextRepository,
-            IHttpContextAccessor httpContextAccessor,
-            IOcudaCache cache,
-            LanguageService languageService,
-            SegmentService segmentService)
-            : base(logger, dateTimeProvider)
-        {
-            ArgumentNullException.ThrowIfNull(cache);
-            ArgumentNullException.ThrowIfNull(categoryRepository);
-            ArgumentNullException.ThrowIfNull(categoryTextRepository);
-            ArgumentNullException.ThrowIfNull(config);
-            ArgumentNullException.ThrowIfNull(emediaCategoryRepository);
-            ArgumentNullException.ThrowIfNull(emediaGroupRepository);
-            ArgumentNullException.ThrowIfNull(emediaRepository);
-            ArgumentNullException.ThrowIfNull(emediaTextRepository);
-            ArgumentNullException.ThrowIfNull(httpContextAccessor);
-            ArgumentNullException.ThrowIfNull(languageService);
-            ArgumentNullException.ThrowIfNull(segmentService);
-            ArgumentNullException.ThrowIfNull(emediaSubjectRepository);
+        private readonly ICategoryRepository _categoryRepository = categoryRepository
+            ?? throw new ArgumentNullException(nameof(categoryRepository));
 
-            _cache = cache;
-            _categoryRepository = categoryRepository;
-            _categoryTextRepository = categoryTextRepository;
-            _config = config;
-            _emediaCategoryRepository = emediaCategoryRepository;
-            _emediaGroupRepository = emediaGroupRepository;
-            _emediaRepository = emediaRepository;
-            _emediaTextRepository = emediaTextRepository;
-            _httpContextAccessor = httpContextAccessor;
-            _languageService = languageService;
-            _segmentService = segmentService;
-            _emediaSubjectRepository = emediaSubjectRepository;
-        }
+        private readonly ICategoryTextRepository _categoryTextRepository = categoryTextRepository
+            ?? throw new ArgumentNullException(nameof(categoryTextRepository));
+
+        private readonly IConfiguration _config = config
+            ?? throw new ArgumentNullException(nameof(config));
+
+        private readonly IEmediaAccessRepository _emediaAccessRepository = emediaAccessRepository
+            ?? throw new ArgumentNullException(nameof(emediaAccessRepository));
+
+        private readonly IEmediaCategoryRepository _emediaCategoryRepository = emediaCategoryRepository
+            ?? throw new ArgumentNullException(nameof(emediaCategoryRepository));
+
+        private readonly IEmediaGroupRepository _emediaGroupRepository = emediaGroupRepository
+            ?? throw new ArgumentNullException(nameof(emediaGroupRepository));
+
+        private readonly IEmediaRepository _emediaRepository = emediaRepository
+            ?? throw new ArgumentNullException(nameof(emediaRepository));
+
+        private readonly IEmediaSubjectRepository _emediaSubjectRepository = emediaSubjectRepository
+            ?? throw new ArgumentNullException(nameof(emediaSubjectRepository));
+
+        private readonly IEmediaTextRepository _emediaTextRepository = emediaTextRepository
+            ?? throw new ArgumentNullException(nameof(emediaTextRepository));
+
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor
+            ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+
+        private readonly LanguageService _languageService = languageService
+            ?? throw new ArgumentNullException(nameof(languageService));
+
+        private readonly SegmentService _segmentService = segmentService
+            ?? throw new ArgumentNullException(nameof(segmentService));
 
         private int CachePagesInHours
         {
@@ -82,10 +79,15 @@ namespace Ocuda.Promenade.Service
             }
         }
 
-        public async Task<Emedia> GetAsync(bool forceReload, string slug)
+        public async Task<Emedia> GetAsync(bool forceReload, string slug, bool countAccess)
         {
-            var emedia = await GetEmediasAsync(forceReload);
-            return emedia.SingleOrDefault(_ => _.Slug == slug);
+            var emedias = await GetEmediasAsync(forceReload);
+            var emedia = emedias.SingleOrDefault(_ => _.Slug == slug);
+            if (countAccess && emedia != null)
+            {
+                await _emediaAccessRepository.AddAccessLogAsync(emedia.Id);
+            }
+            return emedia;
         }
 
         public async Task<ICollection<Emedia>> GetEmediaAsync(bool forceReload)

@@ -28,6 +28,8 @@ namespace Ocuda.Ops.Data
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
         public DbSet<Deck> Decks { get; set; }
         public DbSet<Emedia> Emedia { get; set; }
+        public DbSet<EmediaAccess> EmediaAccesses { get; set; }
+
         public DbSet<EmediaCategory> EmediaCategories { get; set; }
         public DbSet<EmediaGroup> EmediaGroups { get; set; }
         public DbSet<EmediaSubject> EmediaSubjects { get; set; }

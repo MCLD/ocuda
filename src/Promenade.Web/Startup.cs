@@ -414,6 +414,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ICategoryTextRepository,
                 Data.Promenade.CategoryTextRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IEmediaAccessRepository,
+                Data.Promenade.EmediaAccessRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IEmediaCategoryRepository,
                 Data.Promenade.EmediaCategoryRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IEmediaGroupRepository,
