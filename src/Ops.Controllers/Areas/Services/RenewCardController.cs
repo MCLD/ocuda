@@ -97,7 +97,6 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                     _logger.LogWarning("Unable to find Polaris record for the barcode {Barcode}",
                         request.Barcode);
                     ShowAlertDanger($"Unable to find Polaris record for the barcode '{request.Barcode}'");
-                    return RedirectToAction(nameof(Index));
                 }
             }
             catch (OcudaException oex)
@@ -122,9 +121,14 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                     .RenewCard
                     .AssessorLookupUrl),
                 Customer = customer,
-                CustomerName = $"{customer.NameFirst} {customer.NameLast}",
+                CustomerName = $"{customer?.NameFirst} {customer?.NameLast}",
                 Request = request
             };
+
+            if (customer == null)
+            {
+                return View("NotFound", viewModel);
+            }
 
             if (!request.ProcessedAt.HasValue)
             {
