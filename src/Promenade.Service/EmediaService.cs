@@ -103,12 +103,12 @@ namespace Ocuda.Promenade.Service
             var langIds
                 = await GetCurrentDefaultLanguageIdAsync(_httpContextAccessor, _languageService);
 
-            var emedias = await GetEmediasAsync(false, langIds);
+            var emedias = await GetEmediasAsync(forceReload, langIds);
 
             // perform filtering
             if (filter?.SubjectId.HasValue == true)
             {
-                emedias = await FilterBySubjectAsync(forceReload, emedias, filter.SubjectId.Value);
+                emedias = await FilterBySubjectAsync(emedias, filter.SubjectId.Value);
             }
 
             return emedias;
@@ -171,8 +171,7 @@ namespace Ocuda.Promenade.Service
             }
         }
 
-        private async Task<ICollection<Emedia>> FilterBySubjectAsync(bool forceReload,
-            ICollection<Emedia> emedias,
+        private async Task<ICollection<Emedia>> FilterBySubjectAsync(ICollection<Emedia> emedias,
             int subjectId)
         {
             var subjectEmediaIds = await _emediaSubjectRepository.GetEmediaIdsAsync(subjectId);
