@@ -125,6 +125,16 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                 Request = request
             };
 
+            var leapPatronUrl = await _siteSettingService.GetSettingStringAsync(Models
+                .Keys
+                .SiteSetting
+                .RenewCard
+                .LeapPatronUrl);
+            if (!string.IsNullOrWhiteSpace(leapPatronUrl))
+            {
+                viewModel.LeapPath = leapPatronUrl + request.CustomerId + LeapPatronRecordsPath;
+            }
+
             if (customer == null)
             {
                 return View("NotFound", viewModel);
@@ -227,16 +237,6 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                     age--;
                 }
                 viewModel.CustomerAge = age;
-            }
-
-            var leapPatronUrl = await _siteSettingService.GetSettingStringAsync(Models
-                .Keys
-                .SiteSetting
-                .RenewCard
-                .LeapPatronUrl);
-            if (!string.IsNullOrWhiteSpace(leapPatronUrl))
-            {
-                viewModel.LeapPath = leapPatronUrl + request.CustomerId + LeapPatronRecordsPath;
             }
 
             return View(viewModel);
