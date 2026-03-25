@@ -121,6 +121,10 @@
     <value>(Se abre en una nueva ventana)</value>
     <comment>Information added to buttons or links to indicate they open in a new window</comment>
   </data>
+  <data name="A-Z List" xml:space="preserve">
+    <value>Lista A-Z</value>
+    <comment>Text to show for an alphabetical list of electronic resources</comment>
+  </data>
   <data name="An error occurred and we could not find libraries near that location." xml:space="preserve">
     <value>Hubo un error y no pudimos encontrar bibliotecas cerca de esa ubicación.</value>
     <comment>Performing a zip code lookup failed due to a technical issue.</comment>
@@ -448,6 +452,10 @@
   <data name="Podcasts" xml:space="preserve">
     <value>Podcasts</value>
     <comment>Page header for podcasts</comment>
+  </data>
+  <data name="Popular Items First" xml:space="preserve">
+    <value>Artículos Populares Primero</value>
+    <comment>Text to show for grouped emedia</comment>
   </data>
   <data name="Renew an existing Account?" xml:space="preserve">
     <value>¿Renovando una cuenta existente?</value>

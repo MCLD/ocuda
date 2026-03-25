@@ -7,19 +7,19 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Service
 {
-    public class LanguageService : ILanguageService
+    public class LanguageService(ILanguageRepository languageRepository) : ILanguageService
     {
-        private readonly ILanguageRepository _languageRepository;
-
-        public LanguageService(ILanguageRepository languageRepository)
-        {
-            _languageRepository = languageRepository
-                ?? throw new ArgumentNullException(nameof(languageRepository));
-        }
+        private readonly ILanguageRepository _languageRepository = languageRepository
+            ?? throw new ArgumentNullException(nameof(languageRepository));
 
         public async Task<ICollection<Language>> GetActiveAsync()
         {
             return await _languageRepository.GetActiveAsync();
+        }
+
+        public async Task<Language> GetActiveByCulture(string culture)
+        {
+            return await _languageRepository.GetActiveByCulture(culture);
         }
 
         public async Task<Language> GetActiveByIdAsync(int id)

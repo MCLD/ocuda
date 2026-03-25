@@ -8,27 +8,16 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class EmediaTextRepository 
-        : GenericRepository<PromenadeContext, EmediaText>, IEmediaTextRepository
+    public class EmediaTextRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
+        ILogger<EmediaTextRepository> logger)
+            : GenericRepository<PromenadeContext, EmediaText>(repositoryFacade, logger),
+            IEmediaTextRepository
     {
-        public EmediaTextRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
-            ILogger<EmediaTextRepository> logger) : base(repositoryFacade, logger)
-        {
-        }
-
-        public async Task<EmediaText> GetByEmediaAndLanguageAsync(int emediaId, int languageId)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId && _.LanguageId == languageId)
-                .FirstOrDefaultAsync();
-        }
-
         public async Task<ICollection<EmediaText>> GetAllForEmediaAsync(int emediaId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId)
+                .Where(_ => _.Emedia.IsActive && _.EmediaId == emediaId)
                 .ToListAsync();
         }
 
@@ -36,15 +25,25 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Emedia.GroupId == groupId)
+                .Where(_ => _.Emedia.IsActive && _.Emedia.GroupId == groupId)
                 .ToListAsync();
+        }
+
+        public async Task<EmediaText> GetByEmediaAndLanguageAsync(int emediaId, int languageId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Emedia.IsActive
+                    && _.EmediaId == emediaId
+                    && _.LanguageId == languageId)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<ICollection<string>> GetUsedLanguagesForEmediaAsync(int emediaId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId)
+                .Where(_ => _.Emedia.IsActive && _.EmediaId == emediaId)
                 .OrderByDescending(_ => _.Language.IsDefault)
                 .ThenBy(_ => _.Language.Name)
                 .Select(_ => _.Language.Name)

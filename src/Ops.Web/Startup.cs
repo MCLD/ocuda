@@ -73,6 +73,8 @@ namespace Ocuda.Ops.Web
             // update databases to include latest migrations
             app.InitialSetup();
 
+            app.EnsureRequiredDataIsPresent();
+
             // use the culture configured above in services
             app.UseRequestLocalization();
 
@@ -500,6 +502,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.EmediaGroupRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaRepository,
                 Data.Promenade.EmediaRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaSubjectRepository,
+                Data.Promenade.EmediaSubjectRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaTextRepository,
                 Data.Promenade.EmediaTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmployeeCardDepartmentRepository,
@@ -588,6 +592,10 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.SiteSettingPromRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISocialCardRepository,
                 Data.Promenade.SocialCardRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ISubjectRepository,
+                Data.Promenade.SubjectRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ISubjectTextRepository,
+                Data.Promenade.SubjectTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IVolunteerFormRepository,
                 Data.Promenade.VolunteerFormRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IVolunteerFormSubmissionRepository,
@@ -656,6 +664,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ISiteSettingPromService, SiteSettingPromService>();
             services.AddScoped<ISiteSettingService, SiteSettingService>();
             services.AddScoped<ISocialCardService, SocialCardService>();
+            services.AddScoped<ISubjectService, SubjectService>();
             services.AddScoped<ITitleClassService, TitleClassService>();
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserManagementService, UserManagementService>();

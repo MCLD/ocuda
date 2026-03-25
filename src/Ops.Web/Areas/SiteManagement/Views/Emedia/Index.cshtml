@@ -1,23 +1,31 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Emedia.IndexViewModel
 
-<div class="row mb-2">
-    <div class="col-sm-6">
+@section header {
+    <div class="d-flex justify-content-between mb-2">
         <h1>
             Emedia Groups
         </h1>
+        <div>
+            <button data-bs-toggle="modal"
+                    data-bs-target="#addModal"
+                    class="btn btn-outline-success">
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
+                Add Group
+            </button>
+            <a class="btn btn-outline-primary ms-2"
+               asp-action="@nameof(EmediaController.Configure)"
+               asp-area="@EmediaController.Area"
+               asp-controller="@EmediaController.Name">
+                Configure
+            </a>
+            <a class="btn btn-outline-dark ms-2"
+               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index)"
+               asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name">
+                Back
+            </a>
+        </div>
     </div>
-    <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
-        <button data-bs-toggle="modal"
-                data-bs-target="#addModal"
-                class="btn btn-outline-success mt-2 mb-1 me-2 float-end">
-            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
-            Add Group
-        </button>
-    </div>
-</div>
+}
 
 <div class="row">
     <div class="col-12">
@@ -90,10 +98,10 @@
 <nav paginate="@Model.PaginateModel"></nav>
 
 <form id="addForm" role="form">
-    <div modal 
-         id="addModal" 
-         isLarge="true" 
-         name="Emedia Group" 
+    <div modal
+         id="addModal"
+         isLarge="true"
+         name="Emedia Group"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addName" asp-for="EmediaGroup.Name" formgroup />
     </div>
@@ -117,9 +125,9 @@
     <input id="deleteId" asp-for="EmediaGroup.Id" type="hidden" />
     <input id="deleteName" asp-for="EmediaGroup.Name" type="hidden" />
 
-    <div modal 
-         id="deleteModal" 
-         name="Emedia Group" 
+    <div modal
+         id="deleteModal"
+         name="Emedia Group"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
     </div>
 </form>

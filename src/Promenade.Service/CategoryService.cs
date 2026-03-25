@@ -9,20 +9,15 @@ using Ocuda.Utility.Abstract;
 
 namespace Ocuda.Promenade.Service
 {
-    public class CategoryService : BaseService<CategoryService>
+    public class CategoryService(ILogger<CategoryService> logger,
+        IDateTimeProvider dateTimeProvider,
+        ICategoryRepository categoryRepository)
+            : BaseService<CategoryService>(logger, dateTimeProvider)
     {
-        private readonly ICategoryRepository _categoryRepository;
-
-        public CategoryService(ILogger<CategoryService> logger,
-            IDateTimeProvider dateTimeProvider,
-            ICategoryRepository categoryRepository)
-            : base(logger, dateTimeProvider)
-        {
-            _categoryRepository = categoryRepository
+        private readonly ICategoryRepository _categoryRepository = categoryRepository
                 ?? throw new ArgumentNullException(nameof(categoryRepository));
-        }
 
-        public async Task<List<Category>> GetAllLocationsAsync()
+        public async Task<List<Category>> GetAllAsync()
         {
             return await _categoryRepository.GetAllCategories();
         }

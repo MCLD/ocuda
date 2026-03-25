@@ -36,7 +36,6 @@ namespace Ocuda.Promenade.Controllers
         public IFormatProvider CurrentCulture { get; }
 
         [HttpGet("")]
-        [HttpGet("[action]")]
         [HttpGet("[action]/{Zip}")]
         [HttpGet("[action]/{latitude}/{longitude}")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",

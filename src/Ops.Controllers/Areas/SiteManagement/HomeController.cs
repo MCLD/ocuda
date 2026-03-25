@@ -50,6 +50,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 var numericPermissionIds = permissionIds
                     .Select(_ => int.Parse(_, CultureInfo.InvariantCulture));
+                viewModel.HasCategoryPermissions = await HasAppPermissionAsync(
+                    _permissionGroupService, ApplicationPermission.CategoryManagement);
                 viewModel.HasEmediaPermissions = await HasAppPermissionAsync(
                     _permissionGroupService, ApplicationPermission.EmediaManagement);
                 viewModel.HasFeatureManagement = await HasAppPermissionAsync(

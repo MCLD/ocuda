@@ -4,66 +4,72 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
+using Ocuda.Promenade.Service.Filters;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
-    public class EmediaService : BaseService<EmediaService>
+    public class EmediaService(ILogger<EmediaService> logger,
+        IDateTimeProvider dateTimeProvider,
+        ICategoryRepository categoryRepository,
+        ICategoryTextRepository categoryTextRepository,
+        IConfiguration config,
+        IEmediaAccessRepository emediaAccessRepository,
+        IEmediaCategoryRepository emediaCategoryRepository,
+        IEmediaGroupRepository emediaGroupRepository,
+        IEmediaRepository emediaRepository,
+        IEmediaSubjectRepository emediaSubjectRepository,
+        IEmediaTextRepository emediaTextRepository,
+        IHttpContextAccessor httpContextAccessor,
+        IOcudaCache cache,
+        LanguageService languageService,
+        SegmentService segmentService) : BaseService<EmediaService>(logger, dateTimeProvider)
     {
-        private readonly IOcudaCache _cache;
-        private readonly ICategoryRepository _categoryRepository;
-        private readonly ICategoryTextRepository _categoryTextRepository;
-        private readonly IConfiguration _config;
-        private readonly IEmediaCategoryRepository _emediaCategoryRepository;
-        private readonly IEmediaGroupRepository _emediaGroupRepository;
-        private readonly IEmediaRepository _emediaRepository;
-        private readonly IEmediaTextRepository _emediaTextRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly LanguageService _languageService;
-        private readonly SegmentService _segmentService;
+        private readonly IOcudaCache _cache = cache
+            ?? throw new ArgumentNullException(nameof(cache));
 
-        public EmediaService(ILogger<EmediaService> logger,
-            IDateTimeProvider dateTimeProvider,
-            SegmentService segmentService,
-            IHttpContextAccessor httpContextAccessor,
-            ICategoryRepository categoryRepository,
-            ICategoryTextRepository categoryTextRepository,
-            IConfiguration config,
-            IOcudaCache cache,
-            IEmediaRepository emediaRepository,
-            IEmediaCategoryRepository emediaCategoryRepository,
-            IEmediaGroupRepository emediaGroupRepository,
-            IEmediaTextRepository emediaTextRepository,
-            LanguageService languageService)
-            : base(logger, dateTimeProvider)
-        {
-            _segmentService = segmentService;
-            _httpContextAccessor = httpContextAccessor
-                ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _categoryRepository = categoryRepository
-                ?? throw new ArgumentNullException(nameof(categoryRepository));
-            _categoryTextRepository = categoryTextRepository
-                ?? throw new ArgumentNullException(nameof(categoryTextRepository));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-            _emediaRepository = emediaRepository
-                ?? throw new ArgumentNullException(nameof(emediaRepository));
-            _emediaCategoryRepository = emediaCategoryRepository
-                ?? throw new ArgumentNullException(nameof(emediaCategoryRepository));
-            _emediaGroupRepository = emediaGroupRepository
-                ?? throw new ArgumentNullException(nameof(emediaGroupRepository));
-            _emediaTextRepository = emediaTextRepository
-                ?? throw new ArgumentNullException(nameof(emediaTextRepository));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
-        }
+        private readonly ICategoryRepository _categoryRepository = categoryRepository
+            ?? throw new ArgumentNullException(nameof(categoryRepository));
+
+        private readonly ICategoryTextRepository _categoryTextRepository = categoryTextRepository
+            ?? throw new ArgumentNullException(nameof(categoryTextRepository));
+
+        private readonly IConfiguration _config = config
+            ?? throw new ArgumentNullException(nameof(config));
+
+        private readonly IEmediaAccessRepository _emediaAccessRepository = emediaAccessRepository
+            ?? throw new ArgumentNullException(nameof(emediaAccessRepository));
+
+        private readonly IEmediaCategoryRepository _emediaCategoryRepository = emediaCategoryRepository
+            ?? throw new ArgumentNullException(nameof(emediaCategoryRepository));
+
+        private readonly IEmediaGroupRepository _emediaGroupRepository = emediaGroupRepository
+            ?? throw new ArgumentNullException(nameof(emediaGroupRepository));
+
+        private readonly IEmediaRepository _emediaRepository = emediaRepository
+            ?? throw new ArgumentNullException(nameof(emediaRepository));
+
+        private readonly IEmediaSubjectRepository _emediaSubjectRepository = emediaSubjectRepository
+            ?? throw new ArgumentNullException(nameof(emediaSubjectRepository));
+
+        private readonly IEmediaTextRepository _emediaTextRepository = emediaTextRepository
+            ?? throw new ArgumentNullException(nameof(emediaTextRepository));
+
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor
+            ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+
+        private readonly LanguageService _languageService = languageService
+            ?? throw new ArgumentNullException(nameof(languageService));
+
+        private readonly SegmentService _segmentService = segmentService
+            ?? throw new ArgumentNullException(nameof(segmentService));
 
         private int CachePagesInHours
         {
@@ -73,56 +79,109 @@ namespace Ocuda.Promenade.Service
             }
         }
 
+        public async Task<Emedia> GetAsync(bool forceReload, string slug, bool countAccess)
+        {
+            var emedias = await GetEmediasAsync(forceReload);
+            var emedia = emedias.SingleOrDefault(_ => _.Slug == slug);
+            if (countAccess && emedia != null)
+            {
+                await _emediaAccessRepository.AddAccessLogAsync(emedia.Id);
+            }
+            return emedia;
+        }
+
+        public async Task<ICollection<Emedia>> GetEmediaAsync(bool forceReload)
+        {
+            var langIds
+                = await GetCurrentDefaultLanguageIdAsync(_httpContextAccessor, _languageService);
+
+            return await GetEmediasAsync(forceReload, langIds);
+        }
+
+        public async Task<ICollection<Emedia>> GetEmediaAsync(bool forceReload, EmediaFilter filter)
+        {
+            var langIds
+                = await GetCurrentDefaultLanguageIdAsync(_httpContextAccessor, _languageService);
+
+            var emedias = await GetEmediasAsync(forceReload, langIds);
+
+            // perform filtering
+            if (filter?.SubjectId.HasValue == true)
+            {
+                emedias = await FilterBySubjectAsync(emedias, filter.SubjectId.Value);
+            }
+
+            return emedias;
+        }
+
         public async Task<ICollection<EmediaGroup>> GetGroupedEmediaAsync(bool forceReload)
         {
-            var currentCultureName = _httpContextAccessor
-                .HttpContext
-                .Features
-                .Get<IRequestCultureFeature>()
-                .RequestCulture
-                .UICulture?
-                .Name;
+            var langIds
+                = await GetCurrentDefaultLanguageIdAsync(_httpContextAccessor, _languageService);
 
-            int defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
-            int? currentLanguageId = null;
+            var emedias = await GetEmediasAsync(forceReload, langIds);
 
-            if (!string.IsNullOrWhiteSpace(currentCultureName))
+            // fetch groups and divide up into groups
+            var groups = await GetEmediaGroupsAsync(forceReload);
+            foreach (var group in groups)
             {
-                currentLanguageId = await _languageService.GetLanguageIdAsync(currentCultureName);
+                group.Emedias = [.. emedias
+                    .Where(_ => _.GroupId == group.Id)
+                    .OrderBy(_ => _.Name)];
+
+                if (group.SegmentId.HasValue && group.Segment == null)
+                {
+                    group.Segment = new Segment
+                    {
+                        SegmentText = await _segmentService
+                            .GetSegmentTextBySegmentIdAsync((int)group.SegmentId, forceReload)
+                    };
+                }
             }
 
-            ICollection<EmediaGroup> groups = null;
+            return groups;
+        }
 
-            if (CachePagesInHours > 0 && !forceReload)
+        private async Task AddCategoriesAsync(ICollection<Emedia> emedias,
+            bool forceReload,
+            int[] langIds)
+        {
+            var categories = await GetCategoriesAsync(forceReload, langIds);
+
+            var emediaCategories = await GetEmediaCategoriesAsync(forceReload);
+            foreach (var emedia in emedias)
             {
-                groups = await _cache.GetObjectFromCacheAsync<ICollection<EmediaGroup>>(
-                    Utility.Keys.Cache.PromEmediaGroups);
+                foreach (var languageId in langIds)
+                {
+                    emedia.EmediaText = await GetEmediaTextAsync(forceReload,
+                        languageId,
+                        emedia.Id);
+                    if (emedia.EmediaText != null)
+                    {
+                        break;
+                    }
+                }
+
+                var thisEmediaCategoryIds = emediaCategories
+                    .Where(_ => _.EmediaId == emedia.Id)
+                    .Select(_ => _.CategoryId);
+
+                emedia.Categories
+                    .AddRange([.. categories.Where(_ => thisEmediaCategoryIds.Contains(_.Id))]);
             }
+        }
 
-            if (groups == null || groups.Count == 0)
-            {
-                groups = await _emediaGroupRepository.GetAllAsync();
-                await _cache.SaveToCacheAsync(Utility.Keys.Cache.PromEmediaGroups,
-                    groups,
-                    CachePagesInHours);
-            }
+        private async Task<ICollection<Emedia>> FilterBySubjectAsync(ICollection<Emedia> emedias,
+            int subjectId)
+        {
+            var subjectEmediaIds = await _emediaSubjectRepository.GetEmediaIdsAsync(subjectId);
 
-            ICollection<Emedia> emedias = null;
+            return [.. emedias.Where(_ => subjectEmediaIds.Contains(_.Id))];
+        }
 
-            if (CachePagesInHours > 0 && !forceReload)
-            {
-                emedias = await _cache.GetObjectFromCacheAsync<ICollection<Emedia>>(
-                    Utility.Keys.Cache.PromEmedias);
-            }
-
-            if (emedias == null || emedias.Count == 0)
-            {
-                emedias = await _emediaRepository.GetAllAsync();
-                await _cache.SaveToCacheAsync(Utility.Keys.Cache.PromEmedias,
-                    emedias,
-                    CachePagesInHours);
-            }
-
+        private async Task<ICollection<Category>> GetCategoriesAsync(bool forceReload,
+                    int[] langIds)
+        {
             ICollection<Category> categories = null;
 
             if (CachePagesInHours > 0 && !forceReload)
@@ -141,80 +200,19 @@ namespace Ocuda.Promenade.Service
 
             foreach (var category in categories)
             {
-                if (currentLanguageId.HasValue)
+                foreach (var languageId in langIds)
                 {
                     category.CategoryText = await GetCategoryTextAsync(forceReload,
-                        (int)currentLanguageId,
+                        languageId,
                         category.Id);
-                }
-                if (category.CategoryText == null)
-                {
-                    category.CategoryText = await GetCategoryTextAsync(forceReload,
-                        defaultLanguageId,
-                        category.Id);
-                }
-            }
-
-            ICollection<EmediaCategory> emediaCategories = null;
-
-            if (CachePagesInHours > 0 && !forceReload)
-            {
-                emediaCategories = await _cache
-                    .GetObjectFromCacheAsync<ICollection<EmediaCategory>>(
-                        Utility.Keys.Cache.PromEmediaCategories);
-            }
-
-            if (emediaCategories == null || emediaCategories.Count == 0)
-            {
-                emediaCategories = await _emediaCategoryRepository.GetAllAsync();
-                await _cache.SaveToCacheAsync(Utility.Keys.Cache.PromEmediaCategories,
-                    emediaCategories,
-                    CachePagesInHours);
-            }
-
-            foreach (var group in groups)
-            {
-                group.Emedias = emedias
-                    .Where(_ => _.GroupId == group.Id)
-                    .OrderBy(_ => _.Name)
-                    .ToList();
-
-                if (group.SegmentId.HasValue && group.Segment == null)
-                {
-                    group.Segment = new Segment
+                    if (category.CategoryText != null)
                     {
-                        SegmentText = await _segmentService
-                        .GetSegmentTextBySegmentIdAsync((int)group.SegmentId, forceReload)
-                    };
-                }
-
-                foreach (var emedia in group.Emedias)
-                {
-                    if (currentLanguageId.HasValue)
-                    {
-                        emedia.EmediaText = await GetEmediaTextAsync(forceReload,
-                            (int)currentLanguageId,
-                            emedia.Id);
+                        break;
                     }
-
-                    if (emedia.EmediaText == null)
-                    {
-                        emedia.EmediaText = await GetEmediaTextAsync(forceReload,
-                            defaultLanguageId,
-                            emedia.Id);
-                    }
-
-                    var thisEmediaCategoryIds = emediaCategories
-                        .Where(_ => _.EmediaId == emedia.Id)
-                        .Select(_ => _.CategoryId);
-
-                    emedia.Categories = categories
-                        .Where(_ => thisEmediaCategoryIds.Contains(_.Id))
-                        .ToList();
                 }
             }
 
-            return groups;
+            return categories;
         }
 
         private async Task<CategoryText> GetCategoryTextAsync(bool forceReload,
@@ -248,6 +246,93 @@ namespace Ocuda.Promenade.Service
             }
 
             return categoryText;
+        }
+
+        private async Task<ICollection<EmediaCategory>> GetEmediaCategoriesAsync(bool forceReload)
+        {
+            ICollection<EmediaCategory> emediaCategories = null;
+
+            if (CachePagesInHours > 0 && !forceReload)
+            {
+                emediaCategories = await _cache
+                    .GetObjectFromCacheAsync<ICollection<EmediaCategory>>(
+                        Utility.Keys.Cache.PromEmediaCategories);
+            }
+
+            if (emediaCategories == null || emediaCategories.Count == 0)
+            {
+                emediaCategories = await _emediaCategoryRepository.GetAllAsync();
+                await _cache.SaveToCacheAsync(Utility.Keys.Cache.PromEmediaCategories,
+                    emediaCategories,
+                    CachePagesInHours);
+            }
+
+            return emediaCategories;
+        }
+
+        private async Task<ICollection<EmediaGroup>> GetEmediaGroupsAsync(bool forceReload)
+        {
+            ICollection<EmediaGroup> groups = null;
+
+            if (CachePagesInHours > 0 && !forceReload)
+            {
+                groups = await _cache.GetObjectFromCacheAsync<ICollection<EmediaGroup>>(
+                    Utility.Keys.Cache.PromEmediaGroups);
+            }
+
+            if (groups == null || groups.Count == 0)
+            {
+                groups = await _emediaGroupRepository.GetAllAsync();
+                await _cache.SaveToCacheAsync(Utility.Keys.Cache.PromEmediaGroups,
+                    groups,
+                    CachePagesInHours);
+            }
+
+            return groups;
+        }
+
+        /// <summary>
+        /// Return <see cref="Emedia"/> objects from cache or the database if they are not cached.
+        /// This call does not populate any category data and should not be used for display!
+        /// </summary>
+        /// <param name="forceReload">Ignore any cached value and force a database load</param>
+        /// <returns><see cref="ICollection"/> of <see cref="Emedia"/> objects</returns>
+        private async Task<ICollection<Emedia>> GetEmediasAsync(bool forceReload)
+        {
+            ICollection<Emedia> emedias = null;
+
+            if (CachePagesInHours > 0 && !forceReload)
+            {
+                emedias = await _cache.GetObjectFromCacheAsync<ICollection<Emedia>>(
+                    Utility.Keys.Cache.PromEmedias);
+            }
+
+            if (emedias == null || emedias.Count == 0)
+            {
+                emedias = await _emediaRepository.GetAllAsync();
+                await _cache.SaveToCacheAsync(Utility.Keys.Cache.PromEmedias,
+                    emedias,
+                    CachePagesInHours);
+            }
+
+            return emedias;
+        }
+
+        /// <summary>
+        /// Return <see cref="Emedia"/> objects from cache or the database if they are not cached
+        /// including categories for display.
+        /// </summary>
+        /// <param name="forceReload">Ignore any cached value and force a database load</param>
+        /// <param name="langIds">Language ids in order of preference for fetching text</param>
+        /// <returns><see cref="ICollection"/> of <see cref="Emedia"/> objects</returns>
+        private async Task<ICollection<Emedia>> GetEmediasAsync(bool forceReload, int[] langIds)
+        {
+            ICollection<Emedia> emedias = await GetEmediasAsync(forceReload);
+
+            // add category data
+            await AddCategoriesAsync(emedias, forceReload, langIds);
+
+            return emedias;
         }
 
         private async Task<EmediaText> GetEmediaTextAsync(bool forceReload,

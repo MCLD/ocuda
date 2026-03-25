@@ -4,61 +4,122 @@
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
-<div class="row mb-2">
-    <div class="col-sm-6">
+@section header {
+    <div class="d-flex justify-content-between mb-2">
         <h1>
             Emedia
             <small class="text-muted">@Model.Emedia.Name</small>
         </h1>
+        <div>
+            <a class="btn btn-outline-dark ms-2"
+               asp-action="@nameof(EmediaController.GroupDetails)"
+               asp-area="@EmediaController.Area"
+               asp-controller="@EmediaController.Name"
+               asp-route-id="@Model.Emedia.GroupId">
+                Back
+            </a>
+        </div>
     </div>
-    <div class="col-sm-6">
-        <a asp-action="@(nameof(EmediaController.GroupDetails))"
-           asp-route-id="@Model.Emedia.GroupId"
-           class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
-    </div>
-</div>
+}
 
 <div class="row pt-3">
     <div class="col-12">
         <input asp-for="Emedia.Group.Name"
                formgroup
+               disabled="disabled"
                hide-required="true"
                label-name="Group"
                readonly />
         <input asp-for="Emedia.RedirectUrl"
+               disabled="disabled"
                formgroup
                hide-required="true"
                readonly />
+        <hr>
         <div class="row mb-3">
-            <label class="col-form-label text-md-end col-md-3" for="CategorySelection">Categories</label>
+            <label class="col-form-label text-md-end col-md-3"
+                   for="CategorySelection">Media Types</label>
             <div class="mb-3-inner col-md-9">
                 <div class="input-group">
+                    <input asp-for="CategorySelection"
+                           class="form-control"
+                           readonly
+                           value="@Model.CategorySelectionText" />
                     <button class="btn btn-outline-primary"
                             type="button"
                             data-bs-toggle="modal"
                             data-bs-target="#categoryModal">
                         <span class="fa-solid fa-pencil"></span>
                     </button>
-                    <input asp-for="CategorySelection" value="@Model.CategorySelectionText" class="form-control" readonly />
                 </div>
             </div>
         </div>
-        <select asp-for="SelectedLanguage" asp-items="Model.LanguageList" formgroup></select>
+        <div class="row mb-3">
+            <label class="col-form-label text-md-end col-md-3"
+                   for="SubjectSelection">Subjects</label>
+            <div class="mb-3-inner col-md-9">
+                <div class="input-group">
+                    <input asp-for="SubjectSelection"
+                           class="form-control"
+                           readonly
+                           value="@Model.SubjectSelectionText" />
+                    <button class="btn btn-outline-primary"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#subjectModal">
+                        <span class="fa-solid fa-pencil"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="row pb-3">
-    <div class="col-12 col-md-9 offset-md-3">
-        <hr />
+@if (Model.LanguageList?.Count() > 1)
+{
+    <div class="row mb-2">
+        <div class="col-md-3 text-md-end">
+            <label asp-for="SelectedLanguage" class="col-form-label"></label>
+        </div>
+        <div class="col-md-9">
+            @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
+            {
+                <a asp-action="@nameof(EmediaController.Details)"
+                   asp-route-id="@Model.Emedia.Id"
+                   asp-route-language="@item.Value"
+                   class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">
+                    @item.Text
+                </a>
+            }
+        </div>
+    </div>
+}
+
+<hr />
+
+<div class="d-none oc-save-warning offset-md-3 col-md-9 mt-2">
+    <div class="alert alert-warning py-2">
+        <span class="fa-solid fa-circle-arrow-up"></span>
+        Unsaved changes will be lost if you modify media types, subjects, or change languages.
     </div>
 </div>
+
 
 <form asp-action="@nameof(EmediaController.Details)" method="post" role="form">
-    <input asp-for="EmediaText.EmediaId" value="@Model.Emedia.Id" type="hidden" />
     <input asp-for="EmediaText.LanguageId" value="@Model.LanguageId" type="hidden" />
     <input asp-for="LanguageId" type="hidden" />
 
-    <textarea asp-for="EmediaText.Description" formgroup></textarea>
+    <div class="mb-3 row">
+        <div class="col-md-3 text-md-end">
+            <label asp-for="EmediaText.Description" class="col-form-label"></label>
+        </div>
+        <div class="mb-3-inner col-md-9">
+            <textarea asp-for="EmediaText.Description" markdown-editor></textarea>
+            <span asp-validation-for="EmediaText.Description"
+                  class="validation-message text-danger"></span>
+        </div>
+    </div>
+
 
     <div class="mb-3 row">
         <div class="col-md-3 text-md-end">
@@ -68,6 +129,13 @@
             <textarea asp-for="EmediaText.Details" markdown-editor></textarea>
             <span asp-validation-for="EmediaText.Details"
                   class="validation-message text-danger"></span>
+        </div>
+    </div>
+
+    <div class="d-none oc-save-warning offset-md-3 col-md-9 mt-2">
+        <div class="alert alert-warning py-2">
+            <span class="fa-solid fa-circle-arrow-up"></span>
+            Unsaved changes will be lost if you modify media types, subjects, or change languages.
         </div>
     </div>
 
@@ -85,12 +153,10 @@
 
 <form id="categoryForm" role="form">
     <input asp-for="Emedia.Id" type="hidden" />
-
     <div modal
          id="categoryModal"
-         name="Categories"
+         name="Media Types"
          type="ModalTypes.Edit">
-
         @foreach (var category in Model.CategoryList)
         {
             <div>
@@ -107,25 +173,60 @@
     </div>
 </form>
 
+<form id="subjectForm" role="form">
+    <input asp-for="Emedia.Id" type="hidden" />
+    <div modal
+         id="subjectModal"
+         name="Subjects"
+         type="ModalTypes.Edit">
+
+        @foreach (var subject in Model.SubjectList)
+        {
+            <div>
+                <input id="@($"subject{subject.Id}")"
+                       class="subjectSelector"
+                       data-id="@subject.Id"
+                       type="checkbox"
+                       checked="@(Model.SubjectSelection?.Contains(subject.Id) == true ? "checked" : null)" />
+                <label for="@($"subject{subject.Id}")">
+                    @subject.Name
+                </label>
+            </div>
+        }
+    </div>
+</form>
+
 @section scripts {
     <script src="~/js/md.min.js" asp-append-version="true"></script>
 
     <script>
-        var editor = new Markdown.Editor($("#EmediaText_Details"), { allowUploads: true });
+        const editor = new Markdown.Editor($("#EmediaText_Details"), { allowUploads: true });
         editor.run();
 
-        var emediaDetailsUrl
-            = "@Url.Action(nameof(EmediaController.Details), new { id = Model.Emedia.Id})";
+        const editorDescription = new Markdown.Editor($("#EmediaText_Description"), { allowUploads: true });
+        editorDescription.run();
+
+        const emediaDetailsUrl
+            = "@Url.Action(nameof(EmediaController.Details), new { id = Model.Emedia.Id })";
 
         $("#SelectedLanguage").on("change", function () {
             window.location.href = emediaDetailsUrl + "?language=" + $(this).val();
         });
 
+        function showSaveWarning() {
+            document.querySelectorAll('.oc-save-warning').forEach(_ => {
+                _.classList.remove('d-none');
+            });
+        }
+
+        document.getElementById('EmediaText_Details').addEventListener('keydown', showSaveWarning);
+        document.getElementById('EmediaText_Description').addEventListener('keydown', showSaveWarning);
+
         $("#categoryForm").submit(function (e) {
             e.preventDefault();
 
-            var id = @Model.Emedia.Id;
-            var categories = $(".categorySelector:checked")
+            let id = @Model.Emedia.Id;
+            let categories = $(".categorySelector:checked")
                 .map(function () { return $(this).data("id"); })
                 .get();
 
@@ -141,5 +242,27 @@
                     }
                 });
         });
+
+        $("#subjectForm").submit(function (e) {
+            e.preventDefault();
+
+            let id = @Model.Emedia.Id;
+            let subjects = $(".subjectSelector:checked")
+                .map(function () { return $(this).data("id"); })
+                .get();
+
+            $.post("@Url.Action(nameof(EmediaController.ChangeSubjects), EmediaController.Name)",
+                { id, subjects },
+                function (response) {
+                    if (response.success == true) {
+                        location.reload();
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners($(this).find(".btn-spinner"));
+                    }
+                });
+        });
     </script>
 }
+>

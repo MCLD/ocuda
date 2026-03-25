@@ -2,6 +2,7 @@
 {
     public class IndexViewModel
     {
+        public bool HasCategoryPermissions { get; set; }
         public bool HasEmediaPermissions { get; set; }
         public bool HasFeatureManagement { get; set; }
         public bool HasImageOptimizePermissions { get; set; }
@@ -13,6 +14,7 @@
             get
             {
                 return IsSiteManager
+                    || HasCategoryPermissions
                     || HasEmediaPermissions
                     || HasFeatureManagement
                     || HasImageOptimizePermissions

@@ -8,6 +8,11 @@ namespace Ocuda.Ops.Models.Definitions
         public static readonly ApplicationPermissionDefinition[] ApplicationPermissions =
             [
             new() {
+                Id = ApplicationPermission.CategoryManagement,
+                Info = "Manage categories such as Media Types and Subjects.",
+                Name = "Category Management"
+            },
+            new() {
                 Id = ApplicationPermission.CoverIssueManagement,
                 Info = "Able to mark cover issues as resolved.",
                 Name = "Cover Issue Management"

@@ -1,0 +1,43 @@
+﻿@using Ocuda.Promenade.Controllers
+@model Ocuda.Promenade.Controllers.ViewModels.DigitalLibrary.LaunchViewModel
+
+<form action="@Model.Uri" id="launchForm">
+    @foreach (var (key, stringValues) in Model.QueryStringValues)
+    {
+        foreach (var value in stringValues)
+        {
+            <input name="@key" value="@value" type="hidden" />
+        }
+    }
+
+    <div class="d-flex justify-content-center mt-3">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="display-4 px-5 py-3">Launching @Model.Name...</h1>
+                <div class="d-flex justify-content-end mt-2">
+                    <button class="btn btn-outline-dark btn-lg"
+                            id="btnsub"
+                            type="submit">
+                        Launch
+                        <span class="fa-solid fa-spinner fa-pulse fa-fw d-none" id="btnspin"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        const form = document.getElementById("launchForm");
+
+        form.onsubmit = (_) => {
+            document.getElementById("btnspin").classList.remove("d-none");
+            document.getElementById("btnsub").setAttribute("disabled", "disabled");
+        }
+
+        window.onload = (_) => {
+            form.submit();
+        };
+    </script>
+}

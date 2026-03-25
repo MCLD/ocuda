@@ -3,11 +3,6 @@
     public static class Cache
     {
         /// <summary>
-        /// Cached Polaris patron codes
-        /// </summary>
-        public static readonly string PolarisPatronCodes = "patroncodes";
-
-        /// <summary>
         /// Date and time of last expired slide purge
         /// </summary>
         public static readonly string OpsCleanupSlides = "cleanupslides";
@@ -101,6 +96,11 @@
         public static readonly string OpsVolunteerEmails = "email.notification.volunteer.{0}";
 
         /// <summary>
+        /// Cached Polaris patron codes
+        /// </summary>
+        public static readonly string PolarisPatronCodes = "patroncodes";
+
+        /// <summary>
         /// Cached card, {0} is the language id and {1} is the card id
         /// </summary>
         public static readonly string PromCardDetail = "card.{0}.{1}";
@@ -140,6 +140,7 @@
         /// Cached emedia text, {0} is the language id, {1} is the id
         /// </summary>
         public static readonly string PromCategoryText = "categorytext.{0}.{1}";
+
 
         /// <summary>
         /// A list of card IDs associated with a deck, in order
@@ -365,6 +366,21 @@
         /// Cached social card, {0} is the card id
         /// </summary>
         public static readonly string PromSocialCard = "socialcard.{0}";
+
+        /// <summary>
+        /// Cached subject list
+        /// </summary>
+        public static readonly string PromSubjects = "subjects";
+
+        /// <summary>
+        /// Cached subject slugs and descriptions, {0} is the language id
+        /// </summary>
+        public static readonly string PromSubjectSlugsDesc = "subjects.slugDescr.{0}";
+
+        /// <summary>
+        /// Cached subject text, {0} is the item id, {1} is the language id
+        /// </summary>
+        public static readonly string PromSubjectText = "subjecttext.{0}.{1}";
 
         /// <summary>
         /// Cached volunteer forms, {0} is VolunteerFormType, {1} is location id

@@ -1,5 +1,7 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.DigitalLibrary.DigitalLibraryViewModel
-
+@{
+    var navDisplayed = false;
+}
 @section metadata {
     <socialcard card="@Model.SocialCard"></socialcard>
 }
@@ -13,7 +15,9 @@
         {
             if (i == 0)
             {
+                navDisplayed = true;
                 <h1 class="prom-title">@group.Segment.SegmentText.Header</h1>
+                <partial name="_DigitalLibraryPartial" />
             }
             else
             {
@@ -25,6 +29,11 @@
             @Html.Raw(group.Segment.SegmentText.Text)
         }
     }
+    if (!navDisplayed)
+    {
+        navDisplayed = true;
+        <partial name="_DigitalLibraryPartial" />
+    }
     if (group.Emedias.Any())
     {
         <div class="row">
@@ -34,19 +43,41 @@
                     <div class="card flex-fill w-100">
                         <div class="card-header d-flex">
                             <div class="flex-grow-1">
-                                <a aria-label="@Localizer[Promenade.NewWindowItem, emedia.Name]"
-                                   href="@emedia.RedirectUrl"
-                                   target="_blank">
-                                    <h2 class="fs-5 d-inline btn-link">
+                                @if (emedia.IsAvailableExternally || Model.IsLocalNetwork)
+                                {
+                                    <a aria-label="@Localizer[Promenade.NewWindowItem, emedia.Name]"
+                                       asp-action="@nameof(DigitalLibraryController.Launch)"
+                                       asp-route-id="@emedia.Slug"
+                                       target="_blank">
+                                        <h2 class="fs-5 d-inline btn-link">
+                                            @emedia.Name
+                                        </h2>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <h2 class="fs-5 d-inline">
                                         @emedia.Name
                                     </h2>
-                                </a>
+                                }
                             </div>
-                            @if (!string.IsNullOrEmpty(emedia.EmediaText?.Details))
-                            {
-                                <div>
+                            <div>
+                                @if (!emedia.IsAvailableExternally && !Model.IsLocalNetwork)
+                                {
                                     <a href="#"
-                                       class="digital-library-card-header text-dark"
+                                       class="digital-library-card-header text-danger text-decoration-none"
+                                       data-bs-target="#inLibraryOnlyModal"
+                                       data-bs-toggle="modal"
+                                       data-name="Only Available In a Library"
+                                       data-details="<p>You must be in a library to access: @emedia.Name.</p>"
+                                       title="@Localizer[Promenade.HelpItem, emedia.Name]">
+                                        <span class="fa-solid fa-triangle-exclamation"></span>
+                                    </a>
+                                }
+                                @if (!string.IsNullOrEmpty(emedia.EmediaText?.Details))
+                                {
+                                    <a href="#"
+                                       class="digital-library-card-header text-dark text-decoration-none"
                                        data-bs-target="#infoModal"
                                        data-bs-toggle="modal"
                                        data-name="@Localizer[Promenade.HelpItem, emedia.Name]"
@@ -54,8 +85,8 @@
                                        title="@Localizer[Promenade.HelpItem, emedia.Name]">
                                         <span class="fa-solid fa-circle-question"></span>
                                     </a>
-                                </div>
-                            }
+                                }
+                            </div>
                         </div>
                         <div class="card-body">
                             @Html.Raw(emedia.EmediaText?.Description)
@@ -81,11 +112,19 @@
     }
 }
 
-<div modal id="infoModal"></div>
+<div modal id="infoModal" modal-dialog-centered></div>
+
+<div modal id="inLibraryOnlyModal" modal-dialog-centered></div>
 
 @section scripts {
     <script>
         $("#infoModal").on("show.bs.modal", function (e) {
+            let button = $(e.relatedTarget);
+            $(this).find(".modal-title").text(button.data("name"));
+            $(this).find(".modal-body").html(button.data("details"));
+        });
+
+        $("#inLibraryOnlyModal").on("show.bs.modal", function (e) {
             let button = $(e.relatedTarget);
             $(this).find(".modal-title").text(button.data("name"));
             $(this).find(".modal-body").html(button.data("details"));

@@ -14,6 +14,17 @@
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
             "CA1815:Override equals and operator equals on value types",
             Justification = "No reason to compare these site setting keys")]
+        public struct Emedia
+        {
+            public const string AllSegment = "Emedia.AllSegment";
+            public const string ButtonAllSegment = "Emedia.ButtonAllSegment";
+            public const string ButtonGroupSegment = "Emedia.ButtonGroupSegment";
+            public const string ValidReferers = "Emedia.ValidReferers";
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
+            "CA1815:Override equals and operator equals on value types",
+            Justification = "No reason to compare these site setting keys")]
         public struct EmployeeSignup
         {
             public const string EmployeeNumberFormat = "EmployeeSignup.EmployeeNumberFormat";

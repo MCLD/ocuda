@@ -8,6 +8,7 @@ namespace Ocuda.Ops.Models.Defaults
     {
         public static IEnumerable<SiteSetting> Get { get; } =
         [
+
             #region RenewCard
 
             new SiteSetting
@@ -440,6 +441,7 @@ namespace Ocuda.Ops.Models.Defaults
             },
 
             #endregion UserInterface
+
         ];
     }
 }

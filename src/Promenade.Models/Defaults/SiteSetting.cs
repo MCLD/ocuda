@@ -30,6 +30,47 @@ namespace Ocuda.Promenade.Models.Defaults
 
             #endregion Contact
 
+            #region Emedia
+
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Emedia),
+                Description = "Segment ID to show a the top of the All Emedia page",
+                Id= Keys.SiteSetting.Emedia.AllSegment,
+                Name="All Emedia segment id",
+                Type=SiteSettingType.Int,
+                Value="-1"
+            },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Emedia),
+                Description = "Segment ID for the All Emedia button, blank to not display",
+                Id= Keys.SiteSetting.Emedia.ButtonAllSegment,
+                Name="All emedia button segment id",
+                Type=SiteSettingType.Int,
+                Value="-1"
+            },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Emedia),
+                Description = "Segment ID for the Emedia by Group button, blank to not display",
+                Id= Keys.SiteSetting.Emedia.ButtonGroupSegment,
+                Name="Group emedia button segment id",
+                Type=SiteSettingType.Int,
+                Value="-1"
+            },
+            new SiteSetting
+            {
+                Category = nameof(Keys.SiteSetting.Emedia),
+                Description = "Valid referers to launch electronic resources",
+                Id= Keys.SiteSetting.Emedia.ValidReferers,
+                Name="Valid Referers",
+                Type=SiteSettingType.StringNullable,
+                Value=""
+            },
+
+            #endregion Emedia
+
             #region EmployeeSignup
 
             new SiteSetting

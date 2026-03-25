@@ -8,19 +8,17 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class EmediaRepository
-        : GenericRepository<PromenadeContext, Emedia>, IEmediaRepository
+    public class EmediaRepository(
+        ServiceFacade.Repository<PromenadeContext> repositoryFacade,
+        ILogger<EmediaRepository> logger)
+            : GenericRepository<PromenadeContext, Emedia>(repositoryFacade, logger),
+            IEmediaRepository
     {
-        public EmediaRepository(
-            ServiceFacade.Repository<PromenadeContext> repositoryFacade,
-            ILogger<EmediaRepository> logger) : base(repositoryFacade, logger)
-        {
-        }
-
-        public async Task<List<Emedia>> GetAllAsync()
+        public async Task<ICollection<Emedia>> GetAllAsync()
         {
             return await DbSet
                 .AsNoTracking()
+                .Where(_ => _.IsActive)
                 .OrderBy(_ => _.Name)
                 .ToListAsync();
         }

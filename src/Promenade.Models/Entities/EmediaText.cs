@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -20,6 +21,7 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public string Description { get; set; }
 
+        [DisplayName("Info icon pop-up text")]
         [MaxLength(1000)]
         public string Details { get; set; }
     }

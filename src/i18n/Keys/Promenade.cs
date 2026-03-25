@@ -18,6 +18,8 @@
         public const string ContactInformation = "Contact Information";
         public const string ContactUs = "Contact Us";
         public const string CoordinatesErrorItem = "There was a problem locating these coordinates: {0}, {1}";
+        public const string EmediaAll = "A-Z List";
+        public const string EmediaGroups = "Popular Items First";
         public const string EmployeeSignupAddressInfo = "please do not enter your work address here";
         public const string EmployeeSignupAddressLabel = "Home Address";
         public const string EmployeeSignupEmployeeLabel = "Employee Information";
@@ -48,8 +50,8 @@
         public const string ForgotPassword = "Forgot your password?";
         public const string HelpItem = "{0} help";
         public const string HowCanWeHelp = "How can we help?";
-        public const string KeywordsItem = "Keywords: {0}";
         public const string InvalidFieldFormat = "The {0} field is in an invalid format.";
+        public const string KeywordsItem = "Keywords: {0}";
         public const string LabelNo = "No";
         public const string LabelYes = "Yes";
         public const string LinkAdultVolunteerForm = "Use our adult volunteer form.";

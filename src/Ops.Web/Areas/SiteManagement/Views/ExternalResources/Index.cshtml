@@ -9,7 +9,7 @@
             @foreach (var resourceType in (Ocuda.Utility.Models.ExternalResourceType[])Enum.GetValues(typeof(Ocuda.Utility.Models.ExternalResourceType)))
             {
                 <option value="@resourceType" selected="@(resourceType == Model.Type ? "selected" : null)">@resourceType</option>
-            }    
+            }
         </select>
     </div>
 </form>
@@ -28,7 +28,10 @@
     </div>
 </form>
 
-<div modal id="deleteModal" name="External Resource" isNonSubmit="true" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
+<div modal id="deleteModal"
+     name="External Resource"
+     isNonSubmit="true"
+     type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
     <input id="deleteId" asp-for="ExternalResource.Id" type="hidden" />
     <input id="deleteName" asp-for="ExternalResource.Name" type="hidden" />
 </div>

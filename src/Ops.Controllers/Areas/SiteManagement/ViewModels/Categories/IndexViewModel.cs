@@ -4,10 +4,17 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Categories
 {
-    public class IndexViewModel
+    public class IndexViewModel : PaginateModel
     {
-        public ICollection<Category> Categories { get; set; }
-        public PaginateModel PaginateModel { get; set; }
+        public IndexViewModel()
+        {
+            Categories = [];
+            Subjects = [];
+        }
+
+        public ICollection<Category> Categories { get; }
         public Category Category { get; set; }
+        public Subject Subject { get; set; }
+        public ICollection<Subject> Subjects { get; }
     }
 }

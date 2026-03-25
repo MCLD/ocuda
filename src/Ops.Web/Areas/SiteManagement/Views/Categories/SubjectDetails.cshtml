@@ -1,0 +1,74 @@
+﻿@using Ocuda.Ops.Controllers.Areas.SiteManagement
+@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Categories.SubjectDetailsViewModel
+
+@section header {
+    <div class="d-flex">
+        <div class="flex-grow-1 align-middle">
+            <h1 class="h2 ps-2 pb-2 flex-grow-1">
+                Subject
+                <small class="text-muted">@Model.Subject.Name</small>
+            </h1>
+        </div>
+        <div>
+            <a class="btn btn-outline-dark"
+               asp-action="@(nameof(CategoriesController.SubjectIndex))">Back</a>
+        </div>
+    </div>
+}
+
+@if (Model.LanguageList?.Count() > 1)
+{
+    <div class="row mb-2">
+        <div class="col-md-3 text-md-end">
+            <label asp-for="SelectedLanguage" class="col-form-label"></label>
+        </div>
+        <div class="col-md-9">
+            @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
+            {
+                <a asp-action="@nameof(CategoriesController.SubjectDetails)"
+                   asp-route-id="@Model.Subject.Id"
+                   asp-route-language="@item.Value"
+                   class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">
+                    @item.Text
+                </a>
+            }
+        </div>
+        <div class="d-none oc-save-warning offset-md-3 col-md-9 mt-2">
+            <div class="alert alert-warning py-2">
+                <span class="fa-solid fa-circle-arrow-up"></span>
+                Unsaved changes will be lost if you change languages.
+            </div>
+        </div>
+    </div>
+}
+
+<hr />
+
+<form asp-action="@nameof(CategoriesController.CategoryDetails)" method="post" role="form">
+    <input asp-for="SubjectText.LanguageId" value="@Model.LanguageId" type="hidden" />
+    <input asp-for="LanguageId" type="hidden" />
+
+    <input asp-for="SubjectText.Text" formgroup />
+
+    <div class="row">
+        <div class="offset-md-3 col-md-9">
+            <button type="submit"
+                    class="btn btn-outline-success btn-lg"
+                    buttonspinner>
+                Save
+            </button>
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        function showSaveWarning() {
+            document.querySelectorAll('.oc-save-warning').forEach(_ => {
+                _.classList.remove('d-none');
+            });
+        }
+
+        document.getElementById('SubjectText_Text').addEventListener('keydown', showSaveWarning);
+    </script>
+}
