@@ -299,10 +299,18 @@ namespace Ocuda.Promenade.Controllers
 
             if (string.IsNullOrWhiteSpace(validReferers))
             {
-                _logger.LogError("No configured valid referers for launching electronic resources!");
+                _logger.LogError("No configured valid referers for launching emedia!");
             }
 
-            return validReferers?.Split(",")?.Contains(refererUri.Host) == true;
+            if (validReferers?.Split(",")?.Contains(refererUri.Host) == true)
+            {
+                return true;
+            }
+            else
+            {
+                _logger.LogWarning("Invalid referer access to emedia: {Referer}", referer);
+                return false;
+            }
         }
     }
 }
