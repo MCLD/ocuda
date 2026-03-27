@@ -19,52 +19,44 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 {
-    [Area("ContentManagement")]
+    [Area(nameof(ContentManagement))]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
-    public class UsersController : BaseController<UsersController>
+    public class UsersController(ServiceFacades.Controller<UsersController> context,
+        IApiKeyService apiKeyService,
+        IPermissionGroupService permissionGroupService,
+        ITitleClassService titleClassService,
+        IUserMetadataTypeService userMetadataTypeService,
+        IUserService userService) : BaseController<UsersController>(context)
     {
-        private readonly IApiKeyService _apiKeyService;
-        private readonly IPermissionGroupService _permissionGroupService;
-        private readonly ITitleClassService _titleClassService;
-        private readonly IUserMetadataTypeService _userMetadataTypeService;
-        private readonly IUserService _userService;
+        private readonly IApiKeyService _apiKeyService = apiKeyService
+            ?? throw new ArgumentNullException(nameof(apiKeyService));
 
-        public UsersController(ServiceFacades.Controller<UsersController> context,
-            IApiKeyService apiKeyService,
-            IPermissionGroupService permissionGroupService,
-            ITitleClassService titleClassService,
-            IUserMetadataTypeService userMetadataTypeService,
-            IUserService userService) : base(context)
-        {
-            ArgumentNullException.ThrowIfNull(apiKeyService);
-            ArgumentNullException.ThrowIfNull(permissionGroupService);
-            ArgumentNullException.ThrowIfNull(titleClassService);
-            ArgumentNullException.ThrowIfNull(userMetadataTypeService);
-            ArgumentNullException.ThrowIfNull(userService);
+        private readonly IPermissionGroupService _permissionGroupService = permissionGroupService
+            ?? throw new ArgumentNullException(nameof(permissionGroupService));
 
-            _apiKeyService = apiKeyService;
-            _permissionGroupService = permissionGroupService;
-            _titleClassService = titleClassService;
-            _userMetadataTypeService = userMetadataTypeService;
-            _userService = userService;
-        }
+        private readonly ITitleClassService _titleClassService = titleClassService
+            ?? throw new ArgumentNullException(nameof(titleClassService));
+
+        private readonly IUserMetadataTypeService _userMetadataTypeService = userMetadataTypeService
+            ?? throw new ArgumentNullException(nameof(userMetadataTypeService));
+
+        private readonly IUserService _userService = userService
+            ?? throw new ArgumentNullException(nameof(userService));
 
         public static string Area
-        { get { return "ContentManagement"; } }
+        { get { return nameof(ContentManagement); } }
 
         public static string Name
         { get { return "Users"; } }
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> AddApiKey()
+        public IActionResult AddApiKey()
         {
-            var baseUri = await GetBaseUriBuilderAsync();
-            baseUri.Path = Url.Action(nameof(StaffController.SearchJson), StaffController.Name);
-
             var viewModel = new AddApiKeyViewModel
             {
-                JsonStaffSearchUri = baseUri.Uri
+                StaffSearchLink = Url.Action(nameof(StaffController.SearchJson),
+                    StaffController.Name)
             };
 
             foreach (ApiKeyType apiKeyType in Enum.GetValues(typeof(ApiKeyType)))

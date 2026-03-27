@@ -566,10 +566,10 @@
 @section Scripts {
     @if (Model.LocationManager)
     {
-        <script>
-            const mapCoordinatorUrl = new URL('@Url.Action(nameof(LocationsController.MapVolunteerCoordinator), LocationsController.Name, new { slug = Model.Location.Stub }, protocol: Context.Request.Scheme)');
-            const staffSearchUrl = new URL('@Url.Action(nameof(StaffController.SearchJson), StaffController.Name, null, protocol: Context.Request.Scheme)');
-            const updateAltUrlPath = '@Url.Action(nameof(LocationsController.UpdateAltText))'
+        <script type="text/javascript">
+            const mapCoordinatorUrl = new URL(`${location.origin}@Url.Action(nameof(LocationsController.MapVolunteerCoordinator), LocationsController.Name, new { slug = Model.Location.Stub })`);
+            const staffSearchUrl = new URL(`${location.origin}@Url.Action(nameof(StaffController.SearchJson), StaffController.Name)`);
+            const updateAltUrlPath = `${location.origin}@Url.Action(nameof(LocationsController.UpdateAltText))`
             const locationId = @Model.Location.Id;
 
             function updateAltCharCount() {
@@ -637,7 +637,7 @@
             });
 
             document.getElementById("staffSearchText").addEventListener('keyup', (e) => {
-                if(e.key == 'Enter' || e.keyCode == 13) {
+                if(e.key === 'Enter') {
                     document.getElementById('staffSearchGo').click();
                 }
             });
