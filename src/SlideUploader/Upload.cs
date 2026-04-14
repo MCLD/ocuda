@@ -65,9 +65,24 @@ namespace Ocuda.SlideUploader
                 return;
             }
 
-            var jobResult = await _opsClient.UploadJobAsync(job);
+            JsonResponse jobResult;
 
-            if (jobResult.Success)
+            try
+            {
+                jobResult = await _opsClient.UploadJobAsync(job);
+            }
+            catch (OcudaException oex)
+            {
+                var ex = oex.InnerException ?? oex;
+                _logger.LogCritical(ex,
+                    "Unable run job file {JobFile}: {ErrorMessage}",
+                    jobFile,
+                    ex.Message);
+                await JobFailureAsync(jobResultFilePath, $"Critical upload error: {ex.Message}.");
+                return;
+            }
+
+            if (jobResult?.Success == true)
             {
                 _logger.LogInformation("Uploaded {FileName} to set {Set}: {Message}",
                     Path.GetFileName(job.Filepath),
@@ -81,7 +96,7 @@ namespace Ocuda.SlideUploader
                     jobResult.ServerResponse ? "from server" : "without server response",
                     Path.GetFileName(job.Filepath),
                     job.Set,
-                    jobResult.Message);
+                    jobResult?.Message ?? "no error message returned");
             }
 
             await File.WriteAllTextAsync(jobResultFilePath, JsonSerializer.Serialize(jobResult));
