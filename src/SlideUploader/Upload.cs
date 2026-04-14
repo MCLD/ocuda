@@ -56,6 +56,15 @@ namespace Ocuda.SlideUploader
                 return;
             }
 
+            if (!File.Exists(job.Filepath))
+            {
+                _logger.LogCritical("Unable to find image specified in job at: {Path}",
+                    job.Filepath);
+                await JobFailureAsync(jobResultFilePath,
+                    $"Critical error: Unable to find image specified in job at: {job.Filepath}");
+                return;
+            }
+
             var jobResult = await _opsClient.UploadJobAsync(job);
 
             if (jobResult.Success)
