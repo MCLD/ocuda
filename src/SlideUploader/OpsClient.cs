@@ -42,7 +42,16 @@ namespace Ocuda.SlideUploader
 
         internal async Task<JsonResponse> UploadJobAsync(SlideUploadJob job)
         {
-            var fileContent = System.IO.File.ReadAllBytes(job.Filepath);
+            byte[] fileContent;
+            try
+            {
+                fileContent = System.IO.File.ReadAllBytes(job.Filepath);
+            }
+            catch (SystemException ex)
+            {
+                throw new OcudaException($"Uploading job failed: {ex.Message}", ex);
+            }
+
             System.IO.Path.GetFileName(job.Filepath);
 
             using var apiKey = new StringContent(_options.Value.ApiKey);
