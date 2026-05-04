@@ -1,0 +1,391 @@
+﻿@using Ocuda.Ops.Controllers.ViewModels.AddressVerification
+@model IndexViewModel
+
+<div class="d-flex justify-content-between mb-2">
+    <h1>Address Verification</h1>
+    <div>
+        <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)"
+           asp-area=""
+           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+           class="btn btn-outline-dark">
+            Home
+        </a>
+    </div>
+</div>
+<div class="row d-none" id="alertRow">
+    <div class="col-12 col-sm-6 offset-sm-3">
+        <div class="alert alert-danger" id="alertMessage"></div>
+    </div>
+</div>
+<div class="row">
+    @if (Model.AddressLookupConfigured)
+    {
+        <div class="col-12 col-sm-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group mb-2">
+                        <label for="addressInput">Address</label>
+                        <input autocomplete="off" class="form-control" id="addressInput" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="postalCodeInput">ZIP code</label>
+                        <input autocomplete="off"
+                               class="form-control"
+                               id="postalCodeInput"
+                               type="number" />
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-outline-danger me-2"
+                                disabled="disabled"
+                                id="cancelLookup">
+                            Cancel
+                        </button>
+                        <button button-spinner
+                                class="btn btn-outline-dark"
+                                id="lookupAddress">
+                            Lookup Address
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    @if (Model.BarcodeLookupConfigured)
+    {
+        <div class="col-12 col-sm-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group mb-3">
+                        <label for="barcodeInput">Barcode</label>
+                        <input autocomplete="off"
+                               class="form-control"
+                               id="barcodeInput"
+                               type="number" />
+                    </div>
+                    <div class="mb-3" id="barcodeResults"></div>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-outline-danger me-2"
+                                disabled="disabled"
+                                id="cancelBarcodeLookup">
+                            Cancel
+                        </button>
+                        <button button-spinner
+                                class="btn btn-outline-dark"
+                                id="lookupBarcode"
+                                type="submit">
+                            Lookup Barcode
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="row" id="searchResults"></div>
+
+@section Scripts
+{
+    @if (Model.AddressLookupConfigured)
+    {
+        <script src="@Url.Action(nameof(AddressVerificationController.Providers))"
+                type="text/javascript"></script>
+    }
+    <script>
+        const alertMessage = document.getElementById("alertMessage");
+        const alertRow = document.getElementById("alertRow");
+
+        // *** HANDLE LOOKUP RESULTS ***
+        // create a list of address lookup results, barcode = true makes the address clickable
+        function constructResults(jsonResult, barcode) {
+            let html = [];
+            if(jsonResult.serverResponse == false || jsonResult.success == false) {
+                html.push(`<div class="alert alert-warning">${jsonResult.message}</div>`);
+            } else if(jsonResult.data === null || jsonResult.data.length === 0) {
+                html.push("<div class=\"alert alert-info\">No results found.</div>");
+            } else {
+                html.push("<ul>");
+                jsonResult.data.forEach(address => {
+                    html.push("<li>");
+                    if(barcode) {
+                        html.push("<a href=\"#\"");
+                        html.push(`  data-address="${address.streetAddress1}"`);
+                        html.push(`  data-zip="${address.postalCode}">`);
+                    }
+                    html.push(`${address.streetAddress1}, ${address.postalCode}`);
+                    if(barcode) {
+                        html.push("</a>");
+                    }
+                    if(address.propertyType) {
+                        html.push(` - ${address.propertyType}`);
+                    }
+                    if(address.entities) {
+                        html.push("<ul>");
+                        address.entities.forEach(entity => { html.push(`<li>${entity}</li>`); });
+                        html.push("</ul>");
+                    }
+                    html.push("</li>");
+                });
+                html.push("</ul>");
+            }
+            return html.join("");
+        }
+    </script>
+
+    @if (Model.AddressLookupConfigured)
+    {
+        <script>
+            // *** ADDRESS LOOKUP ***
+            const addressInput = document.getElementById("addressInput");
+            const postalCodeInput = document.getElementById("postalCodeInput");
+            const results = document.getElementById("searchResults");
+            const cancel = document.getElementById("cancelLookup");
+            const lookupAddress = document.getElementById("lookupAddress");
+            var abortController;
+
+            // create a card with a lookup result
+            function createCard(source) {
+                return "<div class=\"col-12 col-sm-6 mb-3\"><div class=\"card\">"
+                    + `<div class="card-header">${lookupProviders[source].Name}</div>`
+                    + `<div class="card-body" id="${source}-results">`
+                    + "<div class=\"text-center\">"
+                    + "<span class=\"fa-solid fa-spinner fa-pulse fa-2x fa-fw\">"
+                    + "</div></div></div></div>"
+            }
+
+
+            // event binding to perform address lookup upon button click
+            lookupAddress.addEventListener("click", (event) => {
+                performLookup(event.target);
+            });
+
+            // enter key in address field tabs to postal code or does lookup
+            addressInput.addEventListener("keydown", e => {
+                if(e.key === "Enter") {
+                    e.preventDefault();
+                    if(postalCodeInput.value.length > 0) {
+                        performLookup(lookupAddress)
+                    } else {
+                        postalCodeInput.focus();
+                    }
+                }
+            });
+
+            // enter key in postal code field performs address lookup
+            postalCodeInput.addEventListener("keydown", e => {
+                if(e.key === "Enter") {
+                    e.preventDefault();
+                    performLookup(lookupAddress);
+                }
+            });
+
+            // cancel button for address lookup
+            cancel.addEventListener("click", _ => {
+                if(abortController) {
+                    abortController.abort();
+                }
+            });
+
+            // perform address lookup, target is the lookup button so it can be disabled
+            async function performLookup(target) {
+                abortController = new AbortController();
+                alertMessage.innerText = "";
+                alertRow.classList.add("d-none");
+                cancel.removeAttribute("disabled");
+                target.setAttribute("disabled", "disabled");
+                results.innerHTML = "";
+                addressInput.classList.remove("is-invalid", "is-valid");
+                postalCodeInput.classList.remove("is-invalid", "is-valid");
+
+                if(!lookupProviders || lookupProviders.length == 0) {
+                    alertMessage.innerText = "No address lookup providers are configured.";
+                    alertRow.classList.remove("d-none");
+                    endLookup(target);
+                    return;
+                }
+
+                // perform validation before doing the address query
+                let errors = []
+                if(!addressInput.value || addressInput.value.trim().length == 0) {
+                    errors.push("<li>street address</li>");
+                    addressInput.classList.add("is-invalid");
+                }
+                else {
+                    addressInput.classList.add("is-valid");
+                }
+
+                if(!postalCodeInput.value || postalCodeInput.value.trim().length == 0) {
+                    errors.push("<li>numeric ZIP code</li>");
+                    postalCodeInput.classList.add("is-invalid");
+                } else {
+                    postalCodeInput.classList.add("is-valid");
+                }
+
+                // any issues are noted in the errors array and output in a list
+                if(errors.length > 0) {
+                    alertMessage.innerHTML = "You must provide the following:<ul>"
+                        + errors.join("")
+                        + "</ul>"
+                    alertRow.classList.remove("d-none");
+                    endLookup(target);
+                    return;
+                }
+
+                // create a list of promises so that we can trap on all of them finishing
+                let promises = [];
+                for(let source in lookupProviders) {
+                    const link = new URL(`${location.origin}${lookupProviders[source].Path}`);
+                    results.innerHTML = results.innerHTML + createCard(source);
+                    const params = new URLSearchParams(link.search);
+                    params.append("address", addressInput.value);
+                    params.append("zip", postalCodeInput.value);
+                    promises.push(fetch(new URL(`${link.origin}${link.pathname}?${params}`),
+                        { method: 'GET', signal: abortController.signal }));
+                }
+
+                // run all queries and handle results
+                Promise.all(promises)
+                    .then((responses) => Promise.all(responses.map((r) => r.json())))
+                    .then((jsons) => jsons.forEach((jsonResponse) => {
+                        document.getElementById(`${jsonResponse.source}-results`).innerHTML
+                            = constructResults(jsonResponse);
+                    }))
+                    .catch((error) => {
+                        if(abortController.signal.aborted === true) {
+                            alertMessage.innerText = "Lookup cancelled.";
+                        } else {
+                            alertMessage.innerText = `Address lookup error: ${error}`;
+                        }
+                        alertRow.classList.remove("d-none");
+                    })
+                    .then(_ => {
+                        endLookup(target);
+                    });
+            }
+
+            // reset the form after an address lookup completes (whether or not successful)
+            function endLookup(target) {
+                ResetSpinners(target);
+                results.querySelectorAll(".fa-spinner").forEach(e => {
+                    e.classList.remove("fa-solid", "fa-spinner", "fa-pulse", "fa-2x", "fa-fw");
+                    e.classList.add("alert", "alert-warning");
+                    e.innerText = "Lookup cancelled before results were found.";
+                });
+                cancel.setAttribute("disabled", "disabled");
+                target.removeAttribute("disabled");
+            }
+        </script>
+    }
+
+    @if (Model.BarcodeLookupConfigured)
+    {
+        <script>
+            // *** BARCODE LOOKUP ***
+            const barcodePath = "@Url.Action(nameof(AddressVerificationController.BarcodeLookup))";
+            const barcodeResults = document.getElementById("barcodeResults");
+            const cancelBarcode = document.getElementById("cancelBarcodeLookup");
+            const lookupBarcode = document.getElementById("lookupBarcode");
+
+            var abortBarcodeController;
+
+            // event binding to perform barcode lookup upon button click
+            document.getElementById("lookupBarcode").addEventListener("click", (event) => {
+                performBarcodeLookup(event.target);
+            });
+
+            // enter key in barcode field performs barcode lookup
+            barcodeInput.addEventListener("keydown", e => {
+                if(e.key === "Enter") {
+                    e.preventDefault();
+                    performBarcodeLookup(lookupBarcode);
+                }
+            });
+
+            // cancel button for barcode lookup
+            cancelBarcode.addEventListener("click", _ => {
+                if(abortBarcodeController) {
+                    abortBarcodeController.abort();
+                }
+            });
+
+            // if barcode lookup results link is clicked, perform search on clicked a element
+            barcodeResults.addEventListener("click", function(event) {
+                const clickedLink = event.target.closest("a");
+                if(clickedLink && this.contains(clickedLink)) {
+                    populateAndLookup(clickedLink.dataset.address, clickedLink.dataset.zip);
+                }
+            });
+
+            // populate the address and zip fields and then perform a lookup
+            function populateAndLookup(address, zip) {
+                addressInput.value = address;
+                postalCodeInput.value = zip;
+                performLookup(lookupAddress);
+            }
+
+            // perform barcode lookup, target is the lookup button so it can be disabled
+            function performBarcodeLookup(target) {
+                abortBarcodeController = new AbortController();
+                alertMessage.innerText = "";
+                alertRow.classList.add("d-none");
+                barcodeResults.innerText = "";
+                cancelBarcode.removeAttribute("disabled");
+                target.setAttribute("disabled", "disabled");
+                barcodeInput.classList.remove("is-invalid", "is-valid");
+
+                // perform validation, exit if input is not valid
+                if(!barcodeInput.value || barcodeInput.value.trim().length == 0) {
+                    barcodeInput.classList.add("is-invalid");
+                    alertMessage.innerText = "You must enter a numeric barcode to do a barcodde lookup";
+                    alertRow.classList.remove("d-none");
+                    endBarcodeLookup(target);
+                    return;
+                } else {
+                    barcodeInput.classList.add("is-valid");
+                }
+
+                // construct the link and fetch it
+                const link = new URL(`${location.origin}${barcodePath}`);
+                const params = new URLSearchParams(link.search);
+                params.append("barcode", barcodeInput.value);
+                fetch(new URL(`${link.origin}${link.pathname}?${params}`),
+                    { method: 'GET', signal: abortBarcodeController.signal })
+                    .then((response) => response.json())
+                    .then((jsonResponse) => {
+                        if(!jsonResponse.success || !jsonResponse.serverResponse) {
+                            if(jsonResponse.message && jsonResponse.message.trim().length > 0) {
+                                alertMessage.innerText = jsonResponse.message;
+                            } else {
+                                alertMessage.innerText = "An error occurred looking up that barcode.";
+                            }
+                            alertRow.classList.remove("d-none");
+                        } else {
+                            barcodeResults.innerHTML = constructResults(jsonResponse, true);
+                            if(jsonResponse.data.length == 1) {
+                                address = jsonResponse.data[0];
+                                populateAndLookup(address.streetAddress1, address.postalCode);
+                            }
+                        }
+                    })
+                    .catch((error) => {
+                        if(abortBarcodeController.signal.aborted === true) {
+                            alertMessage.innerText = "Barcode lookup cancelled.";
+                        } else {
+                            alertMessage.innerText = `Barcode lookup error: ${error}.`;
+                        }
+                        alertRow.classList.remove("d-none");
+                    })
+                    .then(_ => {
+                        endBarcodeLookup(target);
+                    });
+            }
+
+            // reset the form after a barcode lookup completes (whether or not successful)
+            function endBarcodeLookup(target) {
+                ResetSpinners(target);
+                cancelBarcode.setAttribute("disabled", "disabled");
+                target.removeAttribute("disabled");
+            }
+        </script>
+    }
+}

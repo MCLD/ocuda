@@ -51,6 +51,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MaricopaCountyAssessorHelper\MaricopaCountyAssessorHelper.csproj" />
     <ProjectReference Include="..\Ops.Controllers\Ops.Controllers.csproj" />
     <ProjectReference Include="..\Ops.DataProvider.SqlServer.Ops\Ops.DataProvider.SqlServer.Ops.csproj" />
     <ProjectReference Include="..\Ops.DataProvider.SqlServer.Promenade\Ops.DataProvider.SqlServer.Promenade.csproj" />
@@ -58,6 +59,7 @@
     <ProjectReference Include="..\Ops.Models\Ops.Models.csproj" />
     <ProjectReference Include="..\Ops.Service\Ops.Service.csproj" />
     <ProjectReference Include="..\Promenade.Models\Promenade.Models.csproj" />
+    <ProjectReference Include="..\TrestleHelper\TrestleHelper.csproj" />
     <ProjectReference Include="..\Utility\Utility.csproj" />
   </ItemGroup>
 

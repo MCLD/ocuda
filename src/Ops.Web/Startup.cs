@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using MaricopaCountyAssessorHelper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -16,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Ocuda.Ops.Controllers;
 using Ocuda.Ops.Data;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Clients;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -27,6 +29,7 @@ using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Providers;
+using TrestleHelper;
 
 namespace Ocuda.Ops.Web
 {
@@ -74,6 +77,8 @@ namespace Ocuda.Ops.Web
             app.InitialSetup();
 
             app.EnsureRequiredDataIsPresent();
+
+            app.VerifyFeatures();
 
             // use the culture configured above in services
             app.UseRequestLocalization();
@@ -125,6 +130,8 @@ namespace Ocuda.Ops.Web
                 _.DefaultRequestCulture
                     = new Microsoft.AspNetCore.Localization.RequestCulture(culture);
             });
+
+            services.AddOptions<OpsFeaturesOptions>();
 
             services.AddHealthChecks();
 
@@ -332,6 +339,18 @@ namespace Ocuda.Ops.Web
                 .ConfigureHttpClient(_ =>
                 {
                     _.Timeout = TimeSpan.FromSeconds(30);
+                    _.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(nameof(Ocuda),
+                        Utility.Helpers.VersionHelper.GetVersion()));
+                });
+            services.AddHttpClient<TrestleClient>()
+                .ConfigureHttpClient(_ =>
+                {
+                    _.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(nameof(Ocuda),
+                        Utility.Helpers.VersionHelper.GetVersion()));
+                });
+            services.AddHttpClient<MaricopaCountyAssessorClient>()
+                .ConfigureHttpClient(_ =>
+                {
                     _.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(nameof(Ocuda),
                         Utility.Helpers.VersionHelper.GetVersion()));
                 });
