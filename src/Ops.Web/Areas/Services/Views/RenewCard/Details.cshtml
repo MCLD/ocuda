@@ -247,23 +247,21 @@
                 <div id="addressContainer"
                      class="accordion-collapse collapse"
                      data-bs-parent="#addressAccordion">
-                    <div class="accordion-body">
+                    <div class="accordion-body" id="addressListContainer">
                         <div class="row">
-                            <div class="col-12 col-md-4">
+                            <div class="col-12 col-md-3">
                                 <div><em>Address(es) in Polaris:</em></div>
                                 @foreach (var address in Model.Customer.Addresses)
                                 {
                                     <div>
                                         <strong>@address.AddressType</strong>
-                                        @if (Model.AddressLookupUrlSet || !string.IsNullOrWhiteSpace(Model.AssessorLookupUrl))
+                                        @if (Model.AddressLookupConfigured)
                                         {
                                             <span>
                                                 (<a href="#"
-                                                    class="addressLookup"
                                                     data-address="@address.StreetAddressOne @address.StreetAddressTwo"
                                                     data-zip="@address.PostalCode">Look up</a>)
                                             </span>
-
                                         }
                                     </div>
                                     <div class="mb-3">
@@ -278,21 +276,9 @@
                                     </div>
                                 }
                             </div>
-                            @if (Model.AddressLookupUrlSet || !string.IsNullOrWhiteSpace(Model.AssessorLookupUrl))
+                            @if (Model.AddressLookupConfigured)
                             {
-                                <div class="col-12 col-md-8">
-                                    @if (Model.AddressLookupUrlSet)
-                                    {
-                                        <div id="addressLookupResults" class="mb-2"></div>
-                                    }
-                                    @if (!string.IsNullOrWhiteSpace(Model.AssessorLookupUrl))
-                                    {
-                                        <div id="assessorLookupResults" class="d-none">
-                                            <strong>Assessor results:</strong>
-                                            <div>Click to <a id="assessorLink" href="" target="_blank">load this search on the County Assessor's site</a></div>
-                                        </div>
-                                    }
-                                </div>
+                                <div class="col-12 col-md-9"><ul id="addressLookupResults"></ul></div>
                             }
                         </div>
                     </div>
@@ -310,7 +296,6 @@
           role="form">
         <input asp-for="CustomerName" type="hidden" />
         <input asp-for="RequestId" value="@Model.Request.Id" type="hidden" />
-
         <div class="row">
             <div class="col-12 col-xl-8 offset-xl-2">
                 <div class="mb-3">
@@ -353,13 +338,11 @@
             </div>
         </div>
     </form>
-
     <form asp-action="@nameof(RenewCardController.Discard)"
           enctype="multipart/form-data"
           method="post"
           role="form">
         <input id="discardId" asp-for="RequestId" value="@Model.Request.Id" type="hidden" />
-
         <div class="modal" tabindex="-1" id="discardModal">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -421,6 +404,108 @@ else
 }
 
 @section scripts {
+    @if (Model.AddressLookupConfigured)
+    {
+        <script src="@Url.Action(nameof(Ocuda.Ops.Controllers.AddressVerificationController.Providers), Ocuda.Ops.Controllers.AddressVerificationController.Name, new { area = "" })"
+                type="text/javascript"></script>
+        <script>
+            const addressListContainer = document.getElementById("addressListContainer");
+            const addressLookupResults = document.getElementById("addressLookupResults");
+            const loadingHtml = "<div class=\"d-flex justify-content-center align-items-center\"><span class=\"fa-solid fa-spinner fa-pulse fa-2x fa-fw\"></div>";
+            var abortController;
+            var addressLookupUnderway = false;
+
+            addressListContainer.addEventListener("click", function(event) {
+                const clickedLink = event.target.closest("a");
+                if(clickedLink && this.contains(clickedLink)) {
+                    event.preventDefault();
+                    performLookup(clickedLink.dataset.address, clickedLink.dataset.zip);
+                }
+            });
+
+            function addAddressLookupResults(jsonResult) {
+                let html = [];
+                html.push(`<li>${lookupProviders[jsonResult.source].Name}`);
+                if(jsonResult.serverResponse == false || jsonResult.success == false) {
+                    html.push(`<div class="alert alert-warning">${jsonResult.message}</div>`);
+                } else if(jsonResult.data === null || jsonResult.data.length === 0) {
+                    html.push("<div class=\"alert alert-info\">No results found.</div>");
+                } else {
+                    html.push("<ul>");
+                    jsonResult.data.forEach(address => {
+                        html.push("<li>");
+                        html.push(`${address.streetAddress1}, ${address.postalCode}`);
+                        if(address.propertyType) {
+                            html.push(` - ${address.propertyType}`);
+                        }
+                        if(address.entities) {
+                            html.push("<ul>");
+                            address.entities.forEach(entity => { html.push(`<li>${entity}</li>`); });
+                            html.push("</ul>");
+                        }
+                        html.push("</li>");
+                    });
+                    html.push("</ul>");
+                }
+                html.push("</li>");
+                addressLookupResults.innerHTML = addressLookupResults.innerHTML + html.join("");
+            }
+
+            async function performLookup(address, zip) {
+                abortController = new AbortController();
+                addressLookupResults.innerHTML = loadingHtml;
+                if(!lookupProviders || lookupProviders.length == 0) {
+                    alertMessage.innerText = "No address lookup providers are configured.";
+                    alertRow.classList.remove("d-none");
+                    endLookup(target);
+                    return;
+                }
+
+                if(address.trim().length == 0 || zip.trim().length == 0) {
+                    alert ("Address or ZIP code missing, cannot perform lookup.");
+                    return;
+                }
+
+                if(addressLookupUnderway) {
+                    alert("Already performing an address lookup.");
+                    return;
+                }
+                addressLookupUnderway = true;
+
+                // create a list of promises so that we can trap on all of them finishing
+                let promises = [];
+                for(let source in lookupProviders) {
+                    const link = new URL(`${location.origin}${lookupProviders[source].Path}`);
+                    const params = new URLSearchParams(link.search);
+                    params.append("address", address);
+                    params.append("zip", zip);
+                    promises.push(fetch(new URL(`${link.origin}${link.pathname}?${params}`),
+                        { method: 'GET', signal: abortController.signal }));
+                }
+
+                // run all queries and handle results
+                Promise.all(promises)
+                    .then((responses) => Promise.all(responses.map((r) => r.json())))
+                    .then((jsons) =>
+                    {
+                        addressLookupResults.innerHTML = "";
+                        jsons.forEach((jsonResponse) => {
+                            addAddressLookupResults(jsonResponse);
+                        })
+                    })
+                    .catch((error) => {
+                        if(abortController.signal.aborted === true) {
+                            alert("Lookup cancelled.");
+                        } else {
+                            alert(`Address lookup error: ${error}`);
+                        }
+                    })
+                    .then(_ => {
+                        addressLookupUnderway = false;
+                    });
+            }
+        </script>
+    }
     <script>
         $('#ResponseId').on('change', function() {
             const languageId = '@Model.Request.LanguageId';
@@ -472,72 +557,4 @@ else
             }
         }
     </script>
-
-    @if (Model.AddressLookupUrlSet)
-    {
-        <script>
-            $('.addressLookup').on("click", function(e) {
-                e.preventDefault();
-
-                const addressLookupDiv = $('#addressLookupResults');
-                const addressLookupHeader = '<strong>Address lookup results:</strong></br>';
-
-                let searchAddress = $(this).attr('data-address').trim();
-                let searchZip = $(this).attr('data-zip');
-
-                addressLookupDiv.html('<strong>Loading address...</strong>  <span class="fa-solid fa-spinner fa-pulse fa-fw">');
-
-                $.get('@Url.Action(nameof(Ocuda.Ops.Controllers.ApiController.AddressLookup), Ocuda.Ops.Controllers.ApiController.Name)',
-                    {
-                        address: searchAddress,
-                        zip: searchZip
-                    })
-                    .done(function(response) {
-                        if (response != null)
-                        {
-                            if (response.success)
-                            {
-                                let formattedResults = [];
-                                formattedResults.push(response.streetAddress1,
-                                    " / ",
-                                    response.postalCode,
-                                    "<ul>");
-                                response.residents.forEach((_) =>
-                                {
-                                    formattedResults.push("<li>", _, "</li>");
-                                })
-                                formattedResults.push("</ul>");
-                                addressLookupDiv.html(addressLookupHeader + formattedResults.join(""));
-                            }
-                            else
-                            {
-                                addressLookupDiv.html(addressLookupHeader + response.error);
-                            }
-                        }
-                        else
-                        {
-                            addressLookupDiv.html(addressLookupHeader + 'An error occured looking up the address');
-                        }
-                    })
-                    .fail(function() {
-                        addressLookupDiv.html(addressLookupHeader + 'An error occured looking up the address');
-                    });
-            });
-        </script>
-    }
-
-    @if (!string.IsNullOrWhiteSpace(Model.AssessorLookupUrl))
-    {
-        <script>
-            $('.addressLookup').on("click", function(e) {
-                e.preventDefault();
-
-                let searchAddress = $(this).attr('data-address').trim();
-                let searchZip = $(this).attr('data-zip');
-
-                $('#assessorLookupResults').removeClass('d-none');
-                $('#assessorLink').attr('href', '@Model.AssessorLookupUrl' + searchAddress + ' ' + searchZip);
-            });
-        </script>
-    }
 }

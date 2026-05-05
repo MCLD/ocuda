@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Ocuda.Models;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Services.ViewModels.RenewCard;
@@ -19,6 +20,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.PolarisHelper;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Filters;
 using Ocuda.Utility.Keys;
 
@@ -30,6 +32,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
     {
         private const string LeapPatronRecordsPath = "/record";
         private const string PageTitle = "Renew Cards";
+        private readonly IOptions<OpsFeaturesOptions> _features;
         private readonly ILanguageService _languageService;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly IPolarisHelper _polarisHelper;
@@ -38,18 +41,21 @@ namespace Ocuda.Ops.Controllers.Areas.Services
 
         public RenewCardController(ServiceFacades.Controller<RenewCardController> context,
             ILanguageService languageService,
+            IOptions<OpsFeaturesOptions> features,
             IPermissionGroupService permissionGroupService,
             IPolarisHelper polarisHelper,
             IRenewCardRequestService renewCardRequestService,
             IRenewCardService renewCardService)
             : base(context)
         {
+            ArgumentNullException.ThrowIfNull(features);
             ArgumentNullException.ThrowIfNull(languageService);
             ArgumentNullException.ThrowIfNull(permissionGroupService);
             ArgumentNullException.ThrowIfNull(polarisHelper);
             ArgumentNullException.ThrowIfNull(renewCardRequestService);
             ArgumentNullException.ThrowIfNull(renewCardService);
 
+            _features = features;
             _languageService = languageService;
             _permissionGroupService = permissionGroupService;
             _polarisHelper = polarisHelper;
@@ -109,17 +115,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
 
             var viewModel = new DetailsViewModel
             {
-                AddressLookupUrlSet = !string.IsNullOrWhiteSpace(
-                    await _siteSettingService.GetSettingStringAsync(Models
-                        .Keys
-                        .SiteSetting
-                        .RenewCard
-                        .AddressLookupUrl)),
-                AssessorLookupUrl = await _siteSettingService.GetSettingStringAsync(Models
-                    .Keys
-                    .SiteSetting
-                    .RenewCard
-                    .AssessorLookupUrl),
+                AddressLookupConfigured = _features.Value.AddressLookupConfigured,
                 Customer = customer,
                 CustomerName = $"{customer?.NameFirst} {customer?.NameLast}",
                 Request = request
@@ -197,7 +193,7 @@ namespace Ocuda.Ops.Controllers.Areas.Services
                         }
                     }
 
-                    viewModel.CustomerBlocks = blocks;
+                    viewModel.CustomerBlocks.AddRange(blocks);
                 }
             }
             catch (OcudaException oex)

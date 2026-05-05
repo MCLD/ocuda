@@ -22,24 +22,6 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
-                Id = Keys.SiteSetting.RenewCard.AddressLookupUrl,
-                Name = "Address lookup url",
-                Description = "Address lookup url with scheme, host and path",
-                Category = nameof(Keys.SiteSetting.RenewCard),
-                Value = string.Empty,
-                Type = SiteSettingType.StringNullable
-            },
-            new SiteSetting
-            {
-                Id = Keys.SiteSetting.RenewCard.AssessorLookupUrl,
-                Name = "Assessor lookup url",
-                Description = "Assessor lookup with scheme, host and path",
-                Category = nameof(Keys.SiteSetting.RenewCard),
-                Value = string.Empty,
-                Type= SiteSettingType.StringNullable
-            },
-            new SiteSetting
-            {
                 Id = Keys.SiteSetting.RenewCard.ChargesLimit,
                 Name = "Charges Limit",
                 Description = "Charges amount when a warning starts being shown",

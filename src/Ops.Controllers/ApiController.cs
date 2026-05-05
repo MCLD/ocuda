@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Ocuda.Models;
 using Ocuda.Ops.Controllers.Areas.ContentManagement;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
@@ -74,53 +70,6 @@ namespace Ocuda.Ops.Controllers
                 ServerResponse = true,
                 Success = false
             };
-        }
-
-        public async Task<AddressLookupResult> AddressLookup(string address, string zip)
-        {
-            var addressLookupPath = await _siteSettingService.GetSettingStringAsync(Models
-                    .Keys
-                    .SiteSetting
-                    .RenewCard
-                    .AddressLookupUrl);
-
-            var queryParams = new Dictionary<string, string>
-            {
-                { nameof(address), HttpUtility.UrlEncode(address) },
-                { nameof(zip), HttpUtility.UrlEncode(zip) }
-            };
-            var parameterString = string.Join('&', queryParams.Select(_ => $"{_.Key}={_.Value}"));
-
-            var queryUri = new UriBuilder(addressLookupPath) { Query = parameterString }.Uri;
-
-            using var response = await _httpClient.GetAsync(queryUri);
-
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                
-                try
-                {
-                    return await JsonSerializer.DeserializeAsync<AddressLookupResult>(
-                        responseStream,
-                        new JsonSerializerOptions
-                        {
-                            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                        });
-                }
-                catch (JsonException jex)
-                {
-                    _logger.LogError(jex, "Error decoding JSON: {ErrorMessage}", jex.Message);
-                }
-            }
-            else
-            {
-                _logger.LogError("Address lookup returned status code {StatusCode} for parameters {Parameters}",
-                    response.StatusCode,
-                    parameterString);
-            }
-
-            return null;
         }
 
         #region Slide Upload

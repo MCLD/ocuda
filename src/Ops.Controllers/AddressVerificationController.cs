@@ -21,6 +21,8 @@ namespace Ocuda.Ops.Controllers
         MaricopaCountyAssessorClient maricopaCountyAssessorClient,
         TrestleClient trestleClient) : BaseController<AddressVerificationController>(context)
     {
+        private const string PageTitle = "Address Verificaiton";
+
         public static string Name
         { get { return "AddressVerification"; } }
 
@@ -79,6 +81,8 @@ namespace Ocuda.Ops.Controllers
                 ShowAlertDanger("Address verification and barcode lookup are not configured.");
                 RedirectToAction(nameof(HomeController.Index), HomeController.Name);
             }
+
+            SetPageTitle(PageTitle);
 
             return View(viewModel);
         }
