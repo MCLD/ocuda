@@ -59,8 +59,6 @@
         public static class RenewCard
         {
             public static readonly string AcceptedCounty = "RenewCard.AcceptedCounty";
-            public static readonly string AddressLookupUrl = "RenewCard.AddressLookupUrl";
-            public static readonly string AssessorLookupUrl = "RenewCard.AssessorLookupUrl";
             public static readonly string ChargesLimit = "RenewCard.ChargesLimit";
             public static readonly string IgnoredBlockIds = "RenewCard.IgnoredBlockIds";
             public static readonly string LeapPatronUrl = "RenewCard.LeapPatronUrl";

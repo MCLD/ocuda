@@ -1,11 +1,19 @@
 ﻿function ResetSpinners(target) {
     if (target != null) {
-        target.removeClass("disabled");
-        target.children(".fa-spinner").addClass("d-none");
-    }
-    else {
+        if (target instanceof jQuery) {
+            target.removeClass("disabled");
+            target.children(".fa-spinner").addClass("d-none");
+        } else {
+            target.classList.remove("disabled");
+            target.querySelectorAll(".fa-spinner").forEach((element) => {
+                element.classList.add("d-none");
+            });
+        }
+    } else {
         $(".btn-spinner, .btn-spinner-no-validate").removeClass("disabled");
-        $(".btn-spinner, .btn-spinner-no-validate").children(".fa-spinner").addClass("d-none");
+        $(".btn-spinner, .btn-spinner-no-validate")
+            .children(".fa-spinner")
+            .addClass("d-none");
     }
 }
 
@@ -18,17 +26,18 @@ $(".btn-spinner").on("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-    }
-    else {
+    } else {
         var parentForm = $(this).closest("form");
 
-        if (!$(this).hasClass("spinner-ignore-validation")
-            && (parentForm.length > 0 && !parentForm.valid())) {
+        if (
+            !$(this).hasClass("spinner-ignore-validation") &&
+            parentForm.length > 0 &&
+            !parentForm.valid()
+        ) {
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
-        }
-        else {
+        } else {
             parentForm.find(".btn-spinner").addClass("disabled");
             $(this).children(".fa-spinner").removeClass("d-none");
         }
@@ -53,7 +62,8 @@ function validateFile(e, filePath) {
 
 function updateStub(stub, text) {
     // From https://gist.github.com/mathewbyrne/1280286
-    var slug = text.toLowerCase()
+    var slug = text
+        .toLowerCase()
         .replace(/\s+/g, "-")
         .replace(/&/g, "-and-")
         .replace(/[^\w\-]+/g, "")
@@ -66,7 +76,9 @@ function updateStub(stub, text) {
 function SetValidation(target, message) {
     target.addClass("input-validation-error");
 
-    var validationMessage = target.closest(".mb-3-inner").find(".validation-message");
+    var validationMessage = target
+        .closest(".mb-3-inner")
+        .find(".validation-message");
     validationMessage.removeClass("field-validation-valid");
     validationMessage.addClass("field-validation-error");
     validationMessage.text(message);
@@ -75,7 +87,9 @@ function SetValidation(target, message) {
 function ClearValidation(target) {
     target.removeClass("input-validation-error");
 
-    var validationMessage = target.closest(".mb-3-inner").find(".validation-message");
+    var validationMessage = target
+        .closest(".mb-3-inner")
+        .find(".validation-message");
     validationMessage.text("");
     validationMessage.removeClass("field-validation-error");
     validationMessage.addClass("text-danger field-validation-valid");
@@ -84,24 +98,23 @@ function ClearValidation(target) {
 function ValidateField(target, validateUrl, params) {
     ClearValidation(target);
 
-    var validationMessage = target.closest(".mb-3-inner").find(".validation-message");
+    var validationMessage = target
+        .closest(".mb-3-inner")
+        .find(".validation-message");
     validationMessage.removeClass("text-danger text-success");
     validationMessage.text("Checking...");
 
-    $.post(validateUrl,
-        params,
-        function (response) {
-            if (!response.success) {
-                SetValidation(target, response.message);
-            }
-            else {
-                ClearValidation(target);
-            }
-        });
+    $.post(validateUrl, params, function (response) {
+        if (!response.success) {
+            SetValidation(target, response.message);
+        } else {
+            ClearValidation(target);
+        }
+    });
 }
 
 $.validator.setDefaults({
-    ignore: ".validation-ignore"
+    ignore: ".validation-ignore",
 });
 
 function removeAttachmentItem(url, id) {
@@ -114,8 +127,7 @@ function removeAttachmentItem(url, id) {
             if (itemCount < 1) {
                 $("#attachmentsInputRow").remove();
             }
-        }
-        else {
+        } else {
             alert(response.message);
         }
     });

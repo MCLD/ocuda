@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Services.Interfaces;
@@ -21,20 +22,24 @@ namespace Ocuda.Ops.Controllers.Filters
 
         public NavigationFilterAttribute(ILocationService locationService,
            ILogger<NavigationFilterAttribute> logger,
+           IOptions<OpsFeaturesOptions> features,
            IOcudaCache ocudaCache,
            IPathResolverService pathResolverService)
         {
+            ArgumentNullException.ThrowIfNull(features);
             ArgumentNullException.ThrowIfNull(locationService);
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(ocudaCache);
             ArgumentNullException.ThrowIfNull(pathResolverService);
 
-            OcudaCache = ocudaCache;
+            Features = features;
             LocationService = locationService;
             Logger = logger;
+            OcudaCache = ocudaCache;
             PathResolverService = pathResolverService;
         }
 
+        public IOptions<OpsFeaturesOptions> Features { get; }
         public ILocationService LocationService { get; }
         public ILogger<NavigationFilterAttribute> Logger { get; }
         public IOcudaCache OcudaCache { get; }
@@ -85,6 +90,8 @@ namespace Ocuda.Ops.Controllers.Filters
             }
 
             context.HttpContext.Items[ItemKey.Locations] = locations;
+
+            context.HttpContext.Items[ItemKey.Features] = Features.Value;
 
             await next();
         }
