@@ -2,6 +2,12 @@
 {
     namespace SiteSetting
     {
+        public static class AddressVerification
+        {
+            public static readonly string Link = $"{nameof(AddressVerification)}.{nameof(Link)}";
+            public static readonly string LinkText = $"{nameof(AddressVerification)}.{nameof(LinkText)}";
+        }
+
         public static class Carousel
         {
             public static readonly string AltTextEnglish = "Carousel.AltTextEnglish";

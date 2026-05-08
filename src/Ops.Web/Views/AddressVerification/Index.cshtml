@@ -4,10 +4,14 @@
 <div class="d-flex justify-content-between mb-2">
     <h1>Address Verification</h1>
     <div>
+        @if (!string.IsNullOrEmpty(Model.LinkText))
+        {
+            <a class="btn btn-outline-primary" href="@Model.Link">@Model.LinkText</a>
+        }
         <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)"
            asp-area=""
            asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
-           class="btn btn-outline-dark">
+           class="btn btn-outline-dark ms-2">
             Home
         </a>
     </div>

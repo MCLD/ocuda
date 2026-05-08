@@ -68,7 +68,7 @@ namespace Ocuda.Ops.Controllers
         }
 
         [HttpGet("")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var viewModel = new ViewModels.AddressVerification.IndexViewModel
             {
@@ -80,6 +80,16 @@ namespace Ocuda.Ops.Controllers
             {
                 ShowAlertDanger("Address verification and barcode lookup are not configured.");
                 RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
+
+            viewModel.Link = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.AddressVerification.Link);
+
+            if (!string.IsNullOrEmpty(viewModel.Link))
+            {
+                viewModel.LinkText = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.AddressVerification.LinkText)
+                    ?? "Information";
             }
 
             SetPageTitle(PageTitle);
