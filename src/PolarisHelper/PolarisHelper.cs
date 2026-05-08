@@ -407,17 +407,17 @@ namespace Ocuda.PolarisHelper
                     _logger.LogError("Polaris Helper is not configured: PapiSetting 'WorkstationId' is missing");
                     validConfiguration = false;
                 }
-                if (string.IsNullOrWhiteSpace(_papiClient.StaffOverrideAccount.Domain))
+                if (string.IsNullOrWhiteSpace(_papiClient.StaffOverrideAccount?.Domain))
                 {
                     _logger.LogError("Polaris Helper is not configured: PapiSetting 'StaffOverrideAccount.Domain' is missing");
                     validConfiguration = false;
                 }
-                if (string.IsNullOrWhiteSpace(_papiClient.StaffOverrideAccount.Password))
+                if (string.IsNullOrWhiteSpace(_papiClient.StaffOverrideAccount?.Password))
                 {
                     _logger.LogError("Polaris Helper is not configured: PapiSetting 'StaffOverrideAccount.Password' is missing");
                     validConfiguration = false;
                 }
-                if (string.IsNullOrWhiteSpace(_papiClient.StaffOverrideAccount.Username))
+                if (string.IsNullOrWhiteSpace(_papiClient.StaffOverrideAccount?.Username))
                 {
                     _logger.LogError("Polaris Helper is not configured: PapiSetting 'StaffOverrideAccount.Username' is missing");
                     validConfiguration = false;
