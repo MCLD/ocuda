@@ -432,10 +432,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             try
             {
                 var fileLibrary = await _fileService.GetLibraryByIdAsync(model.FileLibrary.Id);
-                var files = await _fileService.GetPaginatedListAsync(new BlogFilter
+                var files = await _fileService.GetPaginatedListAsync(new FilesFilter
                 {
-                    FileLibraryId = fileLibrary.Id,
-                    Take = 1
+                    FileLibrary = fileLibrary,
+                    Take = 1,
                 });
 
                 if (files.Count > 0)
@@ -658,9 +658,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var itemsPerPage = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
-            var filter = new BlogFilter(page, itemsPerPage)
+            var filter = new FilesFilter(page, itemsPerPage)
             {
-                FileLibraryId = fileLibrary.Id
+                FileLibrary = fileLibrary,
             };
 
             var filesAndCount = await _fileService.GetPaginatedListAsync(filter);

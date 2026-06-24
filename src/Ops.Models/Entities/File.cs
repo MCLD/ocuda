@@ -13,6 +13,8 @@ namespace Ocuda.Ops.Models.Entities
         public int FileLibraryId { get; set; }
         public FileType FileType { get; set; }
 
+        public DateTime? FileDate { get; set; }
+
         public int FileTypeId { get; set; }
 
         [NotMapped]

@@ -11,13 +11,11 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class FileRepository : OpsRepository<OpsContext, File, int>, IFileRepository
+    public class FileRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+        ILogger<FileRepository> logger)
+        : OpsRepository<OpsContext, File, int>(repositoryFacade, logger),
+        IFileRepository
     {
-        public FileRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
-            ILogger<FileRepository> logger) : base(repositoryFacade, logger)
-        {
-        }
-
         public override async Task<File> FindAsync(int id)
         {
             return await DbSet
@@ -57,23 +55,31 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter)
+        public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(
+            FilesFilter filter)
         {
-            var query = DbSet.AsNoTracking();
+            var baseQuery = DbSet.AsNoTracking();
 
-            if (filter.FileLibraryId.HasValue)
+            if (filter?.FileLibrary?.Id != null)
             {
-                query = query.Where(_ => _.FileLibraryId == filter.FileLibraryId.Value);
+                baseQuery = baseQuery.Where(_ => _.FileLibraryId == filter.FileLibrary.Id);
             }
+
+            IQueryable<File> filteredQuery = baseQuery.Include(_ => _.FileType)
+                .Include(_ => _.CreatedByUser)
+                .Include(_ => _.UpdatedByUser);
+
+            filteredQuery = filter.FileLibrary.SortOrder switch
+            {
+                Models.FileLibrarySort.Date => filteredQuery.OrderBy(_ => _.FileDate),
+                Models.FileLibrarySort.Name => filteredQuery.OrderBy(_ => _.Name),
+                _ => filteredQuery.OrderByDescending(_ => _.CreatedAt),
+            };
 
             return new DataWithCount<ICollection<File>>
             {
-                Count = await query.CountAsync(),
-                Data = await query
-                    .Include(_ => _.FileType)
-                    .Include(_ => _.CreatedByUser)
-                    .Include(_ => _.UpdatedByUser)
-                    .OrderByDescending(_ => _.CreatedAt)
+                Count = await baseQuery.CountAsync(),
+                Data = await filteredQuery
                     .ApplyPagination(filter)
                     .ToListAsync()
             };

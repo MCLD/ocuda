@@ -11,6 +11,7 @@ using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers
@@ -255,14 +256,14 @@ namespace Ocuda.Ops.Controllers
                     foreach (var fileLibrary in fileLibraries)
                     {
                         var fileLibraryFiles = await _fileService
-                            .GetPaginatedListAsync(new BlogFilter
+                            .GetPaginatedListAsync(new FilesFilter
                             {
-                                FileLibraryId = fileLibrary.Id
+                                FileLibrary = fileLibrary,
                             });
 
                         if (fileLibraryFiles.Count > 0)
                         {
-                            fileLibrary.Files = fileLibraryFiles.Data;
+                            fileLibrary.Files.AddRange(fileLibraryFiles.Data);
                             fileLibrary.TotalFilesInLibrary = fileLibraryFiles.Count;
                             viewModel.FileLibraries.Add(fileLibrary);
                         }

@@ -337,19 +337,20 @@ namespace Ocuda.Ops.Service
             return await _fileLibraryRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter)
+        public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(
+            FilesFilter filter)
         {
-            if (!filter.FileLibraryId.HasValue)
+            if (filter?.FileLibrary == null)
             {
                 return new DataWithCount<ICollection<File>>
                 {
-                    Data = new List<File>(),
-                    Count = 0
+                    Count = 0,
+                    Data = [],
                 };
             }
 
-            var library = await GetLibraryByIdAsync(filter.FileLibraryId.Value);
-            var section = await _sectionService.GetByIdAsync(library.SectionId);
+            var section = await _sectionService.GetByIdAsync(filter.FileLibrary.SectionId);
+
             var files = await _fileRepository.GetPaginatedListAsync(filter);
 
             foreach (var file in files.Data)
@@ -358,13 +359,14 @@ namespace Ocuda.Ops.Service
                     .GetPrivateContentFilePath(file.Name + file.FileType.Extension,
                         SectionsPath,
                         section.Slug,
-                        library.Slug);
+                        filter.FileLibrary.Slug);
 
                 if (System.IO.File.Exists(filePath))
                 {
                     file.Size = new System.IO.FileInfo(filePath).HumanSize();
                 }
             }
+
             return files;
         }
 

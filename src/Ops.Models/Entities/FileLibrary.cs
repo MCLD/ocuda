@@ -6,9 +6,9 @@ namespace Ocuda.Ops.Models.Entities
 {
     public class FileLibrary : Abstract.BaseEntity
     {
-        public ICollection<File> Files { get; set; }
+        public ICollection<File> Files { get; }
 
-        public ICollection<FileLibraryFileType> FileTypes { get; set; }
+        public ICollection<FileLibraryFileType> FileTypes { get; }
 
         [Required]
         [MaxLength(255)]
@@ -22,5 +22,8 @@ namespace Ocuda.Ops.Models.Entities
 
         [NotMapped]
         public int TotalFilesInLibrary { get; set; }
+
+        [Required]
+        public FileLibrarySort SortOrder { get; set; }
     }
 }

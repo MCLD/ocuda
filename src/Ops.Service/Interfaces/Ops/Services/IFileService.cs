@@ -53,7 +53,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<DataWithCount<ICollection<FileLibrary>>> GetPaginatedLibraryListAsync(
             BlogFilter filter);
 
-        Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter);
+        Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(FilesFilter filter);
 
         string GetPrivateFilePath(File file);
 

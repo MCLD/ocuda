@@ -14,6 +14,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 
         Task<File> GetLatestByLibraryIdAsync(int id);
 
-        Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter);
+        Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(FilesFilter filter);
     }
 }
