@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="Clc.Polaris.Api" Version="3.1.6" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
   </ItemGroup>
 
