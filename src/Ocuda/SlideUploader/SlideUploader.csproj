@@ -3,7 +3,6 @@
   <PropertyGroup>
     <AssemblyName>Ocuda.SlideUploader</AssemblyName>
     <Authors>Maricopa County Library District Web developers</Authors>
-    <CodeAnalysisRuleSet>../../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
     <Company>Maricopa County Library District</Company>
     <Copyright>Copyright 2018 Maricopa County Library District</Copyright>
     <FileVersion>2.1.0</FileVersion>

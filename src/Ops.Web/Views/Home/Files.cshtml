@@ -1,0 +1,700 @@
+﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement
+@using Ocuda.Ops.Controllers.ViewModels.Home
+@model FileLibraryViewModel
+
+@section header {
+    <div class="d-flex justify-content-between mb-2">
+        <h1>
+            File Library
+            <small class="text-muted d-print-block">
+                @Model.SectionName / @Model.FileLibraryName
+            </small>
+        </h1>
+        <div class="pt-1 d-print-none">
+            @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+            {
+                <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary)"
+                   asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                   asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                   asp-route-sectionslug="@Model.SectionSlug"
+                   asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+                   class="btn btn-sm btn-outline-warning ms-2">
+                    Management
+                </a>
+            }
+            @if (Model.HasAdminRights)
+            {
+                <button class="btn btn-outline-success btn-sm ms-2 my-1"
+                        data-bs-toggle="modal"
+                        data-bs-target="#listAddModal">
+                    <span class="fa-solid fa-file-arrow-up fa-fw" aria-hidden="true"></span>
+                    Add file
+                </button>
+            }
+            <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex)"
+               asp-area=""
+               asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+               asp-route-slug="@Model.SectionSlug"
+               class="btn btn-outline-dark btn-sm ms-2 my-1">Back</a>
+        </div>
+    </div>
+}
+
+@if (Model.Files?.Count > 0)
+{
+    @if (Model.FileLibrarySortOrder == FileLibrarySort.DocumentDateMonthDescending)
+    {
+        <div class="row">
+            @foreach (var yearFiles in Model.ByFileYear.OrderByDescending(_ => _.Key))
+            {
+                <div class="col-12 col-md-6 col-lg-4 mb-2">
+                    <div class="card">
+                        <div class="card-header lead fw-bold">@yearFiles.Key</div>
+                        <ul class="list-group list-group-flush">
+                            @foreach (var file in yearFiles.Value.OrderByDescending(_ => _.FileDate).ThenBy(_ => _.Name))
+                            {
+                                <li class="list-group-item d-flex align-items-center">
+                                    <div class="flex-grow-1">
+                                        <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.GetFile)"
+                                           asp-area=""
+                                           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                           asp-route-libraryId="@Model.FileLibraryId"
+                                           asp-route-fileId="@file.Id"
+                                           class="text-decoration-none">
+                                            @if (string.IsNullOrEmpty(file.FileType?.Icon))
+                                            {
+                                                <span class="fa-regular fa-file fa-fw"></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="@file.FileType.Icon fa-fw"></span>
+                                            }
+                                        </a>
+                                        <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.GetFile)"
+                                           asp-area=""
+                                           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                           asp-route-libraryId="@Model.FileLibraryId"
+                                           asp-route-fileId="@file.Id">
+                                            @file.FullName
+                                        </a>
+                                    </div>
+                                    <div class="d-flex">
+                                        <div class="pe-1">
+                                            <small>
+                                                @file.Size
+                                            </small>
+                                        </div>
+                                        @if (Model.HasReplaceRights)
+                                        {
+                                            <div>
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-dark ms-1"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#replaceModal"
+                                                        data-id="@file.Id"
+                                                        data-name="@file.Name"
+                                                        data-extension="@file.FileType.Extension"
+                                                        title="Replace file">
+                                                    <span class="fa-solid fa-rotate fa-fw"
+                                                          aria-hidden="true"></span>
+                                                </button>
+                                            </div>
+                                        }
+                                        @if (Model.HasAdminRights)
+                                        {
+                                            <div>
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-danger ms-1"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteModal"
+                                                        data-id="@file.Id"
+                                                        data-name="@file.Name"
+                                                        title="Delete file">
+                                                    <span class="fa-regular fa-circle-xmark fa-fw"
+                                                          aria-hidden="true"></span>
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else if (Model.FileLibrarySortOrder == FileLibrarySort.ThumbnailsAlphabetical)
+    {
+        <div class="row pt-2 text-center">
+            @foreach (var file in Model.Files)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="mb-4 ms-auto me-auto oc-thumbnail-container-width">
+                        <div class="img-thumbnail oc-thumbnail-container-height w-100">
+                            @if (file.Thumbnails?.Count == 1)
+                            {
+                                @foreach (var thumbItem in FileLibraryViewModel.GetThumbnails(file))
+                                {
+                                    <div class="carousel-item active">
+                                        <img alt="Thumbnail of @file.FullName"
+                                             class="img-responsive oc-thumbnail-max-width oc-thumbnail-max-height"
+                                             src="@thumbItem.Value.Link">
+                                    </div>
+                                }
+                            }
+                            @if (file.Thumbnails?.Count > 1)
+                            {
+                                <div class="carousel carousel-dark slide w-100 h-100"
+                                     id="carousel-@file.FullName">
+                                    <div class="carousel-indicators">
+                                        @foreach (var thumbItem in FileLibraryViewModel.GetThumbnails(file))
+                                        {
+                                            if (thumbItem.Key == 0)
+                                            {
+                                                <button aria-current="true"
+                                                        aria-label="Thumbnail @(thumbItem.Key + 1) of @file.FullName"
+                                                        class="active"
+                                                        data-bs-slide-to="@thumbItem.Key"
+                                                        data-bs-target="#carousel-@file.FullName"
+                                                        type="button"></button>
+                                            }
+                                            else
+                                            {
+                                                <button data-bs-slide-to="@thumbItem.Key"
+                                                        data-bs-target="#carousel-@file.FullName"
+                                                        type="button"></button>
+                                            }
+                                        }
+                                    </div>
+                                    <div class="carousel-inner">
+                                        @foreach (var thumbItem in FileLibraryViewModel.GetThumbnails(file))
+                                        {
+                                            <div class="carousel-item @(thumbItem.Key == 0 ? "active" : null)">
+                                                <img alt="Thumbnail @(thumbItem.Key + 1) of @file.FullName"
+                                                     class="img-responsive oc-thumbnail-max-width oc-thumbnail-max-height"
+                                                     src="@thumbItem.Value.Link">
+                                            </div>
+                                        }
+                                    </div>
+                                    <button class="carousel-control-prev"
+                                            data-bs-target="#carousel-@file.FullName"
+                                            data-bs-slide="prev"
+                                            type="button">
+                                        <span aria-hidden="true"
+                                              class="carousel-control-prev-icon"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </button>
+                                    <button class="carousel-control-next"
+                                            data-bs-target="#carousel-@file.FullName"
+                                            data-bs-slide="next"
+                                            type="button">
+                                        <span aria-hidden="true"
+                                              class="carousel-control-next-icon"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="d-flex justify-content-center align-items-center w-100 h-100">
+                                    <div>
+                                        No thumbnails available.
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        @if (Model.HasReplaceRights || Model.HasAdminRights || !string.IsNullOrEmpty(file.Description))
+                        {
+                            <div class="py-1 border">
+                                @if (!string.IsNullOrEmpty(file.Description))
+                                {
+                                    <button class="btn btn-sm btn-outline-primary mx-1"
+                                            data-bs-target="#infoModal"
+                                            data-bs-toggle="modal"
+                                            data-fileid="@file.Id"
+                                            data-filename="@file.FullName"
+                                            title="File information"
+                                            type="button">
+                                        <span class="fa-solid fa-circle-info fa-fw"></span>
+                                    </button>
+                                }
+                                @if (Model.HasReplaceRights)
+                                {
+                                    <span>
+                                        <a asp-action="@nameof(SectionController.ManageThumbnails)"
+                                           asp-area="@SectionController.Area"
+                                           asp-controller="@SectionController.Name"
+                                           asp-route-fileId="@file.Id"
+                                           asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+                                           asp-route-sectionSlug="@Model.SectionSlug"
+                                           class="btn btn-sm btn-outline-dark mx-1"
+                                           title="Manage thumbnails">
+                                            <span class="fa-regular fa-images fa-fw"
+                                                  aria-hidden="true"></span>
+                                        </a>
+                                    </span>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-dark mx-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#replaceModal"
+                                            data-id="@file.Id"
+                                            data-name="@file.Name"
+                                            data-extension="@file.FileType.Extension"
+                                            title="Replace file">
+                                        <span class="fa-solid fa-rotate fa-fw"
+                                              aria-hidden="true"></span>
+                                    </button>
+                                }
+                                @if (Model.HasAdminRights)
+                                {
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger mx-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal"
+                                            data-id="@file.Id"
+                                            data-name="@file.Name"
+                                            title="Delete file">
+                                        <span class="fa-regular fa-circle-xmark fa-fw"
+                                              aria-hidden="true"></span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                        <div class="d-flex justify-content-center mt-1">
+                            <div>
+                                <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.GetFile)"
+                                   asp-area=""
+                                   asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                   asp-route-libraryId="@Model.FileLibraryId"
+                                   asp-route-fileId="@file.Id"
+                                   class="text-decoration-none">
+                                    @if (string.IsNullOrEmpty(file.FileType?.Icon))
+                                    {
+                                        <span class="fa-regular fa-file fa-fw fa-lg"></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="@file.FileType.Icon fa-fw fa-lg"></span>
+                                    }
+                                </a>
+                                <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.GetFile)"
+                                   asp-area=""
+                                   asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                   asp-route-libraryId="@Model.FileLibraryId"
+                                   asp-route-fileId="@file.Id">@file.FullName</a>
+                                <small class="d-block lh-1">
+                                    <em>(@file.Size)</em>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="row my-2">
+            <div class="col-12 d-flex justify-content-center">
+                <nav paginate="@Model"></nav>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row pt-2">
+            <div class="col-lg-10 offset-lg-1">
+                <table class="table table-sm table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>File</th>
+                            <th>Size</th>
+                            <th>Last updated</th>
+                            @if (Model.HasReplaceRights || Model.HasAdminRights)
+                            {
+                                <th>Actions</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var file in Model.Files)
+                        {
+                            <tr>
+                                <td class="align-middle px-2">
+                                    <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.GetFile)"
+                                       asp-area=""
+                                       asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                       asp-route-libraryId="@Model.FileLibraryId"
+                                       asp-route-fileId="@file.Id"
+                                       class="text-decoration-none">
+                                        @if (string.IsNullOrEmpty(file.FileType?.Icon))
+                                        {
+                                            <span class="fa-regular fa-file fa-fw fa-lg"></span>
+                                        }
+                                        else
+                                        {
+                                            <span class="@file.FileType.Icon fa-fw fa-lg"></span>
+                                        }
+                                    </a>
+                                    <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.GetFile)"
+                                       asp-area=""
+                                       asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                       asp-route-libraryId="@Model.FileLibraryId"
+                                       asp-route-fileId="@file.Id">@file.Name</a>
+                                    @if (!string.IsNullOrEmpty(file.Description))
+                                    {
+                                        <small class="d-block">@file.Description</small>
+                                    }
+                                </td>
+                                <td class="align-middle px-2">
+                                    @file.Size
+                                </td>
+                                <td class="align-middle px-2 small lh-base">
+                                    <span title="@file.LastUpdateAt">
+                                        @file.LastUpdateAt.ToString("d")
+                                        <span class="d-none d-md-inline">@file.LastUpdateAt.ToString("t")</span>
+                                    </span>
+                                    <em class="d-block">
+                                        <span class="d-none d-md-inline">by </span>
+                                        <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                                           asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                                           asp-route-id="@file.LastUpdateBy.Username">@file.LastUpdateBy.Name</a>
+                                    </em>
+                                </td>
+                                @if (Model.HasReplaceRights || Model.HasAdminRights)
+                                {
+                                    <td class="align-middle">
+                                        <div class="d-flex justify-content-center">
+                                            @if (Model.HasReplaceRights)
+                                            {
+                                                <div>
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-dark mx-1"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#replaceModal"
+                                                            data-id="@file.Id"
+                                                            data-name="@file.Name"
+                                                            data-extension="@file.FileType.Extension"
+                                                            title="Replace file">
+                                                        <span class="fa-solid fa-rotate fa-fw"
+                                                              aria-hidden="true"></span>
+                                                    </button>
+                                                </div>
+                                            }
+                                            @if (Model.HasAdminRights)
+                                            {
+                                                <div>
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-danger mx-1"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#deleteModal"
+                                                            data-id="@file.Id"
+                                                            data-name="@file.Name"
+                                                            title="Delete file">
+                                                        <span class="fa-regular fa-circle-xmark fa-fw"
+                                                              aria-hidden="true"></span>
+                                                    </button>
+                                                </div>
+                                            }
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row my-2">
+            <div class="col-12 d-flex justify-content-center">
+                <nav paginate="@Model"></nav>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="row">
+        <div class="col-12 col-sm-6 offset-sm-3 col-lg-4 offset-lg-4 mt-3">
+            <div class="alert alert-primary">This library contains no files.</div>
+        </div>
+    </div>
+}
+
+<div aria-labelledby="infoModalLabel"
+     aria-hidden="true"
+     class="modal fade"
+     id="infoModal"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="infoModalLabel">Information</h1>
+                <button aria-label="Close"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        type="button"></button>
+            </div>
+            <div class="modal-body" id="infoModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal"
+                        type="button">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.HasReplaceRights)
+{
+    <div aria-labelledby="replaceModalLabel"
+         class="modal fade"
+         data-bs-backdrop="static"
+         id="replaceModal"
+         tabindex="-1"
+         role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="replaceModalLabel">Replace File</h5>
+                    <button aria-label="Close"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            type="button"></button>
+                </div>
+                <form asp-action="@nameof(SectionController.ReplaceFile)"
+                      asp-area="@SectionController.Area"
+                      asp-controller="@SectionController.Name"
+                      asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+                      asp-route-sectionSlug="@Model.SectionSlug"
+                      enctype="multipart/form-data"
+                      method="post"
+                      role="form">
+                    <div class="modal-body">
+                        <input asp-for="CurrentPage" type="hidden" />
+                        <input asp-for="FileLibraryId" type="hidden" />
+                        <input asp-for="ReplaceFileId" type="hidden" />
+                        <label for="" class="form-label">
+                            Replace file: <strong id="ReplaceFileName"></strong>
+                        </label>
+                        <div class="input-group">
+                            <input type="file"
+                                   class="form-control @FileLibraryViewModel.ValidClass(ViewData.ModelState.GetValidationState(nameof(Model.UploadFile)))"
+                                   id="ReplaceFileUpload"
+                                   asp-for="UploadFile" />
+                        </div>
+                        <span asp-validation-for="UploadFile" class="text-danger"></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-dark"
+                                data-bs-dismiss="modal"
+                                type="button">
+                            Close
+                        </button>
+                        <button class="btn btn-outline-primary"
+                                type="submit"
+                                value="Submit">
+                            <span class="fa-solid fa-file-arrow-up" aria-hidden="true"></span>
+                            Replace
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@if (Model.HasAdminRights)
+{
+    <div aria-labelledby="addModalLabel"
+         class="modal fade"
+         data-bs-backdrop="static"
+         id="listAddModal"
+         role="dialog"
+         tabindex="-1">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Add File</h5>
+                    <button aria-label="Close"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            type="button"></button>
+                </div>
+                <form asp-action="@nameof(SectionController.AddFileToLibrary)"
+                      asp-area="@SectionController.Area"
+                      asp-controller="@SectionController.Name"
+                      enctype="multipart/form-data"
+                      id="addFileLib"
+                      method="post"
+                      role="form">
+                    <div class="modal-body">
+                        <input asp-for="SectionSlug"
+                               autocomplete="off"
+                               type="hidden"
+                               value="@Model.SectionSlug" />
+                        <input asp-for="FileLibraryId"
+                               autocomplete="off"
+                               type="hidden"
+                               value="@Model.FileLibraryId" />
+                        <input asp-for="CurrentPage" type="hidden" />
+                        <label class="form-label"
+                               for="UploadFile">
+                            Select a file (valid types:
+                            @(Model.FileTypes?.Any() == true ? Model.JoinFileExtensions(", ") : "none"))
+                        </label>
+                        <div class="input-group mb-3">
+                            <input accept="@Model.JoinFileExtensions(",")"
+                                   asp-for="UploadFile"
+                                   class="form-control @FileLibraryViewModel.ValidClass(ViewData.ModelState.GetValidationState(nameof(Model.UploadFile)))"
+                                   multiple="multiple"
+                                   type="file" />
+                        </div>
+                        <span asp-validation-for="UploadFile" class="text-danger"></span>
+                        <input asp-for="File.Name" autocomplete="off" formgroup />
+                        <input asp-for="File.Description" autocomplete="off" formgroup />
+                        @if (Model.FileLibrarySortOrder == FileLibrarySort.DocumentDateMonthDescending)
+                        {
+                            <input asp-for="File.FileDate"
+                                   autocomplete="off"
+                                   formgroup
+                                   type="date" />
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-dark"
+                                data-bs-dismiss="modal"
+                                type="button">
+                            Cancel
+                        </button>
+                        <button class="btn btn-outline-success"
+                                type="submit"
+                                value="Submit">
+                            <span class="fa-solid fa-file-arrow-up" aria-hidden="true"></span>
+                            Upload
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div aria-labelledby="deleteModalLabel"
+         class="modal fade"
+         data-bs-backdrop="static"
+         id="deleteModal"
+         role="dialog"
+         tabindex="-1">
+        <div class="modal-dialog modal-lg" role="document">
+            <form asp-action="@nameof(SectionController.DeleteFileFromLibrary)"
+                  asp-area="@SectionController.Area"
+                  asp-controller="@SectionController.Name"
+                  asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+                  asp-route-sectionSlug="@Model.SectionSlug"
+                  id="delFileForm"
+                  method="post"
+                  role="form">
+                <input asp-for="CurrentPage" type="hidden" />
+                <input id="delFileId" asp-for="File.Id" type="hidden" />
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Delete Feature</h5>
+                        <button aria-label="Close"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                type="button"></button>
+                    </div>
+                    <div class="modal-body d-flex">
+                        <div class="text-danger">
+                            <span aria-hidden="true"
+                                  class="fa-solid fa-triangle-exclamation fa-lg fa-fw me-3"></span>
+                        </div>
+                        <div class="d-flex-grow-1">
+                            <p class="mb-0">
+                                Are you sure you want to delete this file:
+                                <strong><span id="deleteModalText"></span></strong>?
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-dark me-1"
+                                data-bs-dismiss="modal"
+                                type="button">
+                            Cancel
+                        </button>
+                        <button class="btn btn-outline-danger float-end"
+                                aria-label="Confirm"
+                                id="deleteItem"
+                                type="submit"
+                                value="Submit"
+                                button-spinner>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section scripts {
+    @if (Model.HasAdminRights)
+    {
+        <script>
+            const uploadFile = document.getElementById("UploadFile");
+            const fileName = document.getElementById("File_Name");
+
+            uploadFile.addEventListener("change", (event) => {
+                if(event.target.files.length > 0 && fileName.value.length == 0) {
+                    let split = event.target.files[0].name.split('.');
+                    split.pop();
+                    fileName.value = split.join('.');
+                }
+                console.info("Change: %o", event.target.files);
+            })
+
+            $("#deleteModal").on("show.bs.modal", function (e) {
+                let button = $(e.relatedTarget);
+                let id = button.data("id");
+                let name = button.data("name");
+                $(this).find("#deleteModalText").text(name);
+                $(this).find("#delFileId").val(String(id));
+            });
+        </script>
+    }
+    @if (Model.HasReplaceRights)
+    {
+        <script>
+            $("#replaceModal").on("show.bs.modal", function (e) {
+                let button = $(e.relatedTarget);
+                let id = button.data("id");
+                $(this).find("#ReplaceFileName").text(button.data("name"));
+                $(this).find("#ReplaceFileId").val(String(id));
+                $(this).find("#ReplaceFileUpload").attr("accept", button.data("extension"));
+            });
+        </script>
+    }
+    <script>
+        const dialogSpinner = '<div class="fa-3x text-center"><span class="fa-solid fa-spinner fa-spin"></span></div>';
+        const fileDetailsUrl = new URL(`${location.origin}@Model.GetFileDetailsLink`);
+        const infoModal = document.getElementById('infoModal');
+        const infoHeader = document.getElementById('infoModalLabel');
+        const infoDetails = document.getElementById('infoModalBody');
+
+        infoModal.addEventListener('show.bs.modal', event => {
+            infoDetails.innerHTML = dialogSpinner;
+            const params = new URLSearchParams(fileDetailsUrl.search);
+            params.append('fileId', event.relatedTarget.dataset.fileid);
+            fetch(new URL(`${fileDetailsUrl.origin}${fileDetailsUrl.pathname}?${params}`),
+                {method: 'GET'})
+                .then((response) => response.json())
+                .then((jsonResponse) => {
+                    infoDetails.innerHTML = jsonResponse.data;
+                    infoHeader.innerText = event.relatedTarget.dataset.filename;
+                })
+                .catch((error) => {
+                    infoDetails.innerHTML = `<div class="alert alert-danger">An error occurred: ${error}</div>`;
+                })
+        });
+    </script>
+}

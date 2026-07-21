@@ -4,11 +4,19 @@ using System.ComponentModel.DataAnnotations;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Utility.Models;
 
-namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
+namespace Ocuda.Ops.Controllers.ViewModels.Home
 {
-    public class LinkLibraryViewModel
+    public class LinkLibraryViewModel : PaginateModel
     {
-        public PaginateModel PaginateModel { get; set; }
+        public LinkLibraryViewModel()
+        {
+            Links = [];
+            FileTypes = [];
+        }
+
+        public bool IsSiteManager { get; set; }
+
+        public bool HasAdminRights { get; set; }
 
         [Required]
         public string SectionSlug { get; set; }
@@ -30,8 +38,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
 
         public Link Link { get; set; }
 
-        public ICollection<Link> Links { get; set; }
+        public ICollection<Link> Links { get; }
 
-        public ICollection<FileType> FileTypes { get; set; }
+        public ICollection<FileType> FileTypes { get; }
     }
 }

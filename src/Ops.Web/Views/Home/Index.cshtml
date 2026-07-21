@@ -1,10 +1,11 @@
-﻿@model Ocuda.Ops.Controllers.ViewModels.Home.IndexViewModel
+﻿@using Ocuda.Ops.Controllers.ViewModels.Home
+@model Ocuda.Ops.Controllers.ViewModels.Home.IndexViewModel
 
-@if (!string.IsNullOrEmpty(Model.SectionName))
-{
-    <div class="d-flex">
-        <div class="flex-grow-1 align-middle">
-            <h1 class="h2 ps-2 pb-2 flex-grow-1">
+@section header {
+    @if (!string.IsNullOrEmpty(Model.SectionName))
+    {
+        <div class="d-flex justify-content-between mb-2">
+            <h1>
                 @Model.SectionName
                 @if (Model.SupervisorsOnly)
                 {
@@ -13,23 +14,104 @@
                     </small>
                 }
             </h1>
-        </div>
-        @if (Model.SectionManager)
-        {
-            <div>
-                <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.AddPost)"
-                   asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
-                   asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
-                   asp-route-sectionSlug="@Model.SectionSlug"
-                   class="btn btn-sm btn-outline-success">
-                    <span class="fa-solid fa-circle-plus"></span>
-                    Add Post
-                </a>
+            <div class="pt-1 d-print-none">
+                @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+                {
+                    <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Section)"
+                       asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                       asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                       asp-route-sectionslug="@Model.SectionSlug"
+                       class="btn btn-sm btn-outline-warning ms-2">
+                        Management
+                    </a>
+                }
+                @if (Model.SectionManager)
+                {
+                    <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.AddPost)"
+                       asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                       asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                       asp-route-sectionSlug="@Model.SectionSlug"
+                       class="btn btn-sm btn-outline-success ms-2">
+                        <span class="fa-solid fa-circle-plus"></span>
+                        Add Post
+                    </a>
+                }
+                @if (Model.LinkLibraries?.Where(_ => !_.IsFeatured).Count() == 1)
+                {
+                    @foreach (var linkLibrary in Model.LinkLibraries?.Where(_ => !_.IsFeatured))
+                    {
+                        <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Links)"
+                           asp-area=""
+                           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                           asp-route-linkLibrarySlug="@linkLibrary.Slug"
+                           asp-route-sectionSlug="@Model.SectionSlug"
+                           class="btn btn-sm btn-outline-dark ms-2">@linkLibrary.Name</a>
+                    }
+                }
+                else if (Model.LinkLibraries?.Where(_ => !_.IsFeatured).Count() > 1)
+                {
+                    <div class="btn-group ms-2">
+                        <button class="btn btn-outline-dark dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            Links
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            @foreach (var linkLibrary in Model.LinkLibraries?.Where(_ => !_.IsFeatured).OrderBy(_ => _.Name))
+                            {
+                                <li>
+                                    <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Links)"
+                                       asp-area=""
+                                       asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                       asp-route-linkLibrarySlug="@linkLibrary.Slug"
+                                       asp-route-sectionSlug="@Model.SectionSlug"
+                                       class="dropdown-item">@linkLibrary.Name</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+                @if (Model.FileLibraries?.Where(_ => !_.IsFeatured).Count() == 1)
+                {
+                    @foreach (var fileLibrary in Model.FileLibraries?.Where(_ => !_.IsFeatured))
+                    {
+                        <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Files)"
+                           asp-area=""
+                           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                           asp-route-fileLibrarySlug="@fileLibrary.Slug"
+                           asp-route-sectionSlug="@Model.SectionSlug"
+                           class="btn btn-sm btn-outline-dark ms-2">@fileLibrary.Name</a>
+                    }
+                }
+                else if (Model.FileLibraries?.Where(_ => !_.IsFeatured).Count() > 1)
+                {
+                    <div class="btn-group ms-2">
+                        <button class="btn btn-outline-dark dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            Files
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            @foreach (var fileLibrary in Model.FileLibraries?.Where(_ => !_.IsFeatured).OrderBy(_ => _.Name))
+                            {
+                                <li>
+                                    <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Files)"
+                                       asp-area=""
+                                       asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                       asp-route-fileLibrarySlug="@fileLibrary.Slug"
+                                       asp-route-sectionSlug="@Model.SectionSlug"
+                                       class="dropdown-item">@fileLibrary.Name</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
             </div>
-        }
-    </div>
+        </div>
+    }
 }
-
 <div class="row">
     @if (Model.Posts?.Count > 0)
     {
@@ -37,19 +119,23 @@
             @foreach (var post in Model.Posts)
             {
                 <div class="card @post.BorderColor mb-4">
-                    <div class="card-header d-flex @post.TextColor">
-                        <div class="flex-grow-1">
-                            <h2 class="h5 mb-0">@post.Title</h2>
+                    <div class="card-header d-flex align-content-center @post.TextColor">
+                        <div class="flex-grow-1 lead fw-bold">
+                            <a name="@post.Slug">@post.Title</a>
                         </div>
                         @if (post.ShowOnHomePage && !string.IsNullOrEmpty(Model.SectionName))
                         {
-                            <span class="fa-solid fa-house fa-fw text-muted mt-1"
-                                  title="This post is shown on the Intranet home page."></span>
+                            <div>
+                                <span class="fa-solid fa-house fa-fw text-muted mt-1"
+                                      title="This post is shown on the Intranet home page."></span>
+                            </div>
                         }
                         @if (post.IsPinned)
                         {
-                            <span class="fa-solid fa-map-pin fa-fw mt-1"
-                                  title="This post is pinned to remain at the top until @post.PinnedUntil."></span>
+                            <div>
+                                <span class="fa-solid fa-map-pin fa-fw mt-1"
+                                      title="This post is pinned to the top until @post.PinnedUntil."></span>
+                            </div>
                         }
                     </div>
                     @if (Model.SectionManager)
@@ -62,8 +148,10 @@
                                        asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
                                        asp-route-postSlug="@post.Slug"
                                        asp-route-sectionSlug="@Model.SectionSlug"
+                                       asp-route-page="@Model.CurrentPage"
                                        class="btn btn-sm btn-outline-secondary ms-3">
-                                        <span class="fa-solid fa-pencil fa-xs fa-fw" title="Edit post"></span>
+                                        <span class="fa-solid fa-pencil fa-fw"
+                                              title="Edit post"></span>
                                         Edit Post
                                     </a>
                                 </span>
@@ -72,7 +160,8 @@
                                     <em class="me-3 text-muted" title="@post.UpdatedAt.Value">
                                         <small>
                                             Last update
-                                            @if (post.UpdatedBy.HasValue && !string.IsNullOrEmpty(post.UpdatedByName))
+                                            @if (post.UpdatedBy.HasValue
+                                                && !string.IsNullOrEmpty(post.UpdatedByName))
                                             {
                                                 @:by
                                                 <a asp-controller="@ProfileController.Name"
@@ -86,7 +175,6 @@
                             </li>
                         </ul>
                     }
-
                     <div class="card-body pb-0 pt-3">
                         @Html.Raw(post.Content)
                     </div>
@@ -105,12 +193,13 @@
                                     {
                                         @post.CreatedByName
                                     }
-                                    @if (!string.IsNullOrEmpty(post.SectionSlug) && !string.IsNullOrEmpty(post.SectionName))
+                                    @if (!string.IsNullOrEmpty(post.SectionSlug)
+                                        && !string.IsNullOrEmpty(post.SectionName))
                                     {
                                         @:in
                                         <a asp-controller="@HomeController.Name"
                                            asp-action="@nameof(HomeController.SectionIndex)"
-                                           asp-route-stub="@post.SectionSlug">@post.SectionName</a>
+                                           asp-route-slug="@post.SectionSlug">@post.SectionName</a>
                                     }
                                 </small>
                             </em>
@@ -127,7 +216,7 @@
                         }
                         else
                         {
-                            <em><small class="text-muted">draft</small></em>
+                            <em><small class="text-muted">draft, not published</small></em>
                         }
                     </div>
                 </div>
@@ -135,70 +224,96 @@
             <nav paginate="@Model"></nav>
         </div>
     }
-    @if (Model.LinkLibraries?.Count > 0 || Model.FileLibraries?.Count > 0)
+    @if (Model.LinkLibraries?.Any(_ => _.IsFeatured) == true
+        || Model.FileLibraries?.Any(_ => _.IsFeatured) == true)
     {
         <div class="@Model.LibraryClasses">
-            @if (Model.LinkLibraries?.Count > 0)
+            @if (Model.LinkLibraries?.Any(_ => _.IsFeatured) == true)
             {
-                @foreach (var linkLibrary in Model.LinkLibraries)
+                @foreach (var linkLibrary in Model.LinkLibraries.Where(_ => _.IsFeatured && _.Links.Count > 0))
                 {
                     <div class="card mb-2">
                         <div class="card-header">
-                            <h2 class="h5 mb-0">@linkLibrary.Name</h2>
+                            <div class="d-flex align-content-center">
+                                <div class="flex-grow-1 lead fw-bold">
+                                    @linkLibrary.Name
+                                </div>
+                                <div>
+                                    <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Links)"
+                                       asp-area=""
+                                       asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                       asp-route-linkLibrarySlug="@linkLibrary.Slug"
+                                       asp-route-sectionSlug="@Model.SectionSlug"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <span class="fa-solid fa-list-check fa-fw"
+                                              title="View this link library."></span>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body p-0 ps-2 m-0">
-                            <table class="table table-borderless table-sm mt-1 mb-0">
-                                @foreach (var link in linkLibrary.Links)
-                                {
-                                    <tr>
-                                        <td>
-                                            <a href="@link.Url">
-                                                @if (!string.IsNullOrEmpty(link.Icon))
-                                                {
-                                                    <span class="@link.Icon fa-fw pe-1"></span>
-                                                }
-                                                <small>@link.Name</small>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                }
-                            </table>
+                        <div class="card-body py-1 d-flex flex-column">
+                            @foreach (var link in linkLibrary.Links)
+                            {
+                                <div class="mb-1">
+                                    <a href="@link.Url" class="text-decoration-none">
+                                        @if (string.IsNullOrEmpty(link.Icon))
+                                        {
+                                            <span class="fa-solid fa-angle-right fa-fw pe-1"></span>
+                                        }
+                                        else
+                                        {
+                                            <span class="@link.Icon fa-fw pe-1"></span>
+                                        }
+                                    </a>
+                                    <a href="@link.Url"><small>@link.Name</small></a>
+                                </div>
+                            }
                         </div>
                     </div>
                 }
             }
-            @if (Model.FileLibraries?.Count > 0)
+            @if (Model.FileLibraries?.Any() == true)
             {
-                @foreach (var fileLibrary in Model.FileLibraries)
+                @foreach (var fileLibrary in Model.FileLibraries.Where(_ => _.IsFeatured && _.Files.Count > 0))
                 {
                     <div class="card mb-2">
-                        <div class="card-header d-flex">
+                        <div class="card-header d-flex align-content-center">
                             <div class="flex-grow-1">
-                                <h2 class="h5 mb-0">@fileLibrary.Name</h2>
-                            </div>
-                            <a asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
-                               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary)"
-                               asp-area="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement)"
-                               asp-route-sectionSlug="@Model.SectionSlug"
-                               asp-route-fileLibrarySlug="@fileLibrary.Slug"
-                               class="btn btn-sm btn-outline-secondary">
-                                <span class="fa-solid fa-list-check fa-fw"
-                                      title="View this file library."></span>
-                            </a>
-                        </div>
-                        <div class="card-body p-0 m-0">
-                            <table class="table table-sm mb-0">
-                                <tr>
-                                    <th class="ps-2">File</th>
-                                    <th style="width: 20%;">Size</th>
-                                </tr>
-                                @foreach (var file in fileLibrary.Files)
+                                <span class="lead fw-bold">@fileLibrary.Name</span>
+                                @if (fileLibrary.TotalFilesInLibrary > fileLibrary.Files.Count)
                                 {
-                                    <tr>
-                                        <td class="ps-2">
+                                    <small class="ms-1">
+                                        <em>
+                                            (@fileLibrary.TotalFilesInLibrary total,
+                                            @fileLibrary.Files.Count shown)
+                                        </em>
+                                    </small>
+                                }
+                            </div>
+                            <div>
+                                <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Files)"
+                                   asp-area=""
+                                   asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                   asp-route-fileLibrarySlug="@fileLibrary.Slug"
+                                   asp-route-sectionSlug="@Model.SectionSlug"
+                                   class="btn btn-sm btn-outline-secondary">
+                                    <span class="fa-solid fa-list-check fa-fw"
+                                          title="View this file library."></span>
+                                </a>
+                            </div>
+                        </div>
+                        @if (fileLibrary.SortOrder == FileLibrarySort.DocumentDateMonthDescending)
+                        {
+                            <div class="card-body py-1 d-flex flex-column">
+                                @foreach (var yearFiles in IndexViewModel.GetByFileYear(fileLibrary.Files))
+                                {
+                                    @foreach (var file in yearFiles.Value.OrderByDescending(_ => _.FileDate).ThenBy(_ => _.Name))
+                                    {
+                                        <div class="mb-1">
                                             <a asp-action="@nameof(HomeController.GetFile)"
                                                asp-route-libraryId="@fileLibrary.Id"
-                                               asp-route-fileId="@file.Id">
+                                               asp-route-fileId="@file.Id"
+                                               class="text-decoration-none">
                                                 @if (string.IsNullOrEmpty(file.FileType?.Icon))
                                                 {
                                                     <span class="fa-regular fa-file fa-fw pe-1"></span>
@@ -207,11 +322,11 @@
                                                 {
                                                     <span class="@file.FileType.Icon fa-fw pe-1"></span>
                                                 }
-                                                <small>@file.Name</small>
                                             </a>
-                                        </td>
-                                        <td>
-                                            <small>
+                                            <a asp-action="@nameof(HomeController.GetFile)"
+                                               asp-route-libraryId="@fileLibrary.Id"
+                                               asp-route-fileId="@file.Id"><small>@file.Name</small></a>
+                                            <small class="ms-1">
                                                 @if (string.IsNullOrEmpty(file.Size))
                                                 {
                                                     <span class="text-danger fa-solid fa-triangle-exclamation"
@@ -219,26 +334,61 @@
                                                 }
                                                 else
                                                 {
-                                                    @file.Size
+                                                    <em>(@file.Size)</em>
                                                 }
                                             </small>
-                                        </td>
-                                    </tr>
+                                        </div>
+                                    }
                                 }
-                                @if (fileLibrary.TotalFilesInLibrary > fileLibrary.Files.Count)
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="card-body py-1 d-flex flex-column">
+                                @foreach (var file in fileLibrary.Files)
                                 {
-                                    <tr>
-                                        <td colspan="2" class="text-center">
-                                            <a asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
-                                               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary)"
-                                               asp-area="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement)"
-                                               asp-route-sectionSlug="@Model.SectionSlug"
-                                               asp-route-fileLibrarySlug="@fileLibrary.Slug">More files...</a>
-                                        </td>
-                                    </tr>
+                                    <div class="mb-1">
+                                        <a asp-action="@nameof(HomeController.GetFile)"
+                                           asp-route-libraryId="@fileLibrary.Id"
+                                           asp-route-fileId="@file.Id"
+                                           class="text-decoration-none">
+                                            @if (string.IsNullOrEmpty(file.FileType?.Icon))
+                                            {
+                                                <span class="fa-regular fa-file fa-fw pe-1"></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="@file.FileType.Icon fa-fw pe-1"></span>
+                                            }
+                                        </a>
+                                        <a asp-action="@nameof(HomeController.GetFile)"
+                                           asp-route-libraryId="@fileLibrary.Id"
+                                           asp-route-fileId="@file.Id"><small>@file.Name</small></a>
+                                        <small class="ms-1">
+                                            @if (string.IsNullOrEmpty(file.Size))
+                                            {
+                                                <span class="text-danger fa-solid fa-triangle-exclamation"
+                                                      title="This file appears to be missing."></span>
+                                            }
+                                            else
+                                            {
+                                                <em>(@file.Size)</em>
+                                            }
+                                        </small>
+                                    </div>
                                 }
-                            </table>
-                        </div>
+                            </div>
+                        }
+                        @if (fileLibrary.TotalFilesInLibrary > fileLibrary.Files.Count)
+                        {
+                            <div class="card-footer">
+                                <a asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                   asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Files)"
+                                   asp-area=""
+                                   asp-route-sectionSlug="@Model.SectionSlug"
+                                   asp-route-fileLibrarySlug="@fileLibrary.Slug">More files...</a>
+                            </div>
+                        }
                     </div>
                 }
             }

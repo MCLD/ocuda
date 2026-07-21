@@ -23,8 +23,8 @@ namespace Ocuda.Ops.Data.Ops
             {
                 var postCategory = new PostCategory
                 {
+                    CategoryId = category,
                     PostId = postId,
-                    CategoryId = category
                 };
                 _context.PostCategories.Add(postCategory);
             }
@@ -48,7 +48,7 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BlogFilter filter)
         {
-            if (filter == null) { throw new ArgumentNullException(nameof(filter)); }
+            ArgumentNullException.ThrowIfNull(filter);
 
             var query = DbSet.AsNoTracking();
 
@@ -89,7 +89,7 @@ namespace Ocuda.Ops.Data.Ops
                         : DateTime.MinValue)
                     .ThenByDescending(_ => _.PublishedAt ?? DateTime.MaxValue)
                     .ApplyPagination(filter)
-                    .ToListAsync()
+                    .ToListAsync(),
             };
         }
 
@@ -115,6 +115,8 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
+                .Include(_ => _.CreatedByUser)
+                .Include(_ => _.UpdatedByUser)
                 .Where(_ => _.Slug == slug && _.SectionId == sectionId)
                 .SingleOrDefaultAsync();
         }

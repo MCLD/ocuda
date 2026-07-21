@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Ocuda.Utility.Extensions;
@@ -16,6 +17,7 @@ namespace Ocuda.Ops.Models.Entities
                 {
                     return "border-warning";
                 }
+
                 return IsPinned ? "border-info" : null;
             }
         }
@@ -74,6 +76,7 @@ namespace Ocuda.Ops.Models.Entities
 
         [Required]
         [MaxLength(255)]
+        [Display(Description = "Once published, changing the slug may break existing links")]
         public string Slug { get; set; }
 
         [NotMapped]

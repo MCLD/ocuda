@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.ServiceFacades;
 using Ocuda.Ops.Models.Abstract;
 using Ocuda.Ops.Models.Definitions.Models;
@@ -193,6 +194,28 @@ namespace Ocuda.Ops.Controllers.Abstract
         protected IList<string> UserClaims(string claimType)
         {
             return UserContextProvider.UserClaims(AuthUser, claimType);
+        }
+
+        protected IEnumerable<FileThumbnail> PopulateThumbnailLinks(
+            string fileLibrarySlug,
+            string sectionSlug,
+            IEnumerable<FileThumbnail> thumbnails)
+        {
+            foreach (var thumbnail in thumbnails)
+            {
+                thumbnail.Link = Url.Action(
+                    nameof(HomeController.GetThumbnail),
+                    HomeController.Name,
+                    new
+                    {
+                        area = string.Empty,
+                        fileLibrarySlug,
+                        sectionSlug,
+                        thumbnailId = thumbnail.Id,
+                    });
+            }
+
+            return thumbnails;
         }
     }
 }

@@ -3,7 +3,6 @@
   <PropertyGroup>
     <AssemblyName>Ocuda.Promenade.Controllers</AssemblyName>
     <Authors>Maricopa County Library District</Authors>
-    <CodeAnalysisRuleSet>../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
     <Company>Maricopa County Library District</Company>
     <Copyright>2018 Maricopa County Library District</Copyright>
     <LangVersion>Latest</LangVersion>
@@ -29,7 +28,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Schema.NET" Version="13.0.0" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

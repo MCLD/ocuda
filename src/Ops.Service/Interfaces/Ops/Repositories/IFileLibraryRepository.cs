@@ -10,9 +10,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     {
         Task AddLibraryFileTypesAsync(List<int> fileTypeIds, int libraryId);
 
-        Task<ICollection<FileLibrary>> GetBySectionIdAsync(int sectionId);
+        Task<ICollection<FileLibrary>> GetBySectionAsync(int sectionId, bool? isFeatured);
 
-        Task<FileLibrary> GetBySectionIdSlugAsync(int sectionId, string stub);
+        Task<FileLibrary> GetBySectionIdSlugAsync(int sectionId, string slug);
 
         Task<ICollection<int>> GetLibraryFileTypeIdsAsync(int libraryId);
 

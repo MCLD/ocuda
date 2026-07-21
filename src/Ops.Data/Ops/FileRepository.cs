@@ -11,7 +11,8 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class FileRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+    public class FileRepository(
+        ServiceFacade.Repository<OpsContext> repositoryFacade,
         ILogger<FileRepository> logger)
         : OpsRepository<OpsContext, File, int>(repositoryFacade, logger),
         IFileRepository
@@ -65,23 +66,26 @@ namespace Ocuda.Ops.Data.Ops
                 baseQuery = baseQuery.Where(_ => _.FileLibraryId == filter.FileLibrary.Id);
             }
 
-            IQueryable<File> filteredQuery = baseQuery.Include(_ => _.FileType)
-                .Include(_ => _.CreatedByUser)
-                .Include(_ => _.UpdatedByUser);
-
-            filteredQuery = filter.FileLibrary.SortOrder switch
+            if (filter.OnlyCount)
             {
-                Models.FileLibrarySort.Date => filteredQuery.OrderBy(_ => _.FileDate),
-                Models.FileLibrarySort.Name => filteredQuery.OrderBy(_ => _.Name),
-                _ => filteredQuery.OrderByDescending(_ => _.CreatedAt),
+                return new DataWithCount<ICollection<File>>
+                {
+                    Count = await baseQuery.CountAsync(),
+                };
+            }
+
+            var filteredQuery = filter.FileLibrary.SortOrder switch
+            {
+                Models.FileLibrarySort.DocumentDateMonthDescending
+                    => baseQuery.OrderBy(_ => _.FileDate).ThenBy(_ => _.Name),
+                Models.FileLibrarySort.AlphabeticalName => baseQuery.OrderBy(_ => _.Name),
+                _ => baseQuery.OrderByDescending(_ => _.CreatedAt),
             };
 
             return new DataWithCount<ICollection<File>>
             {
                 Count = await baseQuery.CountAsync(),
-                Data = await filteredQuery
-                    .ApplyPagination(filter)
-                    .ToListAsync()
+                Data = await filteredQuery.ApplyPagination(filter).ToListAsync(),
             };
         }
     }

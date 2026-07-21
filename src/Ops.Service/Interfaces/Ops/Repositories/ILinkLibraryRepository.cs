@@ -9,6 +9,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     public interface ILinkLibraryRepository : IOpsRepository<LinkLibrary, int>
     {
         Task<DataWithCount<ICollection<LinkLibrary>>> GetPaginatedListAsync(BlogFilter filter);
-        Task<List<LinkLibrary>> GetLinkLibrariesBySectionIdAsync(int sectionId);
+
+        Task<ICollection<LinkLibrary>> GetBySectionAsync(int sectionId, bool? isFeatured);
+
+        Task<LinkLibrary> GetBySectionIdSlugAsync(int sectionId, string slug);
     }
 }
