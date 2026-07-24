@@ -1397,18 +1397,20 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         {
             ArgumentNullException.ThrowIfNull(viewModel);
 
-            var section = !string.IsNullOrEmpty(sectionSlug)
-                ? await GetSectionAsManagerAsync(sectionSlug)
-                : null;
+            var section = await sectionService.GetBySlugAsync(sectionSlug);
+
             if (section == null)
             {
-                return RedirectToUnauthorized();
+                return NotFound();
             }
 
             var fileLibrary = await fileService
                 .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
 
-            var hasReplaceRights = await fileService.HasReplaceRightsAsync(fileLibrary.Id);
+            var hasReplaceRights = await HasPermissionAsync<PermissionGroupSectionManager>(
+                permissionGroupService,
+                section.Id)
+                || await fileService.HasReplaceRightsAsync(fileLibrary.Id);
 
             if (!hasReplaceRights)
             {
