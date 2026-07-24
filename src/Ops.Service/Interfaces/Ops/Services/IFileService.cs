@@ -25,7 +25,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task DeleteLibraryAsync(int sectionId, int fileLibraryId);
 
-        Task DeletePrivateFileAsync(int sectionId, string fileLibrarySlug, int fileId);
+        Task DeleteFileLibraryFileAsync(string section, string fileLibrarySlug, File file);
 
         Task<FileLibrary> EditLibraryTypesAsync(FileLibrary library, ICollection<int> fileTypeIds);
 
@@ -41,7 +41,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId);
 
-        Task<string> GetFilePathAsync(int sectionId, string librarySlug, int fileId);
+        string GetFileLibraryFilePath(string sectionSlug, string fileLibrarySlug, File file);
 
         Task<string> GetThumbnailPathAsync(
             int thumbnailId,
@@ -67,6 +67,10 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<byte[]> ReadPrivateFileAsync(File file);
 
         Task<File> ReplaceFileLibraryFileAsync(int fileId);
+
+        Task<File> GetFileLibraryFileAsync(int fileId);
+
+        Task EditFileLibraryFileAsync(string sectionSlug, string fileLibrarySlug, File file);
 
         Task UpdateLibrary(string sectionSlug, string fileLibrarySlug, FileLibrary library);
 

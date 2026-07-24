@@ -1,9 +1,10 @@
 ﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement
 @using Ocuda.Ops.Controllers.ViewModels.Home
+@using Ocuda.Utility.Extensions
 @model FileLibraryViewModel
 
 @section header {
-    <div class="d-flex justify-content-between mb-2">
+    <div class="d-flex justify-content-between align-items-top mb-2">
         <h1>
             File Library
             <small class="text-muted d-print-block">
@@ -18,13 +19,13 @@
                    asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
                    asp-route-sectionslug="@Model.SectionSlug"
                    asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
-                   class="btn btn-sm btn-outline-warning ms-2">
+                   class="btn btn-sm btn-outline-primary mt-1 ms-2">
                     Management
                 </a>
             }
-            @if (Model.HasAdminRights)
+            @if (Model.HasManagementRights)
             {
-                <button class="btn btn-outline-success btn-sm ms-2 my-1"
+                <button class="btn btn-outline-success btn-sm mt-1 ms-2"
                         data-bs-toggle="modal"
                         data-bs-target="#listAddModal">
                     <span class="fa-solid fa-file-arrow-up fa-fw" aria-hidden="true"></span>
@@ -35,7 +36,7 @@
                asp-area=""
                asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
                asp-route-slug="@Model.SectionSlug"
-               class="btn btn-outline-dark btn-sm ms-2 my-1">Back</a>
+               class="btn btn-outline-dark btn-sm mt-1 ms-2">Back</a>
         </div>
     </div>
 }
@@ -47,7 +48,7 @@
         <div class="row">
             @foreach (var yearFiles in Model.ByFileYear.OrderByDescending(_ => _.Key))
             {
-                <div class="col-12 col-md-6 col-lg-4 mb-2">
+                <div class="col-12 col-md-6 col-xl-4 mb-2">
                     <div class="card">
                         <div class="card-header lead fw-bold">@yearFiles.Key</div>
                         <ul class="list-group list-group-flush">
@@ -78,17 +79,31 @@
                                             @file.FullName
                                         </a>
                                     </div>
-                                    <div class="d-flex">
+                                    <div class="d-flex align-items-center">
                                         <div class="pe-1">
                                             <small>
                                                 @file.Size
                                             </small>
                                         </div>
+                                        @if (!string.IsNullOrEmpty(file.Description))
+                                        {
+                                            <div>
+                                                <button class="btn btn-sm btn-outline-secondary mx-1"
+                                                        data-bs-target="#infoModal"
+                                                        data-bs-toggle="modal"
+                                                        data-fileid="@file.Id"
+                                                        data-filename="@file.FullName"
+                                                        title="File information"
+                                                        type="button">
+                                                    <span class="fa-solid fa-circle-info fa-fw"></span>
+                                                </button>
+                                            </div>
+                                        }
                                         @if (Model.HasReplaceRights)
                                         {
                                             <div>
                                                 <button type="button"
-                                                        class="btn btn-sm btn-outline-dark ms-1"
+                                                        class="btn btn-sm btn-outline-primary mx-1"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#replaceModal"
                                                         data-id="@file.Id"
@@ -100,11 +115,25 @@
                                                 </button>
                                             </div>
                                         }
-                                        @if (Model.HasAdminRights)
+                                        @if (Model.HasManagementRights)
                                         {
                                             <div>
                                                 <button type="button"
-                                                        class="btn btn-sm btn-outline-danger ms-1"
+                                                        class="btn btn-sm btn-outline-primary mx-1"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editModal"
+                                                        data-id="@file.Id"
+                                                        data-name="@file.Name"
+                                                        data-description="@file.Description"
+                                                        data-filedate="@file.FileDate?.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)"
+                                                        title="Edit file">
+                                                    <span class="fa-solid fa-pencil fa-fw"
+                                                          aria-hidden="true"></span>
+                                                </button>
+                                            </div>
+                                            <div>
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-danger mx-1"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#deleteModal"
                                                         data-id="@file.Id"
@@ -204,12 +233,12 @@
                                 </div>
                             }
                         </div>
-                        @if (Model.HasReplaceRights || Model.HasAdminRights || !string.IsNullOrEmpty(file.Description))
+                        @if (Model.HasReplaceRights || Model.HasManagementRights || !string.IsNullOrEmpty(file.Description))
                         {
                             <div class="py-1 border">
                                 @if (!string.IsNullOrEmpty(file.Description))
                                 {
-                                    <button class="btn btn-sm btn-outline-primary mx-1"
+                                    <button class="btn btn-sm btn-outline-secondary mx-1"
                                             data-bs-target="#infoModal"
                                             data-bs-toggle="modal"
                                             data-fileid="@file.Id"
@@ -219,23 +248,24 @@
                                         <span class="fa-solid fa-circle-info fa-fw"></span>
                                     </button>
                                 }
+                                @if (Model.HasManagementRights)
+                                {
+                                    <a asp-action="@nameof(SectionController.ManageThumbnails)"
+                                       asp-area="@SectionController.Area"
+                                       asp-controller="@SectionController.Name"
+                                       asp-route-fileId="@file.Id"
+                                       asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+                                       asp-route-sectionSlug="@Model.SectionSlug"
+                                       class="btn btn-sm btn-outline-primary mx-1"
+                                       title="Manage thumbnails">
+                                        <span class="fa-regular fa-images fa-fw"
+                                              aria-hidden="true"></span>
+                                    </a>
+                                }
                                 @if (Model.HasReplaceRights)
                                 {
-                                    <span>
-                                        <a asp-action="@nameof(SectionController.ManageThumbnails)"
-                                           asp-area="@SectionController.Area"
-                                           asp-controller="@SectionController.Name"
-                                           asp-route-fileId="@file.Id"
-                                           asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
-                                           asp-route-sectionSlug="@Model.SectionSlug"
-                                           class="btn btn-sm btn-outline-dark mx-1"
-                                           title="Manage thumbnails">
-                                            <span class="fa-regular fa-images fa-fw"
-                                                  aria-hidden="true"></span>
-                                        </a>
-                                    </span>
                                     <button type="button"
-                                            class="btn btn-sm btn-outline-dark mx-1"
+                                            class="btn btn-sm btn-outline-primary mx-1"
                                             data-bs-toggle="modal"
                                             data-bs-target="#replaceModal"
                                             data-id="@file.Id"
@@ -246,8 +276,20 @@
                                               aria-hidden="true"></span>
                                     </button>
                                 }
-                                @if (Model.HasAdminRights)
+                                @if (Model.HasManagementRights)
                                 {
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary mx-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editModal"
+                                            data-id="@file.Id"
+                                            data-name="@file.Name"
+                                            data-description="@file.Description"
+                                            data-filedate="@file.FileDate"
+                                            title="Edit file">
+                                        <span class="fa-solid fa-pencil fa-fw"
+                                              aria-hidden="true"></span>
+                                    </button>
                                     <button type="button"
                                             class="btn btn-sm btn-outline-danger mx-1"
                                             data-bs-toggle="modal"
@@ -308,7 +350,7 @@
                             <th>File</th>
                             <th>Size</th>
                             <th>Last updated</th>
-                            @if (Model.HasReplaceRights || Model.HasAdminRights)
+                            @if (Model.HasReplaceRights || Model.HasManagementRights)
                             {
                                 <th>Actions</th>
                             }
@@ -359,7 +401,7 @@
                                            asp-route-id="@file.LastUpdateBy.Username">@file.LastUpdateBy.Name</a>
                                     </em>
                                 </td>
-                                @if (Model.HasReplaceRights || Model.HasAdminRights)
+                                @if (Model.HasReplaceRights || Model.HasManagementRights)
                                 {
                                     <td class="align-middle">
                                         <div class="d-flex justify-content-center">
@@ -367,7 +409,7 @@
                                             {
                                                 <div>
                                                     <button type="button"
-                                                            class="btn btn-sm btn-outline-dark mx-1"
+                                                            class="btn btn-sm btn-outline-primary mx-1"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#replaceModal"
                                                             data-id="@file.Id"
@@ -379,8 +421,22 @@
                                                     </button>
                                                 </div>
                                             }
-                                            @if (Model.HasAdminRights)
+                                            @if (Model.HasManagementRights)
                                             {
+                                                <div>
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-primary mx-1"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#editModal"
+                                                            data-id="@file.Id"
+                                                            data-name="@file.Name"
+                                                            data-description="@file.Description"
+                                                            data-filedate="@file.FileDate"
+                                                            title="Edit file">
+                                                        <span class="fa-solid fa-pencil fa-fw"
+                                                              aria-hidden="true"></span>
+                                                    </button>
+                                                </div>
                                                 <div>
                                                     <button type="button"
                                                             class="btn btn-sm btn-outline-danger mx-1"
@@ -504,7 +560,7 @@ else
     </div>
 }
 
-@if (Model.HasAdminRights)
+@if (Model.HasManagementRights)
 {
     <div aria-labelledby="addModalLabel"
          class="modal fade"
@@ -541,17 +597,28 @@ else
                         <label class="form-label"
                                for="UploadFile">
                             Select a file (valid types:
-                            @(Model.FileTypes?.Any() == true ? Model.JoinFileExtensions(", ") : "none"))
+                            @(Model.FileTypes?.Any() == true ? Model.JoinFileExtensions(", ") : "none")
+                            @if (Model.MaximumFileUploadBytes > 0)
+                            {
+                                @:, maximum size: @Model.MaximumFileUploadBytes.ToHumanSizeString())
+                            }
+                            else
+                            {
+                                @:)
+                            }
                         </label>
-                        <div class="input-group mb-3">
-                            <input accept="@Model.JoinFileExtensions(",")"
-                                   asp-for="UploadFile"
-                                   class="form-control @FileLibraryViewModel.ValidClass(ViewData.ModelState.GetValidationState(nameof(Model.UploadFile)))"
-                                   multiple="multiple"
-                                   type="file" />
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <input accept="@Model.JoinFileExtensions(",")"
+                                       asp-for="UploadFile"
+                                       class="form-control @FileLibraryViewModel.ValidClass(ViewData.ModelState.GetValidationState(nameof(Model.UploadFile)))"
+                                       multiple="multiple"
+                                       type="file" />
+                            </div>
+                            <span asp-validation-for="UploadFile" class="text-danger"></span>
+                            <span class="text-danger d-none" id="uploadMessage">The file you've selected is too large!</span>
                         </div>
-                        <span asp-validation-for="UploadFile" class="text-danger"></span>
-                        <input asp-for="File.Name" autocomplete="off" formgroup />
+                        <input asp-for="File.Name" formgroup />
                         <input asp-for="File.Description" autocomplete="off" formgroup />
                         @if (Model.FileLibrarySortOrder == FileLibrarySort.DocumentDateMonthDescending)
                         {
@@ -568,10 +635,71 @@ else
                             Cancel
                         </button>
                         <button class="btn btn-outline-success"
+                                id="addFileSubmit"
                                 type="submit"
                                 value="Submit">
                             <span class="fa-solid fa-file-arrow-up" aria-hidden="true"></span>
                             Upload
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div aria-labelledby="editModalLabel"
+         class="modal fade"
+         data-bs-backdrop="static"
+         id="editModal"
+         role="dialog"
+         tabindex="-1">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit File</h5>
+                    <button aria-label="Close"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            type="button"></button>
+                </div>
+                <form asp-action="@nameof(SectionController.EditFileLibraryFile)"
+                      asp-area="@SectionController.Area"
+                      asp-controller="@SectionController.Name"
+                      asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+                      asp-route-sectionSlug="@Model.SectionSlug"
+                      enctype="multipart/form-data"
+                      id="editFileLib"
+                      method="post"
+                      role="form">
+                    <div class="modal-body">
+                        <input asp-for="CurrentPage" id="editCurrentPage" type="hidden" />
+                        <input asp-for="File.Id" id="editFileId" type="hidden" />
+                        <input asp-for="File.Name" id="editFileName" formgroup />
+                        <input asp-for="File.Description"
+                               autocomplete="off"
+                               formgroup
+                               id="editFileDescription" />
+                        @if (Model.FileLibrarySortOrder == FileLibrarySort.DocumentDateMonthDescending)
+                        {
+                            <input asp-for="File.FileDate"
+                                   autocomplete="off"
+                                   formgroup
+                                   id="editFileDate"
+                                   type="date" />
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-dark"
+                                data-bs-dismiss="modal"
+                                type="button">
+                            Cancel
+                        </button>
+                        <button class="btn btn-outline-success"
+                                id="editFileSubmit"
+                                type="submit"
+                                value="Submit">
+                            <span class="fa-solid fa-file-arrow-up" aria-hidden="true"></span>
+                            Save
                         </button>
                     </div>
                 </form>
@@ -638,39 +766,73 @@ else
 }
 
 @section scripts {
-    @if (Model.HasAdminRights)
+    @if (Model.HasManagementRights)
     {
         <script>
-            const uploadFile = document.getElementById("UploadFile");
+            const validFileTypes = @Html.Raw(Model.JsArrayFileExtensions());
+            const addFileSubmit = document.getElementById("addFileSubmit");
             const fileName = document.getElementById("File_Name");
+            const uploadMessage = document.getElementById("uploadMessage");
+            const maxFileSize = @Model.MaximumFileUploadBytes;
+            const uploadFile = document.getElementById("UploadFile");
 
             uploadFile.addEventListener("change", (event) => {
-                if(event.target.files.length > 0 && fileName.value.length == 0) {
-                    let split = event.target.files[0].name.split('.');
-                    split.pop();
-                    fileName.value = split.join('.');
+                if(event.target.files && event.target.files.length > 0) {
+                    let issues = [];
+                    if(fileName.value.length == 0) {
+                        let split = event.target.files[0].name.split('.');
+                        let ext = split.pop();
+                        if(!validFileTypes.includes(`.${ext}`)) {
+                            issues.push("invalid file type");
+                        }
+                        fileName.value = split.join('.');
+                    }
+                    if(maxFileSize > 0 && event.target.files[0].size > maxFileSize) {
+                        issues.push("file is too large")
+                    }
+                    if(issues.length > 0) {
+                        addFileSubmit.setAttribute('disabled', 'disabled');
+                        uploadMessage.innerText = `File upload failed: ${issues.join(", ")}`
+                        uploadMessage.classList.remove('d-none');
+                    }
+                    else
+                    {
+                        addFileSubmit.removeAttribute("disabled");
+                        uploadMessage.classList.add('d-none');
+                        uploadMessage.innerText = '';
+                    }
                 }
-                console.info("Change: %o", event.target.files);
-            })
+            });
 
-            $("#deleteModal").on("show.bs.modal", function (e) {
-                let button = $(e.relatedTarget);
-                let id = button.data("id");
-                let name = button.data("name");
-                $(this).find("#deleteModalText").text(name);
-                $(this).find("#delFileId").val(String(id));
+            document.getElementById("editModal").addEventListener("show.bs.modal", (event) => {
+                let modal = event.target;
+                let sender = event.relatedTarget;
+                modal.querySelector("#editFileId").value = sender.dataset.id;
+                modal.querySelector("#editFileName").value = sender.dataset.name;
+                modal.querySelector("#editFileDescription").value = sender.dataset.description;
+                let fileDateField = modal.querySelector("#editFileDate");
+                if(fileDateField) {
+                    fileDateField.value = sender.dataset.filedate;
+                }
+            });
+
+            document.getElementById("deleteModal").addEventListener("show.bs.modal", (event) => {
+                let modal = event.target;
+                let sender = event.relatedTarget;
+                modal.querySelector("#deleteModalText").textContent = sender.dataset.name;
+                modal.querySelector("#delFileId").value = sender.dataset.id;
             });
         </script>
     }
     @if (Model.HasReplaceRights)
     {
         <script>
-            $("#replaceModal").on("show.bs.modal", function (e) {
-                let button = $(e.relatedTarget);
-                let id = button.data("id");
-                $(this).find("#ReplaceFileName").text(button.data("name"));
-                $(this).find("#ReplaceFileId").val(String(id));
-                $(this).find("#ReplaceFileUpload").attr("accept", button.data("extension"));
+            document.getElementById("replaceModal").addEventListener("show.bs.modal", (event) => {
+                let modal = event.target;
+                let sender = event.relatedTarget;
+                modal.querySelector("#ReplaceFileName").textContent = sender.dataset.name;
+                modal.querySelector("#ReplaceFileId").value = sender.dataset.id;
+                $(this).find("#ReplaceFileUpload").settAttribute("accept", sender.dataset.id.extension);
             });
         </script>
     }

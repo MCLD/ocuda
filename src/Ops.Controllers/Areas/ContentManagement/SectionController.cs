@@ -38,6 +38,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         ISectionService sectionService)
         : BaseController<SectionController>(context)
     {
+        public const long MaximumFileUploadBytes = 50 * 1024 * 1024;
+
         public static string Area
         {
             get { return "ContentManagement"; }
@@ -77,7 +79,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             string fileLibrarySlug,
             int permissionGroupId)
         {
-            var section = await GetSectionAsManagerAsync(sectionSlug);
+            Section section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -98,7 +102,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 AlertDanger = $"Problem adding permission: {oex.Message}";
             }
 
-            return RedirectToAction(nameof(FileLibraryPermissions), new
+            return RedirectToAction(nameof(ReplaceFilePermissions), new
             {
                 SectionSlug = sectionSlug,
                 FileLibrarySlug = fileLibrarySlug,
@@ -106,11 +110,14 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         }
 
         [HttpPost("[action]")]
+        [RequestSizeLimit(MaximumFileUploadBytes)]
         public async Task<IActionResult> AddFileToLibrary(FileLibraryViewModel viewModel)
         {
             ArgumentNullException.ThrowIfNull(viewModel);
 
-            var section = await GetSectionAsManagerAsync(viewModel.SectionSlug);
+            var section = !string.IsNullOrEmpty(viewModel.SectionSlug)
+                ? await GetSectionAsManagerAsync(viewModel.SectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -192,7 +199,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         {
             ArgumentNullException.ThrowIfNull(viewModel);
 
-            var section = await GetSectionAsManagerAsync(viewModel.SectionSlug);
+            var section = !string.IsNullOrEmpty(viewModel.SectionSlug)
+                ? await GetSectionAsManagerAsync(viewModel.SectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -229,11 +238,13 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        [HttpPost("[action]/{slug}/{permissionGroupId}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("[action]/{slug}/{permissionGroupId}")]
         public async Task<IActionResult> AddPermissionGroup(string slug, int permissionGroupId)
         {
-            var section = await GetSectionAsManagerAsync(slug);
+            var section = !string.IsNullOrEmpty(slug)
+                ? await GetSectionAsManagerAsync(slug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -258,7 +269,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [RestoreModelState]
         public async Task<IActionResult> AddPost(string sectionSlug, int? page)
         {
-            var section = await GetSectionAsManagerAsync(sectionSlug);
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -282,17 +295,15 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         public async Task<IActionResult> AddPost(string sectionSlug, PostViewModel viewModel)
         {
             ArgumentNullException.ThrowIfNull(viewModel);
-
-            Section section = viewModel.Post?.SectionId != null
+            var section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-
-            Post post = null;
-
             if (section == null)
             {
                 return RedirectToUnauthorized();
             }
+
+            Post post = null;
 
             var slug = viewModel.Post.Slug?.Trim();
 
@@ -374,7 +385,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -472,7 +482,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -537,8 +546,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 });
         }
 
-        [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}")]
         public async Task<IActionResult> AddTypeToLibrary(
             string fileLibrarySlug,
             int fileTypeId,
@@ -547,7 +556,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -575,8 +583,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 });
         }
 
-        [HttpGet("{sectionSlug}/[action]/{fileLibrarySlug}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpGet("{sectionSlug}/[action]/{fileLibrarySlug}")]
         public async Task<IActionResult> AvailableFileTypes(
             string fileLibrarySlug,
             string sectionSlug)
@@ -584,7 +592,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -607,8 +614,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             });
         }
 
-        [HttpPost("[action]")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("[action]")]
         public async Task<IActionResult> ClearSectionCache()
         {
             if (string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
@@ -622,6 +629,55 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         }
 
         [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}")]
+        public async Task<IActionResult> EditFileLibraryFile(
+            string fileLibrarySlug,
+            string sectionSlug,
+            FileLibraryViewModel viewModel)
+        {
+            ArgumentNullException.ThrowIfNull(viewModel);
+
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
+            if (section == null)
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var fileLibrary = await fileService
+                .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
+
+            var file = await fileService.GetFileLibraryFileAsync(viewModel.File.Id);
+
+            if (file == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                await fileService.EditFileLibraryFileAsync(
+                    sectionSlug,
+                    fileLibrarySlug,
+                    viewModel.File);
+            }
+            catch (OcudaException oex)
+            {
+                ShowAlertDanger(oex.Message);
+            }
+
+            return RedirectToAction(nameof(Controllers.HomeController.Files),
+                Controllers.HomeController.Name,
+                new
+                {
+                    area = string.Empty,
+                    fileLibrarySlug,
+                    page = viewModel.CurrentPage,
+                    sectionSlug,
+                });
+        }
+
+        [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}")]
         public async Task<IActionResult> DeleteFileFromLibrary(
             string fileLibrarySlug,
             string sectionSlug,
@@ -632,7 +688,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -641,19 +696,12 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var fileLibrary = await fileService
                 .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
 
-            var hasReplaceRights = await fileService.HasReplaceRightsAsync(fileLibrary.Id);
-
-            if (!hasReplaceRights)
-            {
-                return RedirectToUnauthorized();
-            }
-
             try
             {
-                await fileService.DeletePrivateFileAsync(
-                    section.Id,
+                await fileService.DeleteFileLibraryFileAsync(
+                    section.Slug,
                     fileLibrary.Slug,
-                    viewModel.File.Id);
+                    viewModel.File);
             }
             catch (OcudaException oex)
             {
@@ -671,13 +719,15 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 });
         }
 
-        [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}")]
         public async Task<IActionResult> DeleteFileLibrary(
             string fileLibrarySlug,
             string sectionSlug)
         {
-            var section = await GetSectionAsManagerAsync(sectionSlug);
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -725,7 +775,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         {
             ArgumentNullException.ThrowIfNull(model);
 
-            var section = await GetSectionAsManagerAsync(model.SectionSlug);
+            var section = !string.IsNullOrEmpty(model.SectionSlug)
+                ? await GetSectionAsManagerAsync(model.SectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -768,13 +820,15 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        [HttpPost("{sectionSlug}/[action]/{linkLibrarySlug}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("{sectionSlug}/[action]/{linkLibrarySlug}")]
         public async Task<IActionResult> DeleteLinkLibrary(
             string linkLibrarySlug,
             string sectionSlug)
         {
-            var section = await GetSectionAsManagerAsync(sectionSlug);
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -823,7 +877,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -856,7 +909,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [RestoreModelState]
         public async Task<IActionResult> EditPost(string sectionSlug, string postSlug, int? page)
         {
-            var section = await GetSectionAsManagerAsync(sectionSlug);
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -888,11 +943,15 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpPost("{sectionSlug}/[action]/{postSlug}")]
         [SaveModelState]
-        public async Task<IActionResult> EditPost(PostViewModel viewModel)
+        public async Task<IActionResult> EditPost(
+            string sectionSlug,
+            PostViewModel viewModel)
         {
             ArgumentNullException.ThrowIfNull(viewModel);
 
-            var section = await GetSectionAsManagerAsync(viewModel.Post.SectionId);
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -970,7 +1029,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             Section section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -1008,12 +1066,15 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 });
         }
 
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpGet("[action]/{sectionSlug}/{fileLibrarySlug}")]
-        public async Task<IActionResult> FileLibraryPermissions(
+        public async Task<IActionResult> ReplaceFilePermissions(
             string sectionSlug,
             string fileLibrarySlug)
         {
-            var section = await GetSectionAsManagerAsync(sectionSlug);
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -1090,7 +1151,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-
             return section == null
                 ? RedirectToUnauthorized()
                 : View(new LinkLibraryManagementViewModel
@@ -1106,10 +1166,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [RestoreModelState]
         public async Task<IActionResult> LinkLibrary(string sectionSlug, string linkLibrarySlug)
         {
-            Section section = !string.IsNullOrEmpty(sectionSlug)
+            var section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -1147,7 +1206,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -1183,11 +1241,13 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             });
         }
 
-        [HttpGet("[action]/{slug}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpGet("[action]/{slug}")]
         public async Task<IActionResult> Permissions(string slug)
         {
-            var section = await GetSectionAsManagerAsync(slug);
+            var section = !string.IsNullOrEmpty(slug)
+                ? await GetSectionAsManagerAsync(slug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -1220,14 +1280,16 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return View(viewModel);
         }
 
-        [HttpPost("[action]/{sectionSlug}/{fileLibrarySlug}/{permissionGroupId:int}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("[action]/{sectionSlug}/{fileLibrarySlug}/{permissionGroupId:int}")]
         public async Task<IActionResult> RemoveFilePermissionGroup(
             string sectionSlug,
             string fileLibrarySlug,
             int permissionGroupId)
         {
-            var section = await GetSectionAsManagerAsync(sectionSlug);
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -1249,15 +1311,15 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 AlertDanger = $"Problem adding permission: {oex.Message}";
             }
 
-            return RedirectToAction(nameof(FileLibraryPermissions), new
+            return RedirectToAction(nameof(ReplaceFilePermissions), new
             {
                 SectionSlug = sectionSlug,
                 FileLibrarySlug = fileLibrarySlug,
             });
         }
 
-        [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}/{fileTypeId:int}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}/{fileTypeId:int}")]
         public async Task<IActionResult> RemoveLibraryFileType(
             string fileLibrarySlug,
             int fileTypeId,
@@ -1266,7 +1328,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -1300,11 +1361,13 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             });
         }
 
-        [HttpPost("[action]/{slug}/{permissionGroupId:int}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("[action]/{slug}/{permissionGroupId:int}")]
         public async Task<IActionResult> RemovePermissionGroup(string slug, int permissionGroupId)
         {
-            var section = await GetSectionAsManagerAsync(slug);
+            var section = !string.IsNullOrEmpty(slug)
+                ? await GetSectionAsManagerAsync(slug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -1337,7 +1400,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -1364,10 +1426,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
             else
             {
-                var path = await fileService.GetFilePathAsync(
-                    section.Id,
-                    fileLibrarySlug,
-                    file.Id);
+                var path = fileService.GetFileLibraryFilePath(sectionSlug, fileLibrarySlug, file);
 
                 if (viewModel.UploadFile.Length > 0)
                 {
@@ -1393,9 +1452,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 });
         }
 
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost("{sectionSlug}/[action]")]
         [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}")]
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [SaveModelState]
         public async Task<IActionResult> SaveFileLibrary(
             FileLibraryManagementViewModel viewModel,
@@ -1407,7 +1466,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return BadRequest();
             }
 
-            var section = await GetSectionAsManagerAsync(sectionSlug);
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -1469,9 +1530,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 });
         }
 
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost("{sectionSlug}/[action]")]
         [HttpPost("{sectionSlug}/[action]/{linkLibrarySlug}")]
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [SaveModelState]
         public async Task<IActionResult> SaveLinkLibrary(
             LinkLibraryManagementViewModel viewModel,
@@ -1483,7 +1544,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return BadRequest();
             }
 
-            var section = await GetSectionAsManagerAsync(sectionSlug);
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -1546,7 +1609,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpGet("{sectionSlug}")]
         public async Task<IActionResult> Section(string sectionSlug)
         {
-            var section = await GetSectionAsManagerAsync(sectionSlug);
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
             if (section == null)
             {
                 return RedirectToUnauthorized();
@@ -1638,15 +1703,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                         linkLibrarySlug = model.LinkLibrarySlug,
                     });
             }
-        }
-
-        private async Task<Section> GetSectionAsManagerAsync(int sectionId)
-        {
-            var section = await sectionService.GetByIdAsync(sectionId);
-            return await HasPermissionAsync<PermissionGroupSectionManager>(permissionGroupService,
-                section.Id)
-                ? section
-                : null;
         }
 
         private async Task<Section> GetSectionAsManagerAsync(string sectionSlug)

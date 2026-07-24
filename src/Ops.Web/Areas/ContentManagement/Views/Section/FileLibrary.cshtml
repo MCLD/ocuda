@@ -1,7 +1,7 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.FileLibraryManagementViewModel
 
 @section header {
-    <div class="d-flex justify-content-between mb-2">
+    <div class="d-flex justify-content-between align-items-top mb-2">
         <h1>
             File Library
             <small class="text-muted d-print-block">
@@ -13,7 +13,7 @@
                asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
                asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
                asp-route-sectionSlug="@Model.SectionSlug"
-               class="btn btn-outline-dark mt-1 ms-2">Back</a>
+               class="btn btn-sm btn-outline-dark mt-1 ms-2">Back</a>
         </div>
     </div>
 }
@@ -157,24 +157,27 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header d-flex">
-                    <div class="flex-grow-1 lead fw-bold">Permissions</div>
-                </div>
-                <div class="card-body">
-                    <a class="btn btn-outline-primary btn-sm ms-2 my-1"
-                       asp-area="@SectionController.Area"
-                       asp-controller="@SectionController.Name"
-                       asp-action="@nameof(SectionController.FileLibraryPermissions)"
-                       asp-route-sectionSlug="@Model.SectionSlug"
-                       asp-route-fileLibrarySlug="@Model.FileLibrarySlug">
-                        <span class="fa-solid fa-user-plus fa-fw"></span>
-                        Replace/Delete File Permissions
-                    </a>
+        @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+        {
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header d-flex">
+                        <div class="flex-grow-1 lead fw-bold">Permissions</div>
+                    </div>
+                    <div class="card-body">
+                        <a class="btn btn-outline-primary btn-sm ms-2 my-1"
+                           asp-area="@SectionController.Area"
+                           asp-controller="@SectionController.Name"
+                           asp-action="@nameof(SectionController.ReplaceFilePermissions)"
+                           asp-route-sectionSlug="@Model.SectionSlug"
+                           asp-route-fileLibrarySlug="@Model.FileLibrarySlug">
+                            <span class="fa-solid fa-user-plus fa-fw"></span>
+                            Replace File Permissions
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
+        }
     }
 </div>
 
@@ -212,17 +215,17 @@
                             </p>
                         </div>
                     </div>                    <div class="modal-footer">
-                        <button class="btn btn-outline-secondary"
-                                data-bs-dismiss="modal"
-                                type="button">
-                            Close
-                        </button>
-                        <button class="btn btn-outline-danger" type="submit">Delete</button>
-                    </div>
+                    <button class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal"
+                            type="button">
+                        Close
+                    </button>
+                    <button class="btn btn-outline-danger" type="submit">Delete</button>
                 </div>
             </div>
         </div>
-    </form>
+    </div>
+</form>
 }
 
 <div aria-hidden="true"

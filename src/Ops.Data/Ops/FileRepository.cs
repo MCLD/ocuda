@@ -76,9 +76,10 @@ namespace Ocuda.Ops.Data.Ops
 
             var filteredQuery = filter.FileLibrary.SortOrder switch
             {
+                Models.FileLibrarySort.AlphabeticalName => baseQuery.OrderBy(_ => _.Name),
                 Models.FileLibrarySort.DocumentDateMonthDescending
                     => baseQuery.OrderBy(_ => _.FileDate).ThenBy(_ => _.Name),
-                Models.FileLibrarySort.AlphabeticalName => baseQuery.OrderBy(_ => _.Name),
+                Models.FileLibrarySort.ThumbnailsAlphabetical => baseQuery.OrderBy(_ => _.Name),
                 _ => baseQuery.OrderByDescending(_ => _.CreatedAt),
             };
 

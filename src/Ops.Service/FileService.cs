@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
@@ -12,7 +14,6 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Extensions;
-using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Models;
 using Ocuda.Utility.Services.Interfaces;
 
@@ -133,11 +134,29 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public async Task DeletePrivateFileAsync(int sectionId,
+        public async Task DeleteFileLibraryFileAsync(
+            string sectionSlug,
             string fileLibrarySlug,
-            int fileId)
+            File file)
         {
-            var filePath = await GetFilePathAsync(sectionId, fileLibrarySlug, fileId);
+            var issues = new StringBuilder();
+            try
+            {
+                var thumbs = await fileThumbnailRepository.GetByFileIdsAsync([file.Id]);
+                if (thumbs?.Count > 0)
+                {
+                    fileThumbnailRepository.RemoveRange(thumbs);
+                    await fileThumbnailRepository.SaveAsync();
+                }
+            }
+            catch (Exception ex) when (ex is SystemException || ex is OcudaException)
+            {
+                issues.Append("deleting thumbnails: ").Append(ex.Message);
+            }
+
+            file.FileType ??= await GetFileTypeByIdAsync(file.FileTypeId);
+
+            var filePath = GetFileLibraryFilePath(sectionSlug, fileLibrarySlug, file);
 
             var fileExists = System.IO.File.Exists(filePath);
 
@@ -146,13 +165,26 @@ namespace Ocuda.Ops.Service
                 System.IO.File.Delete(filePath);
             }
 
-            fileRepository.Remove(fileId);
+            fileRepository.Remove(file.Id);
             await fileRepository.SaveAsync();
 
             if (!fileExists)
             {
-                var file = await fileRepository.FindAsync(fileId);
-                throw new OcudaException($"File does not exist: {file.Name}");
+                if (issues.Length > 0)
+                {
+                    issues.Append(", ");
+                }
+
+                issues.Append("file does not exist");
+                if (!string.IsNullOrEmpty(file?.Name))
+                {
+                    issues.Append(": ").Append(file.Name);
+                }
+            }
+
+            if (issues.Length > 0)
+            {
+                throw new Exception($"Error: {issues}");
             }
         }
 
@@ -161,6 +193,52 @@ namespace Ocuda.Ops.Service
             var thumbnail = await fileThumbnailRepository.FindAsync(thumbnailId);
             fileThumbnailRepository.Remove(thumbnail);
             await fileThumbnailRepository.SaveAsync();
+        }
+
+        public async Task EditFileLibraryFileAsync(
+            string sectionSlug,
+            string fileLibrarySlug,
+            File file)
+        {
+            var currentFile = await fileRepository.FindAsync(file.Id);
+            file.FileType = currentFile.FileType;
+            var newName = file.Name?.Trim();
+
+            if (currentFile.Name != newName)
+            {
+                var currentPath = GetFileLibraryFilePath(sectionSlug, fileLibrarySlug, currentFile);
+                var newPath = GetFileLibraryFilePath(sectionSlug, fileLibrarySlug, file);
+
+                if (System.IO.File.Exists(newPath))
+                {
+                    throw new OcudaException("A file already exists in this library with that name.");
+                }
+
+                try
+                {
+                    System.IO.File.Move(currentPath, newPath);
+                }
+                catch (Exception ex) when (
+                    ex is SystemException
+                    || ex is System.IO.FileNotFoundException)
+                {
+                    _logger.LogError(
+                        "Unable to move file {SourcePath} to {DestinationPath}: {ErrorMessage}",
+                        currentPath,
+                        newPath,
+                        ex.Message);
+                    throw new OcudaException($"Unable to move file on disk: {ex.Message}", ex);
+                }
+            }
+
+            currentFile.Name = newName;
+            currentFile.Description = file.Description?.Trim();
+            currentFile.FileDate = file.FileDate;
+            currentFile.UpdatedBy = GetCurrentUserId();
+            currentFile.UpdatedAt = dateTimeProvider.Now;
+
+            fileRepository.Update(currentFile);
+            await fileRepository.SaveAsync();
         }
 
         public async Task<FileLibrary> EditLibraryTypesAsync(FileLibrary library,
@@ -228,16 +306,21 @@ namespace Ocuda.Ops.Service
             return await fileTypeService.GetTypesByLibraryIdsAsync(libraryId);
         }
 
-        public async Task<string> GetFilePathAsync(int sectionId, string librarySlug, int fileId)
+        public async Task<File> GetFileLibraryFileAsync(int fileId)
         {
-            var section = await sectionService.GetByIdAsync(sectionId);
-            var file = await GetByIdAsync(fileId);
+            return await fileRepository.FindAsync(fileId);
+        }
 
-            return pathResolver
-                .GetPrivateContentFilePath(file.Name + file.FileType.Extension,
-                    SectionsPath,
-                    section.Slug,
-                    librarySlug);
+        public string GetFileLibraryFilePath(
+            string sectionSlug,
+            string fileLibrarySlug,
+            File file)
+        {
+            return pathResolver.GetPrivateContentFilePath(
+                file.Name + file.FileType.Extension,
+                SectionsPath,
+                sectionSlug,
+                fileLibrarySlug);
         }
 
         public async Task<FileType> GetFileTypeByIdAsync(int id)
@@ -314,7 +397,7 @@ namespace Ocuda.Ops.Service
 
                 if (System.IO.File.Exists(filePath))
                 {
-                    file.Size = new System.IO.FileInfo(filePath).HumanSize();
+                    file.Size = new System.IO.FileInfo(filePath).Length.ToHumanSizeString();
                 }
             }
 
@@ -411,7 +494,7 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException($"Could not find id: {fileId}");
             }
 
-            file.UpdatedAt = DateTime.Now;
+            file.UpdatedAt = dateTimeProvider.Now;
             file.UpdatedBy = GetCurrentUserId();
 
             fileRepository.Update(file);
@@ -472,7 +555,7 @@ namespace Ocuda.Ops.Service
             currentLibrary.IsFeatured = library.IsFeatured;
             currentLibrary.Name = library.Name.Trim();
             currentLibrary.SortOrder = library.SortOrder;
-            currentLibrary.UpdatedAt = DateTime.Now;
+            currentLibrary.UpdatedAt = dateTimeProvider.Now;
             currentLibrary.UpdatedBy = GetCurrentUserId();
 
             fileLibraryRepository.Update(currentLibrary);
@@ -485,7 +568,7 @@ namespace Ocuda.Ops.Service
         {
             var libraryTypes = await GetFileLibrariesFileTypesAsync(fileLibraryId)
                 ?? throw new OcudaException(
-                    "This file library is not configured to accept any file types.");
+                    "This file  library is not configured to accept any file types.");
 
             if (!libraryTypes
                 .Any(_ => _.Extension.Equals(extension, StringComparison.OrdinalIgnoreCase)))
@@ -526,7 +609,7 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException($"Unknown file type: {extension}");
             }
 
-            file.CreatedAt = DateTime.Now;
+            file.CreatedAt = dateTimeProvider.Now;
             file.CreatedBy = GetCurrentUserId();
             file.Description = file.Description?.Trim();
             file.FileTypeId = fileType.Id;

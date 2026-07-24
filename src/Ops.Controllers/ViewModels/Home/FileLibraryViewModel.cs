@@ -12,7 +12,10 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
 {
     public class FileLibraryViewModel : PaginateModel
     {
+        private bool managementRights;
         private bool replaceRights;
+
+        public long MaximumFileUploadBytes { get; set; }
 
         public string GetFileDetailsLink { get; set; }
 
@@ -38,6 +41,19 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
         public ICollection<FileType> FileTypes { get; set; }
 
         public bool HasAdminRights { get; set; }
+
+        public bool HasManagementRights
+        {
+            get
+            {
+                return HasAdminRights || managementRights;
+            }
+
+            set
+            {
+                managementRights = value;
+            }
+        }
 
         public bool HasReplaceRights
         {
@@ -87,6 +103,11 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
         public string JoinFileExtensions(string separator)
         {
             return string.Join(separator, FileTypes.Select(_ => _.Extension).ToList());
+        }
+
+        public string JsArrayFileExtensions()
+        {
+            return $"[{string.Join(",", FileTypes.Select(_ => $"'{_.Extension}'"))}]";
         }
     }
 }

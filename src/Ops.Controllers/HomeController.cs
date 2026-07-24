@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
+using Ocuda.Ops.Controllers.Areas.ContentManagement;
 using Ocuda.Ops.Controllers.ViewModels.Home;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
@@ -203,12 +204,14 @@ namespace Ocuda.Ops.Controllers
                 FileLibrarySortOrder = fileLibrary.SortOrder,
                 Files = filesAndCount.Data,
                 FileTypes = await fileService.GetFileLibrariesFileTypesAsync(fileLibrary.Id),
-                HasAdminRights = await HasPermissionAsync<PermissionGroupSectionManager>(
+                HasAdminRights = IsSiteManager(),
+                HasManagementRights = await HasPermissionAsync<PermissionGroupSectionManager>(
                     permissionGroupService,
                     section.Id),
                 HasReplaceRights = await fileService.HasReplaceRightsAsync(fileLibrary.Id),
                 ItemCount = filesAndCount.Count,
                 ItemsPerPage = filter.Take.Value,
+                MaximumFileUploadBytes = SectionController.MaximumFileUploadBytes,
                 SectionName = section.Name,
                 SectionSlug = section.Slug,
                 UseThumbnails = filesAndCount.Data.Any(_ => _.Thumbnails?.Count > 0),
@@ -241,9 +244,13 @@ namespace Ocuda.Ops.Controllers
                 }
             }
 
-            var filePath = await fileService.GetFilePathAsync(section.Id,
-                library.Slug,
-                fileId);
+            var file = await fileService.GetByIdAsync(fileId);
+            if (file == null)
+            {
+                return NotFound();
+            }
+
+            var filePath = fileService.GetFileLibraryFilePath(section.Slug, library.Slug, file);
             var filename = Path.GetFileName(filePath);
 
             if (!System.IO.File.Exists(filePath))

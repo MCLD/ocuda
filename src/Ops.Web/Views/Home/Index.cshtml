@@ -4,7 +4,7 @@
 @section header {
     @if (!string.IsNullOrEmpty(Model.SectionName))
     {
-        <div class="d-flex justify-content-between mb-2">
+        <div class="d-flex justify-content-between align-items-top mb-2">
             <h1>
                 @Model.SectionName
                 @if (Model.SupervisorsOnly)
@@ -21,7 +21,7 @@
                        asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
                        asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
                        asp-route-sectionslug="@Model.SectionSlug"
-                       class="btn btn-sm btn-outline-warning ms-2">
+                       class="btn btn-sm btn-outline-primary mt-1 ms-2">
                         Management
                     </a>
                 }
@@ -31,7 +31,7 @@
                        asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
                        asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
                        asp-route-sectionSlug="@Model.SectionSlug"
-                       class="btn btn-sm btn-outline-success ms-2">
+                       class="btn btn-sm btn-outline-success mt-1 ms-2">
                         <span class="fa-solid fa-circle-plus"></span>
                         Add Post
                     </a>
@@ -45,13 +45,13 @@
                            asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
                            asp-route-linkLibrarySlug="@linkLibrary.Slug"
                            asp-route-sectionSlug="@Model.SectionSlug"
-                           class="btn btn-sm btn-outline-dark ms-2">@linkLibrary.Name</a>
+                           class="btn btn-sm btn-outline-dark mt-1 ms-2">@linkLibrary.Name</a>
                     }
                 }
                 else if (Model.LinkLibraries?.Where(_ => !_.IsFeatured).Count() > 1)
                 {
-                    <div class="btn-group ms-2">
-                        <button class="btn btn-outline-dark dropdown-toggle"
+                    <div class="btn-group mt-1 ms-2">
+                        <button class="btn btn-sm btn-outline-dark dropdown-toggle"
                                 type="button"
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false">
@@ -81,13 +81,13 @@
                            asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
                            asp-route-fileLibrarySlug="@fileLibrary.Slug"
                            asp-route-sectionSlug="@Model.SectionSlug"
-                           class="btn btn-sm btn-outline-dark ms-2">@fileLibrary.Name</a>
+                           class="btn btn-sm btn-outline-dark mt-1 ms-2">@fileLibrary.Name</a>
                     }
                 }
                 else if (Model.FileLibraries?.Where(_ => !_.IsFeatured).Count() > 1)
                 {
-                    <div class="btn-group ms-2">
-                        <button class="btn btn-outline-dark dropdown-toggle"
+                    <div class="btn-group mt-1 ms-2">
+                        <button class="btn btn-sm btn-outline-dark dropdown-toggle"
                                 type="button"
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false">

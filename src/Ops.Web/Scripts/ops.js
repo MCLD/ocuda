@@ -152,7 +152,11 @@ function bindSlugify(slugifyTo) {
                         const now = new Date();
                         prefix = `${now.getFullYear()} ${('0' + (now.getMonth() + 1)).slice(-2)} `;
                     }
-                    slugifyTo.value = slugify(`${prefix}${event.target.value}`);
+                    slugifyTo.value = slugify(`${prefix}${event.target.value}`,
+                        {
+                            lower: true,
+                            strict: true,
+                        });
                 }
             })
         } else {

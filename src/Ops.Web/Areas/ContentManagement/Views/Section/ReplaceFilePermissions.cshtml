@@ -1,9 +1,9 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.FileLibraryPermissionsViewModel
 
 @section header {
-    <div class="d-flex justify-content-between mb-2">
+    <div class="d-flex justify-content-between align-items-top mb-2">
         <h1>
-            File replacement permissions
+            Replace File
             <small class="text-muted d-print-block">
                 @Model.SectionName / @Model.Name
             </small>
@@ -13,7 +13,7 @@
                asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
                asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
                asp-route-sectionSlug="@Model.SectionSlug"
-               class="btn btn-outline-dark mt-1 ms-2">Back</a>
+               class="btn btn-sm btn-outline-dark mt-1 ms-2">Back</a>
         </div>
     </div>
 }
