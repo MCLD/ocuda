@@ -139,10 +139,14 @@ namespace Ocuda.Ops.Service
             string fileLibrarySlug,
             File file)
         {
+            ArgumentNullException.ThrowIfNull(file);
+
+            var lookupFile = await GetFileLibraryFileAsync(file.Id);
+
             var issues = new StringBuilder();
             try
             {
-                var thumbs = await fileThumbnailRepository.GetByFileIdsAsync([file.Id]);
+                var thumbs = await fileThumbnailRepository.GetByFileIdsAsync([lookupFile.Id]);
                 if (thumbs?.Count > 0)
                 {
                     fileThumbnailRepository.RemoveRange(thumbs);
@@ -154,9 +158,7 @@ namespace Ocuda.Ops.Service
                 issues.Append("deleting thumbnails: ").Append(ex.Message);
             }
 
-            file.FileType ??= await GetFileTypeByIdAsync(file.FileTypeId);
-
-            var filePath = GetFileLibraryFilePath(sectionSlug, fileLibrarySlug, file);
+            var filePath = GetFileLibraryFilePath(sectionSlug, fileLibrarySlug, lookupFile);
 
             var fileExists = System.IO.File.Exists(filePath);
 
@@ -165,7 +167,7 @@ namespace Ocuda.Ops.Service
                 System.IO.File.Delete(filePath);
             }
 
-            fileRepository.Remove(file.Id);
+            fileRepository.Remove(lookupFile.Id);
             await fileRepository.SaveAsync();
 
             if (!fileExists)
@@ -176,9 +178,9 @@ namespace Ocuda.Ops.Service
                 }
 
                 issues.Append("file does not exist");
-                if (!string.IsNullOrEmpty(file?.Name))
+                if (!string.IsNullOrEmpty(lookupFile?.Name))
                 {
-                    issues.Append(": ").Append(file.Name);
+                    issues.Append(": ").Append(lookupFile.Name);
                 }
             }
 
