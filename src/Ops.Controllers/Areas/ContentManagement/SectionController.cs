@@ -168,6 +168,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
             catch (OcudaException oex)
             {
+                ShowAlertDanger($"Error with upload: {oex.Message}");
                 _logger.LogError("Unable to handle uploaded file details for library {Id}, file {Filename}: {ErrorMessage}",
                     fileLibrary.Id,
                     viewModel.File.Name + extension,

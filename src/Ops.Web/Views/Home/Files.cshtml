@@ -622,10 +622,21 @@ else
                         <input asp-for="File.Description" autocomplete="off" formgroup />
                         @if (Model.FileLibrarySortOrder == FileLibrarySort.DocumentDateMonthDescending)
                         {
-                            <input asp-for="File.FileDate"
-                                   autocomplete="off"
-                                   formgroup
-                                   type="date" />
+                            <div class="row mb-3">
+                                <label asp-for="File.FileDate"
+                                       class="col-form-label text-md-end col-md-3">
+                                    Associated date
+                                    <span class="fa-solid fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
+                                </label>
+                                <div class="mb-3-inner col-md-9">
+                                    <input asp-for="File.FileDate"
+                                           autocomplete="off"
+                                           class="form-control"
+                                           required
+                                           type="date">
+                                    <span asp-validation-for="File.FileDate" class="text-danger"></span>
+                                </div>
+                            </div>
                         }
                     </div>
                     <div class="modal-footer">
@@ -681,11 +692,22 @@ else
                                id="editFileDescription" />
                         @if (Model.FileLibrarySortOrder == FileLibrarySort.DocumentDateMonthDescending)
                         {
-                            <input asp-for="File.FileDate"
-                                   autocomplete="off"
-                                   formgroup
-                                   id="editFileDate"
-                                   type="date" />
+                            <div class="row mb-3">
+                                <label asp-for="File.FileDate"
+                                       class="col-form-label text-md-end col-md-3">
+                                    Associated date
+                                    <span class="fa-solid fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
+                                </label>
+                                <div class="mb-3-inner col-md-9">
+                                    <input asp-for="File.FileDate"
+                                           autocomplete="off"
+                                           class="form-control"
+                                           id="editFileDate"
+                                           required
+                                           type="date">
+                                    <span asp-validation-for="File.FileDate" class="text-danger"></span>
+                                </div>
+                            </div>
                         }
                     </div>
                     <div class="modal-footer">

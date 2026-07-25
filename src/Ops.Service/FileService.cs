@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Logging;
@@ -205,6 +206,12 @@ namespace Ocuda.Ops.Service
             var currentFile = await fileRepository.FindAsync(file.Id);
             file.FileType = currentFile.FileType;
             var newName = file.Name?.Trim();
+
+            if (currentFile.FileDate != null
+                && (file.FileDate == null || file.FileDate == DateTime.MinValue))
+            {
+                throw new OcudaException("File Date is required for this file.");
+            }
 
             if (currentFile.Name != newName)
             {
@@ -600,6 +607,12 @@ namespace Ocuda.Ops.Service
             {
                 _logger.LogError("No file library with id: {FileLibraryId}", file.FileLibraryId);
                 throw new OcudaException($"Could not find file library id: {file.FileLibraryId}");
+            }
+
+            if (fileLibrary.SortOrder == Ops.Models.FileLibrarySort.DocumentDateMonthDescending
+                && (file.FileDate == null || file.FileDate == DateTime.MinValue))
+            {
+                throw new OcudaException("File Date is required for this file.");
             }
 
             var extension = System.IO.Path.GetExtension(fileData.FileName);

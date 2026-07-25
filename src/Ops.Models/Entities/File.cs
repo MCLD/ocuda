@@ -15,7 +15,7 @@ namespace Ocuda.Ops.Models.Entities
         [MaxLength(255)]
         public string Description { get; set; }
 
-        [Display(Name = "Associated date (optional)")]
+        [Display(Name = "Associated date")]
         public DateTime? FileDate { get; set; }
 
         public FileLibrary FileLibrary { get; set; }
