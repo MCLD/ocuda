@@ -61,6 +61,8 @@ namespace Ocuda.Ops.Data
 
         public DbSet<File> Files { get; set; }
 
+        public DbSet<FileThumbnail> FileThumbnails { get; set; }
+
         public DbSet<FileType> FileTypes { get; set; }
 
         public DbSet<HistoricalIncident> HistoricalIncidents { get; set; }

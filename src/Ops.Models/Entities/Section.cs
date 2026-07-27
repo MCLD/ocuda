@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Ops.Models.Entities
 {
@@ -20,5 +21,14 @@ namespace Ocuda.Ops.Models.Entities
         public string Slug { get; set; }
 
         public bool SupervisorsOnly { get; set; }
+
+        [NotMapped]
+        public int PostCount { get; set; }
+
+        [NotMapped]
+        public int FileLibraryCount { get; set; }
+
+        [NotMapped]
+        public int LinkLibraryCount { get; set; }
     }
 }

@@ -134,3 +134,31 @@ function removeAttachmentItem(url, id) {
         }
     });
 }
+
+function bindSlugify(slugifyTo) {
+    if (typeof slugify === "function" && slugifyTo) {
+        const slugifyFrom = document.getElementById(slugifyTo.dataset.ocSlugifyFrom);
+        if (slugifyFrom) {
+            slugifyFrom.addEventListener("blur", (event) => {
+                if (slugifyTo && slugifyTo.value.length === 0) {
+                    let prefix = "";
+                    if (slugifyTo.dataset.ocSlugifyPrefix === "YearMonth") {
+                        const now = new Date();
+                        prefix = `${now.getFullYear()} ${("0" + (now.getMonth() + 1)).slice(-2)} `;
+                    }
+                    slugifyTo.value = slugify(`${prefix}${event.target.value}`,
+                        {
+                            lower: true,
+                            strict: true,
+                        });
+                }
+            });
+        }
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (typeof slugify === "function") {
+        Array.from(document.querySelectorAll("[data-oc-slugify-from]")).forEach(bindSlugify);
+    }
+});

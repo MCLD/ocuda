@@ -1,0 +1,91 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.FileLibraryPermissionsViewModel
+
+@section header {
+    <div class="d-flex justify-content-between align-items-top mb-2">
+        <h1>
+            Replace File
+            <small class="text-muted d-print-block">
+                @Model.SectionName / @Model.Name
+            </small>
+        </h1>
+        <div class="d-print-none">
+            <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Files)"
+               asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+               asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+               asp-route-sectionSlug="@Model.SectionSlug"
+               class="btn btn-sm btn-outline-dark mt-1 ms-2">Back</a>
+        </div>
+    </div>
+}
+<div class="row pt-1">
+    <div class="col-12 col-sm-6">
+        <div class="card">
+            <div class="card-header h5">
+                Available Groups <small><em>(@(Model.AvailableGroups?.Count ?? 0))</em></small>
+            </div>
+            <ul class="list-group list-group-flush">
+                @if (Model.AvailableGroups?.Count > 0)
+                {
+                    foreach (var availableGroup in Model.AvailableGroups)
+                    {
+                        <li class="list-group-item">
+                            <form asp-action="@(nameof(SectionController.AddFilePermissionGroup))"
+                                  asp-controller="@SectionController.Name"
+                                  asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+                                  asp-route-sectionSlug="@Model.SectionSlug"
+                                  asp-route-permissionGroupId="@availableGroup.Key"
+                                  class="d-flex align-items-center"
+                                  method="post">
+                                <div class="me-2">
+                                    <button class="btn btn-sm btn-outline-success">
+                                        <span class="fa-solid fa-circle-plus"></span>
+                                    </button>
+                                </div>
+                                <div>@availableGroup.Value</div>
+                            </form>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li class="list-group-item text-danger fw-bold">No groups available.</li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6">
+        <div class="card">
+            <div class="card-header">
+                Assigned Groups <small><em>(@(Model.AssignedGroups?.Count ?? 0))</em></small>
+            </div>
+            <ul class="list-group list-group-flush">
+                @if (Model.AssignedGroups?.Count > 0)
+                {
+                    foreach (var availableGroup in Model.AssignedGroups)
+                    {
+                        <li class="list-group-item">
+                            <form asp-action="@(nameof(SectionController.RemoveFilePermissionGroup))"
+                                  asp-controller="@SectionController.Name"
+                                  asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+                                  asp-route-permissionGroupId="@availableGroup.Key"
+                                  asp-route-sectionSlug="@Model.SectionSlug"
+                                  class="d-flex align-items-center"
+                                  method="post">
+                                <div class="me-2">
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <span class="fa-solid fa-circle-minus"></span>
+                                    </button>
+                                </div>
+                                <div>@availableGroup.Value</div>
+                            </form>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li class="list-group-item text-danger fw-bold">No groups assigned.</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

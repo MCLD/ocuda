@@ -11,13 +11,12 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class FileRepository : OpsRepository<OpsContext, File, int>, IFileRepository
+    public class FileRepository(
+        ServiceFacade.Repository<OpsContext> repositoryFacade,
+        ILogger<FileRepository> logger)
+        : OpsRepository<OpsContext, File, int>(repositoryFacade, logger),
+        IFileRepository
     {
-        public FileRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
-            ILogger<FileRepository> logger) : base(repositoryFacade, logger)
-        {
-        }
-
         public override async Task<File> FindAsync(int id)
         {
             return await DbSet
@@ -57,25 +56,37 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter)
+        public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(
+            FilesFilter filter)
         {
-            var query = DbSet.AsNoTracking();
+            var baseQuery = DbSet.AsNoTracking();
 
-            if (filter.FileLibraryId.HasValue)
+            if (filter?.FileLibrary?.Id != null)
             {
-                query = query.Where(_ => _.FileLibraryId == filter.FileLibraryId.Value);
+                baseQuery = baseQuery.Where(_ => _.FileLibraryId == filter.FileLibrary.Id);
             }
+
+            if (filter.OnlyCount)
+            {
+                return new DataWithCount<ICollection<File>>
+                {
+                    Count = await baseQuery.CountAsync(),
+                };
+            }
+
+            var filteredQuery = filter.FileLibrary.SortOrder switch
+            {
+                Models.FileLibrarySort.AlphabeticalName => baseQuery.OrderBy(_ => _.Name),
+                Models.FileLibrarySort.DocumentDateMonthDescending
+                    => baseQuery.OrderBy(_ => _.FileDate).ThenBy(_ => _.Name),
+                Models.FileLibrarySort.ThumbnailsAlphabetical => baseQuery.OrderBy(_ => _.Name),
+                _ => baseQuery.OrderByDescending(_ => _.CreatedAt),
+            };
 
             return new DataWithCount<ICollection<File>>
             {
-                Count = await query.CountAsync(),
-                Data = await query
-                    .Include(_ => _.FileType)
-                    .Include(_ => _.CreatedByUser)
-                    .Include(_ => _.UpdatedByUser)
-                    .OrderByDescending(_ => _.CreatedAt)
-                    .ApplyPagination(filter)
-                    .ToListAsync()
+                Count = await baseQuery.CountAsync(),
+                Data = await filteredQuery.ApplyPagination(filter).ToListAsync(),
             };
         }
     }

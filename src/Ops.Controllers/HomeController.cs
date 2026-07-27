@@ -1,89 +1,263 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
+using Ocuda.Ops.Controllers.Areas.ContentManagement;
 using Ocuda.Ops.Controllers.ViewModels.Home;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers
 {
     [Route("")]
-    public class HomeController : BaseController<HomeController>
+    public class HomeController(
+        ServiceFacades.Controller<HomeController> context,
+        IFileService fileService,
+        ILinkService linkService,
+        IPermissionGroupService permissionGroupService,
+        IPostService postService,
+        ISectionService sectionService,
+        IUserService userService)
+        : BaseController<HomeController>(context)
     {
-        private readonly IFileService _fileService;
-        private readonly ILinkService _linkService;
-        private readonly IPermissionGroupService _permissionGroupService;
-        private readonly IPostService _postService;
-        private readonly ISectionService _sectionService;
-        private readonly IUserService _userService;
-
-        public HomeController(ServiceFacades.Controller<HomeController> context,
-            IFileService fileService,
-            ILinkService linkService,
-            IPermissionGroupService permissionGroupService,
-            IPostService postService,
-            ISectionService sectionService,
-            IUserService userService) : base(context)
+        public static string Name
         {
-            ArgumentNullException.ThrowIfNull(fileService);
-            ArgumentNullException.ThrowIfNull(linkService);
-            ArgumentNullException.ThrowIfNull(permissionGroupService);
-            ArgumentNullException.ThrowIfNull(postService);
-            ArgumentNullException.ThrowIfNull(sectionService);
-            ArgumentNullException.ThrowIfNull(userService);
-
-            _fileService = fileService;
-            _linkService = linkService;
-            _permissionGroupService = permissionGroupService;
-            _postService = postService;
-            _sectionService = sectionService;
-            _userService = userService;
+            get { return "Home"; }
         }
 
-        public static string Name
-        { get { return "Home"; } }
+        [HttpGet("{sectionSlug}/[action]/{fileLibrarySlug}")]
+        public async Task<IActionResult> GetFileDetailsJson(string sectionSlug,
+            string fileLibrarySlug,
+            int fileId)
+        {
+            Section section;
+            try
+            {
+                section = await GetSection(sectionSlug);
+            }
+            catch (OcudaException oex)
+            {
+                return oex.Data[OcudaExceptionData.HttpResult] is IActionResult
+                    ? oex.Data[OcudaExceptionData.HttpResult] as IActionResult
+                    : NotFound();
+            }
+
+            var fileLibrary = await fileService
+                .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
+
+            if (fileLibrary == null)
+            {
+                return NotFound();
+            }
+
+            var file = await fileService.GetByIdAsync(fileId);
+
+            return file == null ? NotFound() : Json(new JsonResponse<string>
+            {
+                Data = file.Description,
+                ServerResponse = true,
+                Success = true,
+            });
+        }
+
+        [HttpGet("{sectionSlug}/[action]/{fileLibrarySlug}/{thumbnailId}")]
+        public async Task<IActionResult> GetThumbnail(
+            string fileLibrarySlug,
+            string sectionSlug,
+            int thumbnailId)
+        {
+            Section section;
+            try
+            {
+                section = await GetSection(sectionSlug);
+            }
+            catch (OcudaException oex)
+            {
+                return oex.Data[OcudaExceptionData.HttpResult] is IActionResult
+                    ? oex.Data[OcudaExceptionData.HttpResult] as IActionResult
+                    : NotFound();
+            }
+
+            var fileLibrary = await fileService
+                .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
+
+            if (fileLibrary == null)
+            {
+                return NotFound();
+            }
+
+            string filePath;
+            try
+            {
+                filePath = await fileService.GetThumbnailPathAsync(
+                    thumbnailId,
+                    fileLibrary.Slug,
+                    section.Slug);
+            }
+            catch (OcudaException)
+            {
+                return NotFound();
+            }
+
+            var fullPath = Path.GetFileName(filePath);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                ShowAlertDanger($"Thumbnail not found for library {fileLibrary.Name}: {thumbnailId}");
+                _logger.LogError(
+                    "Thumbnail id {ThumbnailId} not found at path {FilePath} for library {LibraryName} (id {LibraryId})",
+                    thumbnailId,
+                    filePath,
+                    fileLibrary.Name,
+                    fileLibrary.Id);
+
+                return NotFound();
+            }
+
+            if (!new FileExtensionContentTypeProvider().TryGetContentType(
+                filePath,
+                out string contentType))
+            {
+                _logger.LogError(
+                    "Unable to determine file type for {FilePath}, using {ContentType",
+                    filePath,
+                    contentType);
+            }
+
+            return File(
+                new FileStream(filePath, FileMode.Open, FileAccess.Read),
+                contentType,
+                fullPath);
+        }
+
+        [HttpGet("{sectionSlug}/[action]/{fileLibrarySlug}")]
+        [HttpGet("{sectionSlug}/[action]/{fileLibrarySlug}/{page:int}")]
+        public async Task<IActionResult> Files(
+            string sectionSlug,
+            string fileLibrarySlug,
+            int? page)
+        {
+            Section section = null;
+            try
+            {
+                section = await GetSection(sectionSlug);
+            }
+            catch (OcudaException oex)
+            {
+                return oex.Data[OcudaExceptionData.ActionResult] is IActionResult
+                    ? oex.Data[OcudaExceptionData.ActionResult] as IActionResult
+                    : RedirectToAction(nameof(Index));
+            }
+
+            var fileLibrary = await fileService
+                .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
+            if (fileLibrary == null)
+            {
+                ShowAlertDanger($"File library not found: {fileLibrarySlug}");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var currentPage = page ?? 1;
+
+            var itemsPerPage = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
+
+            var filter = new FilesFilter(currentPage, itemsPerPage)
+            {
+                FileLibrary = fileLibrary,
+            };
+
+            var filesAndCount = await fileService.GetPaginatedListAsync(filter);
+
+            foreach (var file in filesAndCount.Data)
+            {
+                PopulateThumbnailLinks(
+                    fileLibrary.Slug,
+                    section.Slug,
+                    file.Thumbnails);
+            }
+
+            var viewModel = new FileLibraryViewModel
+            {
+                CurrentPage = currentPage,
+                GetFileDetailsLink = Url.Action(nameof(GetFileDetailsJson),
+                new
+                {
+                    fileLibrarySlug,
+                    sectionSlug,
+                }),
+                FileLibraryId = fileLibrary.Id,
+                FileLibraryName = fileLibrary.Name,
+                FileLibrarySlug = fileLibrary.Slug,
+                FileLibrarySortOrder = fileLibrary.SortOrder,
+                Files = filesAndCount.Data,
+                FileTypes = await fileService.GetFileLibrariesFileTypesAsync(fileLibrary.Id),
+                HasAdminRights = IsSiteManager(),
+                HasManagementRights = await HasPermissionAsync<PermissionGroupSectionManager>(
+                    permissionGroupService,
+                    section.Id),
+                HasReplaceRights = await fileService.HasReplaceRightsAsync(fileLibrary.Id),
+                ItemCount = filesAndCount.Count,
+                ItemsPerPage = filter.Take.Value,
+                MaximumFileUploadBytes = SectionController.MaximumFileUploadBytes,
+                SectionName = section.Name,
+                SectionSlug = section.Slug,
+                UseThumbnails = filesAndCount.Data.Any(_ => _.Thumbnails?.Count > 0),
+            };
+
+            return viewModel.PastMaxPage
+                ? RedirectToRoute(new { page = viewModel.LastPage ?? 1 })
+                : View(viewModel);
+        }
 
         [HttpGet]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability",
-            "CA2000:Dispose objects before losing scope",
-            Justification = "ControllerBase.File handles disposal (dotnet/AspNetCore.Docs#14585)")]
         [Route("[action]/{libraryId:int}/{fileId:int}")]
         [ResponseCache(NoStore = true)]
         public async Task<IActionResult> GetFile(int libraryId, int fileId)
         {
-            var library = await _fileService.GetLibraryByIdAsync(libraryId);
-            var section = await _sectionService.GetByIdAsync(library.SectionId);
+            var library = await fileService.GetLibraryByIdAsync(libraryId);
+            var section = await sectionService.GetByIdAsync(library.SectionId);
 
             if (section == null)
             {
                 return RedirectToUnauthorized();
             }
+
             if (section.SupervisorsOnly)
             {
-                var isSupervisor = await _userService.IsSupervisor(CurrentUserId);
+                var isSupervisor = await userService.IsSupervisor(CurrentUserId);
                 if (!isSupervisor)
                 {
                     return RedirectToUnauthorized();
                 }
             }
 
-            var filePath = await _fileService.GetFilePathAsync(section.Id,
-                library.Slug,
-                fileId);
+            var file = await fileService.GetByIdAsync(fileId);
+            if (file == null)
+            {
+                return NotFound();
+            }
+
+            var filePath = fileService.GetFileLibraryFilePath(section.Slug, library.Slug, file);
             var filename = Path.GetFileName(filePath);
 
             if (!System.IO.File.Exists(filePath))
             {
                 ShowAlertDanger($"File not found in file library {library.Name}: {filename}");
-                _logger.LogError("File {FileName} not found at path {FilePath} for library {LibraryName} (id {LibraryId})",
+                _logger.LogError(
+                    "File {FileName} not found at path {FilePath} for library {LibraryName} (id {LibraryId})",
                     filename,
                     filePath,
                     library.Name,
@@ -99,31 +273,85 @@ namespace Ocuda.Ops.Controllers
         }
 
         [HttpGet("")]
-        public async Task<IActionResult> Index(int page)
+        [HttpGet("{page:int}")]
+        public async Task<IActionResult> Index(int? page)
         {
-            var showPage = page == default ? 1 : page;
-            return await ShowPostsAsync(new BlogFilter(showPage, 5)
+            var currentPage = page ?? 1;
+            return await ShowPostsAsync(new BlogFilter(currentPage, 5)
             {
-                IsShownOnHomePage = true
-            }, showPage);
+                IsShownOnHomePage = true,
+            },
+            currentPage);
+        }
+
+        [HttpGet("{sectionSlug}/[action]/{linkLibrarySlug}")]
+        [HttpGet("{sectionSlug}/[action]/{linkLibrarySlug}/{page:int}")]
+        public async Task<IActionResult> Links(
+            string sectionSlug,
+            string linkLibrarySlug,
+            int? page)
+        {
+            Section section = null;
+            try
+            {
+                section = await GetSection(sectionSlug);
+            }
+            catch (OcudaException oex)
+            {
+                return oex.Data[OcudaExceptionData.ActionResult] is IActionResult
+                    ? oex.Data[OcudaExceptionData.ActionResult] as IActionResult
+                    : RedirectToAction(nameof(Index));
+            }
+
+            var linkLibraries = await linkService.GetBySectionIdAsync(section.Id);
+            var linkLibrary = linkLibraries.Single(_ => _.Slug == linkLibrarySlug);
+            var itemsPerPage = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
+
+            var currentPage = page ?? 1;
+
+            var filter = new LinksFilter(currentPage, itemsPerPage)
+            {
+                LinkLibrary = linkLibrary,
+            };
+            var links = await linkService.GetPaginatedListAsync(filter);
+
+            var viewModel = new LinkLibraryViewModel
+            {
+                CurrentPage = currentPage,
+                HasAdminRights = await HasPermissionAsync<PermissionGroupSectionManager>(
+                    permissionGroupService,
+                    section.Id),
+                IsSiteManager = IsSiteManager(),
+                ItemCount = links.Count,
+                ItemsPerPage = filter.Take.Value,
+                LinkLibrary = linkLibrary,
+                SectionName = section.Name,
+                SectionSlug = section.Slug,
+            };
+
+            viewModel.Links.AddRange(links.Data);
+            viewModel.FileTypes.AddRange(await fileService.GetAllFileTypesAsync());
+
+            return viewModel.PastMaxPage
+                ? RedirectToRoute(new { page = viewModel.LastPage ?? 1 })
+                : View(viewModel);
         }
 
         [HttpGet("{slug}")]
-        public async Task<IActionResult> SectionIndex(string slug, int page)
+        [HttpGet("{slug}/{page:int}")]
+        public async Task<IActionResult> SectionIndex(string slug, int? page)
         {
-            var section = await _sectionService.GetBySlugAsync(slug);
-            if (section == null)
+            Section section = null;
+            try
             {
-                return NotFound();
+                section = await GetSection(slug);
             }
-
-            if (section.SupervisorsOnly)
+            catch (OcudaException oex)
             {
-                var isSupervisor = await _userService.IsSupervisor(CurrentUserId);
-                if (!isSupervisor)
-                {
-                    return RedirectToUnauthorized();
-                }
+                return oex.Data[OcudaExceptionData.ActionResult] is IActionResult
+                    ? oex.Data[OcudaExceptionData.ActionResult] as IActionResult
+                    : RedirectToAction(nameof(Index));
             }
 
             if (section.IsHomeSection)
@@ -131,18 +359,18 @@ namespace Ocuda.Ops.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var showPage = page == default ? 1 : page;
+            var currentPage = page ?? 1;
 
-            var filter = new BlogFilter(showPage, 5)
+            var filter = new BlogFilter(currentPage, 5)
             {
-                SectionId = section.Id
+                SectionId = section.Id,
             };
 
-            var isAdmin
-                = await HasPermissionAsync<PermissionGroupSectionManager>(_permissionGroupService,
-                    section.Id);
+            var isAdmin = await HasPermissionAsync<PermissionGroupSectionManager>(
+                permissionGroupService,
+                section.Id);
 
-            return await ShowPostsAsync(filter, showPage, isAdmin);
+            return await ShowPostsAsync(filter, currentPage, isAdmin);
         }
 
         [HttpGet("[action]")]
@@ -168,7 +396,7 @@ namespace Ocuda.Ops.Controllers
             {
                 AdminEmail = mailLink,
                 ReturnUrl = returnUrl?.ToString(),
-                Username = CurrentUsername
+                Username = CurrentUsername,
             });
         }
 
@@ -182,8 +410,34 @@ namespace Ocuda.Ops.Controllers
                 AuthenticatedAt = UserClaim(ClaimType.AuthenticatedAt) != null
                     ? DateTime.Parse(UserClaim(ClaimType.AuthenticatedAt),
                         CultureInfo.InvariantCulture)
-                    : null
+                    : null,
             });
+        }
+
+        private async Task<Section> GetSection(string slug)
+        {
+            var section = await sectionService.GetBySlugAsync(slug);
+            if (section == null)
+            {
+                var ocudaException = new OcudaException("Section not found");
+                ocudaException.Data[OcudaExceptionData.ActionResult] = NotFound();
+                ocudaException.Data[OcudaExceptionData.HttpResult] = NotFound();
+                throw ocudaException;
+            }
+
+            if (section.SupervisorsOnly)
+            {
+                var isSupervisor = await userService.IsSupervisor(CurrentUserId);
+                if (!isSupervisor)
+                {
+                    var ocudaException = new OcudaException("Access Denied");
+                    ocudaException.Data[OcudaExceptionData.ActionResult] = RedirectToUnauthorized();
+                    ocudaException.Data[OcudaExceptionData.HttpResult] = Unauthorized();
+                    throw ocudaException;
+                }
+            }
+
+            return section;
         }
 
         private async Task<IActionResult> ShowPostsAsync(BlogFilter filter, int page)
@@ -195,17 +449,17 @@ namespace Ocuda.Ops.Controllers
         {
             filter.IncludeDrafts = isAdmin;
 
-            var posts = await _postService.GetPaginatedPostsAsync(filter);
+            var posts = await postService.GetPaginatedPostsAsync(filter);
 
             var viewModel = new IndexViewModel
             {
                 ItemCount = posts.Count,
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value,
-                SectionManager = isAdmin
+                SectionManager = isAdmin,
             };
 
-            ((List<Post>)viewModel.Posts).AddRange(posts.Data);
+            viewModel.Posts.AddRange(posts.Data);
 
             if (viewModel.PastMaxPage)
             {
@@ -217,16 +471,19 @@ namespace Ocuda.Ops.Controllers
                 post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
             }
 
+            int defaultItemsToShow = 10;
+
             if (filter.IsShownOnHomePage == true)
             {
-                filter.SectionId = await _sectionService.GetHomeSectionIdAsync();
+                filter.SectionId = await sectionService.GetHomeSectionIdAsync();
                 viewModel.SectionSlug = "Home";
+                defaultItemsToShow = 15;
             }
             else
             {
                 if (filter.SectionId.HasValue)
                 {
-                    var section = await _sectionService.GetByIdAsync(filter.SectionId.Value);
+                    var section = await sectionService.GetByIdAsync(filter.SectionId.Value);
                     viewModel.SectionName = section.Name;
                     viewModel.SectionSlug = section.Slug;
                     viewModel.SupervisorsOnly = section.SupervisorsOnly;
@@ -235,34 +492,44 @@ namespace Ocuda.Ops.Controllers
 
             if (filter.SectionId.HasValue)
             {
-                var linkLibraries = await _linkService
+                var linkLibraries = await linkService
                     .GetBySectionIdAsync(filter.SectionId.Value);
 
                 if (linkLibraries?.Count > 0)
                 {
                     foreach (var linkLibrary in linkLibraries)
                     {
-                        linkLibrary.Links = await _linkService
-                            .GetLinkLibraryLinksAsync(linkLibrary.Id);
+                        var links = await linkService.GetPaginatedListAsync(
+                            new LinksFilter(1, defaultItemsToShow)
+                            {
+                                LinkLibrary = linkLibrary,
+                            });
+
+                        if (links?.Count > 0)
+                        {
+                            linkLibrary.Links.AddRange(links.Data);
+                        }
+
                         viewModel.LinkLibraries.Add(linkLibrary);
                     }
                 }
 
-                var fileLibraries = await _fileService.GetBySectionIdAsync(filter.SectionId.Value);
+                var fileLibraries = await fileService
+                    .GetBySectionIdAsync(filter.SectionId.Value);
 
                 if (fileLibraries?.Count > 0)
                 {
                     foreach (var fileLibrary in fileLibraries)
                     {
-                        var fileLibraryFiles = await _fileService
-                            .GetPaginatedListAsync(new BlogFilter
+                        var fileLibraryFiles = await fileService
+                            .GetPaginatedListAsync(new FilesFilter(1, defaultItemsToShow)
                             {
-                                FileLibraryId = fileLibrary.Id
+                                FileLibrary = fileLibrary,
                             });
 
-                        if (fileLibraryFiles.Count > 0)
+                        if (fileLibraryFiles?.Count > 0)
                         {
-                            fileLibrary.Files = fileLibraryFiles.Data;
+                            fileLibrary.Files.AddRange(fileLibraryFiles.Data);
                             fileLibrary.TotalFilesInLibrary = fileLibraryFiles.Count;
                             viewModel.FileLibraries.Add(fileLibrary);
                         }

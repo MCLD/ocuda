@@ -8,9 +8,15 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface ILinkService
     {
+        Task<LinkLibrary> CreateLibraryAsync(LinkLibrary library);
+
+        Task UpdateLibrary(string sectionSlug, string slug, LinkLibrary library);
+
+        Task<LinkLibrary> GetBySectionIdSlugAsync(int sectionId, string slug);
+
         Task<Link> CreateAsync(Link link);
 
-        Task<LinkLibrary> CreateLibraryAsync(LinkLibrary library, int sectionId);
+        Task<int> GetLinkCountAsync(int linkLibraryId);
 
         Task DeleteAsync(int id);
 
@@ -20,23 +26,12 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<Link> GetByIdAsync(int id);
 
-        Task<List<LinkLibrary>> GetBySectionIdAsync(int sectionId);
-
-        Task<Link> GetLatestByLibraryIdAsync(int id);
+        Task<ICollection<LinkLibrary>> GetBySectionIdAsync(int sectionId);
 
         Task<LinkLibrary> GetLibraryByIdAsync(int id);
 
-        Task<int> GetLinkCountAsync();
+        Task<ICollection<Link>> GetLinkLibraryLinksAsync(int id);
 
-        Task<List<Link>> GetLinkLibraryLinksAsync(int id);
-
-        Task<ICollection<Link>> GetLinksAsync();
-
-        Task<DataWithCount<ICollection<LinkLibrary>>> GetPaginatedLibraryListAsync(
-            BlogFilter filter);
-
-        Task<DataWithCount<ICollection<Link>>> GetPaginatedListAsync(BlogFilter filter);
-
-        Task<LinkLibrary> UpdateLibraryAsync(LinkLibrary library);
+        Task<DataWithCount<ICollection<Link>>> GetPaginatedListAsync(LinksFilter filter);
     }
 }

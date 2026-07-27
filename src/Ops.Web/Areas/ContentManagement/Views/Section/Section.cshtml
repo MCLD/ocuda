@@ -1,552 +1,269 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.SectionViewModel
 
-<div class="modal fade" id="addLinkLibModal" tabindex="-1" role="dialog" aria-labelledby="listModalLabel">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="row">
-            <div class="col-12 col-sm-10 col-sm-offset-1">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addModalTitle">Add Link Library</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                            <span class="visually-hidden" aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form asp-action="@nameof(SectionController.AddLinkLibrary)"
-                          method="post"
-                          role="form"
-                          enctype="multipart/form-data">
-                        <div class="modal-body">
-                            <div id="modalItemList" class="col-12">
-                                <div class="col-sm-9">
-                                    <input asp-for="Section.Slug"
-                                           value="@Model.Section.Slug"
-                                           autocomplete="off"
-                                           type="hidden" />
-                                    <input asp-for="LinkLibrary.Slug"
-                                           autocomplete="off"
-                                           type="hidden" />
-                                    <input asp-for="LinkLibrary.Name"
-                                           autocomplete="off"
-                                           formgroup />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" value="Submit" class="btn btn-primary">Save</button>
-                            <button type="button"
-                                    class="btn btn-outline-dark"
-                                    data-bs-dismiss="modal"
-                                    style="margin-right: 1em;">
-                                Close
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+@section header {
+    <div class="d-flex justify-content-between align-items-top mb-2">
+        <h1>
+            Section Administration
+            <small class="text-muted d-print-block">
+                @Model.Section.Name
+            </small>
+        </h1>
+        <div class="d-print-none">
+            @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+            {
+                <a asp-action="@nameof(SectionController.Permissions)"
+                   asp-route-slug="@Model.Section.Slug"
+                   class="btn btn-sm btn-outline-primary mt-1 ms-2">
+                    Permissions
+                </a>
+            }
+            <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex)"
+               asp-area=""
+               asp-controller="@HomeController.Name"
+               asp-route-slug="@Model.Section.Slug"
+               class="btn btn-sm btn-outline-primary mt-1 ms-2">
+                View Section
+            </a>
+            <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Index)"
+               asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+               asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+               class="btn btn-sm btn-outline-dark mt-1 ms-2">Back</a>
         </div>
     </div>
-</div>
-
-<div class="modal fade"
-     id="editLibModal"
-     tabindex="-1"
-     role="dialog"
-     aria-labelledby="listModalLabel">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="row">
-            <div class="col-12 col-sm-10 col-sm-offset-1">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addModalTitle"></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                            <span class="visually-hidden" aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form method="post"
-                          role="form"
-                          id="editForm">
-                        <div class="modal-body">
-                            <div id="modalItemList" class="col-12">
-                                <div class="col-sm-9">
-                                    <input asp-for="Section.Slug"
-                                           value="@Model.Section.Slug"
-                                           autocomplete="off"
-                                           type="hidden" />
-                                    <input asp-for="FileLibrary.Slug"
-                                           autocomplete="off"
-                                           type="hidden" />
-                                    <input asp-for="FileLibrary.Slug"
-                                           autocomplete="off"
-                                           type="hidden" />
-                                    <input asp-for="LinkLibrary.Slug"
-                                           autocomplete="off"
-                                           type="hidden" value="0" />
-                                    <input asp-for="LinkLibrary.Id"
-                                           autocomplete="off"
-                                           type="hidden" value="0" />
-                                    <input asp-for="FileLibrary.Name"
-                                           autocomplete="off"
-                                           formgroup />
-                                    <input asp-for="LinkLibrary.Name"
-                                           autocomplete="off"
-                                           formgroup />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" value="submit" class="btn btn-primary">Save</button>
-                            <button type="button"
-                                    class="btn btn-outline-dark"
-                                    data-bs-dismiss="modal"
-                                    style="margin-right: 1em;">
-                                Close
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade"
-     id="addFileLibModal"
-     tabindex="-1"
-     role="dialog"
-     aria-labelledby="listModalLabel">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="row">
-            <div class="col-12 col-sm-10 col-sm-offset-1">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addModalTitle">Add File Library</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                            <span class="visually-hidden" aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form asp-action="@nameof(SectionController.AddFileLibrary)"
-                          method="post"
-                          role="form"
-                          enctype="multipart/form-data">
-                        <div class="modal-body">
-                            <div id="modalItemList" class="col-12">
-                                <div class="col-sm-9">
-                                    <input asp-for="Section.Slug"
-                                           value="@Model.Section.Slug"
-                                           autocomplete="off"
-                                           type="hidden" />
-                                    <input asp-for="FileLibrary.Slug"
-                                           autocomplete="off"
-                                           type="hidden" />
-                                    <input asp-for="FileLibrary.Name"
-                                           autocomplete="off"
-                                           formgroup />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit"
-                                    value="Submit"
-                                    class="btn btn-primary">
-                                Save
-                            </button>
-                            <button type="button"
-                                    class="btn btn-outline-dark"
-                                    data-bs-dismiss="modal"
-                                    style="margin-right: 1em;">
-                                Close
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade"
-     id="deleteModal"
-     tabindex="-1"
-     role="dialog"
-     aria-labelledby="deleteModalLabel">
-    <div class="modal-dialog" role="document">
-        <form id="deleteForm"
-              method="post"
-              role="form">
-            <input asp-for="Section.Slug" value="@Model.Section.Slug" type="hidden" />
-            <input asp-for="FileLibrary.Id" type="hidden" />
-            <input asp-for="LinkLibrary.Id" type="hidden" />
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="deleteModalLabel">Delete Feature</h4>
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close">
-                        <span class="visually-hidden" aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <span class="fa-solid fa-triangle-exclamation" aria-hidden="true"></span>
-                    <span id="modal-text"></span>
-                </div>
-                <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-outline-dark"
-                            data-bs-dismiss="modal"
-                            style="margin-right: 1em;">
-                        Cancel
-                    </button>
-                    <button type="submit"
-                            class="btn btn-danger float-end"
-                            aria-label="Confirm"
-                            id="confirmDelButton"
-                            button-spinner>
-                        Delete
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="row mb-2">
-    <div class="col-sm-7">
-        <h1>Section <small class="text-muted">@Model.Section.Name</small></h1>
-    </div>
-    <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Index))">Back</a>
-        @if (false)
-        {
-            <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
-                data-bs-toggle="modal"
-                data-bs-target="#addModal">
-                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
-                Add Post
-            </button>
-        }
-    </div>
-</div>
-
+}
 <div class="row">
     <div class="col-9">
         @if (!string.IsNullOrEmpty(Model.Section.EmbedVideoUrl))
         {
-            <div class="col-9">
-                <iframe width="590"
+            <iframe width="590"
                     height="332"
                     src="@Model.Section.EmbedVideoUrl"
                     frameborder="0"
                     allowfullscreen=""></iframe>
-            </div>
         }
-        @if (!Model.AllPosts.Any())
-        {
-            @:No Posts have been made.
-        }
-        else
-        {
-            @foreach (var post in Model.AllPosts)
-            {
-                <div class="row m-3">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header p-4" style="transform: rotate(0);">
-                                <div class="float-start align-middle">
-                                    <a class="float-start align-middle"
-                               asp-action="@nameof(SectionController.PostDetails)"
-                               asp-route-sectionSlug="@Model.Section.Slug"
-                               asp-route-postSlug="@post.Slug">
-                                        <h5>
-                                            @post.Title
-                                        </h5>
-                                    </a>
-                                </div>
-                                <div class="float-end align-middle h4">
-                                    <a asp-action="@nameof(SectionController.EditPost)"
-                               asp-route-sectionSlug="@Model.Section.Slug"
-                               asp-route-postSlug="@post.Slug">
-                                        <span class="fa-solid fa-pencil float-end"></span>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                @Html.Raw(post.Content)
-                            </div>
-                            <div class="card-footer">
-                                <div class="row font-italic">
-                                    @if (post.PublishedAt.HasValue)
-                                    {
-                                        @:Posted: @post.PublishedAt.ToString()
-                                    }
-                                    else
-                                    {
-                                        @:Draft
-                                    }
-                                </div>
-                                @if (Model.PostCategories.Count > 0)
-                                {
-                                    <div class="font-italic">
-                                        Category:&nbsp;
-                                        <span>
-                                            @foreach (var category in Model.PostCategories
-                                           .Where(_ => _.PostId == post.Id)
-                                           .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
-                                            {
-                                                <a class="badge rounded-pill bg-info"
-                                                   href="@Url.Action(nameof(SectionController.Posts),
-                                        new { sectionSlug = Model.Section.Slug,
-                                            categorySlug = category.Stub, page = 1})">
-                                                    @category.Name
-                                                </a>
-                                            }
-                                        </span>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-            <nav paginate="@Model.PaginateModel"></nav>
-        }
-    </div>
-    <div class="col-3">
-        <table class="table table-condensed table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th colspan="3">
-                        File Libraries
-                        <div class="float-end align-middle">
-                            <a role="button"
-                               class="text-success align-middle"
-                               id="addFileLibrary"
-                               data-bs-toggle="modal"
-                               data-bs-target="#addFileLibModal">
-                                <span class="fa-solid fa-circle-plus fa-lg align-middle"></span>
-                            </a>
-                        </div>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.FileLibraries.Count > 0)
-                {
-                    @foreach (var library in Model.FileLibraries)
-                    {
-                        <tr>
-                            <td class="row-link file-item text-center" data-slug="@library.Slug">
-                                @library.Name
-                            </td>
-                            <td style="position: relative;" class="text-center">
-                                <a role="button"
-                           class="text-danger h4 editfile text-center"
-                           data-bs-toggle="modal"
-                           data-bs-target="#editLibModal"
-                           data-id="@library.Id"
-                           data-name="@library.Name"
-                           data-slug="@library.Slug"
-                           data-type="file">
-                                    <span class="fa-solid fa-pencil float-end"></span>
-                                </a>
-                            </td>
-                            <td style="position: relative;" class="text-center">
-                                <button type="button"
-                                class="btn btn-danger"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal"
-                                data-id="@library.Id"
-                                data-name="@library.Name"
-                                data-slug="@library.Slug"
-                                data-type="file">
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td>
-                            No File Libraries exist
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        <table class="table table-condensed table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th colspan="3">
-                        Link Libraries
-                        <div class="float-end align-middle">
-                            <a role="button"
-                               class="text-success align-middle"
-                               data-bs-toggle="modal"
-                               data-bs-target="#addLinkLibModal"
-                               id="addLinkLibrary">
-                                <span class="fa-solid fa-circle-plus fa-lg align-middle"></span>
-                            </a>
-                        </div>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.LinkLibraries.Count > 0)
-                {
-                    @foreach (var library in Model.LinkLibraries)
-                    {
-                        <tr>
-                            <td class="row-link link-item text-center" data-slug="@library.Slug">
-                                @library.Name
-                            </td>
-                            <td style="position: relative;" class="text-center align-middle">
-                                <a role="button"
-                           class="text-danger h4 editlink"
-                           data-bs-toggle="modal"
-                           data-bs-target="#editLibModal"
-                           data-id="@library.Id"
-                           data-name="@library.Name"
-                           data-slug="@library.Slug"
-                           data-type="link">
-                                    <span class="fa-solid fa-pencil float-end"></span>
-                                </a>
-                            </td>
-                            <td style="position: relative;" class="text-center">
-                                <button type="button"
-                                class="btn btn-danger"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal"
-                                data-id="@library.Id"
-                                data-name="@library.Name"
-                                data-slug="@library.Slug"
-                                data-type="link">
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td>
-                            No Link Libraries exist
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
     </div>
 </div>
-@section scripts {
-<script>
-    $(".row-link.file-item").on("click", function () {
-        var link = "@Url.Action(nameof(SectionController.FileLibrary), new { sectionSlug = Model.Section.Slug, fileLibrarySlug = 0 })";
-        link = link.replace("0", $(this).data("slug"));
-        window.location.href = link;
-    });
+<div class="row">
+    <div class="col-md-6 col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <span class="lead fw-bold">
+                    Posts
+                </span>
+                <small class="text-muted d-print-block">
+                    @if (Model.PostCount > 5)
+                    {
+                        @:(First 5 of @Model.PostCount)
+                    }
+                    else if (Model.PostCount > 1)
+                    {
+                        @:(all @Model.PostCount posts)
+                    }
+                    else if (Model.PostCount == 1)
+                    {
+                        @:(only post)
+                    }
+                </small>
 
-    $(".row-link.link-item").on("click", function () {
-        var link = "@Url.Action(nameof(SectionController.LinkLibrary), new { sectionSlug = Model.Section.Slug, linkLibSlug = 0 })";
-        link = link.replace("0", $(this).data("slug"));
-        window.location.href = link;
-    });
-    $(".editfile").on("click", function () {
-        var button = $(this);
-        var id = button.data("id");
-        var name = button.data("name");
-        var modal = $("#editLibModal");
-        modal.find("#FileLibrary_Name").parent().parent().show();
-        modal.find("#LinkLibrary_Name").parent().parent().hide();
-        modal.find("#addModalTitle").text("Edit File Library "+name);
-        modal.find("#FileLibrary_Id").val(id);
-        modal.find("#FileLibrary_Name").val(name);
-        modal.find("#editForm").attr("action", "@nameof(SectionController.UpdateFileLibrary)");
-    });
-    $(".editlink").on("click", function () {
-        var button = $(this);
-        var id = button.data("id");
-        var name = button.data("name");
-        var modal = $("#editLibModal");
-        modal.find("#LinkLibrary_Name").parent().parent().show();
-        modal.find("#FileLibrary_Name").parent().parent().hide();
-        modal.find("#addModalTitle").text("Edit Link Library "+name);
-        modal.find("#LinkLibrary_Id").val(id);
-        modal.find("#LinkLibrary_Name").val(name);
-        modal.find("#editForm").attr("action", "@nameof(SectionController.UpdateLinkLibrary)");
+            </div>
+            <div class="card-body p-0">
+                @if (Model.Posts?.Count > 0)
+                {
+                    <table class="table table-sm table-hover mb-0">
+                        @foreach (var post in Model.Posts)
+                        {
+                            <tr>
+                                <td class="d-flex px-3 py-2">
+                                    <div class="flex-grow-1 align-self-center">
+                                        @post.Title
+                                    </div>
+                                    <div>
+                                        @if (post.ShowOnHomePage)
+                                        {
+                                            <span class="fa-solid fa-house fa-fw text-muted"
+                                                  title="This post is shown on the Intranet home page."></span>
+                                        }
+                                        @if (post.IsPinned)
+                                        {
+                                            <span class="fa-solid fa-map-pin fa-fw"
+                                                  title="This post is pinned to the top until @post.PinnedUntil."></span>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                }
+                else
+                {
+                    <div class="d-flex justify-content-center">
+                        <div class="alert alert-info mt-3 px-3 py-2">
+                            Section has no posts.
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="card-footer @(Model.Posts?.Count > 0 ? "border-top-0" : null)">
+                <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.AddPost)"
+                   asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                   asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                   asp-route-sectionSlug="@Model.Section.Slug"
+                   class="btn btn-outline-success btn-sm">
+                    <span class="fa-solid fa-circle-plus fa-fw"></span>
+                    Add post
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header lead fw-bold">
+                File Libraries
+            </div>
+            <div class="card-body p-0">
+                @if (Model.FileLibraries?.Count > 0)
+                {
+                    <table class="table table-sm table-hover mb-0">
+                        @foreach (var fileLibrary in Model.FileLibraries)
+                        {
+                            <tr>
+                                <td class="d-flex px-3 py-2">
+                                    <div class="flex-grow-1 align-self-center">
+                                        <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Files)"
+                                           asp-area=""
+                                           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                           asp-route-fileLibrarySlug="@fileLibrary.Slug"
+                                           asp-route-sectionSlug="@Model.Section.Slug">@fileLibrary.Name</a>
+                                        @if (fileLibrary.TotalFilesInLibrary == 1)
+                                        {
+                                            <small class="text-muted d-print-block">
+                                                (@fileLibrary.TotalFilesInLibrary file)
+                                            </small>
+                                        }
+                                        else
+                                        {
+                                            <small class="text-muted d-print-block">
+                                                (@fileLibrary.TotalFilesInLibrary files)
+                                            </small>
+                                        }
+                                    </div>
+                                    @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+                                    {
+                                        <div>
+                                            <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary)"
+                                               asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                                               asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                                               asp-route-fileLibrarySlug="@fileLibrary.Slug"
+                                               asp-route-sectionSlug="@Model.Section.Slug"
+                                               class="btn btn-outline-primary btn-sm">
+                                                <span class="fa-solid fa-pen-to-square fa-fw"></span>
+                                            </a>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                }
+                else
+                {
+                    <div class="d-flex justify-content-center">
+                        <div class="alert alert-info mt-3 px-3 py-2">
+                            Section has no file libraries.
+                        </div>
+                    </div>
+                }
+            </div>
+            @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+            {
+                <div class="card-footer @(Model.FileLibraries?.Count > 0 ? "border-top-0" : null)">
+                    <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary)"
+                       asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                       asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                       asp-route-sectionSlug="@Model.Section.Slug"
+                       class="btn btn-outline-success btn-sm">
+                        <span class="fa-solid fa-circle-plus fa-fw"></span>
+                        Add File Library
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header lead fw-bold">
+                Link Libraries
+            </div>
+            <div class="card-body p-0">
+                @if (Model.LinkLibraries?.Count > 0)
+                {
+                    <table class="table table-sm table-hover mb-0">
+                        @foreach (var linkLibrary in Model.LinkLibraries)
+                        {
+                            <tr>
+                                <td class="d-flex px-3 py-2">
+                                    <div class="flex-grow-1 align-self-center">
+                                        <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Links)"
+                                           asp-area=""
+                                           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                           asp-route-linkLibrarySlug="@linkLibrary.Slug"
+                                           asp-route-sectionSlug="@Model.Section.Slug">@linkLibrary.Name</a>
+                                        @if (linkLibrary.TotalLinksInLibrary == 1)
+                                        {
+                                            <small class="text-muted d-print-block">
+                                                (@linkLibrary.TotalLinksInLibrary link)
+                                            </small>
+                                        }
+                                        else
+                                        {
+                                            <small class="text-muted d-print-block">
+                                                (@linkLibrary.TotalLinksInLibrary links)
+                                            </small>
+                                        }
 
-    });
-    $("#editForm").submit(function () {
-        if ($("#editForm").find("#LinkLibrary_Name").val()) {
-            linkslug = $("#editForm").find("#LinkLibrary_Name").val().toLowerCase().replace(/[^a-zA-Z0-9]/g, '').replace(/ /g,"-");
-            $("#editForm").find("#LinkLibrary_Slug").val(linkslug);
-            $("#editForm").find("#FileLibrary_Name").remove();
-            $("#editForm").find("#FileLibrary_Slug").remove();
-        }
-        else {
-            fileslug =  $("#editForm").find("#FileLibrary_Name").val().toLowerCase().replace(/[^a-zA-Z0-9]/g, '').replace(/ /g,"-");
-            $("#editForm").find("#FileLibrary_Slug").val(fileslug);
-            $("#editForm").find("#LinkLibrary_Name").remove();
-            $("#editForm").find("#LinkLibrary_Slug").remove();
-        }
-    });
-    $("#addLinkLibModal").submit(function (event) {
-        slug = $("#addLinkLibModal").find("#LinkLibrary_Name").val().toLowerCase().replace(/ /g,"-").replace(/[^a-zA-Z0-9]/g, '');
-        $("#addLinkLibModal").find("#LinkLibrary_Slug").val(slug);
-    });
-    $("#addFileLibModal").submit(function (event) {
-        slug = $("#addFileLibModal").find("#FileLibrary_Name").val().toLowerCase().replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, '');
-        $("#addFileLibModal").find("#FileLibrary_Slug").val(slug);
-    });
-    $("#deleteModal").on("show.bs.modal", function (e) {
-        var button = $(e.relatedTarget);
-        var id = button.data("id");
-        var name = button.data("name");
-        var modal = $(this);
-        var linklib = $("#deleteModal").find('#LinkLibrary_Id');
-        var filelib = $("#deleteModal").find('#FileLibrary_Id');
-        if (button.data("type") == "link") {
-            if (filelib.length) {
-                filelib.remove();
+                                    </div>
+                                    @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+                                    {
+                                        <div>
+                                            <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.LinkLibrary)"
+                                               asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                                               asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                                               asp-route-linkLibrarySlug="@linkLibrary.Slug"
+                                               asp-route-sectionSlug="@Model.Section.Slug"
+                                               class="btn btn-outline-primary btn-sm">
+                                                <span class="fa-solid fa-pen-to-square fa-fw"></span>
+                                            </a>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                }
+                else
+                {
+                    <div class="d-flex justify-content-center">
+                        <div class="alert alert-info mt-3 px-3 py-2">
+                            Section has no link libraries.
+                        </div>
+                    </div>
+                }
+            </div>
+            @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+            {
+                <div class="card-footer @(Model.LinkLibraries?.Count > 0 ? "border-top-0" : null)">
+                    <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.LinkLibrary)"
+                       asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                       asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                       asp-route-sectionSlug="@Model.Section.Slug"
+                       class="btn btn-outline-success btn-sm">
+                        <span class="fa-solid fa-circle-plus fa-fw"></span>
+                        Add Link Library
+                    </a>
+                </div>
             }
-            if (linklib.length) {
-                linklib.val(id);
-            }
-            else {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'LinkLibrary_Id',
-                    name: 'LinkLibrary.Id',
-                    value: id,
-                    class: "input-validation-error"
-                }).attr("aria-describedby", "LinkLibrary_Id-error").appendTo('#deleteForm');
-            }
-            modal.find("#deleteForm").attr("action", "@Url.Action(nameof(SectionController.DeleteLinkLibrary))");
-            modal.find("#modal-text").text("Are you sure you want to delete the link library \"" + name + "\"?");
-        }
-        else {
-            if (linklib.length) {
-                linklib.remove();
-            }
-            if (filelib.length) {
-                filelib.val(id);
-            }
-            else {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'FileLibrary_Id',
-                    name: 'FileLibrary.Id',
-                    value: id,
-                    class: "input-validation-error"
-                }).attr("aria-describedby", "FileLibrary_Id-error").appendTo('#deleteForm');
-            }
-            modal.find("#deleteForm").attr("action","@Url.Action(nameof(SectionController.DeleteFileLibrary))");
-            modal.find("#modal-text").text("Are you sure you want to delete the file library \"" + name + "\"?");
-        }
-    });
-</script>
-}
+        </div>
+    </div>
+</div>
+
+

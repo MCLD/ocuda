@@ -1,125 +1,217 @@
-﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.PostViewModel
-
-@using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section;
+﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
+@model PostViewModel
 
 @section styles {
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
-<div class="row mb-2">
-    <div class="col-sm-7">
+@section header {
+    <div class="d-flex justify-content-between align-items-top mt-1 ms-2">
         <h1>
             Post
-            @if (!string.IsNullOrEmpty(Model.Post.Title))
-            {
-                <small class="text-muted">@Model.Post.Title</small>
-            }
         </h1>
+        <div class="pt-1 d-print-none">
+            <button type="button"
+                    class="btn btn-sm btn-outline-danger mt-1 ms-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteModal">
+                Delete post
+            </button>
+            <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex)"
+               asp-area=""
+               asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+               asp-route-slug="@Model.SectionSlug"
+               asp-route-page="@Model.Page"
+               asp-fragment="@Model.Post.Slug"
+               class="btn btn-sm btn-outline-dark btn-sm mt-1 ms-2">Back</a>
+        </div>
     </div>
-    <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex))"
-           asp-area=""
-           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
-           asp-route-slug="@Model.SectionSlug">Back</a>
-    </div>
-</div>
+}
 
-<div class="row">
-    <div class="col">
-        <form form-action="@nameof(SectionController.EditPost)"
+<form form-action="@nameof(SectionController.EditPost)"
+      method="post"
+      role="form">
+    <input asp-for="Post.SectionId" value="@Model.SectionId" hidden />
+    <input asp-for="Post.Id" value="@Model.Post?.Id" hidden />
+    <input asp-for="Post.Title" formgroup value="@Model.Post.Title" />
+    <input asp-for="Post.Slug"
+           data-oc-slugify-from="Post_Title"
+           data-oc-slugify-prefix="YearMonth"
+           formgroup
+           value="@Model.Post.Slug" />
+    @if (!Model.Post.PublishedAt.HasValue)
+    {
+        <div class="mb-3 row">
+            <label class="col-form-label text-md-end col-md-3"
+                   asp-for="Publish"></label>
+            <div class="col-md-9">
+                <select asp-for="Publish"
+                        class="form-control"
+                        asp-items="PostViewModel.PublishSelect">
+                </select>
+            </div>
+        </div>
+        <div class="mb-3 row d-none" id="PublishWhen">
+            <div class="col-md-3 text-md-end">
+                <label asp-for="PublishAtDate" class="col-form-label"></label>
+                <span class="fa-solid fa-circle-info text-info"
+                      title="Leave date and time empty to publish this post when you save it."></span>
+            </div>
+            <div class="col-md-3">
+                <input asp-for="PublishAtDate"
+                       type="date"
+                       class="form-control"
+                       asp-items="Model.PublishSelect" />
+            </div>
+            <div class="col-md-3">
+                <input asp-for="PublishAtTime"
+                       type="time"
+                       class="form-control"
+                       asp-items="Model.PublishSelect" />
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="mb-3 row">
+            <label class="col-form-label text-md-end col-md-3"
+                   asp-for="Post.PublishedAt">Published</label>
+            <div class="col-md-9">
+                <div class="form-control-plaintext">
+                    @Model.Post.PublishedAt
+                    @if (!string.IsNullOrEmpty(Model.Post.PublishedAgo))
+                    {
+                        <span>(@Model.Post.PublishedAgo)</span>
+                    }
+                    @if (Model.Post.CreatedByUser != null)
+                    {
+                        @:by
+                        <a asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                           asp-area=""
+                           asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                           asp-route-id="@Model.Post.CreatedByUser.Username"
+                           target="_blank">@Model.Post.CreatedByUser.Name</a>
+                    }
+                    @if (Model.Post.UpdatedAt.HasValue)
+                    {
+                        <small class="ms-2">
+                            <em>
+                                <strong>Last update:</strong>
+                                @Model.Post.UpdatedAt
+                                @if (!string.IsNullOrEmpty(Model.Post.PublishedAgo))
+                                {
+                                    <span>(@Model.Post.UpdatedAgo)</span>
+                                }
+                                @if (Model.Post.UpdatedByUser != null)
+                                {
+                                    @:by
+                                    <a asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                                       asp-area=""
+                                       asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                                       asp-route-id="@Model.Post.UpdatedByUser.Username"
+                                       target="_blank">@Model.Post.UpdatedByUser.Name</a>
+                                }
+                            </em>
+                        </small>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    <div class="mb-3 row">
+        <label class="col-form-label text-md-end col-md-3"
+               asp-for="Post.ShowOnHomePage"></label>
+        <div class="col-md-9">
+            <select asp-for="Post.ShowOnHomePage"
+                    class="form-control"
+                    disabled="@(!Model.CanPromote)"
+                    asp-items="Model.ShowOnHomepageSelect">
+            </select>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <div class="col-md-3 text-md-end">
+            <label asp-for="Post.PinnedUntil" class="col-form-label"></label>
+            <span class="fa-solid fa-circle-info text-info"
+                  title="Leave date and time empty to not pin this post to the top of the @Model.SectionName section."></span>
+        </div>
+        <div class="col-md-3">
+            <input asp-for="PinUntilDate"
+                   type="date"
+                   class="form-control"
+                   asp-items="Model.PublishSelect" />
+        </div>
+        <div class="col-md-3">
+            <input asp-for="PinUntilTime"
+                   type="time"
+                   class="form-control"
+                   asp-items="Model.PublishSelect" />
+        </div>
+    </div>
+    <div class="mb-3">
+        <textarea asp-for="Post.Content" markdown-editor style="height: 30rem;"></textarea>
+        <span asp-validation-for="Post.Content" class="validation-message text-danger"></span>
+    </div>
+    <div class="row float-end">
+        <div class="col">
+            <button aria-label="Confirm"
+                    class="btn btn-lg btn-outline-success"
+                    id="addPostBtn"
+                    type="submit">
+                Save
+            </button>
+        </div>
+    </div>
+</form>
+
+<div aria-labelledby="deleteModalLabel"
+     class="modal fade"
+     data-bs-backdrop="static"
+     id="deleteModal"
+     role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <form asp-action="@nameof(SectionController.DeletePost)"
+              asp-area="@SectionController.Area"
+              asp-controller="@SectionController.Name"
+              asp-route-postId="@Model.Post.Id"
+              asp-route-sectionSlug="@Model.SectionSlug"
+              asp-route-page="@Model.Page"
+              id="delFileForm"
               method="post"
               role="form">
-            <input asp-for="Post.SectionId" value="@Model.SectionId" hidden />
-            <input asp-for="Post.Id" value="@Model.Post?.Id" hidden />
-            <input asp-for="Post.Title" formgroup value="@Model.Post.Title" />
-            <input asp-for="Post.Slug" formgroup value="@Model.Post.Slug" />
-            @if (!Model.Post.PublishedAt.HasValue)
-            {
-                <div class="mb-3 row">
-                    <label class="col-form-label text-md-end col-md-3"
-                           asp-for="Publish"></label>
-                    <div class="col-md-9">
-                        <select asp-for="Publish"
-                                class="form-control"
-                                asp-items="PostViewModel.PublishSelect">
-                        </select>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Feature</h5>
+                    <button aria-label="Close"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            type="button"></button>
+                </div>
+                <div class="modal-body d-flex">
+                    <div class="text-danger">
+                        <span aria-hidden="true"
+                              class="fa-solid fa-triangle-exclamation fa-lg fa-fw me-3"></span>
+                    </div>
+                    <div class="d-flex-grow-1">
+                        <p class="mb-0">
+                            Are you sure you want to delete this post?
+                        </p>
                     </div>
                 </div>
-                <div class="mb-3 row d-none" id="PublishWhen">
-                    <div class="col-md-3 text-md-end">
-                        <label asp-for="PublishAtDate" class="col-form-label"></label>
-                        <span class="fa-solid fa-circle-info text-info"
-                              title="Leave date and time empty to publish this post when you save it."></span>
-                    </div>
-                    <div class="col-md-3">
-                        <input asp-for="PublishAtDate"
-                               type="date"
-                               class="form-control"
-                               asp-items="Model.PublishSelect" />
-                    </div>
-                    <div class="col-md-3">
-                        <input asp-for="PublishAtTime"
-                               type="time"
-                               class="form-control"
-                               asp-items="Model.PublishSelect" />
-                    </div>
-                </div>
-            }
-            else
-            {
-                <input asp-for="Post.PublishedAt"
-                       formgroup
-                       value="@Model.Post.PublishedAt"
-                       disabled />
-            }
-            <div class="mb-3 row">
-                <label class="col-form-label text-md-end col-md-3"
-                       asp-for="Post.ShowOnHomePage"></label>
-                <div class="col-md-9">
-                    <select asp-for="Post.ShowOnHomePage"
-                            class="form-control"
-                            disabled="@(!Model.CanPromote)"
-                            asp-items="Model.ShowOnHomepageSelect">
-                    </select>
-                </div>
-            </div>
-            <div class="mb-3 row">
-                <div class="col-md-3 text-md-end">
-                    <label asp-for="Post.PinnedUntil" class="col-form-label"></label>
-                    <span class="fa-solid fa-circle-info text-info"
-                          title="Leave date and time empty to not pin this post to the top of the @Model.SectionName section."></span>
-                </div>
-                <div class="col-md-3">
-                    <input asp-for="PinUntilDate"
-                           type="date"
-                           class="form-control"
-                           asp-items="Model.PublishSelect" />
-                </div>
-                <div class="col-md-3">
-                    <input asp-for="PinUntilTime"
-                           type="time"
-                           class="form-control"
-                           asp-items="Model.PublishSelect" />
-                </div>
-            </div>
-            <div class="mb-3 row">
-                <div class="col-form-label text-md-end col-md-3">
-                    <label asp-for="Post.Content"></label>
-                </div>
-                <div class="col-md-9">
-                    <textarea asp-for="Post.Content" markdown-editor></textarea>
-                    <span asp-validation-for="Post.Content"
-                          class="validation-message text-danger"></span>
-                </div>
-            </div>
-            <div class="row float-end">
-                <div class="col">
-                    <button aria-label="Confirm"
-                            class="btn btn-outline-success"
-                            id="addPostBtn"
-                            type="submit">
-                        Save
+                <div class="modal-footer">
+                    <button class="btn btn-outline-dark me-1"
+                            data-bs-dismiss="modal"
+                            type="button">
+                        Cancel
+                    </button>
+                    <button class="btn btn-outline-danger float-end"
+                            aria-label="Confirm"
+                            id="deleteItem"
+                            type="submit"
+                            value="Submit"
+                            button-spinner>
+                        Delete
                     </button>
                 </div>
             </div>
@@ -131,29 +223,18 @@
     <script src="~/js/md.min.js" asp-append-version="true"></script>
     <script>
         $(function () {
-            var editor = new Markdown.Editor($("#Post_Content"), { allowUploads: false });
-            if (editor) {
-                editor.run();
-            }
+        const editor = new Markdown.Editor($("#Post_Content"), { allowUploads: false });
+        if (editor) {
+        editor.run();
+        }
 
-            $('#Publish').change(function (e) {
-                if (this.value === 'True') {
-                    $('#PublishWhen').removeClass('d-none');
-                } else {
-                    $('#PublishWhen').addClass('d-none');
-                }
-            })
-
-            $('#Post_Title').blur(function (e) {
-                if ($('#Post_Slug').val().length == 0 && slugify) {
-                    let now = new Date();
-                    $('#Post_Slug').val(slugify(now.getFullYear()
-                        + ' '
-                        + ('0' + (now.getMonth() + 1)).slice(-2)
-                        + ' '
-                        + $('#Post_Title').val()));
-                }
-            });
+        $('#Publish').change(function (e) {
+        if (this.value === 'True') {
+        $('#PublishWhen').removeClass('d-none');
+        } else {
+        $('#PublishWhen').addClass('d-none');
+        }
+        })
         });
     </script>
 }

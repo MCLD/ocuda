@@ -37,7 +37,8 @@ namespace Ocuda.Ops.Web
     {
         private const string DefaultCulture = "en-US";
 
-        public void Configure(IApplicationBuilder app,
+        public void Configure(
+            IApplicationBuilder app,
             Utility.Services.Interfaces.IPathResolverService pathResolver)
         {
             ArgumentNullException.ThrowIfNull(pathResolver);
@@ -409,6 +410,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.FileLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileRepository,
                 Data.Ops.FileRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IFileThumbnailRepository,
+                Data.Ops.FileThumbnailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileTypeRepository,
                 Data.Ops.FileTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IHistoricalIncidentRepository,

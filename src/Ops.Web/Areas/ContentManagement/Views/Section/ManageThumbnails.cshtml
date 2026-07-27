@@ -1,0 +1,178 @@
+﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
+@model ManageThumbnailsViewModel
+
+@section header {
+    <div class="d-flex justify-content-between align-items-top mb-2">
+        <h1>
+            Thumbnails
+            <small class="text-muted d-print-block">
+                @Model.FileName
+            </small>
+        </h1>
+        <div class="pt-1 d-print-none">
+            <button class="btn btn-outline-success btn-sm mt-1 ms-2"
+                    data-bs-target="#addModal"
+                    data-bs-toggle="modal">
+                Add Thumbnail
+            </button>
+            <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Files)"
+               asp-area=""
+               asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+               asp-route-sectionSlug="@Model.SectionSlug"
+               asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+               class="btn btn-sm btn-outline-dark btn-sm mt-1 ms-2">Back</a>
+        </div>
+    </div>
+}
+
+<div class="row">
+    @if (Model.Thumbnails?.Count() > 0)
+    {
+        @foreach (var thumbnail in Model.Thumbnails)
+        {
+            <div class="col-12 col-md-6 col-lg-4 text-center">
+                <div class="mb-4 ms-auto me-auto oc-thumbnail-container-width oc-thumbnail-container-height">
+                    <div class="img-thumbnail h-100 w-100 d-flex justify-content-center align-items-center">
+                        <img alt="Thumbnail image"
+                             class="oc-thumbnail-max-width oc-thumbnail-max-height"
+                             src="@thumbnail.Link">
+                    </div>
+                    <div class="py-1 border d-flex justify-content-center">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger mx-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal"
+                                data-id="@thumbnail.Id"
+                                data-name="@thumbnail.ThumbnailFile"
+                                title="Delete file">
+                            <span class="fa-regular fa-circle-xmark fa-fw"
+                                  aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 col-sm-6 offset-sm-3 col-lg-4 offset-lg-4 mt-3">
+            <div class="alert alert-primary">This file has no thumbnails.</div>
+        </div>
+    }
+</div>
+
+<form asp-action="@nameof(SectionController.AddThumbnail)"
+      asp-area="@SectionController.Area"
+      asp-controller="@SectionController.Name"
+      asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+      asp-route-sectionSlug="@Model.SectionSlug"
+      asp-route-fileId="@Model.FileId"
+      enctype="multipart/form-data"
+      method="post"
+      role="form">
+    <div aria-hidden="true"
+         aria-labelledby="addModalLabel"
+         class="modal fade"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false"
+         id="addModal"
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="addModalLabel">Add Thumbnail</h1>
+                    <button aria-label="Close"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label"
+                           for="UploadFile">
+                        Select a file (valid types:
+                        @(Model.FileTypes?.Any() == true ? Model.JoinFileExtensions(",") : "none"))
+                    </label>
+                    <div class="input-group mb-3">
+                        <input accept="@Model.JoinFileExtensions(",")"
+                               asp-for="UploadFile"
+                               class="form-control @ManageThumbnailsViewModel.ValidClass(ViewData.ModelState.GetValidationState(nameof(ManageThumbnailsViewModel.UploadFile)))"
+                               multiple="multiple"
+                               type="file" />
+                    </div>
+                    <span asp-validation-for="UploadFile" class="text-danger"></span>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal"
+                            type="button">
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-outline-success">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form asp-action="@nameof(SectionController.DeleteThumbnail)"
+      asp-area="@SectionController.Area"
+      asp-controller="@SectionController.Name"
+      asp-route-fileId="@Model.FileId"
+      asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+      asp-route-sectionSlug="@Model.SectionSlug"
+      enctype="multipart/form-data"
+      method="post"
+      role="form">
+    <input type="hidden" name="DeleteThumbnailId" id="DeleteThumbnailId" />
+    <div aria-hidden="true"
+         aria-labelledby="deleteModalLabel"
+         class="modal fade"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false"
+         id="deleteModal"
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteModalLabel">Modal title</h1>
+                    <button aria-label="Close"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            type="button"></button>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal"
+                            type="button">
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        const addModal = document.getElementById('addModal');
+        const deleteModal = document.getElementById('deleteModal');
+
+        addModal.addEventListener('show.bs.modal', event => {
+
+        });
+
+        deleteModal.addEventListener('show.bs.modal', event => {
+            let modal = event.target;
+            document.getElementById('DeleteThumbnailId')
+                .setAttribute("value", event.relatedTarget.dataset.id);
+            Array.from(modal.getElementsByClassName('modal-title')).forEach((element) => {
+                element.innerText = `Delete ${event.relatedTarget.dataset.name}`;
+            });
+            Array.from(modal.getElementsByClassName('modal-body')).forEach((element) => {
+                element.innerHTML = `Are you sure you want to delete <strong>${event.relatedTarget.dataset.name}</strong>`;
+            });
+        });
+    </script>
+}

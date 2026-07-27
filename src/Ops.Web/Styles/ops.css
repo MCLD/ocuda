@@ -308,3 +308,19 @@ a.rowlink {
 .oc-staff-index-picture {
     max-width: 100px;
 }
+
+.oc-thumbnail-container-width {
+    width: 310px;
+}
+
+.oc-thumbnail-container-height {
+    height: 310px;
+}
+
+.oc-thumbnail-max-width {
+    max-width: 300px;
+}
+
+.oc-thumbnail-max-height {
+    max-height: 300px;
+}

@@ -12,6 +12,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
         public bool FileExists { get; set; }
 
         public HistoricalIncident HistoricalIncident { get; set; }
-        public int Page { get; set; }
+
+        public new int Page { get; set; }
     }
 }

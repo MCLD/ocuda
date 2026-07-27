@@ -11,25 +11,35 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class LinkLibraryRepository
-        : OpsRepository<OpsContext, LinkLibrary, int>, ILinkLibraryRepository
+    public class LinkLibraryRepository(
+        ServiceFacade.Repository<OpsContext> repositoryFacade,
+        ILogger<LinkLibraryRepository> logger)
+        : OpsRepository<OpsContext, LinkLibrary, int>(repositoryFacade, logger),
+        ILinkLibraryRepository
     {
-        public LinkLibraryRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
-            ILogger<LinkLibraryRepository> logger) : base(repositoryFacade, logger)
+        public async Task<ICollection<LinkLibrary>> GetBySectionAsync(
+            int sectionId,
+            bool? isFeatured)
         {
+            var libraries = DbSet.AsNoTracking().Where(_ => _.SectionId == sectionId);
+
+            if (isFeatured.HasValue)
+            {
+                libraries = libraries.Where(_ => _.IsFeatured == isFeatured.Value);
+            }
+
+            return await libraries.OrderBy(_ => _.Name).ToListAsync();
         }
 
-        public async Task<List<LinkLibrary>> GetLinkLibrariesBySectionIdAsync(int sectionId)
+        public async Task<LinkLibrary> GetBySectionIdSlugAsync(int sectionId, string slug)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.SectionId == sectionId)
-                .OrderBy(_ => _.Name)
-                .ToListAsync();
+                .SingleOrDefaultAsync(_ => _.SectionId == sectionId && _.Slug == slug);
         }
 
         public async Task<DataWithCount<ICollection<LinkLibrary>>> GetPaginatedListAsync(
-                    BlogFilter filter)
+            BlogFilter filter)
         {
             var query = DbSet.AsNoTracking();
 
@@ -39,7 +49,7 @@ namespace Ocuda.Ops.Data.Ops
                 Data = await query
                     .OrderByDescending(_ => _.Name)
                     .ApplyPagination(filter)
-                    .ToListAsync()
+                    .ToListAsync(),
             };
         }
     }
