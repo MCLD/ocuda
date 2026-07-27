@@ -136,7 +136,7 @@ function removeAttachmentItem(url, id) {
 }
 
 function bindSlugify(slugifyTo) {
-    if (slugify && slugifyTo) {
+    if (typeof slugify === "function" && slugifyTo) {
         const slugifyFrom = document.getElementById(slugifyTo.dataset.ocSlugifyFrom);
         if (slugifyFrom) {
             slugifyFrom.addEventListener("blur", (event) => {
@@ -153,14 +153,12 @@ function bindSlugify(slugifyTo) {
                         });
                 }
             });
-        } else {
-            console.warn("Cannot find element %o to slugify from", slugifyFrom);
         }
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    if (slugify) {
+    if (typeof slugify === "function") {
         Array.from(document.querySelectorAll("[data-oc-slugify-from]")).forEach(bindSlugify);
     }
 });
