@@ -147,16 +147,19 @@
                                             </small>
                                         }
                                     </div>
-                                    <div>
-                                        <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary)"
-                                           asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
-                                           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
-                                           asp-route-fileLibrarySlug="@fileLibrary.Slug"
-                                           asp-route-sectionSlug="@Model.Section.Slug"
-                                           class="btn btn-outline-primary btn-sm">
-                                            <span class="fa-solid fa-pen-to-square fa-fw"></span>
-                                        </a>
-                                    </div>
+                                    @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+                                    {
+                                        <div>
+                                            <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary)"
+                                               asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                                               asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                                               asp-route-fileLibrarySlug="@fileLibrary.Slug"
+                                               asp-route-sectionSlug="@Model.Section.Slug"
+                                               class="btn btn-outline-primary btn-sm">
+                                                <span class="fa-solid fa-pen-to-square fa-fw"></span>
+                                            </a>
+                                        </div>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -171,16 +174,19 @@
                     </div>
                 }
             </div>
-            <div class="card-footer @(Model.FileLibraries?.Count > 0 ? "border-top-0" : null)">
-                <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary)"
-                   asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
-                   asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
-                   asp-route-sectionSlug="@Model.Section.Slug"
-                   class="btn btn-outline-success btn-sm">
-                    <span class="fa-solid fa-circle-plus fa-fw"></span>
-                    Add File Library
-                </a>
-            </div>
+            @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+            {
+                <div class="card-footer @(Model.FileLibraries?.Count > 0 ? "border-top-0" : null)">
+                    <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary)"
+                       asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                       asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                       asp-route-sectionSlug="@Model.Section.Slug"
+                       class="btn btn-outline-success btn-sm">
+                        <span class="fa-solid fa-circle-plus fa-fw"></span>
+                        Add File Library
+                    </a>
+                </div>
+            }
         </div>
     </div>
     <div class="col-md-6 col-lg-4">
@@ -216,16 +222,19 @@
                                         }
 
                                     </div>
-                                    <div>
-                                        <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.LinkLibrary)"
-                                           asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
-                                           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
-                                           asp-route-linkLibrarySlug="@linkLibrary.Slug"
-                                           asp-route-sectionSlug="@Model.Section.Slug"
-                                           class="btn btn-outline-primary btn-sm">
-                                            <span class="fa-solid fa-pen-to-square fa-fw"></span>
-                                        </a>
-                                    </div>
+                                    @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+                                    {
+                                        <div>
+                                            <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.LinkLibrary)"
+                                               asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                                               asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                                               asp-route-linkLibrarySlug="@linkLibrary.Slug"
+                                               asp-route-sectionSlug="@Model.Section.Slug"
+                                               class="btn btn-outline-primary btn-sm">
+                                                <span class="fa-solid fa-pen-to-square fa-fw"></span>
+                                            </a>
+                                        </div>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -240,16 +249,19 @@
                     </div>
                 }
             </div>
-            <div class="card-footer @(Model.LinkLibraries?.Count > 0 ? "border-top-0" : null)">
-                <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.LinkLibrary)"
-                   asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
-                   asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
-                   asp-route-sectionSlug="@Model.Section.Slug"
-                   class="btn btn-outline-success btn-sm">
-                    <span class="fa-solid fa-circle-plus fa-fw"></span>
-                    Add Link Library
-                </a>
-            </div>
+            @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+            {
+                <div class="card-footer @(Model.LinkLibraries?.Count > 0 ? "border-top-0" : null)">
+                    <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.LinkLibrary)"
+                       asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                       asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                       asp-route-sectionSlug="@Model.Section.Slug"
+                       class="btn btn-outline-success btn-sm">
+                        <span class="fa-solid fa-circle-plus fa-fw"></span>
+                        Add Link Library
+                    </a>
+                </div>
+            }
         </div>
     </div>
 </div>
