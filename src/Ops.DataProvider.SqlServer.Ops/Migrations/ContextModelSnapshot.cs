@@ -17,7 +17,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.28")
+                .HasAnnotation("ProductVersion", "8.0.26")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -38,7 +38,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DataProtectionKeys");
+                    b.ToTable("DataProtectionKeys", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ApiKey", b =>
@@ -91,7 +91,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("ApiKeys");
+                    b.ToTable("ApiKeys", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Category", b =>
@@ -128,7 +128,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ClaimGroup", b =>
@@ -167,7 +167,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("ClaimGroups");
+                    b.ToTable("ClaimGroups", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.CoverIssueDetail", b =>
@@ -204,7 +204,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("CoverIssueDetails");
+                    b.ToTable("CoverIssueDetails", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.CoverIssueHeader", b =>
@@ -242,7 +242,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("CoverIssueHeaders");
+                    b.ToTable("CoverIssueHeaders", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplay", b =>
@@ -303,7 +303,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("DigitalDisplays");
+                    b.ToTable("DigitalDisplays", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplayAsset", b =>
@@ -346,7 +346,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("DigitalDisplayAssets");
+                    b.ToTable("DigitalDisplayAssets", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplayAssetSet", b =>
@@ -370,7 +370,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("DigitalDisplaySetId");
 
-                    b.ToTable("DigitalDisplayAssetSets");
+                    b.ToTable("DigitalDisplayAssetSets", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplayDisplaySet", b =>
@@ -385,7 +385,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("DigitalDisplaySetId");
 
-                    b.ToTable("DigitalDisplayDisplaySets");
+                    b.ToTable("DigitalDisplayDisplaySets", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplayItem", b =>
@@ -405,7 +405,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("DigitalDisplayId");
 
-                    b.ToTable("DigitalDisplayItems");
+                    b.ToTable("DigitalDisplayItems", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplaySet", b =>
@@ -442,7 +442,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("DigitalDisplaySets");
+                    b.ToTable("DigitalDisplaySets", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailRecord", b =>
@@ -498,7 +498,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmailRecords");
+                    b.ToTable("EmailRecords", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailSetup", b =>
@@ -531,7 +531,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("EmailTemplateId");
 
-                    b.ToTable("EmailSetups");
+                    b.ToTable("EmailSetups", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailSetupText", b =>
@@ -563,7 +563,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("EmailSetupId", "PromenadeLanguageName");
 
-                    b.ToTable("EmailSetupTexts");
+                    b.ToTable("EmailSetupTexts", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailTemplate", b =>
@@ -581,7 +581,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmailTemplates");
+                    b.ToTable("EmailTemplates", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailTemplateText", b =>
@@ -607,7 +607,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("EmailTemplateId", "PromenadeLanguageName");
 
-                    b.ToTable("EmailTemplateTexts");
+                    b.ToTable("EmailTemplateTexts", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmediaStats", b =>
@@ -629,7 +629,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("Month", "Year", "EmediaId");
 
-                    b.ToTable("EmediaStats");
+                    b.ToTable("EmediaStats", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmployeeCardNote", b =>
@@ -643,7 +643,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("EmployeeCardRequestId");
 
-                    b.ToTable("EmployeeCardNotes");
+                    b.ToTable("EmployeeCardNotes", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmployeeCardResult", b =>
@@ -724,7 +724,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("ProcessedBy");
 
-                    b.ToTable("EmployeeCardResults");
+                    b.ToTable("EmployeeCardResults", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ExternalResource", b =>
@@ -769,7 +769,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("ExternalResources");
+                    b.ToTable("ExternalResources", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.File", b =>
@@ -789,9 +789,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime?>("FileDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("FileLibraryId")
                         .HasColumnType("int");
@@ -820,7 +817,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("Files");
+                    b.ToTable("Files", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.FileLibrary", b =>
@@ -837,9 +834,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsFeatured")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -851,9 +845,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.Property<string>("Slug")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -869,7 +860,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("FileLibraries");
+                    b.ToTable("FileLibraries", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.FileLibraryFileType", b =>
@@ -884,46 +875,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("FileTypeId");
 
-                    b.ToTable("FileLibraryFileTypes");
-                });
-
-            modelBuilder.Entity("Ocuda.Ops.Models.Entities.FileThumbnail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FileId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ThumbnailFile")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("FileId");
-
-                    b.HasIndex("UpdatedBy");
-
-                    b.ToTable("FileThumbnails");
+                    b.ToTable("FileLibraryFileTypes", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.FileType", b =>
@@ -961,7 +913,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("FileTypes");
+                    b.ToTable("FileTypes", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.HistoricalIncident", b =>
@@ -1063,7 +1015,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("HistoricalIncidents");
+                    b.ToTable("HistoricalIncidents", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.IdentityProvider", b =>
@@ -1122,7 +1074,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("IdentityProviders");
+                    b.ToTable("IdentityProviders", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Incident", b =>
@@ -1187,7 +1139,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("Incidents");
+                    b.ToTable("Incidents", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.IncidentFollowup", b =>
@@ -1226,7 +1178,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("IncidentFollowups");
+                    b.ToTable("IncidentFollowups", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.IncidentParticipant", b =>
@@ -1275,7 +1227,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("IncidentParticipants");
+                    b.ToTable("IncidentParticipants", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.IncidentRelationship", b =>
@@ -1296,7 +1248,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("CreatedBy");
 
-                    b.ToTable("IncidentRelationships");
+                    b.ToTable("IncidentRelationships", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.IncidentStaff", b =>
@@ -1338,7 +1290,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("IncidentStaffs");
+                    b.ToTable("IncidentStaffs", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.IncidentType", b =>
@@ -1375,7 +1327,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("IncidentTypes");
+                    b.ToTable("IncidentTypes", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Link", b =>
@@ -1423,7 +1375,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("Links");
+                    b.ToTable("Links", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.LinkLibrary", b =>
@@ -1439,9 +1391,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsFeatured")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsNavigation")
                         .HasColumnType("bit");
@@ -1470,7 +1419,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("LinkLibraries");
+                    b.ToTable("LinkLibraries", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroup", b =>
@@ -1509,7 +1458,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("PermissionGroups");
+                    b.ToTable("PermissionGroups", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupApplication", b =>
@@ -1523,7 +1472,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("PermissionGroupId", "ApplicationPermission");
 
-                    b.ToTable("PermissionGroupApplication");
+                    b.ToTable("PermissionGroupApplication", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupIncidentLocation", b =>
@@ -1536,7 +1485,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("PermissionGroupId", "LocationId");
 
-                    b.ToTable("PermissionGroupIncidentLocations");
+                    b.ToTable("PermissionGroupIncidentLocations", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupPageContent", b =>
@@ -1549,7 +1498,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("PermissionGroupId", "PageHeaderId");
 
-                    b.ToTable("PermissionGroupPageContents");
+                    b.ToTable("PermissionGroupPageContents", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupPodcastItem", b =>
@@ -1562,7 +1511,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("PermissionGroupId", "PodcastId");
 
-                    b.ToTable("PermissionGroupPodcastItems");
+                    b.ToTable("PermissionGroupPodcastItems", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupProductManager", b =>
@@ -1575,7 +1524,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("PermissionGroupId", "ProductId");
 
-                    b.ToTable("PermissionGroupProductManager");
+                    b.ToTable("PermissionGroupProductManager", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupReplaceFiles", b =>
@@ -1590,7 +1539,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("FileLibraryId");
 
-                    b.ToTable("PermissionGroupReplaceFiles");
+                    b.ToTable("PermissionGroupReplaceFiles", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupReporting", b =>
@@ -1606,7 +1555,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("PermissionGroupId", "ReportId");
 
-                    b.ToTable("PermissionGroupReportings");
+                    b.ToTable("PermissionGroupReportings", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupSectionManager", b =>
@@ -1621,7 +1570,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("SectionId");
 
-                    b.ToTable("PermissionGroupSectionManager");
+                    b.ToTable("PermissionGroupSectionManager", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Post", b =>
@@ -1678,7 +1627,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.PostCategory", b =>
@@ -1693,7 +1642,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("PostCategories");
+                    b.ToTable("PostCategories", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.RenewCardResponse", b =>
@@ -1741,7 +1690,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("RenewCardResponses");
+                    b.ToTable("RenewCardResponses", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.RenewCardResult", b =>
@@ -1770,7 +1719,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("RenewCardResponseId");
 
-                    b.ToTable("RenewCardResults");
+                    b.ToTable("RenewCardResults", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.RenewCardStats", b =>
@@ -1801,7 +1750,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("Month", "Year");
 
-                    b.ToTable("RenewCardStats");
+                    b.ToTable("RenewCardStats", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ReportingImportDatum", b =>
@@ -1817,7 +1766,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("ReportingImportHeaderId", "LocationId");
 
-                    b.ToTable("ReportingImportData");
+                    b.ToTable("ReportingImportData", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ReportingImportDetails", b =>
@@ -1856,7 +1805,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("ReportingImportDetails");
+                    b.ToTable("ReportingImportDetails", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ReportingImportHeader", b =>
@@ -1908,7 +1857,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("ReportingImportHeaders");
+                    b.ToTable("ReportingImportHeaders", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ReportingLocation", b =>
@@ -1936,7 +1885,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("ReportingLocationSetId");
 
-                    b.ToTable("ReportingLocations");
+                    b.ToTable("ReportingLocations", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ReportingLocationSet", b =>
@@ -1972,7 +1921,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("ReportingLocationSets");
+                    b.ToTable("ReportingLocationSets", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.RosterDetail", b =>
@@ -2051,7 +2000,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("RosterDetails");
+                    b.ToTable("RosterDetails", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.RosterDivision", b =>
@@ -2091,7 +2040,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("RosterDivisions");
+                    b.ToTable("RosterDivisions", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.RosterHeader", b =>
@@ -2126,7 +2075,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("RosterHeaders");
+                    b.ToTable("RosterHeaders", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.RosterLocation", b =>
@@ -2166,7 +2115,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("RosterLocations");
+                    b.ToTable("RosterLocations", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ScheduleClaim", b =>
@@ -2187,7 +2136,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ScheduleClaims");
+                    b.ToTable("ScheduleClaims", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ScheduleLog", b =>
@@ -2230,7 +2179,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("ScheduleLogCallDispositionId");
 
-                    b.ToTable("ScheduleLogs");
+                    b.ToTable("ScheduleLogs", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ScheduleLogCallDisposition", b =>
@@ -2248,7 +2197,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ScheduleLogCallDispositions");
+                    b.ToTable("ScheduleLogCallDispositions", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Section", b =>
@@ -2300,7 +2249,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("Sections");
+                    b.ToTable("Sections", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.SectionCategory", b =>
@@ -2315,7 +2264,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("SectionCategories");
+                    b.ToTable("SectionCategories", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.SiteSetting", b =>
@@ -2363,7 +2312,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("SiteSettings");
+                    b.ToTable("SiteSettings", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.TitleClass", b =>
@@ -2396,7 +2345,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("TitleClasses");
+                    b.ToTable("TitleClasses", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.TitleClassMapping", b =>
@@ -2410,7 +2359,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasKey("TitleClassId", "UserTitle");
 
-                    b.ToTable("TitleClassMappings");
+                    b.ToTable("TitleClassMappings", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.User", b =>
@@ -2528,7 +2477,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("SupervisorId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.UserMetadata", b =>
@@ -2543,7 +2492,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UserMetadataTypeId");
 
-                    b.ToTable("UserMetadata");
+                    b.ToTable("UserMetadata", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.UserMetadataType", b =>
@@ -2580,7 +2529,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("UserMetadataTypes");
+                    b.ToTable("UserMetadataTypes", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.UserSyncHistory", b =>
@@ -2627,7 +2576,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("UserSyncHistories");
+                    b.ToTable("UserSyncHistories", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.UserSyncLocation", b =>
@@ -2664,7 +2613,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("UserSyncLocations");
+                    b.ToTable("UserSyncLocations", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.VolunteerFormSubmissionEmailRecord", b =>
@@ -2684,7 +2633,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("VolunteerFormSubmissionEmailRecords");
+                    b.ToTable("VolunteerFormSubmissionEmailRecords", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.VolunteerFormUserMapping", b =>
@@ -2702,7 +2651,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("VolunteerFormUserMappings");
+                    b.ToTable("VolunteerFormUserMappings", (string)null);
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ApiKey", b =>
@@ -3060,32 +3009,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.Navigation("FileLibrary");
 
                     b.Navigation("FileType");
-                });
-
-            modelBuilder.Entity("Ocuda.Ops.Models.Entities.FileThumbnail", b =>
-                {
-                    b.HasOne("Ocuda.Ops.Models.Entities.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Ocuda.Ops.Models.Entities.File", "File")
-                        .WithMany("Thumbnails")
-                        .HasForeignKey("FileId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Ocuda.Ops.Models.Entities.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("File");
-
-                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.FileType", b =>
@@ -3850,11 +3773,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Ocuda.Ops.Models.Entities.File", b =>
-                {
-                    b.Navigation("Thumbnails");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.FileLibrary", b =>
