@@ -32,9 +32,10 @@ using Ocuda.Utility.Models;
 namespace Ocuda.Ops.Service
 {
     public class ReportingService(ILogger<ReportingService> logger,
-        IHttpContextAccessor httpContextAccessor,
         IDateTimeProvider dateTimeProvider,
         IEmediaReportingService emediaReportingService,
+        IEmployeeCardReportingService employeeCardReportingService,
+        IHttpContextAccessor httpContextAccessor,
         IPolarisHelper polarisHelper,
         IRenewCardReportingService renewCardReportingService,
         IReportingImportDatumRepository reportingImportDatumRepository,
@@ -149,6 +150,8 @@ namespace Ocuda.Ops.Service
             {
                 ReportDefinitionId.DigitalLibraryAccesses => await emediaReportingService
                     .GetStatsAsync(filter),
+                ReportDefinitionId.EmployeeCardRequests => await employeeCardReportingService
+                    .GetStatsAsync(filter),
                 ReportDefinitionId.OnlineCardRenewalStats => await renewCardReportingService
                     .GetStatsAsync(filter),
                 ReportDefinitionId.HooplaCheckouts => new DataWithCount<IDictionary<DateTime, int?>>
@@ -207,6 +210,8 @@ namespace Ocuda.Ops.Service
             {
                 case ReportDefinitionId.DigitalLibraryAccesses:
                     return await emediaReportingService.GetReportAsync(criteria);
+                case ReportDefinitionId.EmployeeCardRequests:
+                    return await employeeCardReportingService.GetReportAsync(criteria);
                 case ReportDefinitionId.OnlineCardRenewalStats:
                     return await renewCardReportingService.GetReportAsync(criteria);
                 case ReportDefinitionId.HooplaCheckouts:
@@ -229,6 +234,8 @@ namespace Ocuda.Ops.Service
             {
                 ReportDefinitionId.DigitalLibraryAccesses
                     => await emediaReportingService.AnyAsync(),
+                ReportDefinitionId.EmployeeCardRequests
+                    => await employeeCardReportingService.AnyAsync(),
                 ReportDefinitionId.OnlineCardRenewalStats
                     => await renewCardReportingService.AnyAsync(),
                 ReportDefinitionId.HooplaCheckouts

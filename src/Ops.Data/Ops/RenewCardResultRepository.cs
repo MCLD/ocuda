@@ -12,15 +12,14 @@ namespace Ocuda.Ops.Data.Ops
 {
     public class RenewCardResultRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
         ILogger<RenewCardResultRepository> logger)
-            : OpsRepository<OpsContext, RenewCardResult, int>(repositoryFacade, logger),
-            IRenewCardResultRepository
+        : OpsRepository<OpsContext, RenewCardResult, int>(repositoryFacade, logger),
+        IRenewCardResultRepository
     {
         public async Task<IEnumerable<DateTime>> GetDatesAfterAsync(DateTime afterMonthYear)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.CreatedAt.Year >= afterMonthYear.Year
-                    && _.CreatedAt.Month > afterMonthYear.Month)
+                .Where(_ => _.CreatedAt > afterMonthYear.AddMonths(1))
                 .Select(_ => new DateTime(_.CreatedAt.Year, _.CreatedAt.Month, 1))
                 .Distinct()
                 .ToListAsync();

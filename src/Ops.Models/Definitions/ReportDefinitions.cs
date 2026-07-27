@@ -9,7 +9,7 @@ namespace Ocuda.Ops.Models.Definitions
     public static class ReportDefinitions
     {
         public const string ReportTypeDigitalLibrary = "Digital Library";
-
+        public const string ReportTypeEmployeeCards = "Employee Cards";
         public const string ReportTypeOnlineCardRenewal = "Online Card Renewal";
 
         public static readonly ReportDefinition[] Definitions =
@@ -43,6 +43,15 @@ namespace Ocuda.Ops.Models.Definitions
                 Name = "Digital Library Accesses",
                 Period = ReportDefinitionPeriod.Monthly,
                 ReportType = ReportTypeDigitalLibrary,
+            },
+            new ()
+            {
+                CanBeImported = false,
+                Description = "Annual stats about employee card requests",
+                Id = ReportDefinitionId.EmployeeCardRequests,
+                Name = "Employee card request stats",
+                Period = ReportDefinitionPeriod.Yearly,
+                ReportType = ReportTypeEmployeeCards,
             },
         ];
     }

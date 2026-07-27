@@ -12,10 +12,10 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class RenewCardStatsRepository(Repository<OpsContext> repositoryFacade,
-        ILogger<RenewCardStatsRepository> logger)
-        : GenericRepository<OpsContext, RenewCardStats>(repositoryFacade, logger),
-        IRenewCardStatsRepository
+    public class EmployeeCardStatsRepository(Repository<OpsContext> repositoryFacade,
+        ILogger<EmployeeCardStatsRepository> logger)
+        : GenericRepository<OpsContext, EmployeeCardStats>(repositoryFacade, logger),
+        IEmployeeCardStatsRepository
     {
         public async Task<bool> AnyAsync()
         {
@@ -57,7 +57,7 @@ namespace Ocuda.Ops.Data.Ops
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<RenewCardStats>> GetReportAsync(DateTime period)
+        public async Task<IEnumerable<EmployeeCardStats>> GetReportAsync(DateTime period)
         {
             return await DbSet
                 .AsNoTracking()
@@ -65,7 +65,7 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public async Task SaveStatsAsync(RenewCardStats stats)
+        public async Task SaveStatsAsync(EmployeeCardStats stats)
         {
             await DbSet.AddAsync(stats);
             await _context.SaveChangesAsync();

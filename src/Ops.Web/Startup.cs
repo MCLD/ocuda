@@ -402,6 +402,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.EmployeeCardNoteRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IEmployeeCardResultRepository,
                 Data.Ops.EmployeeCardResultRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IEmployeeCardStatsRepository,
+                Data.Ops.EmployeeCardStatsRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IExternalResourceRepository,
                 Data.Ops.ExternalResourceRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileLibraryRepository,
@@ -646,6 +648,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IEmediaReportingService, EmediaReportingService>();
             services.AddScoped<IEmediaService, EmediaService>();
+            services.AddScoped<IEmployeeCardReportingService, EmployeeCardReportingService>();
             services.AddScoped<IEmployeeCardRequestService, EmployeeCardRequestService>();
             services.AddScoped<IEmployeeCardService, EmployeeCardService>();
             services.AddScoped<IExternalResourcePromService, ExternalResourcePromService>();

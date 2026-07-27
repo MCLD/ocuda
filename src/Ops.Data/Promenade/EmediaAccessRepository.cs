@@ -12,15 +12,14 @@ namespace Ocuda.Ops.Data.Promenade
 {
     public class EmediaAccessRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
         ILogger<EmediaAccessRepository> logger)
-            : GenericRepository<PromenadeContext, EmediaAccess>(repositoryFacade, logger),
-            IEmediaAccessRepository
+        : GenericRepository<PromenadeContext, EmediaAccess>(repositoryFacade, logger),
+        IEmediaAccessRepository
     {
         public async Task<IEnumerable<DateTime>> GetDatesAfterAsync(DateTime afterMonthYear)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.AccessDate.Year >= afterMonthYear.Year
-                    && _.AccessDate.Month > afterMonthYear.Month)
+                .Where(_ => _.AccessDate > afterMonthYear.AddMonths(1))
                 .Select(_ => new DateTime(_.AccessDate.Year, _.AccessDate.Month, 1))
                 .Distinct()
                 .ToListAsync();

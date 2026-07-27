@@ -14,8 +14,8 @@ namespace Ocuda.Ops.Data.Ops
 {
     public class EmediaStatsRepository(Repository<OpsContext> repositoryFacade,
         ILogger<EmediaStatsRepository> logger)
-            : GenericRepository<OpsContext, EmediaStats>(repositoryFacade, logger),
-            IEmediaStatsRepository
+        : GenericRepository<OpsContext, EmediaStats>(repositoryFacade, logger),
+        IEmediaStatsRepository
     {
         public async Task<bool> AnyAsync()
         {
@@ -38,7 +38,7 @@ namespace Ocuda.Ops.Data.Ops
                 .Select(_ => new
                 {
                     _.Key,
-                    Sum = _.Sum(__ => __.Accesses)
+                    Sum = _.Sum(__ => __.Accesses),
                 })
                 .OrderByDescending(_ => _.Key.Year)
                 .ThenBy(_ => _.Key.Month)
@@ -51,8 +51,8 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .OrderByDescending(_ => _.Month)
-                .ThenByDescending(_ => _.Year)
+                .OrderByDescending(_ => _.Year)
+                .ThenByDescending(_ => _.Month)
                 .Take(1)
                 .Select(_ => new DateTime(_.Year, _.Month, 1))
                 .SingleOrDefaultAsync();

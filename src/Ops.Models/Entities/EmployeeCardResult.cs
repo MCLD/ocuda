@@ -9,9 +9,20 @@ namespace Ocuda.Ops.Models.Entities
     {
         public enum ResultType
         {
+            /// <summary>
+            /// Created card in Polaris and sent notification email
+            /// </summary>
             CardCreated,
+
+            /// <summary>
+            /// Marked as processed and sent notification email
+            /// </summary>
             Processed,
-            ProcessedNoEmail
+
+            /// <summary>
+            /// Marked as processed and sent no email
+            /// </summary>
+            ProcessedNoEmail,
         }
 
         [NotMapped]

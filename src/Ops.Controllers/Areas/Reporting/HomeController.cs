@@ -116,6 +116,10 @@ namespace Ocuda.Ops.Controllers.Areas.Reporting
                         Url.Action(nameof(SiteManagement.EmediaController.Index),
                                 SiteManagement.EmediaController.Name,
                                 new { SiteManagement.EmediaController.Area }),
+                    ReportDefinitions.ReportTypeEmployeeCards =>
+                        Url.Action(nameof(Services.EmployeeSignupController.Index),
+                            Services.EmployeeSignupController.Name,
+                            new { Services.EmployeeSignupController.Area }),
                     ReportDefinitions.ReportTypeOnlineCardRenewal =>
                         Url.Action(nameof(Services.RenewCardController.Index),
                             Services.RenewCardController.Name,

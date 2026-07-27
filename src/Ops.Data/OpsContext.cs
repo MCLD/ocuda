@@ -51,6 +51,8 @@ namespace Ocuda.Ops.Data
 
         public DbSet<EmployeeCardResult> EmployeeCardResults { get; set; }
 
+        public DbSet<EmployeeCardStats> EmployeeCardStats { get; set; }
+
         public DbSet<ExternalResource> ExternalResources { get; set; }
 
         public DbSet<FileLibrary> FileLibraries { get; set; }
@@ -185,6 +187,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.EmailTemplateId, _.PromenadeLanguageName });
             modelBuilder.Entity<EmediaStats>()
                 .HasKey(_ => new { _.Month, _.Year, _.EmediaId });
+            modelBuilder.Entity<EmployeeCardStats>()
+                .HasKey(_ => new { _.Month, _.Year });
             modelBuilder.Entity<FileLibraryFileType>()
                 .HasKey(_ => new { _.FileLibraryId, _.FileTypeId });
             modelBuilder.Entity<IncidentRelationship>()

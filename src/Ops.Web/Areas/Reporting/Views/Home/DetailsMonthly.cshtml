@@ -30,7 +30,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var dateRange in Model.TimespanTotals.OrderBy(_ => _.Key))
+                                @foreach (var dateRange in Model.TimespanTotals.Where(_ => _.Key.Year == year).OrderBy(_ => _.Key))
                                 {
                                     <tr>
                                         <td class="px-2">

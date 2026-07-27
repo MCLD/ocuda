@@ -28,51 +28,6 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
-                Id = Keys.SiteSetting.RenewCard.AcceptedCounty,
-                Name = "Accepted county",
-                Description = "Accepted county for card renewal addresses",
-                Category = nameof(Keys.SiteSetting.RenewCard),
-                Value = string.Empty,
-                Type = SiteSettingType.StringNullable,
-            },
-            new SiteSetting
-            {
-                Id = Keys.SiteSetting.RenewCard.ChargesLimit,
-                Name = "Charges Limit",
-                Description = "Charges amount when a warning starts being shown",
-                Category = nameof(Keys.SiteSetting.RenewCard),
-                Value = "-1",
-                Type = SiteSettingType.Double,
-            },
-            new SiteSetting
-            {
-                Id = Keys.SiteSetting.RenewCard.IgnoredBlockIds,
-                Name = "Ignored block ids",
-                Description = "Ids of blocks that won't be included, comma delimited",
-                Category = nameof(Keys.SiteSetting.RenewCard),
-                Value = string.Empty,
-                Type = SiteSettingType.StringNullable,
-            },
-            new SiteSetting
-            {
-                Id = Keys.SiteSetting.RenewCard.LeapPatronUrl,
-                Name = "Leap patron records url",
-                Description = "Leap patron records url with scheme, host and path",
-                Category = nameof(Keys.SiteSetting.RenewCard),
-                Value = string.Empty,
-                Type = SiteSettingType.StringNullable,
-            },
-            new SiteSetting
-            {
-                Id = Keys.SiteSetting.RenewCard.StatsLookback,
-                Name = "Stats lookback",
-                Description = "Run stats after this many days have passed from the first of the month",
-                Category = nameof(Keys.SiteSetting.RenewCard),
-                Value = "35",
-                Type = SiteSettingType.Int,
-            },
-            new SiteSetting
-            {
                 Id = Keys.SiteSetting.Carousel.AltTextEnglish,
                 Name = "Alt text default (English)",
                 Description = "Default carousel item alt text ({0} is replaced with the title)",
@@ -268,6 +223,15 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
+                Id = Keys.SiteSetting.EmployeeSignup.StatsLookback,
+                Name = "Stats lookback",
+                Description = "Run stats after this many days have passed from the first of the month",
+                Category = nameof(Keys.SiteSetting.EmployeeSignup),
+                Value = "35",
+                Type = SiteSettingType.Int,
+            },
+            new SiteSetting
+            {
                 Id = Keys.SiteSetting.FileManagement.MaxThumbnailCount,
                 Name = "Maximum Thumbnail Count",
                 Description = "Maximum number of thumbnails that can be attached to a file",
@@ -337,6 +301,51 @@ namespace Ocuda.Ops.Models.Defaults
                 Category = "Incident",
                 Value = string.Empty,
                 Type = SiteSettingType.StringNullable,
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.RenewCard.AcceptedCounty,
+                Name = "Accepted county",
+                Description = "Accepted county for card renewal addresses",
+                Category = nameof(Keys.SiteSetting.RenewCard),
+                Value = string.Empty,
+                Type = SiteSettingType.StringNullable,
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.RenewCard.ChargesLimit,
+                Name = "Charges Limit",
+                Description = "Charges amount when a warning starts being shown",
+                Category = nameof(Keys.SiteSetting.RenewCard),
+                Value = "-1",
+                Type = SiteSettingType.Double,
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.RenewCard.IgnoredBlockIds,
+                Name = "Ignored block ids",
+                Description = "Ids of blocks that won't be included, comma delimited",
+                Category = nameof(Keys.SiteSetting.RenewCard),
+                Value = string.Empty,
+                Type = SiteSettingType.StringNullable,
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.RenewCard.LeapPatronUrl,
+                Name = "Leap patron records url",
+                Description = "Leap patron records url with scheme, host and path",
+                Category = nameof(Keys.SiteSetting.RenewCard),
+                Value = string.Empty,
+                Type = SiteSettingType.StringNullable,
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.RenewCard.StatsLookback,
+                Name = "Stats lookback",
+                Description = "Run stats after this many days have passed from the first of the month",
+                Category = nameof(Keys.SiteSetting.RenewCard),
+                Value = "35",
+                Type = SiteSettingType.Int,
             },
             new SiteSetting
             {

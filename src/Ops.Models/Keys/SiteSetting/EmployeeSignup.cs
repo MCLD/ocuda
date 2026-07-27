@@ -9,5 +9,6 @@
         public static readonly string RegistrationState = "EmployeeSignup.RegistrationState";
         public static readonly string RegistrationUserField = "EmployeeSignup.RegistrationUserField";
         public static readonly string RenewEmailSetupId = "EmployeeSignup.RenewEmailSetupId";
+        public static readonly string StatsLookback = "EmployeeSignup.StatsLookback";
     }
 }

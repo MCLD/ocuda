@@ -11,10 +11,11 @@ namespace Ocuda.Ops.Web.JobScheduling
         IDigitalDisplayCleanupService digitalDisplayCleanupService,
         IDigitalDisplaySyncService digitalDisplaySyncService,
         IEmediaReportingService emediaReportingService,
+        IEmployeeCardReportingService employeeCardReportingService,
         IRenewCardReportingService renewCardReportingService,
         IScheduleNotificationService scheduleNotificationService,
         IVolunteerNotificationService volunteerNotificationService)
-            : BaseScopedBackgroundService<JobScopedProcessingService>(logger)
+        : BaseScopedBackgroundService<JobScopedProcessingService>(logger)
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
             "CA1031:Do not catch general exception types",
@@ -33,6 +34,7 @@ namespace Ocuda.Ops.Web.JobScheduling
                     = volunteerNotificationService.SendPendingNotificationsAsync,
                 ["OnlineCardRenewalReports"] = renewCardReportingService.RunPendingReportsAsync,
                 ["EmediaAccessReports"] = emediaReportingService.RunPendingReportsAsync,
+                ["EmployeeCardReports"] = employeeCardReportingService.RunPendingReportsAsync,
             };
 
             foreach (var methodName in scheduledTasks.Keys)

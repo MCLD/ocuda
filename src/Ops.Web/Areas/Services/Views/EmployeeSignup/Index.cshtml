@@ -7,7 +7,8 @@
             Employee Card Requests
             <small class="text-muted d-print-block">@(Model.IsProcessed ? "Processed" : "Pending")</small>
         </h1>
-        <div>
+        <div class="pt-1 d-print-none">
+            <partial name="_ReportingNavPartial" model="Model.ReportLinks" />
             <a asp-action="@nameof(HomeController.Index)"
                asp-area=""
                asp-controller="@HomeController.Name"
