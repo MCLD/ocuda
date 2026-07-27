@@ -645,9 +645,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToUnauthorized();
             }
 
-            var fileLibrary = await fileService
-                .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
-
             var file = await fileService.GetFileLibraryFileAsync(viewModel.File.Id);
 
             if (file == null)
@@ -1177,12 +1174,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             var linkLibrary = await linkService
                 .GetBySectionIdSlugAsync(section.Id, linkLibrarySlug);
-
-            var linkTypeLink = Url.Action(nameof(AvailableFileTypes), new
-            {
-                sectionSlug,
-                linkLibrarySlug,
-            });
 
             return linkLibrary == null
                 ? NotFound()

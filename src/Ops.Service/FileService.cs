@@ -187,7 +187,7 @@ namespace Ocuda.Ops.Service
 
             if (issues.Length > 0)
             {
-                throw new Exception($"Error: {issues}");
+                throw new OcudaException($"Error: {issues}");
             }
         }
 
