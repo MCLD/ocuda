@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Generic;
 using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
@@ -13,9 +12,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
             Posts = [];
         }
 
-        public int PostCount { get; set; }
-
-        public ICollection<Post> Posts { get; }
+        public bool CanBeDeleted { get; set; }
 
         public ICollection<FileLibrary> FileLibraries { get; }
 
@@ -24,6 +21,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
         public ICollection<LinkLibrary> LinkLibraries { get; }
 
         public LinkLibrary LinkLibrary { get; set; }
+
+        public int PostCount { get; set; }
+
+        public ICollection<Post> Posts { get; }
 
         public Models.Entities.Section Section { get; set; }
     }

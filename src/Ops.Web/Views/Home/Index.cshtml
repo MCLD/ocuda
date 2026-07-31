@@ -112,6 +112,14 @@
         </div>
     }
 }
+@if (!(Model.Posts?.Count > 0) && !(Model.FileLibraries?.Count > 0) && !(Model.LinkLibraries?.Count > 0))
+{
+    <div class="row">
+        <div class="col-12 col-md-8 offset-md-2 col-lg-4 offset-lg-4">
+            <div class="alert alert-info">This section appears to have no content.</div>
+        </div>
+    </div>
+}
 <div class="row">
     @if (Model.Posts?.Count > 0)
     {

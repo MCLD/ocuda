@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -73,6 +74,78 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("[action]/{sectionSlug}")]
+        public async Task<IActionResult> DeleteSection(string sectionSlug)
+        {
+            try
+            {
+                await sectionService.DeleteSectionAsync(sectionSlug);
+                await ClearSectionCache();
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogError(
+                    oex,
+                    "User {Username} was unable to delete section with slug {sectionSlug}: {ErrorMessage}",
+                    CurrentUsername,
+                    sectionSlug,
+                    oex.Message);
+                ShowAlertDanger($"Unable to delete section: {oex.Message}");
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("[action]")]
+        [SaveModelState]
+        public async Task<IActionResult> AddSection(SectionIndexViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                var issues = new StringBuilder("Could not create section:<ul>");
+                foreach (var value in ModelState.Values)
+                {
+                    foreach (var error in value.Errors)
+                    {
+                        issues.Append("<li>").Append(error.ErrorMessage).Append("</li>");
+                    }
+                }
+
+                issues.Append("</ul>");
+                ShowAlertDanger(issues.ToString());
+            }
+            else
+            {
+                try
+                {
+                    await sectionService.CreateSectionAsync(new Section
+                    {
+                        Icon = viewModel.SectionIcon,
+                        Name = viewModel.SectionName,
+                        Slug = viewModel.SectionSlug,
+                        SupervisorsOnly = viewModel.SupervisorsOnly,
+                    });
+
+                    await ClearSectionCache();
+
+                    ShowAlertInfo($"Section {viewModel.SectionName} created and section cache cleared.");
+                }
+                catch (OcudaException oex)
+                {
+                    _logger.LogError(oex,
+                        "Couldn't create section {SectionName}: {ErrorMessage}",
+                        viewModel.SectionName,
+                        oex.Message);
+
+                    ShowAlertDanger($"Could not create section: {oex.Message}");
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost("[action]/{sectionSlug}/{fileLibrarySlug}/{permissionGroupId:int}")]
         public async Task<IActionResult> AddFilePermissionGroup(
             string sectionSlug,
@@ -130,7 +203,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             string path;
             try
             {
-                path = await fileService.VerifyAddFileAsync(fileLibrary.Id,
+                path = await fileService.VerifyAddFileAsync(
+                    section,
+                    fileLibrary.Id,
                     extension,
                     viewModel.File.Name + extension);
                 viewModel.File.FileLibraryId = fileLibrary.Id;
@@ -394,13 +469,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var fileLibrary = await fileService
                 .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
 
-            var hasReplaceRights = await fileService.HasReplaceRightsAsync(fileLibrary.Id);
-
-            if (!hasReplaceRights)
-            {
-                return RedirectToUnauthorized();
-            }
-
             var path = await fileService
                 .GetThumbnailPathAsync(viewModel.DeleteThumbnailId, fileLibrarySlug, sectionSlug);
 
@@ -491,13 +559,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var fileLibrary = await fileService
                 .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
 
-            var hasReplaceRights = await fileService.HasReplaceRightsAsync(fileLibrary.Id);
-
-            if (!hasReplaceRights)
-            {
-                return RedirectToUnauthorized();
-            }
-
             var extension = Path.GetExtension(viewModel.UploadFile.FileName);
 
             if (!GetThumbnailTypes.Select(_ => _.Extension).Contains(extension))
@@ -571,9 +632,15 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             var libraryTypeIds = libraryTypes.Select(_ => _.Id).Union([fileTypeId]).ToArray();
 
-            await fileService.EditLibraryTypesAsync(fileLibrary, libraryTypeIds);
-
-            ShowAlertSuccess($"Added ability to upload files of type: {type.Extension}");
+            try
+            {
+                await fileService.EditLibraryTypesAsync(fileLibrary, libraryTypeIds);
+                ShowAlertSuccess($"Added ability to upload files of type: {type.Extension}");
+            }
+            catch (OcudaException oex)
+            {
+                ShowAlertDanger($"Unable to add file types to library: {oex.Message}");
+            }
 
             return RedirectToAction(
                 nameof(SectionController.FileLibrary),
@@ -736,11 +803,13 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 var fileLibrary = await fileService
                     .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
 
-                var files = await fileService.GetPaginatedListAsync(new FilesFilter
-                {
-                    FileLibrary = fileLibrary,
-                    OnlyCount = true,
-                });
+                var files = await fileService.GetPaginatedListAsync(
+                    section,
+                    new FilesFilter
+                    {
+                        FileLibrary = fileLibrary,
+                        OnlyCount = true,
+                    });
 
                 if (files.Count > 0)
                 {
@@ -754,7 +823,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                         });
                 }
 
-                await fileService.DeleteLibraryAsync(section.Id, fileLibrary.Id);
+                await fileService.DeleteFileLibraryAsync(section, fileLibrary.Id);
             }
             catch (OcudaException oex)
             {
@@ -1111,6 +1180,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         }
 
         [HttpGet("")]
+        [RestoreModelState]
         public async Task<IActionResult> Index()
         {
             var permissionGroupIds = UserClaims(ClaimType.PermissionId)
@@ -1136,7 +1206,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             return View(new SectionIndexViewModel
             {
-                IsSiteManager = IsSiteManager(),
                 Sections = sections,
             });
         }
@@ -1205,13 +1274,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             var fileLibrary = await fileService
                 .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
-
-            var hasReplaceRights = await fileService.HasReplaceRightsAsync(fileLibrary.Id);
-
-            if (!hasReplaceRights)
-            {
-                return RedirectToUnauthorized();
-            }
 
             var file = await fileService.GetByIdAsync(fileId);
 
@@ -1484,20 +1546,22 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 {
                     if (string.IsNullOrEmpty(fileLibrarySlug))
                     {
-                        await fileService.CreateLibraryAsync(new FileLibrary
-                        {
-                            IsFeatured = viewModel.IsFeatured,
-                            Name = viewModel.Name,
-                            SectionId = section.Id,
-                            Slug = viewModel.Slug,
-                            SortOrder = viewModel.SortOrder,
-                        });
+                        await fileService.CreateLibraryAsync(
+                            section,
+                            new FileLibrary
+                            {
+                                IsFeatured = viewModel.IsFeatured,
+                                Name = viewModel.Name,
+                                SectionId = section.Id,
+                                Slug = viewModel.Slug,
+                                SortOrder = viewModel.SortOrder,
+                            });
                         ShowAlertSuccess($"Created file library: {viewModel.Name.Trim()}");
                     }
                     else
                     {
                         await fileService.UpdateLibrary(
-                            sectionSlug,
+                            section,
                             fileLibrarySlug,
                             new FileLibrary
                             {
@@ -1574,7 +1638,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                     else
                     {
                         await linkService.UpdateLibrary(
-                            sectionSlug,
+                            section,
                             linkLibrarySlug,
                             new LinkLibrary
                             {
@@ -1627,10 +1691,12 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             viewModel.FileLibraries.AddRange(await fileService.GetBySectionIdAsync(section.Id));
             foreach (var fileLibrary in viewModel.FileLibraries)
             {
-                var files = await fileService.GetPaginatedListAsync(new FilesFilter(1, 1)
-                {
-                    FileLibrary = fileLibrary,
-                });
+                var files = await fileService.GetPaginatedListAsync(
+                    section,
+                    new FilesFilter(1, 1)
+                    {
+                        FileLibrary = fileLibrary,
+                    });
                 fileLibrary.TotalFilesInLibrary = files.Count;
             }
 
@@ -1643,6 +1709,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 });
                 linkLibrary.TotalLinksInLibrary = links.Count;
             }
+
+            viewModel.CanBeDeleted = viewModel.PostCount == 0
+                && !(viewModel.FileLibraries?.Count > 1)
+                && !(viewModel.LinkLibraries?.Count > 1);
 
             return View(viewModel);
         }

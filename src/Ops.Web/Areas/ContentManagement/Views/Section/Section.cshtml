@@ -16,6 +16,14 @@
                    class="btn btn-sm btn-outline-primary mt-1 ms-2">
                     Permissions
                 </a>
+                if (Model.CanBeDeleted)
+                {
+                    <button class="btn btn-sm btn-outline-danger mt-1 ms-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteSection">
+                        Delete Section
+                    </button>
+                }
             }
             <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex)"
                asp-area=""
@@ -267,3 +275,38 @@
 </div>
 
 
+@if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true && Model.CanBeDeleted)
+{
+    <form asp-action="@nameof(SectionController.DeleteSection)"
+          asp-route-sectionSlug="@Model.Section.Slug"
+          method="post">
+        <div aria-hidden="true"
+             aria-labelledby="deleteModalLabel"
+             class="modal fade"
+             id="deleteSection"
+             tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="deleteModalLabel">Delete section</h1>
+                        <button aria-label="Close"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this section? There is no undo!
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal"
+                                type="button">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-outline-danger">Delete Section</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+}
