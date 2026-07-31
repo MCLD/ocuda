@@ -8,6 +8,7 @@ using Ocuda.Ops.Data.Extensions;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
@@ -22,17 +23,26 @@ namespace Ocuda.Ops.Data.Ops
         {
             ArgumentNullException.ThrowIfNull(fileTypeIds);
 
-            foreach (var fileType in fileTypeIds)
+            foreach (var fileTypeId in fileTypeIds)
             {
-                var fileLibType = new FileLibraryFileType
+                var fileLibraryFileType = new FileLibraryFileType
                 {
                     FileLibraryId = libraryId,
-                    FileTypeId = fileType,
+                    FileTypeId = fileTypeId,
                 };
-                await _context.FileLibraryFileTypes.AddAsync(fileLibType);
+                await _context.FileLibraryFileTypes.AddAsync(fileLibraryFileType);
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex) when (ex is InvalidOperationException || ex is DbUpdateException)
+            {
+                throw new OcudaException(
+                    $"Could not add file type to library: {ex.Message}",
+                    ex);
+            }
         }
 
         public override async Task<FileLibrary> FindAsync(int id)
@@ -79,6 +89,11 @@ namespace Ocuda.Ops.Data.Ops
                 BlogFilter filter)
         {
             var query = DbSet.AsNoTracking();
+
+            if (filter.SectionId.HasValue)
+            {
+                query = query.Where(_ => _.SectionId == filter.SectionId.Value);
+            }
 
             return new DataWithCount<ICollection<FileLibrary>>
             {

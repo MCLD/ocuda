@@ -97,6 +97,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaricopaCountyAssessorHelpe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ops.Service.Test", "test\Ops\Ops.Service.Test\Ops.Service.Test.csproj", "{1E0D60D5-3313-4A71-AA0A-F860C0A9914B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ocuda", "Ocuda", "{DE93E337-44E9-4D40-BE31-99D5670B3ECC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ocuda.Utility.Test", "test\Ocuda\Ocuda.Utility.Test\Ocuda.Utility.Test.csproj", "{14FED238-C488-4BE3-8927-E608F306F7C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -195,6 +199,10 @@ Global
 		{1E0D60D5-3313-4A71-AA0A-F860C0A9914B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E0D60D5-3313-4A71-AA0A-F860C0A9914B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E0D60D5-3313-4A71-AA0A-F860C0A9914B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14FED238-C488-4BE3-8927-E608F306F7C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14FED238-C488-4BE3-8927-E608F306F7C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14FED238-C488-4BE3-8927-E608F306F7C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14FED238-C488-4BE3-8927-E608F306F7C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -227,6 +235,8 @@ Global
 		{406EDF3E-A118-4C12-9BC3-1C57C2C18CC8} = {FC70E8FE-76E9-4D23-8D85-F219DD8BAC37}
 		{37847C78-513E-40FD-B954-1C89FAFAB836} = {FC70E8FE-76E9-4D23-8D85-F219DD8BAC37}
 		{1E0D60D5-3313-4A71-AA0A-F860C0A9914B} = {3138C719-1208-42FE-8D35-B79DA1529219}
+		{DE93E337-44E9-4D40-BE31-99D5670B3ECC} = {EF2E402F-3D9C-4EAD-93A2-68D759A003A7}
+		{14FED238-C488-4BE3-8927-E608F306F7C5} = {DE93E337-44E9-4D40-BE31-99D5670B3ECC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E2592F73-781B-49DC-8020-540473F814F7}

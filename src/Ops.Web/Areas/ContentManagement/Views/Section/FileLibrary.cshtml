@@ -257,11 +257,11 @@
 @if (!Model.IsNew)
 {
     <form asp-action="@nameof(SectionController.AddTypeToLibrary)"
-          asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
-          asp-route-sectionSlug="@Model.SectionSlug"
-          class="d-none"
-          id="addFileTypeForm"
-          method="POST">
+            asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+            asp-route-sectionSlug="@Model.SectionSlug"
+            class="d-none"
+            id="addFileTypeForm"
+            method="POST">
         <input type="hidden" name="fileTypeId" id="fileTypeId" />
     </form>
 }
@@ -283,7 +283,6 @@
                 fetch(new URL(`${location.origin}${fileTypeLink}`), { method: 'GET' })
                     .then((response) => response.json())
                     .then((jsonResponse) => {
-                        console.info("JSON response: %o", jsonResponse);
                         const html = [];
                         jsonResponse.items.forEach((e) => {
                             html.push('<button class="btn btn-outline-primary add-type-button m-1" ');
@@ -294,7 +293,7 @@
                         addFileTypeContent.innerHTML = html.join('');
                         const elements = document.getElementsByClassName('add-type-button');
                         Array.from(elements).forEach(function(element) {
-                                element.addEventListener('click', addType);
+                            element.addEventListener('click', addType);
                         });
                     })
                     .catch((error) => {
@@ -310,7 +309,7 @@
                 addFileTypeContent.innerHTML = dialogSpinner;
                 document
                     .getElementById('fileTypeId')
-                    .setAttribute('value', e.target.dataset.typeid);
+                    .setAttribute('value', e.currentTarget.dataset.typeid);
                 addFileTypeForm.submit();
             }
         </script>

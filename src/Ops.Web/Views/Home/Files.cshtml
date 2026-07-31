@@ -532,6 +532,16 @@ else
                         <input asp-for="ReplaceFileId" type="hidden" />
                         <label for="" class="form-label">
                             Replace file: <strong id="ReplaceFileName"></strong>
+                            (valid types:
+                            @(Model.FileTypes?.Any() == true ? Model.JoinFileExtensions(", ") : "none")
+                            @if (Model.MaximumFileUploadBytes > 0)
+                            {
+                                @:, maximum size: @Model.MaximumFileUploadBytes.ToHumanSizeString())
+                            }
+                            else
+                            {
+                                @:)
+                            }
                         </label>
                         <div class="input-group">
                             <input type="file"

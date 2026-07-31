@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
@@ -179,7 +178,7 @@ namespace Ocuda.Ops.Controllers
                 FileLibrary = fileLibrary,
             };
 
-            var filesAndCount = await fileService.GetPaginatedListAsync(filter);
+            var filesAndCount = await fileService.GetPaginatedListAsync(section, filter);
 
             foreach (var file in filesAndCount.Data)
             {
@@ -473,17 +472,24 @@ namespace Ocuda.Ops.Controllers
 
             int defaultItemsToShow = 10;
 
+            var sectionId = filter.IsShownOnHomePage == true
+                ? await sectionService.GetHomeSectionIdAsync()
+                : filter.SectionId;
+
+            var section = sectionId.HasValue
+                ? await sectionService.GetByIdAsync(sectionId.Value)
+                : null;
+
             if (filter.IsShownOnHomePage == true)
             {
-                filter.SectionId = await sectionService.GetHomeSectionIdAsync();
+                filter.SectionId = sectionId;
                 viewModel.SectionSlug = "Home";
                 defaultItemsToShow = 15;
             }
             else
             {
-                if (filter.SectionId.HasValue)
+                if (section != null)
                 {
-                    var section = await sectionService.GetByIdAsync(filter.SectionId.Value);
                     viewModel.SectionName = section.Name;
                     viewModel.SectionSlug = section.Slug;
                     viewModel.SupervisorsOnly = section.SupervisorsOnly;
@@ -522,10 +528,12 @@ namespace Ocuda.Ops.Controllers
                     foreach (var fileLibrary in fileLibraries)
                     {
                         var fileLibraryFiles = await fileService
-                            .GetPaginatedListAsync(new FilesFilter(1, defaultItemsToShow)
-                            {
-                                FileLibrary = fileLibrary,
-                            });
+                            .GetPaginatedListAsync(
+                                section,
+                                new FilesFilter(1, defaultItemsToShow)
+                                {
+                                    FileLibrary = fileLibrary,
+                                });
 
                         if (fileLibraryFiles?.Count > 0)
                         {

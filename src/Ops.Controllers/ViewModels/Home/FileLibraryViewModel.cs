@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,11 +15,16 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
         private bool managementRights;
         private bool replaceRights;
 
-        public long MaximumFileUploadBytes { get; set; }
-
-        public string GetFileDetailsLink { get; set; }
-
-        public bool UseThumbnails { get; set; }
+        public IDictionary<int, List<File>> ByFileYear
+        {
+            get
+            {
+                return Files != null
+                    ? Files.GroupBy(_ => _.FileDate?.Year ?? 0)
+                        .ToDictionary(_ => _.Key, _ => _.ToList())
+                    : [];
+            }
+        }
 
         public File File { get; set; }
 
@@ -40,6 +45,8 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
 
         public ICollection<FileType> FileTypes { get; set; }
 
+        public string GetFileDetailsLink { get; set; }
+
         public bool HasAdminRights { get; set; }
 
         public bool HasManagementRights
@@ -59,7 +66,7 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
         {
             get
             {
-                return HasAdminRights || replaceRights;
+                return HasAdminRights || HasManagementRights || replaceRights;
             }
 
             set
@@ -67,6 +74,8 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
                 replaceRights = value;
             }
         }
+
+        public long MaximumFileUploadBytes { get; set; }
 
         public int ReplaceFileId { get; set; }
 
@@ -80,16 +89,7 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
         [DisplayName("file")]
         public IFormFile UploadFile { get; set; }
 
-        public IDictionary<int, List<File>> ByFileYear
-        {
-            get
-            {
-                return Files != null
-                    ? Files.GroupBy(_ => _.FileDate?.Year ?? 0)
-                        .ToDictionary(_ => _.Key, _ => _.ToList())
-                    : [];
-            }
-        }
+        public bool UseThumbnails { get; set; }
 
         public static IDictionary<int, FileThumbnail> GetThumbnails(File file)
         {

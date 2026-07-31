@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DocumentFormat.OpenXml.Drawing.Charts;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
@@ -30,7 +28,6 @@ namespace Ocuda.Ops.Service
         IFileTypeService fileTypeService,
         IPathResolverService pathResolver,
         IPermissionGroupService permissionGroupService,
-        ISectionService sectionService,
         IUserService userService)
         : BaseService<FileService>(logger, httpContextAccessor),
         IFileService
@@ -59,8 +56,9 @@ namespace Ocuda.Ops.Service
             await fileThumbnailRepository.SaveAsync();
         }
 
-        public async Task<FileLibrary> CreateLibraryAsync(FileLibrary library)
+        public async Task<FileLibrary> CreateLibraryAsync(Section section, FileLibrary library)
         {
+            ArgumentNullException.ThrowIfNull(section);
             ArgumentNullException.ThrowIfNull(library);
 
             library.Name = library.Name?.Trim();
@@ -74,8 +72,6 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(
                     $"A file library for this section already exists with this slug: {library.Slug}");
             }
-
-            var section = await sectionService.GetByIdAsync(library.SectionId);
 
             var path = pathResolver
                 .GetPrivateContentFilePath(null, SectionsPath, section.Slug, library.Slug);
@@ -97,6 +93,20 @@ namespace Ocuda.Ops.Service
             return library;
         }
 
+        public async Task DeleteReplacePemissionsAsync(int fileLibraryId)
+        {
+            var replaceFilePermissions = await permissionGroupService
+                .GetPermissionsAsync<PermissionGroupReplaceFiles>(fileLibraryId);
+
+            foreach (var permission in replaceFilePermissions)
+            {
+                await permissionGroupService
+                    .RemoveFromPermissionGroupAsync<PermissionGroupReplaceFiles>(
+                        permission.FileLibraryId,
+                        permission.PermissionGroupId);
+            }
+        }
+
         public async Task DeleteFileTypesByLibrary(int fileLibraryId)
         {
             var currentLibrary = await fileLibraryRepository.FindAsync(fileLibraryId);
@@ -109,22 +119,34 @@ namespace Ocuda.Ops.Service
                 .RemoveLibraryFileTypesAsync(fileTypesToRemove, currentLibrary.Id);
         }
 
-        public async Task DeleteLibraryAsync(int sectionId, int fileLibraryId)
+        public async Task DeleteFileLibraryAsync(Section section, int fileLibraryId)
         {
-            var library = await GetLibraryByIdAsync(fileLibraryId);
-            var section = await sectionService.GetByIdAsync(sectionId);
+            ArgumentNullException.ThrowIfNull(section);
+
+            var fileLibrary = await GetLibraryByIdAsync(fileLibraryId);
 
             var filePath = pathResolver
-                .GetPrivateContentFilePath(null, SectionsPath, section.Slug, library.Slug);
+                .GetPrivateContentFilePath(null, SectionsPath, section.Slug, fileLibrary.Slug);
 
             var exists = System.IO.Directory.Exists(filePath);
 
             if (exists)
             {
-                System.IO.Directory.Delete(filePath);
+                try
+                {
+                    System.IO.Directory.Delete(filePath, true);
+                }
+                catch (SystemException ex)
+                {
+                    throw new OcudaException(
+                        $"Unable to delete file library directory: {ex.Message}",
+                        ex);
+                }
             }
 
             await DeleteFileTypesByLibrary(fileLibraryId);
+            await DeleteReplacePemissionsAsync(fileLibraryId);
+
             fileLibraryRepository.Remove(fileLibraryId);
             await fileLibraryRepository.SaveAsync();
 
@@ -261,9 +283,9 @@ namespace Ocuda.Ops.Service
             fileTypeIds ??= [];
 
             var typesToDelete = currentTypeIds.Except(fileTypeIds).ToList();
-            var typessToAdd = fileTypeIds.Except(currentTypeIds).ToList();
+            var typesToAdd = fileTypeIds.Except(currentTypeIds).ToList();
 
-            await fileLibraryRepository.AddLibraryFileTypesAsync(typessToAdd, library.Id);
+            await fileLibraryRepository.AddLibraryFileTypesAsync(typesToAdd, library.Id);
             await fileLibraryRepository.RemoveLibraryFileTypesAsync(typesToDelete, library.Id);
 
             return library;
@@ -349,8 +371,11 @@ namespace Ocuda.Ops.Service
         }
 
         public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(
+            Section section,
             FilesFilter filter)
         {
+            ArgumentNullException.ThrowIfNull(section);
+
             if (filter?.FileLibrary == null)
             {
                 return new DataWithCount<ICollection<File>>
@@ -379,8 +404,6 @@ namespace Ocuda.Ops.Service
                     userLookup.Add(userId, await userService.GetNameUsernameAsync(userId));
                 }
             }
-
-            var section = await sectionService.GetByIdAsync(filter.FileLibrary.SectionId);
 
             foreach (var file in files.Data)
             {
@@ -512,11 +535,10 @@ namespace Ocuda.Ops.Service
             return file;
         }
 
-        public async Task UpdateLibrary(string sectionSlug, string slug, FileLibrary library)
+        public async Task UpdateLibrary(Section section, string slug, FileLibrary library)
         {
+            ArgumentNullException.ThrowIfNull(section);
             ArgumentNullException.ThrowIfNull(library);
-            var section = await sectionService.GetBySlugAsync(sectionSlug)
-                ?? throw new OcudaException($"Unable to find section with slug {sectionSlug}");
 
             var currentLibrary = await GetBySectionIdSlugAsync(section.Id, slug);
 
@@ -534,13 +556,13 @@ namespace Ocuda.Ops.Service
                 var oldPath = pathResolver.GetPrivateContentFilePath(
                     null,
                     SectionsPath,
-                    sectionSlug,
+                    section.Slug,
                     currentLibrary.Slug);
 
                 var newPath = pathResolver.GetPrivateContentFilePath(
                     null,
                     SectionsPath,
-                    sectionSlug,
+                    section.Slug,
                     library.Slug);
 
                 if (System.IO.Directory.GetFiles(newPath).Length > 0)
@@ -551,11 +573,24 @@ namespace Ocuda.Ops.Service
 
                 try
                 {
-                    System.IO.Directory.Move(oldPath, newPath);
+                    foreach (var dir in new System.IO.DirectoryInfo(oldPath).GetDirectories())
+                    {
+                        dir.MoveTo(System.IO.Path.Combine(newPath, dir.Name));
+                    }
+
+                    foreach (var file in new System.IO.DirectoryInfo(oldPath).GetFiles())
+                    {
+                        file.MoveTo(System.IO.Path.Combine(newPath, file.Name));
+                    }
                 }
                 catch (Exception ex)
                 {
                     throw new OcudaException($"Unable to move files: {ex.Message}", ex);
+                }
+
+                if (System.IO.Directory.GetFiles(oldPath).Length == 0)
+                {
+                    System.IO.Directory.Delete(oldPath, true);
                 }
 
                 currentLibrary.Slug = library.Slug.Trim();
@@ -571,7 +606,9 @@ namespace Ocuda.Ops.Service
             await fileLibraryRepository.SaveAsync();
         }
 
-        public async Task<string> VerifyAddFileAsync(int fileLibraryId,
+        public async Task<string> VerifyAddFileAsync(
+            Section section,
+            int fileLibraryId,
             string extension,
             string filename)
         {
@@ -587,7 +624,6 @@ namespace Ocuda.Ops.Service
             }
 
             var library = await fileLibraryRepository.FindAsync(fileLibraryId);
-            var section = await sectionService.GetByIdAsync(library.SectionId);
 
             var filePath = pathResolver.GetPrivateContentFilePath(filename,
                     SectionsPath,

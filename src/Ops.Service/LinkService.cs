@@ -19,8 +19,7 @@ namespace Ocuda.Ops.Service
         IHttpContextAccessor httpContextAccessor,
         IDateTimeProvider dateTimeProvider,
         ILinkLibraryRepository linkLibraryRepository,
-        ILinkRepository linkRepository,
-        ISectionService sectionService)
+        ILinkRepository linkRepository)
         : BaseService<LinkService>(logger, httpContextAccessor),
         ILinkService
     {
@@ -148,11 +147,10 @@ namespace Ocuda.Ops.Service
             return await linkRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task UpdateLibrary(string sectionSlug, string slug, LinkLibrary library)
+        public async Task UpdateLibrary(Section section, string slug, LinkLibrary library)
         {
+            ArgumentNullException.ThrowIfNull(section);
             ArgumentNullException.ThrowIfNull(library);
-            var section = await sectionService.GetBySlugAsync(sectionSlug)
-                ?? throw new OcudaException($"Unable to find section with slug {sectionSlug}");
 
             var currentLibrary = await GetBySectionIdSlugAsync(section.Id, slug);
 

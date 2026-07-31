@@ -6,12 +6,11 @@
             Sections
         </h1>
         <div class="pt-1 d-print-none">
-            @if (Model.IsSiteManager)
+            @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
             {
                 <button class="btn btn-sm btn-outline-success mt-1 ms-2"
                         data-bs-toggle="modal"
-                        data-bs-target="#addModal"
-                        disabled>
+                        data-bs-target="#addSection">
                     <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                     Add Section
                 </button>
@@ -99,3 +98,89 @@
         }
     }
 </div>
+
+@if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+{
+    <form asp-action="@nameof(SectionController.AddSection)">
+        <div aria-hidden="true"
+             aria-labelledby="addSectionLabel"
+             class="modal fade"
+             data-bs-backdrop="static"
+             data-bs-keyboard="false"
+             id="addSection"
+             tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="addSectionLabel">Add Section</h1>
+                        <button aria-label="Close"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label asp-for="SectionName" class="form-label"></label>
+                            <input asp-for="SectionName" class="form-control" type="text" />
+                            <span asp-validation-for="SectionName"
+                                  class="validation-message text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="SectionSlug" class="form-label"></label>
+                            <input asp-for="SectionSlug"
+                                   class="form-control"
+                                   data-oc-slugify-from="SectionName"
+                                   type="text" />
+                            <span asp-validation-for="SectionSlug"
+                                  class="validation-message text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="SectionIcon" class="form-label"></label>
+                            <div class="input-group">
+                                <input asp-for="SectionIcon" class="form-control" type="text" />
+                                <span class="input-group-text">
+                                    <span id="iconPreview" style="min-width: 1.1rem;"></span>
+                                </span>
+                            </div>
+                            <span asp-validation-for="SectionIcon"
+                                  class="validation-message text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="SupervisorsOnly" class="form-label"></label>
+                            <select asp-for="SupervisorsOnly" class="form-select">
+                                <option value="False" selected>No</option>
+                                <option value="True">Yes</option>
+                            </select>
+                            <span asp-validation-for="SupervisorsOnly"
+                                  class="validation-message text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal"
+                                type="button">
+                            Close
+                        </button>
+                        <button class="btn btn-outline-success"
+                                type="submit">
+                            Add Section
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+}
+
+@if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+{
+    <script>
+        const iconPreview = document.getElementById("iconPreview");
+        const iconField = document.getElementById("SectionIcon");
+        iconField.addEventListener("blur", (event) => {
+            console.info("Event: %o", event);
+            iconPreview.setAttribute("class", event.target.value);
+            iconPreview.addClass("fa-fw");
+        });
+    </script>
+}

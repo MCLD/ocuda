@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Ocuda.Ops.Models.Entities;
@@ -9,23 +9,21 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IFileService
     {
-        string GetUnusedThumbnailPath(string filename, string fileLibrarySlug, string sectionSlug);
-
-        Task<IEnumerable<FileThumbnail>> GetThumbnailsAsync(IEnumerable<int> fileIds);
+        Task<File> AddFileLibraryFileAsync(File file, IFormFile fileDatas);
 
         Task AddThumbnailAsync(int fileId, string thumbnailFile);
 
-        Task DeleteThumbnailAsync(int thumbnailId);
+        Task<FileLibrary> CreateLibraryAsync(Section section, FileLibrary library);
 
-        Task<File> AddFileLibraryFileAsync(File file, IFormFile fileDatas);
+        Task DeleteFileLibraryAsync(Section section, int fileLibraryId);
 
-        Task<FileLibrary> CreateLibraryAsync(FileLibrary library);
+        Task DeleteFileLibraryFileAsync(string section, string fileLibrarySlug, File file);
 
         Task DeleteFileTypesByLibrary(int fileLibraryId);
 
-        Task DeleteLibraryAsync(int sectionId, int fileLibraryId);
+        Task DeleteThumbnailAsync(int thumbnailId);
 
-        Task DeleteFileLibraryFileAsync(string section, string fileLibrarySlug, File file);
+        Task EditFileLibraryFileAsync(string sectionSlug, string fileLibrarySlug, File file);
 
         Task<FileLibrary> EditLibraryTypesAsync(FileLibrary library, ICollection<int> fileTypeIds);
 
@@ -39,14 +37,13 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<FileLibrary> GetBySectionIdSlugAsync(int sectionId, string slug);
 
+        Task<int> GetFileCountAsync(int fileLibraryId);
+
         Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId);
 
-        string GetFileLibraryFilePath(string sectionSlug, string fileLibrarySlug, File file);
+        Task<File> GetFileLibraryFileAsync(int fileId);
 
-        Task<string> GetThumbnailPathAsync(
-            int thumbnailId,
-            string fileLibrarySlug,
-            string sectionSlug);
+        string GetFileLibraryFilePath(string sectionSlug, string fileLibrarySlug, File file);
 
         Task<FileType> GetFileTypeByIdAsync(int id);
 
@@ -54,13 +51,22 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<ICollection<int>> GetLibraryFileTypeIdsAsync(int libraryId);
 
-        Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(FilesFilter filter);
-
-        Task<int> GetFileCountAsync(int fileLibraryId);
+        Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(
+            Section section,
+            FilesFilter filter);
 
         string GetPrivateFilePath(File file);
 
         string GetPublicFilePath(File file);
+
+        Task<string> GetThumbnailPathAsync(
+            int thumbnailId,
+            string fileLibrarySlug,
+            string sectionSlug);
+
+        Task<IEnumerable<FileThumbnail>> GetThumbnailsAsync(IEnumerable<int> fileIds);
+
+        string GetUnusedThumbnailPath(string filename, string fileLibrarySlug, string sectionSlug);
 
         Task<bool> HasReplaceRightsAsync(int fileLibraryId);
 
@@ -68,12 +74,12 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<File> ReplaceFileLibraryFileAsync(int fileId);
 
-        Task<File> GetFileLibraryFileAsync(int fileId);
+        Task UpdateLibrary(Section section, string fileLibrarySlug, FileLibrary library);
 
-        Task EditFileLibraryFileAsync(string sectionSlug, string fileLibrarySlug, File file);
-
-        Task UpdateLibrary(string sectionSlug, string fileLibrarySlug, FileLibrary library);
-
-        Task<string> VerifyAddFileAsync(int fileLibraryId, string extension, string filename);
+        Task<string> VerifyAddFileAsync(
+            Section section,
+            int fileLibraryId,
+            string extension,
+            string filename);
     }
 }
