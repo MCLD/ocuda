@@ -864,7 +864,7 @@ else
                 let sender = event.relatedTarget;
                 modal.querySelector("#ReplaceFileName").textContent = sender.dataset.name;
                 modal.querySelector("#ReplaceFileId").value = sender.dataset.id;
-                $(this).find("#ReplaceFileUpload").settAttribute("accept", sender.dataset.id.extension);
+                $(this).find("#ReplaceFileUpload").setAttribute("accept", sender.dataset.id.extension);
             });
         </script>
     }
