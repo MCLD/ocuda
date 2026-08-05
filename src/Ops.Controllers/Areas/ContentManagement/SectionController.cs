@@ -157,6 +157,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to add a file permission group: section {Section} - file library {FileLibrarySlug}",
+                    CurrentUsername,
+                    sectionSlug,
+                    fileLibrarySlug);
                 return RedirectToUnauthorized();
             }
 
@@ -193,6 +198,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to add a file to a file library: section {SectionSlug} - file library {FileLibraryId}",
+                    CurrentUsername,
+                    viewModel.SectionSlug,
+                    viewModel.FileLibraryId);
                 return RedirectToUnauthorized();
             }
 
@@ -280,6 +290,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to add a link to a link library: section {Section} - link library {LinkLibraryId}",
+                    CurrentUsername,
+                    viewModel.SectionSlug,
+                    viewModel.LinkLibraryId);
                 return RedirectToUnauthorized();
             }
 
@@ -323,6 +338,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to add a permission group: section {Section}",
+                    CurrentUsername,
+                    slug);
                 return RedirectToUnauthorized();
             }
 
@@ -350,6 +369,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to add a post: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -376,6 +399,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to add a post: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -463,6 +490,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to delete a thumbnail: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -553,6 +584,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to add a thumbnail: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -620,6 +655,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to add file type to a file library: section {SectionSlug} file library {FileLibrarySlug}",
+                    CurrentUsername,
+                    sectionSlug,
+                    fileLibrarySlug);
                 return RedirectToUnauthorized();
             }
 
@@ -662,6 +702,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to view available file types: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -688,6 +732,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         {
             if (string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to clear the sections from cache",
+                    CurrentUsername);
                 return RedirectToUnauthorized();
             }
 
@@ -709,6 +756,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to edit a file library: section {SectionSlug} file library {FileLibrarySlug}",
+                    CurrentUsername,
+                    sectionSlug,
+                    fileLibrarySlug);
                 return RedirectToUnauthorized();
             }
 
@@ -755,6 +807,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to delete a file from a file library: section {SectionSlug} file library {FileLibrarySlug}",
+                    CurrentUsername,
+                    sectionSlug,
+                    fileLibrarySlug);
                 return RedirectToUnauthorized();
             }
 
@@ -795,6 +852,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to delete a file library: section {SectionSlug} file library {FileLibrarySlug}",
+                    CurrentUsername,
+                    sectionSlug,
+                    fileLibrarySlug);
                 return RedirectToUnauthorized();
             }
 
@@ -847,6 +909,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried delete a link from a link library: section {SectionSlug}",
+                    CurrentUsername,
+                    model?.SectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -898,6 +964,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to delete a link library: section {SectionSlug} link library {LinkLibrarySlug}",
+                    CurrentUsername,
+                    sectionSlug,
+                    linkLibrarySlug);
                 return RedirectToUnauthorized();
             }
 
@@ -946,6 +1017,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to delete a post: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -981,6 +1056,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to edit a post: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -1021,6 +1100,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to edit a post: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -1073,19 +1156,26 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
 
-            return section == null
-                ? RedirectToUnauthorized()
-                : View(new FileLibraryManagementViewModel
+            if (section == null)
+            {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to access file library admin: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
+                RedirectToUnauthorized();
+            }
+
+            return View(new FileLibraryManagementViewModel
+            {
+                IsNew = true,
+                SectionName = section.Name,
+                SectionSlug = sectionSlug,
+                SortOrderOptions = FileLibrarySortOptions.Select(_ => new SelectListItem
                 {
-                    IsNew = true,
-                    SectionName = section.Name,
-                    SectionSlug = sectionSlug,
-                    SortOrderOptions = FileLibrarySortOptions.Select(_ => new SelectListItem
-                    {
-                        Value = _.Key.ToString(CultureInfo.InvariantCulture),
-                        Text = _.Value,
-                    }),
-                });
+                    Value = _.Key.ToString(CultureInfo.InvariantCulture),
+                    Text = _.Value,
+                }),
+            });
         }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
@@ -1098,6 +1188,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to access file library admin: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -1144,6 +1238,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried replace file permissions: section {SectionSlug} file library {FileLibrarySlug}",
+                    CurrentUsername,
+                    sectionSlug,
+                    fileLibrarySlug);
                 return RedirectToUnauthorized();
             }
 
@@ -1218,14 +1317,22 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var section = !string.IsNullOrEmpty(sectionSlug)
                 ? await GetSectionAsManagerAsync(sectionSlug)
                 : null;
-            return section == null
-                ? RedirectToUnauthorized()
-                : View(new LinkLibraryManagementViewModel
-                {
-                    IsNew = true,
-                    SectionName = section.Name,
-                    SectionSlug = sectionSlug,
-                });
+
+            if (section == null)
+            {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to admin link libraries: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
+                RedirectToUnauthorized();
+            }
+
+            return View(new LinkLibraryManagementViewModel
+            {
+                IsNew = true,
+                SectionName = section.Name,
+                SectionSlug = sectionSlug,
+            });
         }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
@@ -1238,6 +1345,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to admin link libraries: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -1269,6 +1380,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to manage thumbnails: section {SectionSlug} file library {FileLibrarySlug}",
+                    CurrentUsername,
+                    sectionSlug,
+                    fileLibrarySlug);
                 return RedirectToUnauthorized();
             }
 
@@ -1304,6 +1420,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to access permissions: section {SectionSlug}",
+                    CurrentUsername,
+                    slug);
                 return RedirectToUnauthorized();
             }
 
@@ -1346,6 +1466,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to remove permission file group: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -1384,6 +1508,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to remove a file library file type: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -1424,6 +1552,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to remove a permission group: section {SectionSlug}",
+                    CurrentUsername,
+                    slug);
                 return RedirectToUnauthorized();
             }
 
@@ -1468,6 +1600,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             if (!hasReplaceRights)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to replace a file: section {SectionSlug} - file library {FileLibrarySlug}",
+                    CurrentUsername,
+                    sectionSlug,
+                    fileLibrarySlug);
                 return RedirectToUnauthorized();
             }
 
@@ -1527,6 +1664,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to save changes to a file library: section {SectionSlug} - file library {FileLibrarySlug}.",
+                    CurrentUsername,
+                    sectionSlug,
+                    fileLibrarySlug);
                 return RedirectToUnauthorized();
             }
 
@@ -1607,6 +1749,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to save changes to a link library: section {SectionSlug} - link library {LinkLibrarySlug}",
+                    CurrentUsername,
+                    sectionSlug,
+                    linkLibrarySlug);
                 return RedirectToUnauthorized();
             }
 
@@ -1672,6 +1819,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 : null;
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to view section management: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
                 return RedirectToUnauthorized();
             }
 
@@ -1723,6 +1874,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var section = await GetSectionAsManagerAsync(model?.SectionSlug);
             if (section == null)
             {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to update a link library link: section {SectionSlug}",
+                    CurrentUsername,
+                    model?.SectionSlug);
                 return RedirectToUnauthorized();
             }
 
