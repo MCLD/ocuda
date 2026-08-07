@@ -96,7 +96,14 @@ namespace Ocuda.Ops.Web.JobScheduling
                 }
             }
 
-            await jobService.ScheduleJobsAsync(adminUser.Id);
+            try
+            {
+                await jobService.ScheduleJobsAsync(adminUser.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "Scheduling jobs failed: {ErrorMessage}", ex.Message);
+            }
 
             _logger.LogDebug(
                 "Scheduled tasks complete in {Elapsed} ms",

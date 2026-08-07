@@ -25,6 +25,15 @@ namespace Ocuda.Ops.Data.Ops
                 .SingleOrDefaultAsync();
         }
 
+        public async Task<Job> GetLastCreatedAsync(JobType jobType)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .OrderByDescending(_ => _.CreatedAt)
+                .Take(1)
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<IEnumerable<Job>> GetPendingAsync()
         {
             return await DbSet

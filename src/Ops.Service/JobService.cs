@@ -98,28 +98,52 @@ namespace Ocuda.Ops.Service
 
                     if (configuration.MinimumSecondsBetweenRuns.HasValue)
                     {
-                        var lastRun = await GetLastCompletedFinishedTime(configuration.Id);
+                        var nextRunEligible = System.DateTime.MaxValue;
 
-                        var nextRunEligible = lastRun
-                            .FinishedAt
-                            .Value
-                            .AddSeconds(configuration.MinimumSecondsBetweenRuns.Value);
+                        var lastRun = await GetLastCompletedFinishedTimeAsync(configuration.Id);
 
-                        if (dateTimeProvider.Now < nextRunEligible)
+                        if (lastRun != null)
                         {
-                            schedule = false;
-                            logger.LogDebug("Now ({Now}) < last run ({LastRun}) + minimum elapsed ({MinimumElapsed}) can NOT schedule",
-                                dateTimeProvider.Now,
-                                lastRun.StartedAt,
-                                configuration.MinimumSecondsBetweenRuns);
+                            nextRunEligible = lastRun
+                                .FinishedAt
+                                .Value
+                                .AddSeconds(configuration.MinimumSecondsBetweenRuns.Value);
                         }
                         else
                         {
-                            schedule = true;
-                            logger.LogDebug("Now ({Now}) is >= last run ({LastRun}) + minimum elapsed ({MinimumElapsed}) can schedule",
-                                dateTimeProvider.Now,
-                                lastRun.StartedAt,
-                                configuration.MinimumSecondsBetweenRuns);
+                            // no record with a finished timestamp means no jobs or open jobs
+                            var recent = await jobRepository.GetLastCreatedAsync(configuration.Id);
+                            if (recent == null)
+                            {
+                                nextRunEligible = dateTimeProvider.Now;
+                            }
+                            else
+                            {
+                                _logger.LogError(
+                                    "Can not schedule: job type {JobType} has a start time of {StartTime} with no finish time.",
+                                    recent.JobType,
+                                    recent.StartedAt);
+                            }
+                        }
+
+                        if (nextRunEligible < System.DateTime.MaxValue)
+                        {
+                            if (dateTimeProvider.Now < nextRunEligible)
+                            {
+                                schedule = false;
+                                logger.LogDebug("Now ({Now}) < last run ({LastRun}) + minimum elapsed ({MinimumElapsed}) can NOT schedule",
+                                    dateTimeProvider.Now,
+                                    lastRun?.StartedAt.ToString() ?? "never",
+                                    configuration.MinimumSecondsBetweenRuns);
+                            }
+                            else
+                            {
+                                schedule = true;
+                                logger.LogDebug("Now ({Now}) is >= last run ({LastRun}) + minimum elapsed ({MinimumElapsed}) can schedule",
+                                    dateTimeProvider.Now,
+                                    lastRun?.StartedAt.ToString() ?? "never",
+                                    configuration.MinimumSecondsBetweenRuns);
+                            }
                         }
                     }
 
@@ -168,7 +192,7 @@ namespace Ocuda.Ops.Service
             ];
         }
 
-        private async Task<Job> GetLastCompletedFinishedTime(JobType jobType)
+        private async Task<Job> GetLastCompletedFinishedTimeAsync(JobType jobType)
         {
             return await jobRepository.GetLastCompletedFinishedTime(jobType);
         }
