@@ -1,25 +1,30 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Extensions;
 
 namespace Ocuda.Ops.Web.JobScheduling
 {
     internal class JobScopedProcessingService(ILogger<JobScopedProcessingService> logger,
+        IDateTimeProvider dateTimeProvider,
         IDigitalDisplayCleanupService digitalDisplayCleanupService,
         IDigitalDisplaySyncService digitalDisplaySyncService,
         IEmediaReportingService emediaReportingService,
         IEmployeeCardReportingService employeeCardReportingService,
+        IJobService jobService,
         IRenewCardReportingService renewCardReportingService,
         IScheduleNotificationService scheduleNotificationService,
+        IUserManagementService userManagementService,
         IVolunteerNotificationService volunteerNotificationService)
         : BaseScopedBackgroundService<JobScopedProcessingService>(logger)
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
-            "CA1031:Do not catch general exception types",
-            Justification = "Catch all exceptions and log them as this runs headless")]
         public override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             StartProcessing();
@@ -66,8 +71,111 @@ namespace Ocuda.Ops.Web.JobScheduling
                 }
             }
 
-            _logger.LogDebug("Scheduled tasks complete in {Elapsed} ms",
+            var adminUser = await userManagementService.EnsureSysadminUserAsync();
+
+            var pendingJobs = await jobService.GetPendingJobsAsync();
+            if (pendingJobs.Any())
+            {
+                foreach (var job in pendingJobs)
+                {
+                    try
+                    {
+                        job.Progress = new Progress<Job>();
+                        job.UserId = adminUser.Id;
+
+                        await RunJobAsync(job);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(
+                            ex,
+                            "Critical error in job {JobId}: {ErrorMessage}",
+                            job.Id,
+                            ex.Message);
+                    }
+                }
+            }
+
+            await jobService.ScheduleJobsAsync(adminUser.Id);
+
+            _logger.LogDebug(
+                "Scheduled tasks complete in {Elapsed} ms",
                 StopProcessing().ElapsedMilliseconds);
+        }
+
+        private async Task RunJobAsync(Job job)
+        {
+            var jobDefinition = jobService.GetDefinition(job.JobType)
+                ?? throw new OcudaException($"Job {job.Id} requested job type {job.JobType} which is is not defined.");
+
+            job.PercentComplete = 0;
+            job.StartedAt = dateTimeProvider.Now;
+            job.Status = "Starting job.";
+
+            try
+            {
+                // try/catch wrap this, if it fails we will never know the job started
+                // if we can't start a job then it's a critical error
+                await jobService.UpdateJobAsync(job);
+            }
+            catch (Exception ex)
+            {
+                throw new OcudaException(
+                    $"Aborting running {job.Id} due to inability to mark it as started: {ex.Message}",
+                    ex);
+            }
+
+            try
+            {
+                await jobDefinition.RunAsync(job, StatusUpdateAsync);
+
+                job.FinishedAt = dateTimeProvider.Now;
+                job.WasSuccessful = true;
+
+                await jobService.UpdateJobAsync(job);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Critical error in job {JobId}: {ErrorMessage}",
+                    job.Id,
+                    ex.Message);
+                job.Status = $"Critical error: {ex.Message}";
+            }
+
+            if (!job.WasSuccessful)
+            {
+                try
+                {
+                    job.FinishedAt = dateTimeProvider.Now;
+                    job.WasSuccessful = false;
+
+                    await StatusUpdateAsync(job);
+                    await jobService.UpdateJobAsync(job);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogCritical(
+                        ex,
+                        "Unable to mark job {JobId} as errored, status will remain incomplete: {ErrorMessage}",
+                        job.Id,
+                        ex.Message);
+                }
+            }
+        }
+
+        private async Task StatusUpdateAsync(Job job)
+        {
+            job.Progress?.Report(job);
+            await jobService.AddJobLogAsync(new JobLog
+            {
+                CreatedAt = dateTimeProvider.Now,
+                CreatedBy = job.UserId,
+                JobId = job.Id,
+                PercentComplete = job.PercentComplete,
+                Status = job.Status.TruncateTo(255),
+            });
         }
     }
 }

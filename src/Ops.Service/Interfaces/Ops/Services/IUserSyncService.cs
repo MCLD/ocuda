@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
@@ -17,10 +18,12 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<CollectionWithCount<UserSyncHistory>> GetPaginatedHeadersAsync(BaseFilter filter);
 
-        Task<StatusReport> SyncDirectoryAsync(bool applyChanges);
+        Task JobSyncDirectoryAsync(Job job, Func<Job, Task> statusAsync);
 
-        Task SyncLocationsAsync();
+        Task<StatusReport> SyncDirectoryAsync(int userId, bool applyChanges);
 
-        Task UpdateLocationMappingAsync(int userSyncLocationId, int? mapToLocationId);
+        Task SyncLocationsAsync(int userId);
+
+        Task UpdateLocationMappingAsync(int userId, int userSyncLocationId, int? mapToLocationId);
     }
 }
