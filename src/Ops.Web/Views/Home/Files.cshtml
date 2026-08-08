@@ -175,7 +175,7 @@
                             @if (file.Thumbnails?.Count > 1)
                             {
                                 <div class="carousel carousel-dark slide w-100 h-100"
-                                     id="carousel-@file.FullName">
+                                     id="carousel-@file.HtmlId">
                                     <div class="carousel-indicators">
                                         @foreach (var thumbItem in FileLibraryViewModel.GetThumbnails(file))
                                         {
@@ -185,13 +185,13 @@
                                                         aria-label="Thumbnail @(thumbItem.Key + 1) of @file.FullName"
                                                         class="active"
                                                         data-bs-slide-to="@thumbItem.Key"
-                                                        data-bs-target="#carousel-@file.FullName"
+                                                        data-bs-target="#carousel-@file.HtmlId"
                                                         type="button"></button>
                                             }
                                             else
                                             {
                                                 <button data-bs-slide-to="@thumbItem.Key"
-                                                        data-bs-target="#carousel-@file.FullName"
+                                                        data-bs-target="#carousel-@file.HtmlId"
                                                         type="button"></button>
                                             }
                                         }
@@ -207,7 +207,7 @@
                                         }
                                     </div>
                                     <button class="carousel-control-prev"
-                                            data-bs-target="#carousel-@file.FullName"
+                                            data-bs-target="#carousel-@file.HtmlId"
                                             data-bs-slide="prev"
                                             type="button">
                                         <span aria-hidden="true"
@@ -215,7 +215,7 @@
                                         <span class="visually-hidden">Previous</span>
                                     </button>
                                     <button class="carousel-control-next"
-                                            data-bs-target="#carousel-@file.FullName"
+                                            data-bs-target="#carousel-@file.HtmlId"
                                             data-bs-slide="next"
                                             type="button">
                                         <span aria-hidden="true"
@@ -864,7 +864,7 @@ else
                 let sender = event.relatedTarget;
                 modal.querySelector("#ReplaceFileName").textContent = sender.dataset.name;
                 modal.querySelector("#ReplaceFileId").value = sender.dataset.id;
-                $(this).find("#ReplaceFileUpload").setAttribute("accept", sender.dataset.id.extension);
+                modal.querySelector("#ReplaceFileUpload").setAttribute("accept", sender.dataset.id.extension);
             });
         </script>
     }
