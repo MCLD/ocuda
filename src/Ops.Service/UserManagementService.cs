@@ -15,41 +15,17 @@ using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Service
 {
-    public class UserManagementService : BaseService<UserManagementService>, IUserManagementService
+    public class UserManagementService(ILogger<UserManagementService> logger,
+        IHttpContextAccessor httpContextAccessor,
+        IOcudaCache cache,
+        IPathResolverService pathResolver,
+        IUserRepository userRepository,
+        IVolunteerFormService volunteerFormService,
+        IImageService imageService)
+        : BaseService<UserManagementService>(logger, httpContextAccessor), IUserManagementService
     {
         public static readonly string ProfilePicturePath = "profilepicture";
 
-        private readonly IOcudaCache _cache;
-        private readonly IImageService _imageService;
-        private readonly IPathResolverService _pathResolver;
-        private readonly IUserRepository _userRepository;
-        private readonly IVolunteerFormService _volunteerFormService;
-
-        public UserManagementService(ILogger<UserManagementService> logger,
-            IHttpContextAccessor httpContextAccessor,
-            IOcudaCache cache,
-            IPathResolverService pathResolver,
-            IUserRepository userRepository,
-            IVolunteerFormService volunteerFormService,
-            IImageService imageService)
-            : base(logger, httpContextAccessor)
-        {
-            ArgumentNullException.ThrowIfNull(cache);
-            ArgumentNullException.ThrowIfNull(pathResolver);
-            ArgumentNullException.ThrowIfNull(userRepository);
-            ArgumentNullException.ThrowIfNull(volunteerFormService);
-            ArgumentNullException.ThrowIfNull(imageService);
-
-            _cache = cache;
-            _pathResolver = pathResolver;
-            _userRepository = userRepository;
-            _volunteerFormService = volunteerFormService;
-            _imageService = imageService;
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
-            "CA1308:Normalize strings to uppercase",
-            Justification = "Normalize usernames and emails to lowercase.")]
         public async Task<User> AddUser(User user)
         {
             ArgumentNullException.ThrowIfNull(user);
@@ -58,13 +34,13 @@ namespace Ocuda.Ops.Service
             user.Email = user.Email?.Trim().ToLowerInvariant();
             user.CreatedAt = DateTime.Now;
 
-            await _userRepository.AddAsync(user);
-            await _userRepository.SaveAsync();
+            await userRepository.AddAsync(user);
+            await userRepository.SaveAsync();
 
-            User createdUser = await _userRepository.FindByUsernameAsync(user.Username);
+            User createdUser = await userRepository.FindByUsernameAsync(user.Username);
             createdUser.CreatedBy = createdUser.Id;
-            _userRepository.Update(user);
-            await _userRepository.SaveAsync();
+            userRepository.Update(user);
+            await userRepository.SaveAsync();
             return createdUser;
         }
 
@@ -72,22 +48,23 @@ namespace Ocuda.Ops.Service
         {
             ArgumentNullException.ThrowIfNull(user);
 
-            User currentUser = await _userRepository.FindAsync(user.Id);
+            User currentUser = await userRepository.FindAsync(user.Id);
             currentUser.Nickname = user.Nickname;
             currentUser.UpdatedAt = DateTime.Now;
             currentUser.UpdatedBy = GetCurrentUserId();
 
-            _userRepository.Update(currentUser);
-            await _userRepository.SaveAsync();
+            userRepository.Update(currentUser);
+            await userRepository.SaveAsync();
             return currentUser;
         }
 
         /// <summary>
         /// Ensure the sysadmin user exists.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task<User> EnsureSysadminUserAsync()
         {
-            User sysadminUser = await _userRepository.GetSystemAdministratorAsync();
+            User sysadminUser = await userRepository.GetSystemAdministratorAsync();
             if (sysadminUser == null)
             {
                 sysadminUser = new User
@@ -95,17 +72,19 @@ namespace Ocuda.Ops.Service
                     Username = "sysadmin",
                     Name = "System",
                     CreatedAt = DateTime.Now,
-                    IsSysadmin = true
+                    IsSysadmin = true,
                 };
-                await _userRepository.AddAsync(sysadminUser);
-                await _userRepository.SaveAsync();
+                await userRepository.AddAsync(sysadminUser);
+                await userRepository.SaveAsync();
             }
+
             if (!sysadminUser.ExcludeFromRoster)
             {
                 sysadminUser.ExcludeFromRoster = true;
-                _userRepository.Update(sysadminUser);
-                await _userRepository.SaveAsync();
+                userRepository.Update(sysadminUser);
+                await userRepository.SaveAsync();
             }
+
             return sysadminUser;
         }
 
@@ -113,9 +92,9 @@ namespace Ocuda.Ops.Service
         {
             ArgumentNullException.ThrowIfNull(user);
 
-            var systemAdminUser = await _userRepository.GetSystemAdministratorAsync();
+            var systemAdminUser = await userRepository.GetSystemAdministratorAsync();
 
-            User dbUser = await _userRepository.FindAsync(user.Id);
+            User dbUser = await userRepository.FindAsync(user.Id);
             dbUser.Department = user.Department;
             dbUser.LastRosterUpdate = user.LastRosterUpdate;
             dbUser.LastSeen = DateTime.Now;
@@ -129,44 +108,43 @@ namespace Ocuda.Ops.Service
             dbUser.UpdatedAt = DateTime.Now;
             dbUser.UpdatedBy = systemAdminUser.Id;
 
-            _userRepository.Update(dbUser);
-            await _userRepository.SaveAsync();
+            userRepository.Update(dbUser);
+            await userRepository.SaveAsync();
         }
 
         /// <summary>
         /// Perform necessary housekeeping and then mark a user as deleted/disabled.
         /// </summary>
-        /// <param name="username">The username of the user</param>
-        /// <param name="asOf">Informational date and time when they were marekd disabled</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
-            "CA1031:Do not catch general exception types",
-            Justification = "User delete housekeeping shouldn't prevent the user deletion")]
-        public async Task MarkUserDisabledAsync(string username, DateTime asOf)
+        /// <param name="username">The username of the user.</param>
+        /// <param name="asOf">Informational date and time when they were marekd disabled.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public async Task MarkUserDisabledAsync(int userId, string username, DateTime asOf)
         {
             try
             {
-                var user = await _userRepository.FindByUsernameAsync(username);
-                var supervisorUser = await _userRepository.GetSupervisorAsync(user.Id);
+                var user = await userRepository.FindByUsernameAsync(username);
+                var supervisorUser = await userRepository.GetSupervisorAsync(user.Id);
                 while (supervisorUser?.IsDeleted == true)
                 {
                     if (!supervisorUser.SupervisorId.HasValue)
                     {
                         throw new OcudaException($"Could find no active users above user {username}");
                     }
-                    supervisorUser = await _userRepository.GetSupervisorAsync(supervisorUser.Id);
+
+                    supervisorUser = await userRepository.GetSupervisorAsync(supervisorUser.Id);
                 }
 
                 // remap any volunteer assignments
-                var volunteerMappings = await _volunteerFormService.GetUserMappingsAsync(user.Id);
+                var volunteerMappings = await volunteerFormService.GetUserMappingsAsync(user.Id);
                 foreach (var mapping in volunteerMappings)
                 {
                     try
                     {
-                        var form = await _volunteerFormService
+                        var form = await volunteerFormService
                             .GetFormByIdAsync(mapping.VolunteerFormId);
                         if (supervisorUser != null)
                         {
-                            await _volunteerFormService.AddFormUserMapping(mapping.LocationId,
+                            await volunteerFormService.AddFormUserMapping(mapping.LocationId,
                                 form.VolunteerFormType,
                                 supervisorUser.Id);
                         }
@@ -176,7 +154,8 @@ namespace Ocuda.Ops.Service
                                 form.VolunteerFormType,
                                 username);
                         }
-                        await _volunteerFormService.RemoveFormUserMapping(mapping.LocationId,
+
+                        await volunteerFormService.RemoveFormUserMapping(mapping.LocationId,
                             user.Id,
                             form.VolunteerFormType);
                         _logger.LogInformation("Reassigned volunteer form type {FormType} to go to supervisor {SupervisorUsername} of disabled user {Username}",
@@ -203,12 +182,12 @@ namespace Ocuda.Ops.Service
                     ex.Message);
             }
 
-            await _userRepository.MarkUserDeletedAsync(username, GetCurrentUserId(), asOf);
+            await userRepository.MarkUserDeletedAsync(username, userId, asOf);
         }
 
         public async Task RemoveProfilePictureAsync(int userId)
         {
-            var user = await _userRepository.FindAsync(userId)
+            var user = await userRepository.FindAsync(userId)
                 ?? throw new OcudaException($"Cannot find user ID {userId}");
 
             var fullPath = GetProfilePictureFilePath(user.PictureFilename);
@@ -224,24 +203,24 @@ namespace Ocuda.Ops.Service
             user.PictureFilename = null;
             user.PictureUpdatedBy = GetCurrentUserId();
 
-            _userRepository.Update(user);
-            await _userRepository.SaveAsync();
+            userRepository.Update(user);
+            await userRepository.SaveAsync();
 
             var cacheKey = string.Format(CultureInfo.InvariantCulture,
                 Cache.OpsUserProfilePicture,
                 user.Username);
 
-            await _cache.RemoveAsync(cacheKey);
+            await cache.RemoveAsync(cacheKey);
         }
 
         public async Task UnsetManualLocationAsync(int userId)
         {
-            var user = await _userRepository.FindAsync(userId)
+            var user = await userRepository.FindAsync(userId)
                 ?? throw new OcudaException($"Cannot find user id {userId}");
 
             user.AssociatedLocationManuallySet = false;
-            _userRepository.Update(user);
-            await _userRepository.SaveAsync();
+            userRepository.Update(user);
+            await userRepository.SaveAsync();
         }
 
         public async Task UpdateLocationAsync(int userId, int locationId)
@@ -251,21 +230,21 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException("Permission denied.");
             }
 
-            var user = await _userRepository.FindAsync(userId)
+            var user = await userRepository.FindAsync(userId)
                 ?? throw new OcudaException($"Cannot find user id {userId}");
             user.AssociatedLocation = locationId;
             user.AssociatedLocationManuallySet = true;
-            _userRepository.Update(user);
-            await _userRepository.SaveAsync();
+            userRepository.Update(user);
+            await userRepository.SaveAsync();
         }
 
         public async Task<User> UpdateRosterUserAsync(int rosterUserId, User user)
         {
             ArgumentNullException.ThrowIfNull(user);
 
-            var systemAdminUser = await _userRepository.GetSystemAdministratorAsync();
+            var systemAdminUser = await userRepository.GetSystemAdministratorAsync();
 
-            User rosterUser = await _userRepository.FindAsync(rosterUserId);
+            User rosterUser = await userRepository.FindAsync(rosterUserId);
             rosterUser.Department = user.Department;
             rosterUser.Email = user.Email;
             rosterUser.Mobile = user.Mobile;
@@ -276,8 +255,8 @@ namespace Ocuda.Ops.Service
             rosterUser.UpdatedBy = systemAdminUser.Id;
             rosterUser.Username = user.Username;
 
-            _userRepository.Update(rosterUser);
-            await _userRepository.SaveAsync();
+            userRepository.Update(rosterUser);
+            await userRepository.SaveAsync();
 
             return rosterUser;
         }
@@ -291,7 +270,7 @@ namespace Ocuda.Ops.Service
 
             try
             {
-                (extension, profilePicture) = _imageService.ConvertFromBase64(profilePictureBase64, true);
+                (extension, profilePicture) = imageService.ConvertFromBase64(profilePictureBase64, true);
             }
             catch (OcudaException oex)
             {
@@ -324,19 +303,19 @@ namespace Ocuda.Ops.Service
             user.PictureFilename = filename;
             user.PictureUpdatedBy = GetCurrentUserId();
 
-            _userRepository.Update(user);
-            await _userRepository.SaveAsync();
+            userRepository.Update(user);
+            await userRepository.SaveAsync();
 
             var cacheKey = string.Format(CultureInfo.InvariantCulture,
                 Cache.OpsUserProfilePicture,
                 user.Username);
 
-            await _cache.RemoveAsync(cacheKey);
+            await cache.RemoveAsync(cacheKey);
         }
 
         private string GetProfilePictureFilePath(string filename)
         {
-            return _pathResolver.GetPrivateContentFilePath(filename, ProfilePicturePath);
+            return pathResolver.GetPrivateContentFilePath(filename, ProfilePicturePath);
         }
     }
 }

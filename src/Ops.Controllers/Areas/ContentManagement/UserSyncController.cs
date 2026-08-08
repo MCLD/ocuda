@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.UserSync;
@@ -14,30 +13,22 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 {
     [Area("ContentManagement")]
     [Route("[area]/[controller]")]
-    public class UserSyncController : BaseController<UserSyncController>
+    public class UserSyncController(
+        Controller<UserSyncController> context,
+        ILocationService locationService,
+        IPermissionGroupService permissionGroupService,
+        IUserSyncService userSyncService)
+        : BaseController<UserSyncController>(context)
     {
-        private readonly ILocationService _locationService;
-        private readonly IPermissionGroupService _permissionGroupService;
-        private readonly IUserSyncService _userSyncService;
-
-        public UserSyncController(Controller<UserSyncController> context,
-            ILocationService locationService,
-            IPermissionGroupService permissionGroupService,
-            IUserSyncService userSyncService) : base(context)
+        public static string Area
         {
-            _locationService = locationService
-                ?? throw new ArgumentNullException(nameof(locationService));
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
-            _userSyncService = userSyncService
-                ?? throw new ArgumentNullException(nameof(userSyncService));
+            get { return "ContentManagement"; }
         }
 
-        public static string Area
-        { get { return "ContentManagement"; } }
-
         public static string Name
-        { get { return "UserSync"; } }
+        {
+            get { return "UserSync"; }
+        }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> AdjustMapping(LocationsViewModel viewModel)
@@ -55,39 +46,35 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             int mappingId = viewModel.IsClear ? viewModel.ClearId : viewModel.UpdateId;
             int? locationId = viewModel.IsClear ? null : viewModel.SelectedLocation;
 
-            await _userSyncService.UpdateLocationMappingAsync(mappingId, locationId);
+            await userSyncService.UpdateLocationMappingAsync(CurrentUserId, mappingId, locationId);
             return RedirectToAction(nameof(UpdateLocations));
         }
 
         [HttpGet("[action]")]
         public async Task<IActionResult> CheckLocations()
         {
-            if (!await HasUserSyncRights())
-            {
-                return RedirectToUnauthorized();
-            }
-            return View("ChangeReport", new ChangeReportViewModel
-            {
-                AllowUpdateLocations = true,
-                Status = await _userSyncService.CheckSyncLocationsAsync(),
-                Title = "Check Locations"
-            });
+            return !await HasUserSyncRights()
+                ? RedirectToUnauthorized()
+                : View("ChangeReport", new ChangeReportViewModel
+                {
+                    AllowUpdateLocations = true,
+                    Status = await userSyncService.CheckSyncLocationsAsync(),
+                    Title = "Check Locations",
+                });
         }
 
         [HttpGet("[action]")]
         public async Task<IActionResult> CheckSync()
         {
-            if (!await HasUserSyncRights())
-            {
-                return RedirectToUnauthorized();
-            }
-            return View("ChangeReport", new ChangeReportViewModel
-            {
-                AllowPerformSync = true,
-                IsApplied = false,
-                Status = await _userSyncService.SyncDirectoryAsync(false),
-                Title = "Check Sync"
-            });
+            return !await HasUserSyncRights()
+                ? RedirectToUnauthorized()
+                : View("ChangeReport", new ChangeReportViewModel
+                {
+                    AllowPerformSync = true,
+                    IsApplied = false,
+                    Status = await userSyncService.SyncDirectoryAsync(CurrentUserId, false),
+                    Title = "Check Sync",
+                });
         }
 
         [HttpGet("[action]/{id}")]
@@ -98,14 +85,14 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToUnauthorized();
             }
 
-            var detail = await _userSyncService.GetImportDetailAsync(id);
+            var detail = await userSyncService.GetImportDetailAsync(id);
 
             return View("ChangeReport", new ChangeReportViewModel
             {
                 IsApplied = true,
                 Status = detail,
                 Subtitle = detail.AsOf.ToString(System.Globalization.CultureInfo.CurrentCulture),
-                Title = "Historical sync"
+                Title = "Historical sync",
             });
         }
 
@@ -123,22 +110,17 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             var filter = new BaseFilter(currentPage);
 
-            var rosterHeaders = await _userSyncService.GetPaginatedHeadersAsync(filter);
+            var rosterHeaders = await userSyncService.GetPaginatedHeadersAsync(filter);
 
             var viewModel = new IndexViewModel
             {
                 CurrentPage = currentPage,
                 ItemCount = rosterHeaders.Count,
                 ItemsPerPage = filter.Take.Value,
-                UserSyncHistories = rosterHeaders.Data
+                UserSyncHistories = rosterHeaders.Data,
             };
 
-            if (viewModel.PastMaxPage)
-            {
-                return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
-            }
-
-            return View(viewModel);
+            return viewModel.PastMaxPage ? RedirectToRoute(new { page = viewModel.LastPage ?? 1 }) : View(viewModel);
         }
 
         [HttpPost("[action]")]
@@ -149,7 +131,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToUnauthorized();
             }
 
-            await _userSyncService.SyncDirectoryAsync(true);
+            await userSyncService.SyncDirectoryAsync(CurrentUserId, true);
             return RedirectToAction(nameof(Index));
         }
 
@@ -161,30 +143,27 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToUnauthorized();
             }
 
-            await _userSyncService.SyncLocationsAsync();
+            await userSyncService.SyncLocationsAsync(CurrentUserId);
             return RedirectToAction("UpdateLocations");
         }
 
         [HttpGet("[action]")]
         public async Task<IActionResult> UpdateLocations()
         {
-            if (!await HasUserSyncRights())
-            {
-                return RedirectToUnauthorized();
-            }
-
-            return View("Locations", new LocationsViewModel
-            {
-                Locations = await _locationService.GetAllLocationsIdNameAsync(),
-                Mapping = await _userSyncService.GetLocationsAsync(),
-                Summary = "Locations"
-            });
+            return !await HasUserSyncRights()
+                ? RedirectToUnauthorized()
+                : View("Locations", new LocationsViewModel
+                {
+                    Locations = await locationService.GetAllLocationsIdNameAsync(),
+                    Mapping = await userSyncService.GetLocationsAsync(),
+                    Summary = "Locations",
+                });
         }
 
         private async Task<bool> HasUserSyncRights()
         {
             return !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
-                || await HasAppPermissionAsync(_permissionGroupService,
+                || await HasAppPermissionAsync(permissionGroupService,
                     ApplicationPermission.UserSync);
         }
     }

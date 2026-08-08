@@ -81,6 +81,12 @@ namespace Ocuda.Ops.Data
 
         public DbSet<IncidentType> IncidentTypes { get; set; }
 
+        public DbSet<JobConfiguration> JobConfigurations { get; set; }
+
+        public DbSet<JobLog> JobLogs { get; set; }
+
+        public DbSet<Job> Jobs { get; set; }
+
         public DbSet<LinkLibrary> LinkLibraries { get; set; }
 
         public DbSet<Link> Links { get; set; }

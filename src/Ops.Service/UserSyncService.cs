@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -21,63 +21,45 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
 {
-    public class UserSyncService : BaseService<UserSyncService>, IUserSyncService
+    public class UserSyncService(ILogger<UserSyncService> logger,
+        IHttpContextAccessor httpContextAccessor,
+        IConfiguration config,
+        IDateTimeProvider dateTimeProvider,
+        ILdapService ldapService,
+        ILocationService locationService,
+        ISiteSettingService siteSettingService,
+        IUserManagementService userManagementService,
+        IUserRepository userRepository,
+        IUserSyncHistoryRepository userSyncHistoryRepository,
+        IUserSyncLocationRepository userSyncLocationRepository)
+        : BaseService<UserSyncService>(logger, httpContextAccessor),
+        IUserSyncService
     {
-        private readonly IConfiguration _config;
-        private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly ILdapService _ldapService;
-        private readonly ILocationService _locationService;
-        private readonly ISiteSettingService _siteSettingService;
-        private readonly IUserManagementService _userManagementService;
-        private readonly IUserRepository _userRepository;
-        private readonly IUserSyncHistoryRepository _userSyncHistoryRepository;
-        private readonly IUserSyncLocationRepository _userSyncLocationRepository;
-
-        public UserSyncService(ILogger<UserSyncService> logger,
-            IHttpContextAccessor httpContextAccessor,
-            IConfiguration config,
-            IDateTimeProvider dateTimeProvider,
-            ILdapService ldapService,
-            ILocationService locationService,
-            ISiteSettingService siteSettingService,
-            IUserManagementService userManagementService,
-            IUserRepository userRepository,
-            IUserSyncHistoryRepository userSyncHistoryRepository,
-            IUserSyncLocationRepository userSyncLocationRepository)
-            : base(logger, httpContextAccessor)
+        private static async Task SendUpdateAsync(
+            Job job,
+            Func<Job, Task> statusAsync,
+            int percentComplete,
+            string status)
         {
-            ArgumentNullException.ThrowIfNull(config);
-            ArgumentNullException.ThrowIfNull(dateTimeProvider);
-            ArgumentNullException.ThrowIfNull(ldapService);
-            ArgumentNullException.ThrowIfNull(locationService);
-            ArgumentNullException.ThrowIfNull(siteSettingService);
-            ArgumentNullException.ThrowIfNull(userManagementService);
-            ArgumentNullException.ThrowIfNull(userRepository);
-            ArgumentNullException.ThrowIfNull(userSyncHistoryRepository);
-            ArgumentNullException.ThrowIfNull(userSyncLocationRepository);
-
-            _config = config;
-            _dateTimeProvider = dateTimeProvider;
-            _ldapService = ldapService;
-            _locationService = locationService;
-            _siteSettingService = siteSettingService;
-            _userManagementService = userManagementService;
-            _userRepository = userRepository;
-            _userSyncHistoryRepository = userSyncHistoryRepository;
-            _userSyncLocationRepository = userSyncLocationRepository;
+            if (job != null && statusAsync != null)
+            {
+                job.PercentComplete = percentComplete;
+                job.Status = status;
+                await statusAsync(job);
+            }
         }
 
         public async Task<StatusReport> CheckSyncLocationsAsync()
         {
             var report = new StatusReport
             {
-                AsOf = _dateTimeProvider.Now
+                AsOf = dateTimeProvider.Now,
             };
 
-            var siteLocations = await _locationService.GetAllLocationsAsync();
+            var siteLocations = await locationService.GetAllLocationsAsync();
 
-            var ldapLocations = _ldapService.GetAllLocations();
-            var dbLocations = await _userSyncLocationRepository.GetAllAsync();
+            var ldapLocations = ldapService.GetAllLocations();
+            var dbLocations = await userSyncLocationRepository.GetAllAsync();
 
             foreach (var location in ldapLocations)
             {
@@ -111,6 +93,7 @@ namespace Ocuda.Ops.Service
                     }
                 }
             }
+
             foreach (var dbNotLdapLocation in dbLocations
                 .Where(_ => !ldapLocations.Contains(_.Name)))
             {
@@ -118,12 +101,13 @@ namespace Ocuda.Ops.Service
                     "In database, not in LDAP/Active Directory",
                     LogLevel.Warning);
             }
+
             return report;
         }
 
         public async Task<StatusReport> GetImportDetailAsync(int id)
         {
-            var detail = await _userSyncHistoryRepository.FindAsync(id)
+            var detail = await userSyncHistoryRepository.FindAsync(id)
                 ?? throw new OcudaException($"Unable to find import id {id}");
 
             try
@@ -138,41 +122,86 @@ namespace Ocuda.Ops.Service
 
         public async Task<ICollection<UserSyncLocation>> GetLocationsAsync()
         {
-            return await _userSyncLocationRepository.GetAllAsync();
+            return await userSyncLocationRepository.GetAllAsync();
         }
 
         public async Task<CollectionWithCount<UserSyncHistory>>
             GetPaginatedHeadersAsync(BaseFilter filter)
         {
-            return await _userSyncHistoryRepository.GetPaginatedAsync(filter);
+            return await userSyncHistoryRepository.GetPaginatedAsync(filter);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
-            "CA1308:Normalize strings to uppercase",
-            Justification = "Normalize usernames to lower case.")]
-        public async Task<StatusReport> SyncDirectoryAsync(bool applyChanges)
+        public async Task JobSyncDirectoryAsync(Job job, Func<Job, Task> statusAsync)
+        {
+            await SyncDirectoryAsync(job.UserId, true, job, statusAsync);
+        }
+
+        public async Task<StatusReport> SyncDirectoryAsync(int userId, bool applyChanges)
+        {
+            return await SyncDirectoryAsync(userId, applyChanges, null, null);
+        }
+
+        public async Task SyncLocationsAsync(int userId)
+        {
+            var now = dateTimeProvider.Now;
+            var ldapLocations = ldapService.GetAllLocations();
+            var dbLocations = await userSyncLocationRepository.GetAllAsync();
+
+            foreach (var missingLocation in ldapLocations.Except(dbLocations.Select(_ => _.Name)))
+            {
+                await userSyncLocationRepository.AddAsync(new UserSyncLocation
+                {
+                    CreatedAt = now,
+                    CreatedBy = userId,
+                    Name = missingLocation,
+                });
+            }
+
+            await userSyncHistoryRepository.SaveAsync();
+        }
+
+        public async Task UpdateLocationMappingAsync(
+            int userId,
+            int userSyncLocationId,
+            int? mapToLocationId)
+        {
+            var locationMapping = await userSyncLocationRepository.FindAsync(userSyncLocationId);
+            locationMapping.MapToLocationId = mapToLocationId;
+            locationMapping.UpdatedAt = dateTimeProvider.Now;
+            locationMapping.UpdatedBy = userId;
+            userSyncLocationRepository.Update(locationMapping);
+            await userSyncLocationRepository.SaveAsync();
+        }
+
+        private async Task<StatusReport> SyncDirectoryAsync(
+            int userId,
+            bool applyChanges,
+            Job job,
+            Func<Job, Task> statusAsync)
         {
             var result = new StatusReport
             {
-                AsOf = _dateTimeProvider.Now
+                AsOf = dateTimeProvider.Now,
             };
 
             var timer = Stopwatch.StartNew();
-            var ldapUsers = _ldapService.GetAllUsers();
+            var ldapUsers = ldapService.GetAllUsers();
 
             int timerCount = 1;
             long lastStop = timer.ElapsedMilliseconds;
-            result.StatusCounts.Add($"Timer {timerCount++}: completed LDAP query (ms)",
+            result.StatusCounts.Add(
+                $"Timer {timerCount++}: completed LDAP query (ms)",
                 (int)lastStop);
 
-            var opsUsers = await _userRepository.GetAllAsync();
-            result.StatusCounts.Add($"Timer {timerCount++}: Initial all-staff query (ms)",
+            var opsUsers = await userRepository.GetAllAsync();
+            result.StatusCounts.Add(
+                $"Timer {timerCount++}: Initial all-staff query (ms)",
                 (int)(timer.ElapsedMilliseconds - lastStop));
             lastStop = timer.ElapsedMilliseconds;
 
-            var systemUser = await _userRepository.GetSystemAdministratorAsync();
+            var systemUser = await userRepository.GetSystemAdministratorAsync();
 
-            var locations = await _userSyncLocationRepository.GetAllAsync();
+            var locations = await userSyncLocationRepository.GetAllAsync();
             var locationsToAdd = new List<string>();
 
             var updatedUsernames = new List<string>();
@@ -193,11 +222,14 @@ namespace Ocuda.Ops.Service
             }
 
             DN dnDisabledUsersGroup = null;
-            var disabledUsersGroup = _config[Configuration.OpsLdapDisabledUsers];
+            var disabledUsersGroup = config[Configuration.OpsLdapDisabledUsers];
             if (!string.IsNullOrEmpty(disabledUsersGroup))
             {
                 dnDisabledUsersGroup = new DN(disabledUsersGroup);
             }
+
+            // we are adding 5% as a guess towards how many not present in AD users there will be
+            int total = ldapUsers.Count() + ldapUsers.Count(_ => _.DirectReportDNs.Count > 0) + 5;
 
             foreach (var ldapUser in ldapUsers)
             {
@@ -207,10 +239,17 @@ namespace Ocuda.Ops.Service
 
                 if (string.IsNullOrEmpty(ldapUser.Username))
                 {
-                    result.AddStatus(ldapUser.DistinguishedName,
+                    result.AddStatus(
+                        ldapUser.DistinguishedName,
                         "No user found for this DistinguishedName in AD",
                         LogLevel.Warning);
-                    _logger.LogWarning("No username found for AD distinguished name {DistinguishedName}",
+                    await SendUpdateAsync(
+                        job,
+                        statusAsync,
+                        count * 100 / total,
+                        $"No username found for DN: {ldapUser.DistinguishedName}");
+                    _logger.LogWarning(
+                        "No username found for AD distinguished name {DistinguishedName}",
                         ldapUser.DistinguishedName);
                     continue;
                 }
@@ -223,7 +262,13 @@ namespace Ocuda.Ops.Service
 
                 if (matchingUsers?.Count() > 1)
                 {
-                    _logger.LogError("Taking no action on this record - found multiple users with the same username: {Username}",
+                    await SendUpdateAsync(
+                        job,
+                        statusAsync,
+                        count * 100 / total,
+                        $"Multiple users with this username: {ldapUser.Username}");
+                    _logger.LogError(
+                        "Taking no action on this record - found multiple users with the same username: {Username}",
                         ldapUser.Username);
                     continue;
                 }
@@ -234,12 +279,13 @@ namespace Ocuda.Ops.Service
                 {
                     try
                     {
-                        opsUser = await _userRepository
+                        opsUser = await userRepository
                             .FindUsernameIncludeDeletedAsync(ldapUser.Username);
                     }
                     catch (InvalidOperationException ioex)
                     {
-                        _logger.LogError("Taking no action on this record - {Username}: {ErrorMessage}",
+                        _logger.LogError(
+                            "Taking no action on this record - {Username}: {ErrorMessage}",
                             ldapUser.Username,
                             ioex.Message);
                         continue;
@@ -252,80 +298,100 @@ namespace Ocuda.Ops.Service
                         {
                             CreatedAt = result.AsOf,
                             CreatedBy = systemUser.Id,
-                            Username = ldapUser.Username
+                            Username = ldapUser.Username,
                         };
-                        result.AddStatus(opsUser.Username,
+                        result.AddStatus(
+                            opsUser.Username,
                             "Created user from AD record",
                             LogLevel.Information);
+                        await SendUpdateAsync(
+                            job,
+                            statusAsync,
+                            count * 100 / total,
+                            $"Creating user from AD: {opsUser.Username}");
                         _logger.LogWarning("Creating user: {Username}", opsUser.Username);
                         newUsers++;
                         isNew = true;
                     }
                     else
                     {
-                        //deleted
+                        // deleted
                         _logger.LogWarning("Undeleting user: {Username}", opsUser.Username);
                         undeletedUsers++;
                         result.AddStatus(opsUser.Username, "Undeleted user", LogLevel.Warning);
+                        await SendUpdateAsync(
+                            job,
+                            statusAsync,
+                            count * 100 / total,
+                            $"Undeleting user: {opsUser.Username}");
                         opsUser.IsDeleted = false;
                     }
                 }
 
                 // update user info
-
                 if (ldapUser.Department?.Length > 0 && opsUser.Department != ldapUser.Department)
                 {
                     userFieldChanges.Add(nameof(opsUser.Department));
                     opsUser.Department = ldapUser.Department;
                 }
+
                 if (ldapUser.Description?.Length > 0
                     && opsUser.Description != ldapUser.Description)
                 {
                     userFieldChanges.Add(nameof(opsUser.Description));
                     opsUser.Description = ldapUser.Description;
                 }
+
                 if (ldapUser.Name?.Length > 0 && opsUser.Name != ldapUser.Name)
                 {
                     userFieldChanges.Add(nameof(opsUser.Name));
                     opsUser.Name = ldapUser.Name;
                 }
+
                 if (ldapUser.EmployeeId.HasValue && opsUser.EmployeeId != ldapUser.EmployeeId)
                 {
                     userFieldChanges.Add(nameof(opsUser.EmployeeId));
                     opsUser.EmployeeId = ldapUser.EmployeeId;
                 }
+
                 if (ldapUser.ServiceStartDate.HasValue
                     && opsUser.ServiceStartDate != ldapUser.ServiceStartDate.Value)
                 {
                     userFieldChanges.Add(nameof(opsUser.ServiceStartDate));
                     opsUser.ServiceStartDate = ldapUser.ServiceStartDate;
                 }
+
                 if (!string.IsNullOrEmpty(ldapUser.Nickname)
                     && string.IsNullOrEmpty(opsUser.Nickname))
                 {
                     userFieldChanges.Add(nameof(opsUser.Nickname));
                     opsUser.Nickname = ldapUser.Nickname;
                 }
+
                 if (ldapUser.Email?.Length > 0 && opsUser.Email != ldapUser.Email)
                 {
                     userFieldChanges.Add(nameof(opsUser.Email));
                     opsUser.Email = ldapUser.Email;
                 }
+
                 if (ldapUser.Mobile?.Length > 0 && opsUser.Mobile != ldapUser.Mobile)
                 {
                     userFieldChanges.Add(nameof(opsUser.Mobile));
                     opsUser.Mobile = ldapUser.Mobile;
                 }
+
                 if (ldapUser.Phone?.Length > 0 && opsUser.Phone != ldapUser.Phone)
                 {
                     userFieldChanges.Add(nameof(opsUser.Phone));
                     opsUser.Phone = ldapUser.Phone;
                 }
+
                 if (ldapUser.Title?.Length > 0 && opsUser.Title != ldapUser.Title)
                 {
                     userFieldChanges.Add(nameof(opsUser.Title));
                     opsUser.Title = ldapUser.Title;
                 }
+
                 if (!opsUser.AssociatedLocationManuallySet
                     && !string.IsNullOrEmpty(ldapUser.PhysicalDeliveryOfficeName))
                 {
@@ -340,6 +406,11 @@ namespace Ocuda.Ops.Service
                             result.AddStatus(opsUser.Username,
                                 $"Unknown location: {ldapUser.PhysicalDeliveryOfficeName}",
                                 LogLevel.Error);
+                            await SendUpdateAsync(
+                                job,
+                                statusAsync,
+                                count * 100 / total,
+                                $"Unknown location: {opsUser.Username} at {ldapUser.PhysicalDeliveryOfficeName}");
                             _logger.LogError("New location seen: {LocationName}",
                                 ldapUser.PhysicalDeliveryOfficeName);
                             locationsToAdd.Add(ldapUser.PhysicalDeliveryOfficeName);
@@ -357,12 +428,19 @@ namespace Ocuda.Ops.Service
                 updatedUsernames.Add(opsUser.Username.ToLowerInvariant());
                 if (userFieldChanges.Count > 0)
                 {
-                    result.AddStatus(opsUser.Username,
+                    result.AddStatus(
+                        opsUser.Username,
                         $"Updated fields: {string.Join(", ", userFieldChanges)}");
+                    await SendUpdateAsync(
+                        job,
+                        statusAsync,
+                        count * 100 / total,
+                        $"Updated fields for: {opsUser.Username} - {string.Join(", ", userFieldChanges)}");
                     opsUser.LastLdapUpdate = result.AsOf;
                     updatedUsers++;
-                    _logger.LogTrace("Updated fields for {Username}: {Fields}",
-                    opsUser.Username,
+                    _logger.LogTrace(
+                        "Updated fields for {Username}: {Fields}",
+                        opsUser.Username,
                         string.Join(", ", userFieldChanges));
                 }
 
@@ -370,17 +448,22 @@ namespace Ocuda.Ops.Service
                 {
                     if (isNew)
                     {
-                        await _userRepository.AddAsync(opsUser);
+                        await userRepository.AddAsync(opsUser);
                     }
                     else
                     {
-                        _userRepository.Update(opsUser);
+                        userRepository.Update(opsUser);
                     }
-                    if (count % 40 == 0)
+
+                    if (count % 40 == 0 && count > 0)
                     {
                         _logger.LogDebug("Committing batch of {RecordCount} total records...",
                             count);
-                        await _userRepository.SaveAsync();
+                        await SendUpdateAsync(
+                            job,
+                            statusAsync,
+                            count * 100 / total,
+                            $"Saving update batch, on record {count} of {total}");
                     }
                 }
 
@@ -389,7 +472,7 @@ namespace Ocuda.Ops.Service
 
             if (applyChanges)
             {
-                await _userRepository.SaveAsync();
+                await userRepository.SaveAsync();
             }
 
             result.StatusCounts.Add($"Timer {timerCount++}: processed updates (ms)",
@@ -397,8 +480,7 @@ namespace Ocuda.Ops.Service
             lastStop = timer.ElapsedMilliseconds;
 
             // supervisor update
-
-            opsUsers = await _userRepository.GetAllAsync();
+            opsUsers = await userRepository.GetAllAsync();
 
             var staffToSupervisiorMap = new Dictionary<string, string>();
 
@@ -412,9 +494,15 @@ namespace Ocuda.Ops.Service
 
                 if (supervisorUser == null)
                 {
-                    result.AddStatus(supervisor.Username,
+                    result.AddStatus(
+                        supervisor.Username,
                         "Unable to find this supervisor after import",
                         LogLevel.Error);
+                    await SendUpdateAsync(
+                        job,
+                        statusAsync,
+                        count * 100 / total,
+                        $"Unable to find supervisor after import: {supervisor.Username}");
                     _logger.LogWarning("Unable to find supervisor with username {Username}",
                         supervisor.Username);
                     continue;
@@ -434,9 +522,15 @@ namespace Ocuda.Ops.Service
                         {
                             continue;
                         }
+
                         result.AddStatus(directReportDn,
                             "Unable to find staff to attach supervisor for this DN, possibly disabled?",
                             LogLevel.Error);
+                        await SendUpdateAsync(
+                            job,
+                            statusAsync,
+                            count * 100 / total,
+                            $"Unable to find staff to attach supervisor for this DN, disabled?: {directReportDn}");
                         _logger.LogWarning("Unable to determine staff username for DN: {DistinguishedName}",
                             directReportDn);
                         continue;
@@ -451,6 +545,11 @@ namespace Ocuda.Ops.Service
                         result.AddStatus(staffUsername,
                             "Unable to find staff to attach supervisor",
                             LogLevel.Error);
+                        await SendUpdateAsync(
+                            job,
+                            statusAsync,
+                            count * 100 / total,
+                            $"Unable to find staff to attach supervisor: {staffUsername}");
                         _logger.LogWarning("Unable to find staff user username {Username}",
                             staffUsername);
                         continue;
@@ -462,10 +561,16 @@ namespace Ocuda.Ops.Service
                         {
                             var oldSupervisor
                                 = opsUsers.SingleOrDefault(_ => _.Id == staffUser.SupervisorId)
-                                ?? await _userRepository
+                                ?? await userRepository
                                     .FindIncludeDeletedAsync(staffUser.SupervisorId.Value);
-                            result.AddStatus(staffUsername,
+                            result.AddStatus(
+                                staffUsername,
                                 $"Update supervisor from {oldSupervisor.Username} to {supervisorUser.Username}");
+                            await SendUpdateAsync(
+                                job,
+                                statusAsync,
+                                count * 100 / total,
+                                $"Update supervisor: {staffUsername} from {oldSupervisor.Username} to {supervisor.Username}");
                             _logger.LogInformation("Updating supervisor for {Staff} from {SupervisorId} to {NewSupervisorId}",
                                 staffUsername,
                                 oldSupervisor.Username,
@@ -473,8 +578,14 @@ namespace Ocuda.Ops.Service
                         }
                         else
                         {
-                            result.AddStatus(staffUsername,
+                            result.AddStatus(
+                                staffUsername,
                                 $"Setting supervisor to {supervisorUser.Username}");
+                            await SendUpdateAsync(
+                                job,
+                                statusAsync,
+                                count * 100 / total,
+                                $"Adding supervisor: {staffUsername} to {supervisorUser.Username}");
                             _logger.LogInformation("Adding supervisor for {Staff} to {NewSupervisorId}",
                                 staffUsername,
                                 supervisorUser.Username);
@@ -487,11 +598,14 @@ namespace Ocuda.Ops.Service
 
                         if (applyChanges)
                         {
-                            await _userRepository.UpdateSupervisor(staffUser.Id, supervisorUser.Id);
+                            await userRepository.UpdateSupervisor(staffUser.Id, supervisorUser.Id);
                         }
+
                         updatedSupervisors++;
                     }
                 }
+
+                count++;
             }
 
             result.StatusCounts.Add($"Timer {timerCount++}: processed supervisors (ms)",
@@ -499,7 +613,6 @@ namespace Ocuda.Ops.Service
             lastStop = timer.ElapsedMilliseconds;
 
             // everyone who hasn't been touched should be deactivated
-
             var missingUserNames = opsUsers.Where(_ => !string.IsNullOrEmpty(_.Username))
                 .Select(_ => _.Username.ToLowerInvariant())
                 .Where(_ => !updatedUsernames.Contains(_));
@@ -510,12 +623,19 @@ namespace Ocuda.Ops.Service
             {
                 deletedUsers++;
                 result.AddStatus(missingUserName, "Not present in AD, deleted", LogLevel.Warning);
+                await SendUpdateAsync(
+                    job,
+                    statusAsync,
+                    count * 100 / total,
+                    $"Not present in AD, deleted: {missingUserName}");
                 if (applyChanges)
                 {
                     try
                     {
-                        await _userManagementService
-                            .MarkUserDisabledAsync(missingUserName, result.AsOf);
+                        await userManagementService.MarkUserDisabledAsync(
+                            userId,
+                            missingUserName,
+                            result.AsOf);
                     }
                     catch (OcudaException oex)
                     {
@@ -524,7 +644,14 @@ namespace Ocuda.Ops.Service
                             LogLevel.Error);
                     }
                 }
+
+                if (count < total + 1)
+                {
+                    count++;
+                }
             }
+
+            count = total;
 
             result.StatusCounts.Add($"Timer {timerCount++}: processed deletions (ms)",
                 (int)(timer.ElapsedMilliseconds - lastStop));
@@ -537,6 +664,11 @@ namespace Ocuda.Ops.Service
                 deletedUsers,
                 updatedUsers,
                 updatedSupervisors);
+            await SendUpdateAsync(
+                job,
+                statusAsync,
+                count * 100 / total,
+                $"Total AD {count} records; {newUsers} added, {undeletedUsers} undeleted, {deletedUsers} deleted, {updatedUsers} updated, {updatedSupervisors} updated supervisors");
 
             result.StatusCounts.Add("Added users", newUsers);
             result.StatusCounts.Add("Deleted users", deletedUsers);
@@ -549,49 +681,21 @@ namespace Ocuda.Ops.Service
 
             if (applyChanges)
             {
-                await _userSyncHistoryRepository.AddAsync(new UserSyncHistory
+                await userSyncHistoryRepository.AddAsync(new UserSyncHistory
                 {
                     AddedUsers = newUsers,
                     CreatedAt = result.AsOf,
-                    CreatedBy = GetCurrentUserId(),
+                    CreatedBy = userId,
                     DeletedUsers = deletedUsers,
                     Log = System.Text.Json.JsonSerializer.Serialize(result),
                     TotalRecords = count,
                     UndeletedUsers = undeletedUsers,
-                    UpdatedUsers = updatedUsers
+                    UpdatedUsers = updatedUsers,
                 });
-                await _userSyncHistoryRepository.SaveAsync();
+                await userSyncHistoryRepository.SaveAsync();
             }
 
             return result;
-        }
-
-        public async Task SyncLocationsAsync()
-        {
-            var now = _dateTimeProvider.Now;
-            var ldapLocations = _ldapService.GetAllLocations();
-            var dbLocations = await _userSyncLocationRepository.GetAllAsync();
-
-            foreach (var missingLocation in ldapLocations.Except(dbLocations.Select(_ => _.Name)))
-            {
-                await _userSyncLocationRepository.AddAsync(new UserSyncLocation
-                {
-                    CreatedAt = now,
-                    CreatedBy = GetCurrentUserId(),
-                    Name = missingLocation,
-                });
-            }
-            await _userSyncHistoryRepository.SaveAsync();
-        }
-
-        public async Task UpdateLocationMappingAsync(int userSyncLocationId, int? mapToLocationId)
-        {
-            var locationMapping = await _userSyncLocationRepository.FindAsync(userSyncLocationId);
-            locationMapping.MapToLocationId = mapToLocationId;
-            locationMapping.UpdatedAt = _dateTimeProvider.Now;
-            locationMapping.UpdatedBy = GetCurrentUserId();
-            _userSyncLocationRepository.Update(locationMapping);
-            await _userSyncLocationRepository.SaveAsync();
         }
     }
 }

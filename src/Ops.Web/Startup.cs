@@ -430,6 +430,12 @@ namespace Ocuda.Ops.Web
                 Data.Ops.IncidentStaffRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IIncidentTypeRepository,
                 Data.Ops.IncidentTypeRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IJobConfigurationRepository,
+                Data.Ops.JobConfigurationRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IJobLogRepository,
+                Data.Ops.JobLogRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IJobRepository,
+                Data.Ops.JobRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkLibraryRepository,
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
@@ -664,6 +670,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IIncidentService, IncidentService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
+            services.AddScoped<IJobService, JobService>();
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<ILdapService, LdapService>();
             services.AddScoped<ILinkService, LinkService>();

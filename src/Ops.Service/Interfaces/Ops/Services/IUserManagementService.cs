@@ -14,7 +14,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task LoggedInUpdateAsync(User user);
 
-        Task MarkUserDisabledAsync(string username, DateTime asOf);
+        Task MarkUserDisabledAsync(int userId, string username, DateTime asOf);
 
         Task RemoveProfilePictureAsync(int userId);
 
