@@ -13,19 +13,11 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class IncidentRepository : OpsRepository<OpsContext, Incident, int>, IIncidentRepository
+    public class IncidentRepository(Repository<OpsContext> repositoryFacade,
+        ILogger<IncidentRepository> logger,
+        IDateTimeProvider dateTimeProvider)
+        : OpsRepository<OpsContext, Incident, int>(repositoryFacade, logger), IIncidentRepository
     {
-        private readonly IDateTimeProvider _dateTimeProvider;
-
-        public IncidentRepository(Repository<OpsContext> repositoryFacade,
-            ILogger<IncidentRepository> logger,
-            IDateTimeProvider dateTimeProvider) : base(repositoryFacade, logger)
-        {
-            ArgumentNullException.ThrowIfNull(dateTimeProvider);
-
-            _dateTimeProvider = dateTimeProvider;
-        }
-
         public async Task<CollectionWithCount<Incident>> GetPaginatedAsync(IncidentFilter filter)
         {
             ArgumentNullException.ThrowIfNull(filter);
@@ -38,7 +30,8 @@ namespace Ocuda.Ops.Data.Ops
 
             if (!string.IsNullOrEmpty(filter.SearchText))
             {
-                query = query.Where(_ => _.Description.Contains(filter.SearchText)
+                query = query.Where(_ => _.Id.ToString() == filter.SearchText
+                    || _.Description.Contains(filter.SearchText)
                     || _.IncidentType.Description.Contains(filter.SearchText)
                     || _.InjuriesDamages.Contains(filter.SearchText)
                     || _.LocationDescription.Contains(filter.SearchText)
@@ -58,7 +51,7 @@ namespace Ocuda.Ops.Data.Ops
                     .OrderByDescending(_ => _.IncidentAt)
                     .ApplyPagination(filter)
                     .AsNoTracking()
-                    .ToListAsync()
+                    .ToListAsync(),
             };
         }
 
@@ -74,7 +67,7 @@ namespace Ocuda.Ops.Data.Ops
                     IncidentAt = _.IncidentAt,
                     IncidentTypeId = _.IncidentTypeId,
                     LocationId = _.LocationId,
-                    ReportedByName = _.ReportedByName
+                    ReportedByName = _.ReportedByName,
                 })
                 .SingleOrDefaultAsync();
         }
@@ -88,7 +81,7 @@ namespace Ocuda.Ops.Data.Ops
             {
                 incident.IsVisible = isVisible;
                 incident.UpdatedBy = userId;
-                incident.UpdatedAt = _dateTimeProvider.Now;
+                incident.UpdatedAt = dateTimeProvider.Now;
                 _context.Update(incident);
                 await _context.SaveChangesAsync();
             }

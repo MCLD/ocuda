@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Ocuda.Ops.Models.Entities
 {
@@ -29,9 +31,21 @@ namespace Ocuda.Ops.Models.Entities
         [NotMapped]
         public string FullName
         {
-           get
+            get
             {
                 return $"{Name}{FileType?.Extension}";
+            }
+        }
+
+        /// <summary>
+        /// Gets a valid and unique HTML id to represent this image.
+        /// </summary>
+        [NotMapped]
+        public string HtmlId
+        {
+            get
+            {
+                return Convert.ToHexString(MD5.HashData(Encoding.UTF8.GetBytes(Name)));
             }
         }
 
