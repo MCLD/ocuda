@@ -36,6 +36,30 @@
                hide-required="true"
                readonly />
         <hr>
+        <form asp-action="@nameof(EmediaController.UpdateSortAs)" method="post" role="form">
+            <input name="id" value="@Model.Emedia.Id" type="hidden" />
+            <div class="row mb-3">
+                <label asp-for="Emedia.SortAs" class="col-form-label text-md-end col-md-3"></label>
+                <div class="mb-3-inner col-md-9">
+                    <div class="input-group">
+                        <input name="sortAs"
+                               class="form-control"
+                               data-initialvalue="@Model.Emedia.SortAs"
+                               id="UpdateSortAs"
+                               value="@Model.Emedia.SortAs" />
+                        <button buttonspinner class="btn btn-outline-success" type="submit">
+                            <span class="fa-regular fa-floppy-disk"></span>
+                        </button>
+                    </div>
+                    <div class="d-none alert alert-warning mt-2 mb-0 py-2" id="UpdateSortAsSave">
+                        <strong>
+                            Don't forget to save this updated Sort As value using the button
+                            at the right!
+                        </strong>
+                    </div>
+                </div>
+            </div>
+        </form>
         <div class="row mb-3">
             <label class="col-form-label text-md-end col-md-3"
                    for="CategorySelection">Media Types</label>
@@ -103,7 +127,6 @@
         Unsaved changes will be lost if you modify media types, subjects, or change languages.
     </div>
 </div>
-
 
 <form asp-action="@nameof(EmediaController.Details)" method="post" role="form">
     <input asp-for="EmediaText.LanguageId" value="@Model.LanguageId" type="hidden" />
@@ -209,7 +232,7 @@
         const emediaDetailsUrl
             = "@Url.Action(nameof(EmediaController.Details), new { id = Model.Emedia.Id })";
 
-        $("#SelectedLanguage").on("change", function () {
+        $("#SelectedLanguage").on("change", function() {
             window.location.href = emediaDetailsUrl + "?language=" + $(this).val();
         });
 
@@ -222,17 +245,30 @@
         document.getElementById('EmediaText_Details').addEventListener('keydown', showSaveWarning);
         document.getElementById('EmediaText_Description').addEventListener('keydown', showSaveWarning);
 
-        $("#categoryForm").submit(function (e) {
+        const updateSortAsSave = document.getElementById("UpdateSortAsSave");
+
+        function updateSortAs(e) {
+            if (e.currentTarget.value === e.currentTarget.dataset.initialvalue) {
+                updateSortAsSave.classList.add("d-none")
+            }
+            else {
+                updateSortAsSave.classList.remove("d-none")
+            }
+        }
+
+        document.getElementById("UpdateSortAs").addEventListener("input", updateSortAs);
+
+        $("#categoryForm").submit(function(e) {
             e.preventDefault();
 
             let id = @Model.Emedia.Id;
             let categories = $(".categorySelector:checked")
-                .map(function () { return $(this).data("id"); })
+                .map(function() { return $(this).data("id"); })
                 .get();
 
             $.post("@Url.Action(nameof(EmediaController.ChangeCategories), EmediaController.Name)",
                 { id, categories },
-                function (response) {
+                function(response) {
                     if (response.success == true) {
                         location.reload();
                     }
@@ -243,17 +279,17 @@
                 });
         });
 
-        $("#subjectForm").submit(function (e) {
+        $("#subjectForm").submit(function(e) {
             e.preventDefault();
 
             let id = @Model.Emedia.Id;
             let subjects = $(".subjectSelector:checked")
-                .map(function () { return $(this).data("id"); })
+                .map(function() { return $(this).data("id"); })
                 .get();
 
             $.post("@Url.Action(nameof(EmediaController.ChangeSubjects), EmediaController.Name)",
                 { id, subjects },
-                function (response) {
+                function(response) {
                     if (response.success == true) {
                         location.reload();
                     }
@@ -265,4 +301,3 @@
         });
     </script>
 }
->

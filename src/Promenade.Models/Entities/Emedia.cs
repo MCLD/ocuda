@@ -50,14 +50,16 @@ namespace Ocuda.Promenade.Models.Entities
         [DisplayName("Redirect Url")]
         [MaxLength(255)]
         [Required]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
-            "CA1056:URI-like properties should not be strings",
-            Justification = "URL stored as string in database server")]
         public string RedirectUrl { get; set; }
 
         [MaxLength(255)]
         [Required]
         public string Slug { get; set; }
+
+        [DisplayName("Sort as")]
+        [MaxLength(255)]
+        [Required]
+        public string SortAs { get; set; }
 
         [NotMapped]
         public ICollection<Subject> Subjects { get; }

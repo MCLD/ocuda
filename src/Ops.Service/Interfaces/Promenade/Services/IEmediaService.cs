@@ -54,6 +54,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task SetEmediaTextAsync(EmediaText emediaText);
 
+        Task SetSortAsAsync(int emediaId, string sortAs);
+
         Task UpdateCategoriesAsync(int emediaId, ICollection<int> categoryIds);
 
         Task UpdateGroupSortOrder(int id, bool increase);

@@ -15,8 +15,8 @@ namespace Ocuda.Ops.Data.Promenade
 {
     public class EmediaRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
         ILogger<EmediaRepository> logger)
-            : GenericRepository<PromenadeContext, Emedia>(repositoryFacade, logger),
-            IEmediaRepository
+        : GenericRepository<PromenadeContext, Emedia>(repositoryFacade, logger),
+        IEmediaRepository
     {
         public async Task ApplySlugAsync(int id, string slug)
         {
@@ -51,6 +51,7 @@ namespace Ocuda.Ops.Data.Promenade
                     emedia.GroupId = default;
                 }
             }
+
             DbSet.UpdateRange(emedias);
         }
 
@@ -109,9 +110,10 @@ namespace Ocuda.Ops.Data.Promenade
             {
                 Count = await query.CountAsync(),
                 Data = await query
-                    .OrderBy(_ => _.Name)
+                    .OrderBy(_ => _.SortAs)
+                    .ThenBy(_ => _.Name)
                     .ApplyPagination(filter)
-                    .ToListAsync()
+                    .ToListAsync(),
             };
         }
 
@@ -133,11 +135,13 @@ namespace Ocuda.Ops.Data.Promenade
                         .AsNoTracking()
                         .AnyAsync(_ => _.IsActive && _.Slug == revisedSlug);
                 }
+
                 if (count > 100)
                 {
-                    throw new Utility.Exceptions.OcudaException("Unable to create a unique slug.");
+                    throw new OcudaException("Unable to create a unique slug.");
                 }
             }
+
             return revisedSlug;
         }
 

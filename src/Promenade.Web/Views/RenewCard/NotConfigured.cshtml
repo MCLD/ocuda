@@ -11,5 +11,8 @@
 else
 {
     <h1 class="prom-title">@Localizer[Promenade.RenewYourLibraryCard]</h1>
-    <p>@HtmlLocalizer[Promenade.RenewCardNotConfigured, Url.Action(nameof(LocationsController.Find), LocationsController.Name)]</p>
+    <p>
+        @HtmlLocalizer[Promenade.RenewCardNotConfigured,
+            Url.Action(nameof(LocationsController.Find), LocationsController.Name)]
+    </p>
 }
