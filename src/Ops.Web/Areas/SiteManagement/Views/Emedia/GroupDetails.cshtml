@@ -127,6 +127,10 @@
                                    asp-route-id="@emedia.Id">
                                     @emedia.Name
                                 </a>
+                                @if (emedia.Name != emedia.SortAs)
+                                {
+                                    <small class="d-block"><em>sort: @emedia.SortAs</em></small>
+                                }
                             </td>
                             <td class="align-middle">@emedia.Slug</td>
                             <td class="align-middle">HTTP @(emedia.IsHttpPost ? "POST" : "GET")</td>
@@ -181,7 +185,8 @@
          isLarge="true"
          name="Emedia"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
-        <input id="addName" asp-for="Emedia.Name" formgroup data-slugifyto="addSlug" />
+        <input id="addName" asp-for="Emedia.Name" formgroup data-slugifyto="addSlug" data-sortifyto="sortAs" />
+        <input id="sortAs" asp-for="Emedia.SortAs" formgroup />
         <input id="addUrl" asp-for="Emedia.RedirectUrl" formgroup />
         <input id="addSlug" asp-for="Emedia.Slug" formgroup />
         <select id="addIsHttpPost" asp-for="Emedia.IsHttpPost" formgroup autocomplete="off">
@@ -334,12 +339,14 @@
 
 @section scripts {
     <script>
-        $("#addForm").submit(function (e) {
+        const deSorts = ["a ", "an ", "the "];
+
+        $("#addForm").submit(function(e) {
             e.preventDefault();
             var form = $(this);
             $.post("@(Url.Action(nameof(EmediaController.CreateEmedia), EmediaController.Name))",
                 form.serialize(),
-                function (response) {
+                function(response) {
                     if (response.success == true) {
                         location.href = response.url;
                     }
@@ -351,17 +358,31 @@
         });
 
         function doSlugify(e) {
-            let slugFromField = $(e.currentTarget)
-            let slugifyTo = $("#"+slugFromField.data("slugifyto"));
-            if (slugFromField.val().length > 0 && slugifyTo.val().length == 0 && slugify) {
-                slugifyTo.val(slugify(slugFromField.val()).substring(0, 80).toLowerCase());
+            const slugifyTo = document.getElementById(e.currentTarget.dataset.slugifyto)
+            if (e.currentTarget.value.length > 0 && slugifyTo.value.length == 0) {
+                slugifyTo.value = slugify(e.currentTarget.value).substring(0, 80).toLowerCase();
             }
         }
+
+        function doSortify(e) {
+            const sortifyTo = document.getElementById(e.currentTarget.dataset.sortifyto);
+            if (e.currentTarget.value.length > 0 && sortifyTo.value.length == 0) {
+                const source = e.currentTarget.value.trim();
+                const m = deSorts.find((_) => source.toLowerCase().startsWith(_));
+                sortifyTo.value = m
+                    ? `${source.substring(m.length)}, ${source.substring(0, m.length - 1)}`.trim()
+                    : e.currentTarget.value.trim();
+            }
+        }
+
+        document.getElementById("addName").addEventListener("blur", doSlugify);
+        document.getElementById("addName").addEventListener("blur", doSortify);
+        document.getElementById("editName").addEventListener("blur", doSlugify);
 
         function showSaveWarning(e) {
             let currentSlugField = $(e.currentTarget);
             let priorValue = currentSlugField.data("priorvalue");
-            if(currentSlugField.val() != priorValue) {
+            if (currentSlugField.val() != priorValue) {
                 document.querySelectorAll('.oc-edit-warning').forEach(_ => {
                     _.classList.remove('d-none');
                 });
@@ -377,7 +398,7 @@
         function showWarning(e) {
             let currentSlugField = $(e.currentTarget);
             let priorValue = currentSlugField.data("priorvalue");
-            if(currentSlugField.val() != priorValue) {
+            if (currentSlugField.val() != priorValue) {
                 $("#slugWarning").show();
             }
             else {
@@ -385,11 +406,8 @@
             }
         }
 
-        $("#addName").blur(doSlugify);
-        $("#editName").blur(doSlugify);
-
-        $("#editModal").on("show.bs.modal", function (e) {
-            document.querySelectorAll('.oc-edit-warning').forEach(_ => {_.classList.add('d-none')});
+        $("#editModal").on("show.bs.modal", function(e) {
+            document.querySelectorAll('.oc-edit-warning').forEach(_ => { _.classList.add('d-none') });
             var button = $(e.relatedTarget);
             $("#editEmedia").val(button.data("id"));
             $("#editName").val(button.data("name"));
@@ -400,12 +418,12 @@
             $("#editIsHttpPost").val(button.data("ispost"));
         });
 
-        $("#editForm").submit(function (e) {
+        $("#editForm").submit(function(e) {
             e.preventDefault();
             var form = $(this);
             $.post("@(Url.Action(nameof(EmediaController.EditEmedia), EmediaController.Name))",
                 form.serialize(),
-                function (response) {
+                function(response) {
                     if (response.success == true) {
                         location.reload();
                     }
@@ -416,7 +434,7 @@
                 });
         });
 
-        $("#deleteModal").on("show.bs.modal", function (e) {
+        $("#deleteModal").on("show.bs.modal", function(e) {
             var button = $(e.relatedTarget);
             var id = button.data("id");
             var name = button.data("name");
@@ -426,12 +444,12 @@
             modal.find(".modal-text").html(`Are you sure you want to delete <strong>${name}</strong>?`);
         });
 
-        $("#updateSegmentForm").submit(function (e) {
+        $("#updateSegmentForm").submit(function(e) {
             e.preventDefault();
             var form = $(this);
             $.post("@(Url.Action(nameof(EmediaController.UpdateGroupSegment), EmediaController.Name))",
                 form.serialize(),
-                function (response) {
+                function(response) {
                     if (response.success == true) {
                         if (response.location) {
                             location.href = response.url;
@@ -447,7 +465,7 @@
                 });
         });
 
-        $("#deleteSegmentModal").on("show.bs.modal", function (e) {
+        $("#deleteSegmentModal").on("show.bs.modal", function(e) {
             var button = $(e.relatedTarget);
             var id = button.data("id");
             var name = button.data("name");

@@ -257,6 +257,10 @@
     <value>Find my Library</value>
     <comment>Title of the page to locate the nearest library</comment>
   </data>
+  <data name="Find our nearest &lt;a href=&quot;{0}&quot;&gt;location&lt;/a&gt; to you." xml:space="preserve">
+    <value>Find our nearest &lt;a href="{0}"&gt;location&lt;/a&gt; to you.</value>
+    <comment>Text with a link to the location search page</comment>
+  </data>
   <data name="First Name" xml:space="preserve">
     <value>First Name</value>
     <comment>Label prompting a customer to enter their first name</comment>
@@ -317,6 +321,10 @@
     <value>Last Update</value>
     <comment>Column header describing when data was last updated</comment>
   </data>
+  <data name="Launching {0}..." xml:space="preserve">
+    <value>Launching {0}...</value>
+    <comment>Text shown when launching a digital library resource</comment>
+  </data>
   <data name="Libraries closest to ZIP code: {0}" xml:space="preserve">
     <value>Libraries closest to ZIP code: {0}</value>
     <comment>Label describing the search results for libraries close to a ZIP code; {0} is the ZIP code</comment>
@@ -368,6 +376,10 @@
   <data name="Now launching this Digital Library resource..." xml:space="preserve">
     <value>Now launching this Digital Library resource...</value>
     <comment>Default shown when the digital library launch text is added</comment>
+  </data>
+  <data name="Only Available In a Library" xml:space="preserve">
+    <value>Only Available In a Library</value>
+    <comment>Message indicating that a digital library resource is only available in the library</comment>
   </data>
   <data name="Open" xml:space="preserve">
     <value>Open</value>
@@ -708,6 +720,10 @@
   <data name="You have entered an invalid card number or password." xml:space="preserve">
     <value>You have entered an invalid card number or password.</value>
     <comment>Error message: invalid login information</comment>
+  </data>
+  <data name="You must be in a library to access: {0}." xml:space="preserve">
+    <value>You must be in a library to access: {0}.</value>
+    <comment>Error message: must be in a library to view this digital library resource</comment>
   </data>
   <data name="You must request a date on or after: {0}" xml:space="preserve">
     <value>You must request a date on or after: {0}</value>

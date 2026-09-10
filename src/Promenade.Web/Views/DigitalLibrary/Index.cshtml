@@ -68,9 +68,9 @@
                                        class="digital-library-card-header text-danger text-decoration-none"
                                        data-bs-target="#inLibraryOnlyModal"
                                        data-bs-toggle="modal"
-                                       data-name="Only Available In a Library"
-                                       data-details="<p>You must be in a library to access: @emedia.Name.</p>"
-                                       title="@Localizer[Promenade.HelpItem, emedia.Name]">
+                                       data-name="@Localizer[Promenade.EmediaOnlyInLibrary]"
+                                       data-details="<p>@Localizer[Promenade.EmediaMustBeInLibrary, emedia.Name]</p>"
+                                       title="@Localizer[Promenade.EmediaMustBeInLibrary, emedia.Name]">
                                         <span class="fa-solid fa-triangle-exclamation"></span>
                                     </a>
                                 }
@@ -118,13 +118,13 @@
 
 @section scripts {
     <script>
-        $("#infoModal").on("show.bs.modal", function (e) {
+        $("#infoModal").on("show.bs.modal", function(e) {
             let button = $(e.relatedTarget);
             $(this).find(".modal-title").text(button.data("name"));
             $(this).find(".modal-body").html(button.data("details"));
         });
 
-        $("#inLibraryOnlyModal").on("show.bs.modal", function (e) {
+        $("#inLibraryOnlyModal").on("show.bs.modal", function(e) {
             let button = $(e.relatedTarget);
             $(this).find(".modal-title").text(button.data("name"));
             $(this).find(".modal-body").html(button.data("details"));

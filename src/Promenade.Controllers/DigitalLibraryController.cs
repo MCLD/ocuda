@@ -142,7 +142,10 @@ namespace Ocuda.Promenade.Controllers
 
             if (!emedia.IsAvailableExternally && !isLocalNetwork)
             {
-                return View("NotAvailable");
+                return View("NotAvailable", new LaunchViewModel
+                {
+                    Name = emedia.Name,
+                });
             }
 
             if (emedia.IsHttpPost || showLaunch)

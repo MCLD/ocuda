@@ -14,7 +14,9 @@
     <div class="d-flex justify-content-center mt-3">
         <div class="card">
             <div class="card-header">
-                <h1 class="display-4 px-5 pt-2">Launching @Model.Name...</h1>
+                <h1 class="display-4 px-5 pt-2">
+                    @Localizer[Promenade.EmediaLaunching, Model.Name]
+                </h1>
             </div>
             @if (!string.IsNullOrEmpty(Model.LaunchText))
             {
@@ -41,13 +43,13 @@
         const form = document.getElementById("launchForm");
         const launchDelay = @(Model.LaunchDelayMs > -1 ? Model.LaunchDelayMs : 0)
 
-        form.onsubmit = (_) => {
-            document.getElementById("btnspin").classList.remove("d-none");
-            document.getElementById("btnsub").setAttribute("disabled", "disabled");
-        }
+            form.onsubmit = (_) => {
+                document.getElementById("btnspin").classList.remove("d-none");
+                document.getElementById("btnsub").setAttribute("disabled", "disabled");
+            }
 
         window.onload = (_) => {
-            if("@Model.Method.Equals("POST", StringComparison.OrdinalIgnoreCase)" === "True") {
+            if ("@Model.Method.Equals("POST", StringComparison.OrdinalIgnoreCase)" === "True") {
                 window.setTimeout(() => form.submit(), launchDelay);
             } else {
                 window.setTimeout(() => window.location = form.action, launchDelay);

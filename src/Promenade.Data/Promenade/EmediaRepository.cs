@@ -11,15 +11,16 @@ namespace Ocuda.Promenade.Data.Promenade
     public class EmediaRepository(
         ServiceFacade.Repository<PromenadeContext> repositoryFacade,
         ILogger<EmediaRepository> logger)
-            : GenericRepository<PromenadeContext, Emedia>(repositoryFacade, logger),
-            IEmediaRepository
+        : GenericRepository<PromenadeContext, Emedia>(repositoryFacade, logger),
+        IEmediaRepository
     {
         public async Task<ICollection<Emedia>> GetAllAsync()
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.IsActive)
-                .OrderBy(_ => _.Name)
+                .OrderBy(_ => _.SortAs)
+                .ThenBy(_ => _.Name)
                 .ToListAsync();
         }
     }

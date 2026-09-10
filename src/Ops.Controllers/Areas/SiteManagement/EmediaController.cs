@@ -227,12 +227,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 HasReferers = !string.IsNullOrEmpty(validReferers),
                 InvalidRefererBehavior =
                     [
-                        new ()
+                        new()
                         {
                              Text = "Redirect to index",
                              Value = "False",
                         },
-                        new ()
+                        new()
                         {
                             Selected = invalidRefererShowResource,
                             Text = "Launch resource",
@@ -1046,6 +1046,33 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             return Json(response);
+        }
+
+        [HttpPost("[action]")]
+        [SaveModelState]
+        public async Task<IActionResult> UpdateSortAs(int id, string sortAs)
+        {
+            if (!await HasAppPermissionAsync(permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            try
+            {
+                await emediaService.SetSortAsAsync(id, sortAs);
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogError(oex,
+                    "Error updating emedia {Id} sort as text to {SortAs}: {ErrorMessage}",
+                    id,
+                    sortAs,
+                    oex.Message);
+                ShowAlertDanger($"Could not update Sort As text: {oex.Message}");
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         private async Task<IActionResult> RedirectToNewSegmentAsync(string name,

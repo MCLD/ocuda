@@ -20,6 +20,9 @@
         public const string CoordinatesErrorItem = "There was a problem locating these coordinates: {0}, {1}";
         public const string EmediaAll = "A-Z List";
         public const string EmediaGroups = "Popular Items First";
+        public const string EmediaLaunching = "Launching {0}...";
+        public const string EmediaMustBeInLibrary = "You must be in a library to access: {0}.";
+        public const string EmediaOnlyInLibrary = "Only Available In a Library";
         public const string EmployeeSignupAddressInfo = "please do not enter your work address here";
         public const string EmployeeSignupAddressLabel = "Home Address";
         public const string EmployeeSignupEmployeeLabel = "Employee Information";
@@ -69,6 +72,7 @@
         public const string LocationInformationHeader = "Library Information";
         public const string LocationInterestedInNearby = "Interested in updates from every library in this area?";
         public const string LocationNearbyLocationsHeader = "Nearby Locations";
+        public const string LocationNearestLink = "Find our nearest <a href=\"{0}\">location</a> to you.";
         public const string LocationOpen = "Open";
         public const string LocationOpensAtItem = "Opens at {0}";
         public const string LocationOpensNextItem = "Opens {0} at {1}";
