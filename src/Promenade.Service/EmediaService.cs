@@ -127,7 +127,8 @@ namespace Ocuda.Promenade.Service
             {
                 group.Emedias = [.. emedias
                     .Where(_ => _.GroupId == group.Id)
-                    .OrderBy(_ => _.Name)];
+                    .OrderBy(_ => _.SortAs)
+                    .ThenBy(_ => _.Name)];
 
                 if (group.SegmentId.HasValue && group.Segment == null)
                 {
