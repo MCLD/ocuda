@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Run docker-lock verify
         run: docker run -v $PWD:/run safewaters/docker-lock lock verify
