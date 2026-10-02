@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Ocuda.Ops.Models.Entities;
-using Category = Ocuda.Ops.Models.Entities.Category;
 
 namespace Ocuda.Ops.Data
 {
@@ -23,6 +22,8 @@ namespace Ocuda.Ops.Data
 
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
+        public DbSet<DigitalDisplay> DigitalDisplays { get; set; }
+
         public DbSet<DigitalDisplayAsset> DigitalDisplayAssets { get; set; }
 
         public DbSet<DigitalDisplayAssetSet> DigitalDisplayAssetSets { get; set; }
@@ -30,8 +31,6 @@ namespace Ocuda.Ops.Data
         public DbSet<DigitalDisplayDisplaySet> DigitalDisplayDisplaySets { get; set; }
 
         public DbSet<DigitalDisplayItem> DigitalDisplayItems { get; set; }
-
-        public DbSet<DigitalDisplay> DigitalDisplays { get; set; }
 
         public DbSet<DigitalDisplaySet> DigitalDisplaySets { get; set; }
 
@@ -55,11 +54,15 @@ namespace Ocuda.Ops.Data
 
         public DbSet<ExternalResource> ExternalResources { get; set; }
 
+        public DbSet<File> Files { get; set; }
+
+        public DbSet<FileCategory> FileCategories { get; set; }
+
         public DbSet<FileLibrary> FileLibraries { get; set; }
 
-        public DbSet<FileLibraryFileType> FileLibraryFileTypes { get; set; }
+        public DbSet<FileLibraryCategory> FileLibraryCategories { get; set; }
 
-        public DbSet<File> Files { get; set; }
+        public DbSet<FileLibraryFileType> FileLibraryFileTypes { get; set; }
 
         public DbSet<FileThumbnail> FileThumbnails { get; set; }
 
@@ -69,27 +72,29 @@ namespace Ocuda.Ops.Data
 
         public DbSet<IdentityProvider> IdentityProviders { get; set; }
 
+        public DbSet<Incident> Incidents { get; set; }
+
         public DbSet<IncidentFollowup> IncidentFollowups { get; set; }
 
         public DbSet<IncidentParticipant> IncidentParticipants { get; set; }
 
         public DbSet<IncidentRelationship> IncidentRelationships { get; set; }
 
-        public DbSet<Incident> Incidents { get; set; }
-
         public DbSet<IncidentStaff> IncidentStaffs { get; set; }
 
         public DbSet<IncidentType> IncidentTypes { get; set; }
+
+        public DbSet<Job> Jobs { get; set; }
 
         public DbSet<JobConfiguration> JobConfigurations { get; set; }
 
         public DbSet<JobLog> JobLogs { get; set; }
 
-        public DbSet<Job> Jobs { get; set; }
+        public DbSet<Link> Links { get; set; }
 
         public DbSet<LinkLibrary> LinkLibraries { get; set; }
 
-        public DbSet<Link> Links { get; set; }
+        public DbSet<PermissionGroup> PermissionGroups { get; set; }
 
         public DbSet<PermissionGroupApplication> PermissionGroupApplication { get; set; }
 
@@ -105,13 +110,11 @@ namespace Ocuda.Ops.Data
 
         public DbSet<PermissionGroupReporting> PermissionGroupReportings { get; set; }
 
-        public DbSet<PermissionGroup> PermissionGroups { get; set; }
-
         public DbSet<PermissionGroupSectionManager> PermissionGroupSectionManager { get; set; }
 
-        public DbSet<PostCategory> PostCategories { get; set; }
-
         public DbSet<Post> Posts { get; set; }
+
+        public DbSet<PostCategory> PostCategories { get; set; }
 
         public DbSet<RenewCardResponse> RenewCardResponses { get; set; }
 
@@ -139,13 +142,13 @@ namespace Ocuda.Ops.Data
 
         public DbSet<ScheduleClaim> ScheduleClaims { get; set; }
 
-        public DbSet<ScheduleLogCallDisposition> ScheduleLogCallDispositions { get; set; }
-
         public DbSet<ScheduleLog> ScheduleLogs { get; set; }
 
-        public DbSet<SectionCategory> SectionCategories { get; set; }
+        public DbSet<ScheduleLogCallDisposition> ScheduleLogCallDispositions { get; set; }
 
         public DbSet<Section> Sections { get; set; }
+
+        public DbSet<SectionCategory> SectionCategories { get; set; }
 
         public DbSet<SiteSetting> SiteSettings { get; set; }
 
@@ -153,11 +156,11 @@ namespace Ocuda.Ops.Data
 
         public DbSet<TitleClassMapping> TitleClassMappings { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
         public DbSet<UserMetadata> UserMetadata { get; set; }
 
         public DbSet<UserMetadataType> UserMetadataTypes { get; set; }
-
-        public DbSet<User> Users { get; set; }
 
         public DbSet<UserSyncHistory> UserSyncHistories { get; set; }
 
@@ -195,6 +198,10 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.Month, _.Year, _.EmediaId });
             modelBuilder.Entity<EmployeeCardStats>()
                 .HasKey(_ => new { _.Month, _.Year });
+            modelBuilder.Entity<FileCategory>()
+                .HasKey(_ => new { _.FileId, _.CategoryId });
+            modelBuilder.Entity<FileLibraryCategory>()
+                .HasKey(_ => new { _.FileLibraryId, _.CategoryId });
             modelBuilder.Entity<FileLibraryFileType>()
                 .HasKey(_ => new { _.FileLibraryId, _.FileTypeId });
             modelBuilder.Entity<IncidentRelationship>()

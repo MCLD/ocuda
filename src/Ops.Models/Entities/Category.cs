@@ -8,6 +8,6 @@ namespace Ocuda.Ops.Models.Entities
         public string Name { get; set; }
 
         [MaxLength(255)]
-        public string Stub { get; set; }
+        public string Slug { get; set; }
     }
 }

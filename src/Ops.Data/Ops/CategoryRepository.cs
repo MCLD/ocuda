@@ -28,7 +28,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub.ToLower() == stub.ToLower())
+                .Where(_ => _.Slug.ToLower() == stub.ToLower())
                 .SingleOrDefaultAsync();
         }
 
