@@ -1316,7 +1316,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 SectionSlug = section.Slug,
             };
 
-            var allCategories = await contentCategoryService.GetAllAsync();
             var fileCategories = await fileService.GetCategoriesAsync(fileId);
 
             foreach (var category in await sectionService.GetCategoriesAsync(section.Id))
