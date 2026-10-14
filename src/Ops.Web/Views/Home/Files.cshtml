@@ -41,11 +41,11 @@
     </div>
 }
 
-@if (Model.Categories?.Count() > 0)
+@if (Model.UsedCategories?.Count() > 0)
 {
     <div class="col-12 mb-2 d-flex">
         <div class="me-2">Filter by category:</div>
-        @foreach (var category in Model.Categories)
+        @foreach (var category in Model.UsedCategories)
         {
             <div class="me-2">
             <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Files)"
@@ -154,7 +154,7 @@
                                         }
                                         @if (Model.HasManagementRights)
                                         {
-                                            @if (Model.Categories.Any())
+                                            @if (Model.AllCategories.Any())
                                             {
                                                 <div>
                                                     <a asp-action="@nameof(SectionController.FileCategories)"
@@ -341,7 +341,7 @@
                                 }
                                 @if (Model.HasManagementRights)
                                 {
-                                    @if (Model.Categories.Any())
+                                    @if (Model.AllCategories.Any())
                                     {
                                         <a asp-action="@nameof(SectionController.FileCategories)"
                                            asp-area="@SectionController.Area"
@@ -509,7 +509,7 @@
                                             }
                                             @if (Model.HasManagementRights)
                                             {
-                                                @if (Model.Categories.Any())
+                                                @if (Model.AllCategories.Any())
                                                 {
                                                     <div>
                                                         <a asp-action="@nameof(SectionController.FileCategories)"
@@ -755,7 +755,8 @@ else
                                 type="button">
                             Cancel
                         </button>
-                        <button class="btn btn-outline-success"
+                        <button button-spinner
+                                class="btn btn-outline-success"
                                 id="addFileSubmit"
                                 type="submit"
                                 value="Submit">

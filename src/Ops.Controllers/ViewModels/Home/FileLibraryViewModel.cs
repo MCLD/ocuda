@@ -15,6 +15,8 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
         private bool managementRights;
         private bool replaceRights;
 
+        public IEnumerable<Category> AllCategories { get; set; }
+
         public IDictionary<int, List<File>> ByFileYear
         {
             get
@@ -25,8 +27,6 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
                     : [];
             }
         }
-
-        public IEnumerable<Category> Categories { get; set; }
 
         public int? CategoryId { get; set; }
 
@@ -92,6 +92,8 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
         [Required]
         [DisplayName("file")]
         public IFormFile UploadFile { get; set; }
+
+        public IEnumerable<Category> UsedCategories { get; set; }
 
         public bool UseThumbnails { get; set; }
 

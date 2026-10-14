@@ -107,7 +107,7 @@ namespace Ocuda.Ops.Controllers
 
             var viewModel = new FileLibraryViewModel
             {
-                Categories = inUseCategories,
+                AllCategories = await sectionService.GetCategoriesAsync(section.Id),
                 CategoryId = categoryId,
                 CurrentPage = currentPage,
                 GetFileDetailsLink = Url.Action(nameof(GetFileDetailsJson),
@@ -132,6 +132,7 @@ namespace Ocuda.Ops.Controllers
                 MaximumFileUploadBytes = SectionController.MaximumFileUploadBytes,
                 SectionName = section.Name,
                 SectionSlug = section.Slug,
+                UsedCategories = inUseCategories,
                 UseThumbnails = filesAndCount.Data.Any(_ => _.Thumbnails?.Count > 0),
             };
 
