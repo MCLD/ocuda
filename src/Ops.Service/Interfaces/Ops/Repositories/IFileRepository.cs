@@ -8,11 +8,13 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface IFileRepository : IOpsRepository<File, int>
     {
-        Task<ICollection<File>> GetFileLibraryFilesAsync(int id);
+        Task<IEnumerable<int>> GetFileLibraryFileIdsAsync(int fileLibraryId);
 
-        Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int libraryId);
+        Task<ICollection<File>> GetFileLibraryFilesAsync(int fileLibraryId);
 
-        Task<File> GetLatestByLibraryIdAsync(int id);
+        Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int fileLibraryId);
+
+        Task<File> GetLatestByLibraryIdAsync(int fileLibraryId);
 
         Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(FilesFilter filter);
     }

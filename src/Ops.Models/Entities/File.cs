@@ -12,6 +12,12 @@ namespace Ocuda.Ops.Models.Entities
             Thumbnails = [];
         }
 
+        [NotMapped]
+        public IEnumerable<int> CategoryIds { get; set; }
+
+        [NotMapped]
+        public IEnumerable<string> CategoryNames { get; set; }
+
         [MaxLength(255)]
         public string Description { get; set; }
 

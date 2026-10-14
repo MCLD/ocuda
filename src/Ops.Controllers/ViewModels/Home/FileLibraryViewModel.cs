@@ -26,6 +26,10 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
             }
         }
 
+        public IEnumerable<Category> Categories { get; set; }
+
+        public int? CategoryId { get; set; }
+
         public File File { get; set; }
 
         [Required]

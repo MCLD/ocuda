@@ -1,11 +1,11 @@
-﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.FileLibraryPermissionsViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.AssignmentViewModel
 
 @section header {
     <div class="d-flex justify-content-between align-items-top mb-2">
         <h1>
             Replace File
             <small class="text-muted d-print-block">
-                @Model.SectionName / @Model.Name
+                @Model.SectionName / @Model.FileLibraryName
             </small>
         </h1>
         <div class="d-print-none">
@@ -21,12 +21,12 @@
     <div class="col-12 col-sm-6">
         <div class="card">
             <div class="card-header h5">
-                Available Groups <small><em>(@(Model.AvailableGroups?.Count ?? 0))</em></small>
+                Available Permissions <small><em>(@(Model.Available?.Count ?? 0))</em></small>
             </div>
             <ul class="list-group list-group-flush">
-                @if (Model.AvailableGroups?.Count > 0)
+                @if (Model.Available?.Count > 0)
                 {
-                    foreach (var availableGroup in Model.AvailableGroups)
+                    foreach (var availableGroup in Model.Available)
                     {
                         <li class="list-group-item">
                             <form asp-action="@(nameof(SectionController.AddFilePermissionGroup))"
@@ -56,12 +56,12 @@
     <div class="col-12 col-sm-6">
         <div class="card">
             <div class="card-header">
-                Assigned Groups <small><em>(@(Model.AssignedGroups?.Count ?? 0))</em></small>
+                Assigned Permissions <small><em>(@(Model.Assigned?.Count ?? 0))</em></small>
             </div>
             <ul class="list-group list-group-flush">
-                @if (Model.AssignedGroups?.Count > 0)
+                @if (Model.Assigned?.Count > 0)
                 {
-                    foreach (var availableGroup in Model.AssignedGroups)
+                    foreach (var availableGroup in Model.Assigned)
                     {
                         <li class="list-group-item">
                             <form asp-action="@(nameof(SectionController.RemoveFilePermissionGroup))"

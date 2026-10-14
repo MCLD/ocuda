@@ -3,18 +3,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Data.Extensions;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class CategoryRepository : OpsRepository<OpsContext, Category, int>, ICategoryRepository
+    public class CategoryRepository(
+        ServiceFacade.Repository<OpsContext> repositoryFacade,
+        ILogger<CategoryRepository> logger)
+        : OpsRepository<OpsContext, Category, int>(repositoryFacade, logger),
+        ICategoryRepository
     {
-        public CategoryRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
-            ILogger<CategoryRepository> logger) : base(repositoryFacade, logger)
-        {
-        }
-
         public async Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId)
         {
             return await _context.SectionCategories
@@ -24,12 +26,20 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public async Task<Category> GetCategoryBySlugAsync(string stub)
+        public async Task<Category> GetCategoryBySlugAsync(string slug)
         {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.Slug.ToLower() == stub.ToLower())
-                .SingleOrDefaultAsync();
+            return await DbSet.AsNoTracking().Where(_ => _.Slug == slug).SingleOrDefaultAsync();
+        }
+
+        public async Task<CollectionWithCount<Category>> PageAsync(BaseFilter filter)
+        {
+            var query = DbSet.AsNoTracking();
+
+            return new CollectionWithCount<Category>
+            {
+                Count = await query.CountAsync(),
+                Data = await query.AsNoTracking().ApplyPagination(filter).ToListAsync(),
+            };
         }
 
         public async Task<bool> SectionHasCategoryAsync(int categoryId, int sectionId)

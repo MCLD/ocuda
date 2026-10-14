@@ -1,12 +1,17 @@
-﻿using System.Text;
+using System;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Category;
 using Ocuda.Ops.Controllers.ServiceFacades;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 {
@@ -15,7 +20,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
     public class CategoryController(
         Controller<CategoryController> context,
         IDateTimeProvider dateTimeProvider,
-        ICategoryRepository categoryRepository)
+        IContentCategoryService contentCategoryService)
         : BaseController<CategoryController>(context)
     {
         public static string Area
@@ -28,35 +33,18 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             get { return "Category"; }
         }
 
-        [HttpGet("")]
-        [HttpGet("{page:int}")]
-        public async Task<IActionResult> Index(int? page)
-        {
-            var filter = new BaseFilter(page);
-
-            var viewModel = new IndexViewModel
-            {
-                Categories = await categoryRepository.PageAsync(filter),
-                Page = filter.Page,
-            };
-
-            return View(viewModel);
-        }
-
         [HttpPost("[action]")]
         public async Task<IActionResult> Add(IndexViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
-                await categoryRepository.AddAsync(new Models.Entities.Category
+                await contentCategoryService.AddAsync(new Models.Entities.Category
                 {
                     CreatedAt = dateTimeProvider.Now,
                     CreatedBy = CurrentUserId,
                     Name = viewModel.CategoryName,
                     Slug = viewModel.CategorySlug,
                 });
-
-                await categoryRepository.SaveAsync();
             }
             else
             {
@@ -73,6 +61,70 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
 
             return RedirectToAction(nameof(Index), new { page = viewModel.Page });
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Delete(int deleteCategoryId, int? page)
+        {
+            try
+            {
+                await contentCategoryService.RemoveAsync(deleteCategoryId);
+            }
+            catch (ArgumentNullException)
+            {
+                context.Logger.LogError("Asked to delete nonexistent category id {CategoryId}",
+                    deleteCategoryId);
+                ShowAlertDanger($"Unable to find category id {deleteCategoryId}");
+            }
+            catch (OcudaException oex)
+            {
+                context.Logger.LogError("Unable to delete category id {CategoryId}: {ErrorMessage}",
+                    deleteCategoryId,
+                    oex.Message);
+                ShowAlertDanger($"Unable to delete category id {deleteCategoryId}: {oex.Message}");
+            }
+
+            return RedirectToAction(nameof(Index), new { page });
+        }
+
+        [HttpGet("")]
+        [HttpGet("{page:int}")]
+        public async Task<IActionResult> Index(int? page)
+        {
+            var filter = new BaseFilter(page != 0 ? page : 1);
+
+            var categories = await contentCategoryService.PageAsync(filter);
+
+            var mapping = categories.Data
+                .ToDictionary(k => k.Id, v => v.UsedInSections.Select(_ => new { _.Name, _.Slug }));
+
+            var link = Url.Action(
+                nameof(SectionController.Categories),
+                SectionController.Name,
+                new { slug = '0' }).TrimEnd('0');
+
+            var viewModel = new IndexViewModel
+            {
+                Categories = categories.Data,
+                CategorySectionLink = link,
+                CategorySectionMappingJson = JsonSerializer.Serialize(mapping),
+                CurrentPage = filter.Page,
+                HasManagementPermission = IsSiteManager(),
+                ItemCount = categories.Count,
+                ItemsPerPage = filter.Take.Value,
+            };
+
+            if (viewModel.PastMaxPage)
+            {
+                return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
+            }
+
+            if (categories.Count == 0)
+            {
+                ShowAlertWarning("No categories configured.");
+            }
+
+            return View(viewModel);
         }
     }
 }

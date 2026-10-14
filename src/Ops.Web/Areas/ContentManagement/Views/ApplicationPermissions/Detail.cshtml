@@ -21,7 +21,7 @@
     <div class="col-12 col-sm-6">
         <div class="card">
             <div class="card-header">
-                Available Groups
+                Available Groups <small><em>(@(Model.AvailableGroups?.Count ?? 0))</em></small>
             </div>
             <ul class="list-group list-group-flush">
                 @if (Model.AvailableGroups?.Count > 0)
@@ -52,7 +52,7 @@
     <div class="col-12 col-sm-6">
         <div class="card">
             <div class="card-header">
-                Assigned Groups
+                Assigned Groups <small><em>(@(Model.AssignedGroups?.Count ?? 0))</em></small>
             </div>
             <ul class="list-group list-group-flush">
                 @if (Model.AssignedGroups?.Count > 0)
