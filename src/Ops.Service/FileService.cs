@@ -331,7 +331,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<IEnumerable<Category>> GetCategoriesAsync(int sectionId)
         {
-            return await fileCategoryRepository.GetCategoriesAsync([sectionId]);
+            var categories = await fileCategoryRepository.GetCategoriesAsync([sectionId]);
+            return categories.OrderBy(_ => _.Name);
         }
 
         public async Task<int> GetFileCountAsync(int fileLibraryId)
@@ -380,7 +381,9 @@ namespace Ocuda.Ops.Service
         {
             var allFileIds = await fileRepository.GetFileLibraryFileIdsAsync(fileLibraryId);
 
-            return await fileCategoryRepository.GetCategoriesAsync(allFileIds);
+            var categories = await fileCategoryRepository.GetCategoriesAsync(allFileIds);
+
+            return categories.OrderBy(_ => _.Name);
         }
 
         public async Task<FileLibrary> GetLibraryByIdAsync(int id)

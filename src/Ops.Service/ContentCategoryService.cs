@@ -7,6 +7,7 @@ using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Models;
 
@@ -22,6 +23,12 @@ namespace Ocuda.Ops.Service
     {
         public async Task AddAsync(Category category)
         {
+            var existing = await categoryRepository.GetCategoryBySlugAsync(category.Slug);
+            if (existing != null)
+            {
+                throw new OcudaException("A category with that slug already exists.");
+            }
+
             await categoryRepository.AddAsync(category);
             await categoryRepository.SaveAsync();
         }

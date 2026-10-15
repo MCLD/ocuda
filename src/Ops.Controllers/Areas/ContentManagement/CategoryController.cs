@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
@@ -12,6 +13,7 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
+using Org.BouncyCastle.Utilities.Encoders;
 
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 {
@@ -38,13 +40,21 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         {
             if (ModelState.IsValid)
             {
-                await contentCategoryService.AddAsync(new Models.Entities.Category
+                try
                 {
-                    CreatedAt = dateTimeProvider.Now,
-                    CreatedBy = CurrentUserId,
-                    Name = viewModel.CategoryName,
-                    Slug = viewModel.CategorySlug,
-                });
+                    await contentCategoryService.AddAsync(new Models.Entities.Category
+                    {
+                        CreatedAt = dateTimeProvider.Now,
+                        CreatedBy = CurrentUserId,
+                        Name = viewModel.CategoryName,
+                        Slug = viewModel.CategorySlug,
+                    });
+                }
+                catch (OcudaException oex)
+                {
+                    ShowAlertDanger(
+                        $"Unable to add category: {HttpUtility.HtmlEncode(oex.Message)}");
+                }
             }
             else
             {
@@ -53,7 +63,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 {
                     foreach (var error in value.Errors)
                     {
-                        issues.Append("<li>").Append(error.ErrorMessage).Append("</li>");
+                        issues.Append("<li>")
+                            .Append(HttpUtility.HtmlEncode(error.ErrorMessage))
+                            .Append("</li>");
                     }
                 }
 
@@ -68,11 +80,15 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         {
             try
             {
+                _logger.LogInformation(
+                    "Attempting to delete category ID: {CategoryId}",
+                    deleteCategoryId);
                 await contentCategoryService.RemoveAsync(deleteCategoryId);
             }
-            catch (ArgumentNullException)
+            catch (ArgumentNullException anex)
             {
-                context.Logger.LogError("Asked to delete nonexistent category id {CategoryId}",
+                context.Logger.LogError(anex,
+                    "Asked to delete nonexistent category id {CategoryId}",
                     deleteCategoryId);
                 ShowAlertDanger($"Unable to find category id {deleteCategoryId}");
             }
@@ -81,7 +97,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 context.Logger.LogError("Unable to delete category id {CategoryId}: {ErrorMessage}",
                     deleteCategoryId,
                     oex.Message);
-                ShowAlertDanger($"Unable to delete category id {deleteCategoryId}: {oex.Message}");
+                ShowAlertDanger($"Unable to delete category id {deleteCategoryId}: {HttpUtility.HtmlEncode(oex.Message)}");
             }
 
             return RedirectToAction(nameof(Index), new { page });

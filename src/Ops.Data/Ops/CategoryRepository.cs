@@ -22,7 +22,8 @@ namespace Ocuda.Ops.Data.Ops
             return await _context.SectionCategories
                 .AsNoTracking()
                 .Where(_ => _.SectionId == sectionId)
-                .Select(__ => __.Category)
+                .Select(_ => _.Category)
+                .OrderBy(_ => _.Name)
                 .ToListAsync();
         }
 
@@ -38,7 +39,10 @@ namespace Ocuda.Ops.Data.Ops
             return new CollectionWithCount<Category>
             {
                 Count = await query.CountAsync(),
-                Data = await query.AsNoTracking().ApplyPagination(filter).ToListAsync(),
+                Data = await query.AsNoTracking()
+                    .OrderBy(_ => _.Name)
+                    .ApplyPagination(filter)
+                    .ToListAsync(),
             };
         }
 
