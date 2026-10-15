@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
     [Route("[area]/[controller]")]
     public class SectionController(
         ServiceFacades.Controller<SectionController> context,
+        IContentCategoryService contentCategoryService,
         IFileService fileService,
         ILinkService linkService,
         IOcudaCache cache,
@@ -74,75 +76,66 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        [HttpPost("[action]/{sectionSlug}")]
-        public async Task<IActionResult> DeleteSection(string sectionSlug)
+        [HttpPost("[action]/{slug}/{categoryId}")]
+        public async Task<IActionResult> AddCategory(string slug, int categoryId)
         {
+            var section = !string.IsNullOrEmpty(slug)
+                ? await GetSectionAsManagerAsync(slug)
+                : null;
+
+            if (section == null)
+            {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to add a category to section {Slug}",
+                    CurrentUsername,
+                    slug);
+                return RedirectToUnauthorized();
+            }
+
             try
             {
-                await sectionService.DeleteSectionAsync(sectionSlug);
-                await ClearSectionCache();
+                await sectionService.AddCategoryAsync(section.Id, categoryId);
+                AlertInfo = "Category added.";
             }
             catch (OcudaException oex)
             {
-                _logger.LogError(
-                    oex,
-                    "User {Username} was unable to delete section with slug {sectionSlug}: {ErrorMessage}",
-                    CurrentUsername,
-                    sectionSlug,
-                    oex.Message);
-                ShowAlertDanger($"Unable to delete section: {oex.Message}");
+                AlertDanger = $"Problem adding category: {oex.Message}";
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Categories), new { slug });
         }
 
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        [HttpPost("[action]")]
-        [SaveModelState]
-        public async Task<IActionResult> AddSection(SectionIndexViewModel viewModel)
+        [HttpPost("[action]/{sectionSlug}/{fileId:int}/{categoryId:int}")]
+        public async Task<IActionResult> AddCategoryToFile(string sectionSlug,
+            int fileId,
+            int categoryId)
         {
-            if (!ModelState.IsValid)
+            var section = await sectionService.GetBySlugAsync(sectionSlug);
+
+            if (section == null)
             {
-                var issues = new StringBuilder("Could not create section:<ul>");
-                foreach (var value in ModelState.Values)
-                {
-                    foreach (var error in value.Errors)
-                    {
-                        issues.Append("<li>").Append(error.ErrorMessage).Append("</li>");
-                    }
-                }
-
-                issues.Append("</ul>");
-                ShowAlertDanger(issues.ToString());
-            }
-            else
-            {
-                try
-                {
-                    await sectionService.CreateSectionAsync(new Section
-                    {
-                        Icon = viewModel.SectionIcon,
-                        Name = viewModel.SectionName,
-                        Slug = viewModel.SectionSlug,
-                        SupervisorsOnly = viewModel.SupervisorsOnly,
-                    });
-
-                    await ClearSectionCache();
-
-                    ShowAlertInfo($"Section {viewModel.SectionName} created and section cache cleared.");
-                }
-                catch (OcudaException oex)
-                {
-                    _logger.LogError(oex,
-                        "Couldn't create section {SectionName}: {ErrorMessage}",
-                        viewModel.SectionName,
-                        oex.Message);
-
-                    ShowAlertDanger($"Could not create section: {oex.Message}");
-                }
+                return NotFound();
             }
 
-            return RedirectToAction(nameof(Index));
+            if (!await HasFileCategoryPermissionsAsync(section))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            try
+            {
+                await fileService.AddCategoryAsync(fileId, categoryId);
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogWarning(oex,
+                    "Unable to add category {CategoryId} to file {FileId}",
+                    categoryId,
+                    fileId);
+                ShowAlertWarning("Unable to add category to file.");
+            }
+
+            return RedirectToAction(nameof(FileCategories), new { fileId, sectionSlug });
         }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
@@ -478,96 +471,53 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 });
         }
 
-        [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}/{fileId:int}")]
-        public async Task<IActionResult> DeleteThumbnail(
-            int fileId,
-            string fileLibrarySlug,
-            string sectionSlug,
-            ManageThumbnailsViewModel viewModel)
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("[action]")]
+        [SaveModelState]
+        public async Task<IActionResult> AddSection(SectionIndexViewModel viewModel)
         {
-            var section = !string.IsNullOrEmpty(sectionSlug)
-                ? await GetSectionAsManagerAsync(sectionSlug)
-                : null;
-            if (section == null)
+            if (!ModelState.IsValid)
             {
-                _logger.LogWarning(
-                    "Access denied: user {Username} tried to delete a thumbnail: section {SectionSlug}",
-                    CurrentUsername,
-                    sectionSlug);
-                return RedirectToUnauthorized();
-            }
-
-            var fileLibrary = await fileService
-                .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
-
-            var path = await fileService
-                .GetThumbnailPathAsync(viewModel.DeleteThumbnailId, fileLibrarySlug, sectionSlug);
-
-            bool fileExists = System.IO.File.Exists(path);
-            bool fileDeleteFailure = false;
-            bool fileDatabaseFailure = false;
-
-            if (fileExists)
-            {
-                try
+                var issues = new StringBuilder("Could not create section:<ul>");
+                foreach (var value in ModelState.Values)
                 {
-                    System.IO.File.Delete(path);
+                    foreach (var error in value.Errors)
+                    {
+                        issues.Append("<li>").Append(error.ErrorMessage).Append("</li>");
+                    }
                 }
-                catch (SystemException ex)
-                {
-                    fileDeleteFailure = true;
-                    _logger.LogWarning(
-                        "Unable to delete thumbnail file {Path}: {ErrorMessage}",
-                        path,
-                        ex.Message);
-                }
+
+                issues.Append("</ul>");
+                ShowAlertDanger(issues.ToString());
             }
             else
             {
-                _logger.LogWarning("Asked to delete file but it's already gone: {Path}", path);
-            }
-
-            if (!fileDeleteFailure)
-            {
                 try
                 {
-                    await fileService.DeleteThumbnailAsync(viewModel.DeleteThumbnailId);
+                    await sectionService.CreateSectionAsync(new Section
+                    {
+                        Icon = viewModel.SectionIcon,
+                        Name = viewModel.SectionName,
+                        Slug = viewModel.SectionSlug,
+                        SupervisorsOnly = viewModel.SupervisorsOnly,
+                    });
+
+                    await ClearSectionCache();
+
+                    ShowAlertInfo($"Section {viewModel.SectionName} created and section cache cleared.");
                 }
                 catch (OcudaException oex)
                 {
-                    fileDatabaseFailure = true;
-                    _logger.LogWarning(
-                        "Couldn't delete thumbnail from database: {ErrorMessage}",
+                    _logger.LogError(oex,
+                        "Couldn't create section {SectionName}: {ErrorMessage}",
+                        viewModel.SectionName,
                         oex.Message);
+
+                    ShowAlertDanger($"Could not create section: {oex.Message}");
                 }
             }
 
-            string message = $"For thumbnail id {viewModel.DeleteThumbnailId}:"
-                + (fileExists
-                    ? fileDeleteFailure
-                        ? " file could not be deleted"
-                        : " file was deleted"
-                    : " file could not be found")
-                + (fileDatabaseFailure
-                    ? " and thumbnail could not be removed from the database."
-                    : " and thumbnail was removed from the database.");
-
-            if (!fileExists || fileDeleteFailure || fileDatabaseFailure)
-            {
-                ShowAlertWarning(message);
-            }
-            else
-            {
-                ShowAlertSuccess(message);
-            }
-
-            return RedirectToAction(nameof(ManageThumbnails),
-                new
-                {
-                    fileId,
-                    fileLibrarySlug,
-                    sectionSlug,
-                });
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}/{fileId:int}")]
@@ -727,6 +677,72 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpGet("[action]/{slug}")]
+        public async Task<IActionResult> Categories(string slug)
+        {
+            var section = !string.IsNullOrEmpty(slug)
+                ? await GetSectionAsManagerAsync(slug)
+                : null;
+            if (section == null)
+            {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to access {Section} categories",
+                    CurrentUsername,
+                    slug);
+                return RedirectToUnauthorized();
+            }
+
+            var viewModel = new AssignmentViewModel
+            {
+                SectionName = section.Name,
+                SectionSlug = section.Slug,
+            };
+
+            foreach (var fileLibrary in await fileService.GetBySectionIdAsync(section.Id))
+            {
+                foreach (var category in await fileService.GetInUseCategoriesAsync(fileLibrary.Id))
+                {
+                    if (!viewModel.InUse.TryGetValue(category.Id, out IList<FileLibrary> value))
+                    {
+                        value = [];
+                        viewModel.InUse.Add(category.Id, value);
+                    }
+
+                    value.Add(fileLibrary);
+                }
+            }
+
+            viewModel.InUseJson = JsonSerializer.Serialize(viewModel.InUse.ToDictionary(k => k.Key,
+                v => v.Value.Select(_ => new { _.Name, _.Slug })));
+
+            viewModel.BaseLink = Url.Action(
+                nameof(Controllers.HomeController.Files),
+                Controllers.HomeController.Name,
+                new
+                {
+                    area = string.Empty,
+                    sectionSlug = section.Slug,
+                    fileLibrarySlug = '0',
+                }).TrimEnd('0');
+
+            var sectionCategories = await sectionService.GetCategoriesAsync(section.Id);
+
+            foreach (var category in await contentCategoryService.GetAllAsync())
+            {
+                if (sectionCategories.Any(_ => _.Id == category.Id))
+                {
+                    viewModel.Assigned.Add(category.Id, category.Name);
+                }
+                else
+                {
+                    viewModel.Available.Add(category.Id, category.Name);
+                }
+            }
+
+            return View(viewModel);
+        }
+
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost("[action]")]
         public async Task<IActionResult> ClearSectionCache()
         {
@@ -741,57 +757,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             await cache.RemoveAsync(Cache.OpsSections);
             ShowAlertInfo("Section cache cleared.");
             return RedirectToAction(nameof(Index));
-        }
-
-        [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}")]
-        public async Task<IActionResult> EditFileLibraryFile(
-            string fileLibrarySlug,
-            string sectionSlug,
-            FileLibraryViewModel viewModel)
-        {
-            ArgumentNullException.ThrowIfNull(viewModel);
-
-            var section = !string.IsNullOrEmpty(sectionSlug)
-                ? await GetSectionAsManagerAsync(sectionSlug)
-                : null;
-            if (section == null)
-            {
-                _logger.LogWarning(
-                    "Access denied: user {Username} tried to edit a file library: section {SectionSlug} file library {FileLibrarySlug}",
-                    CurrentUsername,
-                    sectionSlug,
-                    fileLibrarySlug);
-                return RedirectToUnauthorized();
-            }
-
-            var file = await fileService.GetFileLibraryFileAsync(viewModel.File.Id);
-
-            if (file == null)
-            {
-                return NotFound();
-            }
-
-            try
-            {
-                await fileService.EditFileLibraryFileAsync(
-                    sectionSlug,
-                    fileLibrarySlug,
-                    viewModel.File);
-            }
-            catch (OcudaException oex)
-            {
-                ShowAlertDanger(oex.Message);
-            }
-
-            return RedirectToAction(nameof(Controllers.HomeController.Files),
-                Controllers.HomeController.Name,
-                new
-                {
-                    area = string.Empty,
-                    fileLibrarySlug,
-                    page = viewModel.CurrentPage,
-                    sectionSlug,
-                });
         }
 
         [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}")]
@@ -1047,6 +1012,172 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 });
         }
 
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("[action]/{sectionSlug}")]
+        public async Task<IActionResult> DeleteSection(string sectionSlug)
+        {
+            try
+            {
+                await sectionService.DeleteSectionAsync(sectionSlug);
+                await ClearSectionCache();
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogError(
+                    oex,
+                    "User {Username} was unable to delete section with slug {sectionSlug}: {ErrorMessage}",
+                    CurrentUsername,
+                    sectionSlug,
+                    oex.Message);
+                ShowAlertDanger($"Unable to delete section: {oex.Message}");
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}/{fileId:int}")]
+        public async Task<IActionResult> DeleteThumbnail(
+            int fileId,
+            string fileLibrarySlug,
+            string sectionSlug,
+            ManageThumbnailsViewModel viewModel)
+        {
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
+            if (section == null)
+            {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to delete a thumbnail: section {SectionSlug}",
+                    CurrentUsername,
+                    sectionSlug);
+                return RedirectToUnauthorized();
+            }
+
+            var fileLibrary = await fileService
+                .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
+
+            var path = await fileService
+                .GetThumbnailPathAsync(viewModel.DeleteThumbnailId, fileLibrarySlug, sectionSlug);
+
+            bool fileExists = System.IO.File.Exists(path);
+            bool fileDeleteFailure = false;
+            bool fileDatabaseFailure = false;
+
+            if (fileExists)
+            {
+                try
+                {
+                    System.IO.File.Delete(path);
+                }
+                catch (SystemException ex)
+                {
+                    fileDeleteFailure = true;
+                    _logger.LogWarning(
+                        "Unable to delete thumbnail file {Path}: {ErrorMessage}",
+                        path,
+                        ex.Message);
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Asked to delete file but it's already gone: {Path}", path);
+            }
+
+            if (!fileDeleteFailure)
+            {
+                try
+                {
+                    await fileService.DeleteThumbnailAsync(viewModel.DeleteThumbnailId);
+                }
+                catch (OcudaException oex)
+                {
+                    fileDatabaseFailure = true;
+                    _logger.LogWarning(
+                        "Couldn't delete thumbnail from database: {ErrorMessage}",
+                        oex.Message);
+                }
+            }
+
+            string message = $"For thumbnail id {viewModel.DeleteThumbnailId}:"
+                + (fileExists
+                    ? fileDeleteFailure
+                        ? " file could not be deleted"
+                        : " file was deleted"
+                    : " file could not be found")
+                + (fileDatabaseFailure
+                    ? " and thumbnail could not be removed from the database."
+                    : " and thumbnail was removed from the database.");
+
+            if (!fileExists || fileDeleteFailure || fileDatabaseFailure)
+            {
+                ShowAlertWarning(message);
+            }
+            else
+            {
+                ShowAlertSuccess(message);
+            }
+
+            return RedirectToAction(nameof(ManageThumbnails),
+                new
+                {
+                    fileId,
+                    fileLibrarySlug,
+                    sectionSlug,
+                });
+        }
+
+        [HttpPost("{sectionSlug}/[action]/{fileLibrarySlug}")]
+        public async Task<IActionResult> EditFileLibraryFile(
+            string fileLibrarySlug,
+            string sectionSlug,
+            FileLibraryViewModel viewModel)
+        {
+            ArgumentNullException.ThrowIfNull(viewModel);
+
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
+            if (section == null)
+            {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to edit a file library: section {SectionSlug} file library {FileLibrarySlug}",
+                    CurrentUsername,
+                    sectionSlug,
+                    fileLibrarySlug);
+                return RedirectToUnauthorized();
+            }
+
+            var file = await fileService.GetFileLibraryFileAsync(viewModel.File.Id);
+
+            if (file == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                await fileService.EditFileLibraryFileAsync(
+                    sectionSlug,
+                    fileLibrarySlug,
+                    viewModel.File);
+            }
+            catch (OcudaException oex)
+            {
+                ShowAlertDanger(oex.Message);
+            }
+
+            return RedirectToAction(nameof(Controllers.HomeController.Files),
+                Controllers.HomeController.Name,
+                new
+                {
+                    area = string.Empty,
+                    fileLibrarySlug,
+                    page = viewModel.CurrentPage,
+                    sectionSlug,
+                });
+        }
+
         [HttpGet("{sectionSlug}/[action]/{postSlug}")]
         [RestoreModelState]
         public async Task<IActionResult> EditPost(string sectionSlug, string postSlug, int? page)
@@ -1147,6 +1278,61 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 });
         }
 
+        [HttpGet("{sectionSlug}/[action]/{fileId}")]
+        public async Task<IActionResult> FileCategories(string sectionSlug, int fileId)
+        {
+            var section = await sectionService.GetBySlugAsync(sectionSlug);
+
+            if (section == null)
+            {
+                return NotFound();
+            }
+
+            var file = await fileService.GetByIdAsync(fileId);
+
+            if (file == null)
+            {
+                return NotFound();
+            }
+
+            var fileLibrary = await fileService.GetLibraryByIdAsync(file.FileLibraryId);
+
+            if (fileLibrary == null)
+            {
+                return NotFound();
+            }
+
+            if (!await HasFileCategoryPermissionsAsync(section))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var viewModel = new AssignmentViewModel
+            {
+                FileId = file.Id,
+                FileLibrarySlug = fileLibrary.Slug,
+                FileName = file.Name,
+                SectionName = section.Name,
+                SectionSlug = section.Slug,
+            };
+
+            var fileCategories = await fileService.GetCategoriesAsync(fileId);
+
+            foreach (var category in await sectionService.GetCategoriesAsync(section.Id))
+            {
+                if (fileCategories.Any(_ => _.Id == category.Id))
+                {
+                    viewModel.Assigned.Add(category.Id, category.Name);
+                }
+                else
+                {
+                    viewModel.Available.Add(category.Id, category.Name);
+                }
+            }
+
+            return View(viewModel);
+        }
+
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpGet("{sectionSlug}/[action]")]
         [RestoreModelState]
@@ -1225,57 +1411,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                         Text = _.Value,
                     }),
                 });
-        }
-
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        [HttpGet("[action]/{sectionSlug}/{fileLibrarySlug}")]
-        public async Task<IActionResult> ReplaceFilePermissions(
-            string sectionSlug,
-            string fileLibrarySlug)
-        {
-            var section = !string.IsNullOrEmpty(sectionSlug)
-                ? await GetSectionAsManagerAsync(sectionSlug)
-                : null;
-            if (section == null)
-            {
-                _logger.LogWarning(
-                    "Access denied: user {Username} tried replace file permissions: section {SectionSlug} file library {FileLibrarySlug}",
-                    CurrentUsername,
-                    sectionSlug,
-                    fileLibrarySlug);
-                return RedirectToUnauthorized();
-            }
-
-            var fileLibrary = await fileService
-                .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
-
-            var permissionGroups = await permissionGroupService.GetAllAsync();
-            var fileLibraryPermissions = await permissionGroupService
-                .GetPermissionsAsync<PermissionGroupReplaceFiles>(fileLibrary.Id);
-
-            var viewModel = new FileLibraryPermissionsViewModel
-            {
-                Name = fileLibrary.Name,
-                SectionName = section.Name,
-                SectionSlug = section.Slug,
-                FileLibrarySlug = fileLibrary.Slug,
-            };
-
-            foreach (var permissionGroup in permissionGroups)
-            {
-                if (fileLibraryPermissions.Any(_ => _.PermissionGroupId == permissionGroup.Id))
-                {
-                    viewModel.AssignedGroups.Add(permissionGroup.Id,
-                        permissionGroup.PermissionGroupName);
-                }
-                else
-                {
-                    viewModel.AvailableGroups.Add(permissionGroup.Id,
-                        permissionGroup.PermissionGroupName);
-                }
-            }
-
-            return View(viewModel);
         }
 
         [HttpGet("")]
@@ -1431,27 +1566,91 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var sectionPermissions = await permissionGroupService
                 .GetPermissionsAsync<PermissionGroupSectionManager>(section.Id);
 
-            var viewModel = new PermissionsViewModel
+            var viewModel = new AssignmentViewModel
             {
-                Name = section.Name,
-                Slug = section.Slug,
+                SectionName = section.Name,
+                SectionSlug = section.Slug,
             };
 
             foreach (var permissionGroup in permissionGroups)
             {
                 if (sectionPermissions.Any(_ => _.PermissionGroupId == permissionGroup.Id))
                 {
-                    viewModel.AssignedGroups.Add(permissionGroup.Id,
+                    viewModel.Assigned.Add(permissionGroup.Id,
                         permissionGroup.PermissionGroupName);
                 }
                 else
                 {
-                    viewModel.AvailableGroups.Add(permissionGroup.Id,
+                    viewModel.Available.Add(permissionGroup.Id,
                         permissionGroup.PermissionGroupName);
                 }
             }
 
             return View(viewModel);
+        }
+
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("[action]/{slug}/{categoryId:int}")]
+        public async Task<IActionResult> RemoveCategory(string slug, int categoryId)
+        {
+            var section = !string.IsNullOrEmpty(slug)
+                ? await GetSectionAsManagerAsync(slug)
+                : null;
+
+            if (section == null)
+            {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried to remove a category from section {Slug}",
+                    CurrentUsername,
+                    slug);
+                return RedirectToUnauthorized();
+            }
+
+            try
+            {
+                await sectionService.RemoveCategoryAsync(section.Id, categoryId);
+                AlertInfo = "Category removed.";
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogError(oex, "Unable to remove category: {ErrorMessage}", oex.Message);
+                AlertDanger = $"Problem removing category: {oex.Message}";
+            }
+
+            return RedirectToAction(nameof(Categories), new { slug });
+        }
+
+        [HttpPost("[action]/{sectionSlug}/{fileId:int}/{categoryId:int}")]
+        public async Task<IActionResult> RemoveCategoryFromFile(string sectionSlug,
+            int fileId,
+            int categoryId)
+        {
+            var section = await sectionService.GetBySlugAsync(sectionSlug);
+
+            if (section == null)
+            {
+                return NotFound();
+            }
+
+            if (!await HasFileCategoryPermissionsAsync(section))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            try
+            {
+                await fileService.RemoveCategoryAsync(fileId, categoryId);
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogWarning(oex,
+                    "Unable to remove category {CategoryId} to file {FileId}",
+                    categoryId,
+                    fileId);
+                ShowAlertWarning("Unable to remove category from file.");
+            }
+
+            return RedirectToAction(nameof(FileCategories), new { fileId, sectionSlug });
         }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
@@ -1643,6 +1842,57 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                     page = viewModel.CurrentPage,
                     sectionSlug,
                 });
+        }
+
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpGet("[action]/{sectionSlug}/{fileLibrarySlug}")]
+        public async Task<IActionResult> ReplaceFilePermissions(
+            string sectionSlug,
+            string fileLibrarySlug)
+        {
+            var section = !string.IsNullOrEmpty(sectionSlug)
+                ? await GetSectionAsManagerAsync(sectionSlug)
+                : null;
+            if (section == null)
+            {
+                _logger.LogWarning(
+                    "Access denied: user {Username} tried replace file permissions: section {SectionSlug} file library {FileLibrarySlug}",
+                    CurrentUsername,
+                    sectionSlug,
+                    fileLibrarySlug);
+                return RedirectToUnauthorized();
+            }
+
+            var fileLibrary = await fileService
+                .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
+
+            var permissionGroups = await permissionGroupService.GetAllAsync();
+            var fileLibraryPermissions = await permissionGroupService
+                .GetPermissionsAsync<PermissionGroupReplaceFiles>(fileLibrary.Id);
+
+            var viewModel = new AssignmentViewModel
+            {
+                FileLibraryName = fileLibrary.Name,
+                SectionName = section.Name,
+                SectionSlug = section.Slug,
+                FileLibrarySlug = fileLibrary.Slug,
+            };
+
+            foreach (var permissionGroup in permissionGroups)
+            {
+                if (fileLibraryPermissions.Any(_ => _.PermissionGroupId == permissionGroup.Id))
+                {
+                    viewModel.Assigned.Add(permissionGroup.Id,
+                        permissionGroup.PermissionGroupName);
+                }
+                else
+                {
+                    viewModel.Available.Add(permissionGroup.Id,
+                        permissionGroup.PermissionGroupName);
+                }
+            }
+
+            return View(viewModel);
         }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
@@ -1936,6 +2186,14 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 section.Id)
                 ? section
                 : null;
+        }
+
+        private async Task<bool> HasFileCategoryPermissionsAsync(Section section)
+        {
+            return IsSiteManager()
+                || await HasPermissionAsync<PermissionGroupSectionManager>(
+                    permissionGroupService,
+                    section.Id);
         }
     }
 }

@@ -24,11 +24,22 @@ namespace Ocuda.Ops.Service
         IFileLibraryRepository fileLibraryRepository,
         IPostRepository postRepository,
         ILinkLibraryRepository linkLibraryRepository,
+        ISectionCategoryRepository sectionCategoryRepository,
         ISectionRepository sectionRepository,
         IUserService userService)
         : BaseService<SectionService>(logger, httpContextAccessor),
         ISectionService
     {
+        public async Task AddCategoryAsync(int sectionId, int categoryId)
+        {
+            await sectionCategoryRepository.AddAsync(new SectionCategory
+            {
+                CategoryId = categoryId,
+                SectionId = sectionId,
+            });
+            await sectionCategoryRepository.SaveAsync();
+        }
+
         public async Task CreateSectionAsync(Section section)
         {
             ArgumentNullException.ThrowIfNull(section);
@@ -113,6 +124,11 @@ namespace Ocuda.Ops.Service
                 : [.. sections.Where(_ => !_.SupervisorsOnly)];
         }
 
+        public async Task<IEnumerable<Section>> GetByCategoryId(int categoryId)
+        {
+            return await sectionCategoryRepository.GetSectionsAsync(categoryId);
+        }
+
         public async Task<Section> GetByIdAsync(int id)
         {
             var sections = await GetAllAsync();
@@ -130,6 +146,11 @@ namespace Ocuda.Ops.Service
             var sections = await GetAllAsync();
             return sections.SingleOrDefault(_ => _.Slug.Equals(slug,
                 StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        public async Task<IEnumerable<Category>> GetCategoriesAsync(int sectionId)
+        {
+            return await sectionCategoryRepository.GetCategoriesAsync(sectionId);
         }
 
         public async Task<int> GetHomeSectionIdAsync()
@@ -151,6 +172,11 @@ namespace Ocuda.Ops.Service
             }
 
             return sections;
+        }
+
+        public async Task RemoveCategoryAsync(int sectionId, int categoryId)
+        {
+            await sectionCategoryRepository.RemoveAsync(sectionId, categoryId);
         }
     }
 }

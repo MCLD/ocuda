@@ -26,32 +26,41 @@ namespace Ocuda.Ops.Data.Ops
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<ICollection<File>> GetFileLibraryFilesAsync(int id)
+        public async Task<IEnumerable<int>> GetFileLibraryFileIdsAsync(int fileLibraryId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.FileLibraryId == fileLibraryId)
+                .Select(_ => _.Id)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<File>> GetFileLibraryFilesAsync(int fileLibraryId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Include(_ => _.FileType)
-                .Where(_ => _.FileLibraryId == id)
+                .Where(_ => _.FileLibraryId == fileLibraryId)
                 .OrderBy(_ => _.Name)
                 .ToListAsync();
         }
 
-        public async Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int libraryId)
+        public async Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int fileLibraryId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.FileLibraryId == libraryId)
+                .Where(_ => _.FileLibraryId == fileLibraryId)
                 .Select(_ => _.FileTypeId)
                 .Distinct()
                 .ToListAsync();
         }
 
-        public async Task<File> GetLatestByLibraryIdAsync(int id)
+        public async Task<File> GetLatestByLibraryIdAsync(int fileLibraryId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Include(_ => _.FileType)
-                .Where(_ => _.FileLibraryId == id)
+                .Where(_ => _.FileLibraryId == fileLibraryId)
                 .OrderByDescending(_ => _.CreatedAt)
                 .FirstOrDefaultAsync();
         }
@@ -72,6 +81,15 @@ namespace Ocuda.Ops.Data.Ops
                 {
                     Count = await baseQuery.CountAsync(),
                 };
+            }
+
+            if (filter.CategoryId.HasValue)
+            {
+                baseQuery = baseQuery.Join(
+                    _context.FileCategories.Where(_ => _.CategoryId == filter.CategoryId),
+                    file => file.Id,
+                    fileCategory => fileCategory.FileId,
+                    (file, _) => file);
             }
 
             var filteredQuery = filter.FileLibrary.SortOrder switch

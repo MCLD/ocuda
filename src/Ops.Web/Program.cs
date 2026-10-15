@@ -19,9 +19,6 @@ namespace Ocuda.Ops.Web
                 .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
                 .UseSerilog();
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
-            "CA1031:Do not catch general exception types",
-            Justification = "Handle top-level system exceptions properly")]
         public static int Main(string[] args)
         {
             using var webHost = CreateHostBuilder(args).Build();

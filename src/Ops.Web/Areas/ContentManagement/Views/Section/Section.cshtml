@@ -11,9 +11,14 @@
         <div class="d-print-none">
             @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
             {
+                <a asp-action="@nameof(SectionController.Categories)"
+                   asp-route-slug="@Model.Section.Slug"
+                   class="btn btn-sm btn-outline-primary mt-1 ms-1">
+                    Categories
+                </a>
                 <a asp-action="@nameof(SectionController.Permissions)"
                    asp-route-slug="@Model.Section.Slug"
-                   class="btn btn-sm btn-outline-primary mt-1 ms-2">
+                   class="btn btn-sm btn-outline-primary mt-1 ms-1">
                     Permissions
                 </a>
                 if (Model.CanBeDeleted)

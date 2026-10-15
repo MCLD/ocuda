@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
@@ -23,6 +24,7 @@ namespace Ocuda.Ops.Controllers
     [Route("")]
     public class HomeController(
         ServiceFacades.Controller<HomeController> context,
+        IContentCategoryService contentCategoryService,
         IFileService fileService,
         ILinkService linkService,
         IPermissionGroupService permissionGroupService,
@@ -34,6 +36,159 @@ namespace Ocuda.Ops.Controllers
         public static string Name
         {
             get { return "Home"; }
+        }
+
+        [HttpGet("{sectionSlug}/[action]/{fileLibrarySlug}")]
+        [HttpGet("{sectionSlug}/[action]/{fileLibrarySlug}/{page:int}")]
+        public async Task<IActionResult> Files(
+            string sectionSlug,
+            string fileLibrarySlug,
+            int? page,
+            string category)
+        {
+            Section section = null;
+            try
+            {
+                section = await GetSection(sectionSlug);
+            }
+            catch (OcudaException oex)
+            {
+                return oex.Data[OcudaExceptionData.ActionResult] is IActionResult
+                    ? oex.Data[OcudaExceptionData.ActionResult] as IActionResult
+                    : RedirectToAction(nameof(Index));
+            }
+
+            var fileLibrary = await fileService
+                .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
+
+            if (fileLibrary == null)
+            {
+                ShowAlertDanger($"File library not found: {fileLibrarySlug}");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var currentPage = page ?? 1;
+
+            var itemsPerPage = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
+
+            int? categoryId = null;
+
+            if (!string.IsNullOrEmpty(category))
+            {
+                categoryId = await contentCategoryService.GetIdAsync(category);
+                if (!categoryId.HasValue)
+                {
+                    ShowAlertWarning($"Unable to find requested category: <strong>{HttpUtility.HtmlEncode(category)}</strong>");
+                }
+            }
+
+            var filter = new FilesFilter(currentPage, itemsPerPage)
+            {
+                CategoryId = categoryId,
+                FileLibrary = fileLibrary,
+                IncludeCategoryIds = true,
+            };
+
+            var filesAndCount = await fileService.GetPaginatedListAsync(section, filter);
+
+            var inUseCategories = await fileService.GetInUseCategoriesAsync(fileLibrary.Id);
+
+            foreach (var file in filesAndCount.Data)
+            {
+                PopulateThumbnailLinks(
+                    fileLibrary.Slug,
+                    section.Slug,
+                    file.Thumbnails);
+
+                file.CategoryNames = inUseCategories
+                    .Where(_ => file.CategoryIds.Contains(_.Id)).Select(_ => _.Name);
+            }
+
+            var viewModel = new FileLibraryViewModel
+            {
+                AllCategories = await sectionService.GetCategoriesAsync(section.Id),
+                CategoryId = categoryId,
+                CurrentPage = currentPage,
+                GetFileDetailsLink = Url.Action(nameof(GetFileDetailsJson),
+                new
+                {
+                    fileLibrarySlug,
+                    sectionSlug,
+                }),
+                FileLibraryId = fileLibrary.Id,
+                FileLibraryName = fileLibrary.Name,
+                FileLibrarySlug = fileLibrary.Slug,
+                FileLibrarySortOrder = fileLibrary.SortOrder,
+                Files = filesAndCount.Data,
+                FileTypes = await fileService.GetFileLibrariesFileTypesAsync(fileLibrary.Id),
+                HasAdminRights = IsSiteManager(),
+                HasManagementRights = await HasPermissionAsync<PermissionGroupSectionManager>(
+                    permissionGroupService,
+                    section.Id),
+                HasReplaceRights = await fileService.HasReplaceRightsAsync(fileLibrary.Id),
+                ItemCount = filesAndCount.Count,
+                ItemsPerPage = filter.Take.Value,
+                MaximumFileUploadBytes = SectionController.MaximumFileUploadBytes,
+                SectionName = section.Name,
+                SectionSlug = section.Slug,
+                UsedCategories = inUseCategories,
+                UseThumbnails = filesAndCount.Data.Any(_ => _.Thumbnails?.Count > 0),
+            };
+
+            return viewModel.PastMaxPage
+                ? RedirectToRoute(new { page = viewModel.LastPage ?? 1 })
+                : View(viewModel);
+        }
+
+        [HttpGet]
+        [Route("[action]/{libraryId:int}/{fileId:int}")]
+        [ResponseCache(NoStore = true)]
+        public async Task<IActionResult> GetFile(int libraryId, int fileId)
+        {
+            var library = await fileService.GetLibraryByIdAsync(libraryId);
+            var section = await sectionService.GetByIdAsync(library.SectionId);
+
+            if (section == null)
+            {
+                return RedirectToUnauthorized();
+            }
+
+            if (section.SupervisorsOnly)
+            {
+                var isSupervisor = await userService.IsSupervisor(CurrentUserId);
+                if (!isSupervisor)
+                {
+                    return RedirectToUnauthorized();
+                }
+            }
+
+            var file = await fileService.GetByIdAsync(fileId);
+            if (file == null)
+            {
+                return NotFound();
+            }
+
+            var filePath = fileService.GetFileLibraryFilePath(section.Slug, library.Slug, file);
+            var filename = Path.GetFileName(filePath);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                ShowAlertDanger($"File not found in file library {library.Name}: {filename}");
+                _logger.LogError(
+                    "File {FileName} not found at path {FilePath} for library {LibraryName} (id {LibraryId})",
+                    filename,
+                    filePath,
+                    library.Name,
+                    library.Id);
+
+                return RedirectToAction(nameof(SectionIndex),
+                    new { slug = section.Slug });
+            }
+
+            return File(new FileStream(filePath, FileMode.Open, FileAccess.Read),
+                System.Net.Mime.MediaTypeNames.Application.Octet,
+                filename);
         }
 
         [HttpGet("{sectionSlug}/[action]/{fileLibrarySlug}")]
@@ -139,136 +294,6 @@ namespace Ocuda.Ops.Controllers
                 new FileStream(filePath, FileMode.Open, FileAccess.Read),
                 contentType,
                 fullPath);
-        }
-
-        [HttpGet("{sectionSlug}/[action]/{fileLibrarySlug}")]
-        [HttpGet("{sectionSlug}/[action]/{fileLibrarySlug}/{page:int}")]
-        public async Task<IActionResult> Files(
-            string sectionSlug,
-            string fileLibrarySlug,
-            int? page)
-        {
-            Section section = null;
-            try
-            {
-                section = await GetSection(sectionSlug);
-            }
-            catch (OcudaException oex)
-            {
-                return oex.Data[OcudaExceptionData.ActionResult] is IActionResult
-                    ? oex.Data[OcudaExceptionData.ActionResult] as IActionResult
-                    : RedirectToAction(nameof(Index));
-            }
-
-            var fileLibrary = await fileService
-                .GetBySectionIdSlugAsync(section.Id, fileLibrarySlug);
-            if (fileLibrary == null)
-            {
-                ShowAlertDanger($"File library not found: {fileLibrarySlug}");
-                return RedirectToAction(nameof(Index));
-            }
-
-            var currentPage = page ?? 1;
-
-            var itemsPerPage = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
-
-            var filter = new FilesFilter(currentPage, itemsPerPage)
-            {
-                FileLibrary = fileLibrary,
-            };
-
-            var filesAndCount = await fileService.GetPaginatedListAsync(section, filter);
-
-            foreach (var file in filesAndCount.Data)
-            {
-                PopulateThumbnailLinks(
-                    fileLibrary.Slug,
-                    section.Slug,
-                    file.Thumbnails);
-            }
-
-            var viewModel = new FileLibraryViewModel
-            {
-                CurrentPage = currentPage,
-                GetFileDetailsLink = Url.Action(nameof(GetFileDetailsJson),
-                new
-                {
-                    fileLibrarySlug,
-                    sectionSlug,
-                }),
-                FileLibraryId = fileLibrary.Id,
-                FileLibraryName = fileLibrary.Name,
-                FileLibrarySlug = fileLibrary.Slug,
-                FileLibrarySortOrder = fileLibrary.SortOrder,
-                Files = filesAndCount.Data,
-                FileTypes = await fileService.GetFileLibrariesFileTypesAsync(fileLibrary.Id),
-                HasAdminRights = IsSiteManager(),
-                HasManagementRights = await HasPermissionAsync<PermissionGroupSectionManager>(
-                    permissionGroupService,
-                    section.Id),
-                HasReplaceRights = await fileService.HasReplaceRightsAsync(fileLibrary.Id),
-                ItemCount = filesAndCount.Count,
-                ItemsPerPage = filter.Take.Value,
-                MaximumFileUploadBytes = SectionController.MaximumFileUploadBytes,
-                SectionName = section.Name,
-                SectionSlug = section.Slug,
-                UseThumbnails = filesAndCount.Data.Any(_ => _.Thumbnails?.Count > 0),
-            };
-
-            return viewModel.PastMaxPage
-                ? RedirectToRoute(new { page = viewModel.LastPage ?? 1 })
-                : View(viewModel);
-        }
-
-        [HttpGet]
-        [Route("[action]/{libraryId:int}/{fileId:int}")]
-        [ResponseCache(NoStore = true)]
-        public async Task<IActionResult> GetFile(int libraryId, int fileId)
-        {
-            var library = await fileService.GetLibraryByIdAsync(libraryId);
-            var section = await sectionService.GetByIdAsync(library.SectionId);
-
-            if (section == null)
-            {
-                return RedirectToUnauthorized();
-            }
-
-            if (section.SupervisorsOnly)
-            {
-                var isSupervisor = await userService.IsSupervisor(CurrentUserId);
-                if (!isSupervisor)
-                {
-                    return RedirectToUnauthorized();
-                }
-            }
-
-            var file = await fileService.GetByIdAsync(fileId);
-            if (file == null)
-            {
-                return NotFound();
-            }
-
-            var filePath = fileService.GetFileLibraryFilePath(section.Slug, library.Slug, file);
-            var filename = Path.GetFileName(filePath);
-
-            if (!System.IO.File.Exists(filePath))
-            {
-                ShowAlertDanger($"File not found in file library {library.Name}: {filename}");
-                _logger.LogError(
-                    "File {FileName} not found at path {FilePath} for library {LibraryName} (id {LibraryId})",
-                    filename,
-                    filePath,
-                    library.Name,
-                    library.Id);
-
-                return RedirectToAction(nameof(SectionIndex),
-                    new { slug = section.Slug });
-            }
-
-            return File(new FileStream(filePath, FileMode.Open, FileAccess.Read),
-                System.Net.Mime.MediaTypeNames.Application.Octet,
-                filename);
         }
 
         [HttpGet("")]

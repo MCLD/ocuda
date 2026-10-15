@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Ocuda.Ops.Models.Entities;
-using Category = Ocuda.Ops.Models.Entities.Category;
 
 namespace Ocuda.Ops.Data
 {
@@ -54,6 +53,8 @@ namespace Ocuda.Ops.Data
         public DbSet<EmployeeCardStats> EmployeeCardStats { get; set; }
 
         public DbSet<ExternalResource> ExternalResources { get; set; }
+
+        public DbSet<FileCategory> FileCategories { get; set; }
 
         public DbSet<FileLibrary> FileLibraries { get; set; }
 
@@ -195,6 +196,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.Month, _.Year, _.EmediaId });
             modelBuilder.Entity<EmployeeCardStats>()
                 .HasKey(_ => new { _.Month, _.Year });
+            modelBuilder.Entity<FileCategory>()
+                .HasKey(_ => new { _.FileId, _.CategoryId });
             modelBuilder.Entity<FileLibraryFileType>()
                 .HasKey(_ => new { _.FileLibraryId, _.FileTypeId });
             modelBuilder.Entity<IncidentRelationship>()

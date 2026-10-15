@@ -91,6 +91,12 @@
                                 <span class="fa-solid fa-user-plus fa-fw"></span>
                                 Permissions
                             </a>
+                            <a asp-action="@nameof(SectionController.Categories)"
+                               asp-route-slug="@opsSection.Slug"
+                               class="btn btn-outline-primary btn-sm me-1">
+                                <span class="fa-solid fa-tag fa-fw"></span>
+                                Categories
+                            </a>
                         }
                     </div>
                 </div>

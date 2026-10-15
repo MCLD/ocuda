@@ -22,6 +22,7 @@ namespace Ocuda.Ops.Service
         ILogger<FileService> logger,
         IHttpContextAccessor httpContextAccessor,
         IDateTimeProvider dateTimeProvider,
+        IFileCategoryRepository fileCategoryRepository,
         IFileLibraryRepository fileLibraryRepository,
         IFileRepository fileRepository,
         IFileThumbnailRepository fileThumbnailRepository,
@@ -34,6 +35,16 @@ namespace Ocuda.Ops.Service
     {
         private const string SectionsPath = "sections";
         private const string ThumbnailsPath = "thumbnails";
+
+        public async Task AddCategoryAsync(int fileId, int categoryId)
+        {
+            await fileCategoryRepository.AddAsync(new FileCategory
+            {
+                CategoryId = categoryId,
+                FileId = fileId,
+            });
+            await fileCategoryRepository.SaveAsync();
+        }
 
         public Task<File> AddFileLibraryFileAsync(File file, IFormFile fileDatas)
         {
@@ -91,32 +102,6 @@ namespace Ocuda.Ops.Service
             await fileLibraryRepository.SaveAsync();
 
             return library;
-        }
-
-        public async Task DeleteReplacePemissionsAsync(int fileLibraryId)
-        {
-            var replaceFilePermissions = await permissionGroupService
-                .GetPermissionsAsync<PermissionGroupReplaceFiles>(fileLibraryId);
-
-            foreach (var permission in replaceFilePermissions)
-            {
-                await permissionGroupService
-                    .RemoveFromPermissionGroupAsync<PermissionGroupReplaceFiles>(
-                        permission.FileLibraryId,
-                        permission.PermissionGroupId);
-            }
-        }
-
-        public async Task DeleteFileTypesByLibrary(int fileLibraryId)
-        {
-            var currentLibrary = await fileLibraryRepository.FindAsync(fileLibraryId);
-            var fileTypeIds = await GetLibraryFileTypeIdsAsync(fileLibraryId);
-            var fileTypesToRemove = currentLibrary.FileTypes
-                .Where(_ => fileTypeIds.Any(__ => __ == _.FileTypeId))
-                .Select(_ => _.FileTypeId)
-                .ToList();
-            await fileLibraryRepository
-                .RemoveLibraryFileTypesAsync(fileTypesToRemove, currentLibrary.Id);
         }
 
         public async Task DeleteFileLibraryAsync(Section section, int fileLibraryId)
@@ -210,6 +195,32 @@ namespace Ocuda.Ops.Service
             if (issues.Length > 0)
             {
                 throw new OcudaException($"Error: {issues}");
+            }
+        }
+
+        public async Task DeleteFileTypesByLibrary(int fileLibraryId)
+        {
+            var currentLibrary = await fileLibraryRepository.FindAsync(fileLibraryId);
+            var fileTypeIds = await GetLibraryFileTypeIdsAsync(fileLibraryId);
+            var fileTypesToRemove = currentLibrary.FileTypes
+                .Where(_ => fileTypeIds.Any(__ => __ == _.FileTypeId))
+                .Select(_ => _.FileTypeId)
+                .ToList();
+            await fileLibraryRepository
+                .RemoveLibraryFileTypesAsync(fileTypesToRemove, currentLibrary.Id);
+        }
+
+        public async Task DeleteReplacePemissionsAsync(int fileLibraryId)
+        {
+            var replaceFilePermissions = await permissionGroupService
+                .GetPermissionsAsync<PermissionGroupReplaceFiles>(fileLibraryId);
+
+            foreach (var permission in replaceFilePermissions)
+            {
+                await permissionGroupService
+                    .RemoveFromPermissionGroupAsync<PermissionGroupReplaceFiles>(
+                        permission.FileLibraryId,
+                        permission.PermissionGroupId);
             }
         }
 
@@ -318,6 +329,12 @@ namespace Ocuda.Ops.Service
             return await fileLibraryRepository.GetBySectionIdSlugAsync(sectionId, slug);
         }
 
+        public async Task<IEnumerable<Category>> GetCategoriesAsync(int sectionId)
+        {
+            var categories = await fileCategoryRepository.GetCategoriesAsync([sectionId]);
+            return categories.OrderBy(_ => _.Name);
+        }
+
         public async Task<int> GetFileCountAsync(int fileLibraryId)
         {
             var result = await fileRepository.GetPaginatedListAsync(new FilesFilter
@@ -358,6 +375,15 @@ namespace Ocuda.Ops.Service
         {
             var types = await GetAllFileTypesAsync();
             return types.FirstOrDefault(_ => _.Id == id);
+        }
+
+        public async Task<IEnumerable<Category>> GetInUseCategoriesAsync(int fileLibraryId)
+        {
+            var allFileIds = await fileRepository.GetFileLibraryFileIdsAsync(fileLibraryId);
+
+            var categories = await fileCategoryRepository.GetCategoriesAsync(allFileIds);
+
+            return categories.OrderBy(_ => _.Name);
         }
 
         public async Task<FileLibrary> GetLibraryByIdAsync(int id)
@@ -426,6 +452,11 @@ namespace Ocuda.Ops.Service
                         SectionsPath,
                         section.Slug,
                         filter.FileLibrary.Slug);
+
+                if (filter.IncludeCategoryIds)
+                {
+                    file.CategoryIds = await fileCategoryRepository.GetCategoryIdsAsync(file.Id);
+                }
 
                 if (System.IO.File.Exists(filePath))
                 {
@@ -515,6 +546,15 @@ namespace Ocuda.Ops.Service
             await using var ms = new System.IO.MemoryStream();
             await fileStream.CopyToAsync(ms);
             return ms.ToArray();
+        }
+
+        public async Task RemoveCategoryAsync(int fileId, int categoryId)
+        {
+            var fileCategory = await fileCategoryRepository.FindAsync(fileId, categoryId)
+                ?? throw new OcudaException("Unable to find category id {categoryId} assigned to file id {fileId}");
+
+            fileCategoryRepository.Remove(fileCategory);
+            await fileCategoryRepository.SaveAsync();
         }
 
         public async Task<File> ReplaceFileLibraryFileAsync(int fileId)

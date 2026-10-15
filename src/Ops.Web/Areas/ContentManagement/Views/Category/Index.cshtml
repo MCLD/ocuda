@@ -1,0 +1,238 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Category.IndexViewModel
+
+@section header {
+    <div class="d-flex justify-content-between align-items-top mb-2">
+        <h1>
+            Categories
+        </h1>
+        <div class="pt-1 d-print-none">
+            @if (Model.HasManagementPermission)
+            {
+                <button class="btn btn-sm btn-outline-success mt-1 ms-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addCategory">
+                    <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
+                    Add Category
+                </button>
+            }
+            <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)"
+               asp-area=""
+               asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+               class="btn btn-sm btn-outline-dark mt-1 ms-2">Back</a>
+        </div>
+    </div>
+}
+
+@if (Model.Categories?.Count() > 0)
+{
+    <table class="table table-bordered table-sm table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Slug</th>
+                @if (Model.HasManagementPermission)
+                {
+                    <th>Action</th>
+                }
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            @foreach (var category in Model.Categories)
+            {
+                <tr>
+                    <td>@category.Name</td>
+                    <td>@category.Slug</td>
+                    @if (Model.HasManagementPermission)
+                    {
+                        <td>
+                            @if (category.UsedInSections?.Count > 0)
+                            {
+                                <a class="btn btn-outline-secondary btn-sm"
+                                   data-bs-target="#inUse"
+                                   data-bs-toggle="modal"
+                                   data-inuse="@category.Id">
+                                    <span class="fa-solid fa-circle-exclamation fa-fw"></span>
+                                </a>
+                            }
+                            else
+                            {
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm"
+                                        data-bs-target="#deleteCategory"
+                                        data-bs-toggle="modal"
+                                        data-id="@category.Id"
+                                        data-name="@category.Name">
+                                    <span aria-hidden="true"
+                                          class="fa-solid fa-circle-minus fa-fw"></span>
+                                </button>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+    <nav paginate="@Model"></nav>
+}
+
+@if (Model.HasManagementPermission)
+{
+    <form asp-action="@nameof(CategoryController.Add)"
+          asp-area="@CategoryController.Area"
+          asp-controller="@CategoryController.Name"
+          method="post">
+        <input asp-for="Page" type="hidden" value="@Model.Page" />
+        <div aria-hidden="true"
+             aria-labelledby="addCategoryLabel"
+             class="modal fade"
+             data-bs-backdrop="static"
+             data-bs-keyboard="false"
+             id="addCategory"
+             tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5"
+                            id="addCategoryLabel">
+                            Add category
+                        </h1>
+                        <button aria-label="Close"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label asp-for="CategoryName" class="form-label"></label>
+                            <input asp-for="CategoryName"
+                                   class="form-control"
+                                   type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="CategorySlug" class="form-label"></label>
+                            <input asp-for="CategorySlug"
+                                   class="form-control"
+                                   data-oc-slugify-from="CategoryName"
+                                   type="text">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal"
+                                type="button">
+                            Close
+                        </button>
+                        <button button-spinner
+                                class="btn btn-outline-primary"
+                                type="submit">
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <form asp-action="@nameof(CategoryController.Delete)"
+          asp-area="@CategoryController.Area"
+          asp-controller="@CategoryController.Name"
+          method="post">
+        <input name="page" type="hidden" value="@Model.Page" />
+        <input id="deleteCategoryId" name="deleteCategoryId" type="hidden" />
+        <div aria-hidden="true"
+             aria-labelledby="deleteCategoryLabel"
+             class="modal fade"
+             data-bs-backdrop="static"
+             data-bs-keyboard="false"
+             id="deleteCategory"
+             tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5"
+                            id="deleteCategoryLabel">
+                            Delete category
+                        </h1>
+                        <button aria-label="Close"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete category
+                        <strong id="deleteCategoryName"></strong>?
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal"
+                                type="button">
+                            Close
+                        </button>
+                        <button button-spinner
+                                class="btn btn-outline-danger"
+                                type="submit">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div aria-hidden="true"
+         aria-labelledby="inUseLabel"
+         class="modal fade"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false"
+         id="inUse"
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5"
+                        id="inUseLabel">
+                        Category in use
+                    </h1>
+                    <button aria-label="Close"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            type="button"></button>
+                </div>
+                <div class="modal-body">
+                    This category is currently in use in the following section(s):
+                    <ul id="inUseList"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal"
+                            type="button">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @if (Model.HasManagementPermission)
+    {
+        <script>
+            const mapping = JSON.parse('@Html.Raw(Model.CategorySectionMappingJson)');
+            const sectionUrl = new URL(`${location.origin}@Model.CategorySectionLink`);
+
+            document.getElementById('inUse').addEventListener('show.bs.modal', _ => {
+                let categoryId = _.relatedTarget.dataset.inuse;
+                let uses = [];
+                mapping[categoryId].forEach(_ => {
+                    uses.push(`<li><a href="${sectionUrl}${_.Slug}">${_.Name}</a></li>`);
+                });
+                document.getElementById('inUseList').innerHTML = uses.join('\n');
+            });
+
+            document.getElementById('deleteCategory').addEventListener('show.bs.modal', _ => {
+                document.getElementById('deleteCategoryId').value = _.relatedTarget.dataset.id;
+                document.getElementById('deleteCategoryName').innerText
+                    = _.relatedTarget.dataset.name;
+            });
+        </script>
+    }
+}

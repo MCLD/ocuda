@@ -41,10 +41,14 @@
                     Sections
                 </div>
                 <div class="card-body">
+                    <a asp-area="@CategoryController.Area"
+                       asp-controller="@CategoryController.Name"
+                       asp-action="@nameof(CategoryController.Index)"
+                       class="btn btn-outline-dark mt-1">View Categories</a>
                     <a asp-area="@SectionController.Area"
                        asp-controller="@SectionController.Name"
                        asp-action="@nameof(SectionController.Index)"
-                       class="btn btn-outline-dark mt-1">View @SectionController.Name</a>
+                       class="btn btn-outline-dark mt-1">View Sections</a>
                 </div>
             </div>
         </div>

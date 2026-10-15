@@ -6,11 +6,15 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface ISectionService
     {
+        Task AddCategoryAsync(int sectionId, int categoryId);
 
         Task CreateSectionAsync(Section section);
+
         Task DeleteSectionAsync(string sectionSlug);
 
         Task<ICollection<Section>> GetAllAsync();
+
+        Task<IEnumerable<Section>> GetByCategoryId(int categoryId);
 
         Task<Section> GetByIdAsync(int id);
 
@@ -18,8 +22,12 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<Section> GetBySlugAsync(string slug);
 
+        Task<IEnumerable<Category>> GetCategoriesAsync(int sectionId);
+
         Task<int> GetHomeSectionIdAsync();
 
         Task<ICollection<Section>> GetManagedByCurrentUserAsync();
+
+        Task RemoveCategoryAsync(int sectionId, int categoryId);
     }
 }

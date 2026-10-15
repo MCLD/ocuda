@@ -1,17 +1,18 @@
-﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.PermissionsViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.AssignmentViewModel
+@using Ocuda.Ops.Controllers.Areas.ContentManagement
 
 @section header {
     <div class="d-flex justify-content-between align-items-top mb-2">
         <h1>
-            Section Management
+            Permission Management
             <small class="text-muted d-print-block">
-                @Model.Name
+                @Model.SectionName
             </small>
         </h1>
         <div class="pt-1 d-print-none">
-            <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Section)"
-               asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
-               asp-route-sectionSlug="@Model.Slug"
+            <a asp-action="@nameof(SectionController.Section)"
+               asp-controller="@SectionController.Name"
+               asp-route-sectionSlug="@Model.SectionSlug"
                class="btn btn-outline-dark btn-sm mt-1 ms-2">Back</a>
         </div>
     </div>
@@ -30,22 +31,21 @@
         </div>
     </div>
 </div>
-
 <div class="row pt-1">
     <div class="col-12 col-sm-6">
         <div class="card">
-            <div class="card-header px-3">
-                Available Groups
+            <div class="card-header fw-bold px-3">
+                Available Permissions  <small><em>(@(Model.Available?.Count ?? 0))</em></small>
             </div>
             <ul class="list-group list-group-flush">
-                @if (Model.AvailableGroups?.Count > 0)
+                @if (Model.Available?.Count > 0)
                 {
-                    foreach (var availableGroup in Model.AvailableGroups)
+                    foreach (var availableGroup in Model.Available)
                     {
                         <li class="list-group-item px-3 py-2">
                             <form asp-controller="@SectionController.Name"
                                   asp-action="@(nameof(SectionController.AddPermissionGroup))"
-                                  asp-route-slug="@Model.Slug"
+                                  asp-route-slug="@Model.SectionSlug"
                                   asp-route-permissionGroupId="@availableGroup.Key">
                                 <span class="d-inline-block mt-1">@availableGroup.Value</span>
                                 <button class="btn btn-outline-success float-end">
@@ -57,25 +57,25 @@
                 }
                 else
                 {
-                    <li class="list-group-item">No groups available.</li>
+                    <li class="list-group-item fw-bold">No groups available.</li>
                 }
             </ul>
         </div>
     </div>
     <div class="col-12 col-sm-6">
         <div class="card">
-            <div class="card-header px-3">
-                Assigned Groups
+            <div class="card-header fw-bold px-3">
+                Assigned Permissions <small><em>(@(Model.Assigned?.Count ?? 0))</em></small>
             </div>
             <ul class="list-group list-group-flush">
-                @if (Model.AssignedGroups?.Count > 0)
+                @if (Model.Assigned?.Count > 0)
                 {
-                    foreach (var availableGroup in Model.AssignedGroups)
+                    foreach (var availableGroup in Model.Assigned)
                     {
                         <li class="list-group-item px-3 py-2">
                             <form asp-controller="@SectionController.Name"
                                   asp-action="@(nameof(SectionController.RemovePermissionGroup))"
-                                  asp-route-slug="@Model.Slug"
+                                  asp-route-slug="@Model.SectionSlug"
                                   asp-route-permissionGroupId="@availableGroup.Key">
                                 <span class="d-inline-block mt-1">@availableGroup.Value</span>
                                 <button class="btn btn-outline-danger float-end">
@@ -87,7 +87,7 @@
                 }
                 else
                 {
-                    <li class="list-group-item">No groups assigned.</li>
+                    <li class="list-group-item fw-bold">No groups assigned.</li>
                 }
             </ul>
         </div>

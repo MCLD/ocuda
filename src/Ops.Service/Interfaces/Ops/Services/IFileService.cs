@@ -9,6 +9,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IFileService
     {
+        Task AddCategoryAsync(int fileId, int categoryId);
+
         Task<File> AddFileLibraryFileAsync(File file, IFormFile fileDatas);
 
         Task AddThumbnailAsync(int fileId, string thumbnailFile);
@@ -37,6 +39,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<FileLibrary> GetBySectionIdSlugAsync(int sectionId, string slug);
 
+        Task<IEnumerable<Category>> GetCategoriesAsync(int sectionId);
+
         Task<int> GetFileCountAsync(int fileLibraryId);
 
         Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId);
@@ -46,6 +50,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         string GetFileLibraryFilePath(string sectionSlug, string fileLibrarySlug, File file);
 
         Task<FileType> GetFileTypeByIdAsync(int id);
+
+        Task<IEnumerable<Category>> GetInUseCategoriesAsync(int fileLibraryId);
 
         Task<FileLibrary> GetLibraryByIdAsync(int id);
 
@@ -71,6 +77,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<bool> HasReplaceRightsAsync(int fileLibraryId);
 
         Task<byte[]> ReadPrivateFileAsync(File file);
+
+        Task RemoveCategoryAsync(int fileId, int categoryId);
 
         Task<File> ReplaceFileLibraryFileAsync(int fileId);
 

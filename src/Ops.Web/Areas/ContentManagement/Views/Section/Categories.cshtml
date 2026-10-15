@@ -1,0 +1,152 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.AssignmentViewModel
+@using Ocuda.Ops.Controllers.Areas.ContentManagement
+
+@section header {
+    <div class="d-flex justify-content-between align-items-top mb-2">
+        <h1>
+            Section Category Assignment
+            <small class="text-muted d-print-block">
+                @Model.SectionName
+            </small>
+        </h1>
+        <div class="pt-1 d-print-none">
+            <a asp-action="@nameof(SectionController.Section)"
+               asp-controller="@SectionController.Name"
+               asp-route-sectionSlug="@Model.SectionSlug"
+               class="btn btn-outline-dark btn-sm mt-1 ms-2">Back</a>
+        </div>
+    </div>
+}
+<div class="row pt-1">
+    <div class="col-12 col-md-8 offset-md-2">
+        <div class="alert alert-primary">
+            Assign categories to a section. Once assigned those categories become available for use
+            in file libraries.
+        </div>
+    </div>
+</div>
+<div class="row pt-1">
+    <div class="col-12 col-sm-6">
+        <div class="card">
+            <div class="card-header fw-bold px-3">
+                Available Categories <small><em>(@(Model.Available?.Count ?? 0))</em></small>
+            </div>
+            <ul class="list-group list-group-flush">
+                @if (Model.Available.Count > 0)
+                {
+                    foreach (var availableGroup in Model.Available)
+                    {
+                        <li class="list-group-item px-3 py-2 d-flex">
+                            <div class="flex-grow-1">
+                                @availableGroup.Value
+                            </div>
+                            <div>
+                                <form asp-action="@nameof(SectionController.AddCategory)"
+                                      asp-route-categoryId="@availableGroup.Key"
+                                      asp-route-slug="@Model.SectionSlug">
+                                    <button button-spinner class="btn btn-sm btn-outline-success">
+                                        <span class="fa-solid fa-circle-plus fa-fw"></span>
+                                    </button>
+                                </form>
+
+                            </div>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li class="list-group-item">None available.</li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6">
+        <div class="card">
+            <div class="card-header fw-bold px-3">
+                Assigned Categories <small><em>(@(Model.Assigned?.Count ?? 0))</em></small>
+            </div>
+            <ul class="list-group list-group-flush">
+                @if (Model.Assigned?.Count > 0)
+                {
+                    foreach (var assignedGroup in Model.Assigned)
+                    {
+                        <li class="list-group-item px-3 py-2 d-flex">
+                            <div class="flex-grow-1">@assignedGroup.Value</div>
+                            @if (Model.InUse.ContainsKey(assignedGroup.Key))
+                            {
+                                <a class="btn btn-outline-secondary btn-sm"
+                                   data-bs-target="#inUse"
+                                   data-bs-toggle="modal"
+                                   data-categoryId="@assignedGroup.Key">
+                                    <span class="fa-solid fa-circle-exclamation fa-fw"></span>
+                                </a>
+                            }
+                            else
+                            {
+                                <form asp-action="@nameof(SectionController.RemoveCategory)"
+                                      asp-route-categoryId="@assignedGroup.Key"
+                                      asp-route-slug="@Model.SectionSlug">
+                                    <button button-spinner class="btn btn-sm btn-outline-danger">
+                                        <span class="fa-solid fa-circle-minus fa-fw"></span>
+                                    </button>
+                                </form>
+                            }
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li class="list-group-item">None assigned.</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+<div aria-hidden="true"
+     aria-labelledby="inUseLabel"
+     class="modal fade"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     id="inUse"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5"
+                    id="inUseLabel">
+                    Category in use
+                </h1>
+                <button aria-label="Close"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        type="button"></button>
+            </div>
+            <div class="modal-body">
+                This category is currently in use in the following file library/libraries:
+                <ul id="inUseList"></ul>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal"
+                        type="button">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        const mapping = JSON.parse('@Html.Raw(Model.InUseJson)');
+        const sectionUrl = new URL(`${location.origin}@Model.BaseLink`);
+
+        document.getElementById('inUse').addEventListener('show.bs.modal', _ => {
+            let categoryId = _.relatedTarget.dataset.categoryid;
+            let uses = [];
+            mapping[categoryId].forEach(_ => {
+                uses.push(`<li><a href="${sectionUrl}${_.Slug}">${_.Name}</a></li>`);
+            });
+            document.getElementById('inUseList').innerHTML = uses.join('\n');
+        });
+    </script>
+}
