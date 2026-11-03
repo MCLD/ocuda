@@ -143,6 +143,7 @@
                                         data-bs-target="#editModal"
                                         data-id="@emedia.Id"
                                         data-name="@emedia.Name"
+                                        data-sortas="@emedia.SortAs"
                                         data-slug="@emedia.Slug"
                                         data-url="@emedia.RedirectUrl"
                                         data-availableexternally="@emedia.IsAvailableExternally"
@@ -218,6 +219,7 @@
             </strong>
         </div>
         <input id="editName" asp-for="Emedia.Name" formgroup data-slugifyto="editSlug" />
+        <input id="editSortAs" asp-for="Emedia.SortAs" formgroup />
         <input id="editUrl" asp-for="Emedia.RedirectUrl" formgroup />
         <input id="editSlug" asp-for="Emedia.Slug" formgroup />
         <select id="editIsHttpPost"
@@ -411,6 +413,7 @@
             var button = $(e.relatedTarget);
             $("#editEmedia").val(button.data("id"));
             $("#editName").val(button.data("name"));
+            $("#editSortAs").val(button.data("sortas"));
             $("#editSlug").val(button.data("slug"));
             $("#editSlug").data("priorvalue", button.data("slug"));
             $("#editUrl").val(button.data("url"));

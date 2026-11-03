@@ -162,6 +162,7 @@ namespace Ocuda.Ops.Service
 
             currentEmedia.Name = emedia.Name?.Trim();
             currentEmedia.RedirectUrl = emedia.RedirectUrl?.Trim();
+            currentEmedia.SortAs = emedia.SortAs?.Trim();
             currentEmedia.Slug = emedia.Slug?.Trim();
             currentEmedia.IsHttpPost = emedia.IsHttpPost;
             currentEmedia.IsAvailableExternally = emedia.IsAvailableExternally;
