@@ -12,12 +12,17 @@
         @if (Model.PageLayoutId.HasValue)
         {
             <a asp-controller="@PagesController.Name"
-                asp-action="@nameof(PagesController.LayoutDetail)"
-                asp-route-id="@Model.PageLayoutId.Value"
-                class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
+               asp-action="@nameof(PagesController.LayoutDetail)"
+               asp-route-id="@Model.PageLayoutId.Value"
+               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
         }
     </div>
-    <form class="d-flex flex-column gap-2" enctype="multipart/form-data" asp-action="@nameof(NavBannerController.Detail)" method="post" role="form">
+    <form asp-action="@nameof(NavBannerController.Detail)"
+          class="d-flex flex-column gap-2"
+          enctype="multipart/form-data"
+          id="updateForm"
+          method="post"
+          role="form">
         <input type="hidden" asp-for="PageLayoutId" />
         <input type="hidden" asp-for="NavBannerId" />
         <input type="hidden" asp-for="Language.Id" />
@@ -26,11 +31,11 @@
             <div class="mb-3 row">
                 <div class="col-md-9">
                     <label asp-for="Language" class="col-form-label me-3"></label>
-            @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
-            {
-                <a href="@Url.Action(nameof(NavBannerController.Detail), new { id = Model.NavBannerId, language = item.Value })"
-                    class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">@item.Text</a>
-            }
+                    @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
+                    {
+                        <a href="@Url.Action(nameof(NavBannerController.Detail), new { id = Model.NavBannerId, language = item.Value })"
+                           class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">@item.Text</a>
+                    }
                 </div>
             </div>
             <div class="row d-none oc-save-warning">
@@ -49,8 +54,8 @@
                         <div class="row g-0">
                             <div class="col-12 col-md-7">
                                 <img id="imagePreview"
-                                        class="img-fluid"
-                                        src="@Model.NavBannerLinkPath" />
+                                     class="img-fluid"
+                                     src="@Model.NavBannerLinkPath" />
                             </div>
                             <div class="col-12 col-md-5 p-2 gap-2 fs-5 text-bold navbanner-link-container">
                                 <div class="navbanner-link-grid-container gap-2 h-100">
@@ -71,13 +76,13 @@
                                             <span class="@Model.BottomLeft.Icon mb-1 navbanner-link-icon"></span>
                                             <span class="text-bold navbanner-link-text">@Model.BottomLeft.NavBannerLinkText.Text</span>
                                         </div>
-                                    </a>    
+                                    </a>
                                     <a class="navbanner-link-href h-100" href="@Model.BottomRight.Link" data-preview="BottomRight">
                                         <div class="d-flex align-items-center justify-content-center py-4 py-md-1 gap-2 h-100 navbanner-link-box">
                                             <span class="@Model.BottomRight.Icon mb-1 navbanner-link-icon"></span>
                                             <span class="text-bold navbanner-link-text">@Model.BottomRight.NavBannerLinkText.Text</span>
                                         </div>
-                                    </a>                                      
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -98,7 +103,7 @@
             <small class="text-muted">Changes reflected above when you tab or click out of a field</small>
         </h2>
         <table class="table table-bordered" style="border: 2px solid black;">
-            <tr> 
+            <tr>
                 <td data-quadrant="TopLeft">
                     <h3>Top left</h3>
                     <div class="mb-1">
@@ -136,7 +141,7 @@
                     </div>
                 </td>
             </tr>
-            <tr> 
+            <tr>
                 <td data-quadrant="BottomLeft">
                     <h3>Bottom left</h3>
                     <div class="mb-1">
@@ -170,7 +175,7 @@
                         <label asp-for="@Model.BottomRight.Link" class="form-label"></label>
                         <input class="navbanner-link-href-input form-control" asp-for="@Model.BottomRight.Link" type="text" />
                         <div class="form-text">External links fully qualified (e.g. <code>https://...</code>), local links relative (e.g. <code>/about/administration/</code>)</div>
-                        <input type="hidden" asp-for="@Model.BottomRight.Order" value="3"  />
+                        <input type="hidden" asp-for="@Model.BottomRight.Order" value="3" />
                     </div>
                 </td>
             </tr>
@@ -184,7 +189,11 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <button class="btn btn-success" type="submit">Save Changes</button>
+                <button class="btn btn-outline-success"
+                        button-spinner
+                        type="submit">
+                    Save Changes
+                </button>
             </div>
         </div>
     </form>
@@ -199,11 +208,19 @@
             $(".oc-save-warning").removeClass("d-none");
         }
 
-        $(".alt-text-field").keydown(function (event) {
+        $(".alt-text-field").keydown(function(event) {
             $(".oc-save-warning").removeClass("d-none");
         });
 
-        document.querySelector('#Image').addEventListener('change', updateBannerImage);
+        const imageInput = document.getElementById("Image");
+
+        document.getElementById("updateForm").addEventListener("submit", (e) => {
+            if (imageInput.value && uploadingAndOptimizingModal) {
+                uploadingAndOptimizingModal.show();
+            }
+        });
+
+        imageInput.addEventListener('change', updateBannerImage);
 
         document.querySelectorAll('.navbanner-link-icon-input').forEach(_ => {
             _.addEventListener('keydown', showSaveChanges);
@@ -214,8 +231,8 @@
             _.addEventListener('change', updateLinkTexts);
         });
         document.querySelectorAll('.navbanner-link-href-input').forEach(_ => {
-                _.addEventListener('keydown', showSaveChanges);
-                _.addEventListener('change', updateLinkHrefs)
+            _.addEventListener('keydown', showSaveChanges);
+            _.addEventListener('change', updateLinkHrefs)
         });
 
         function updateBannerImage() {
@@ -224,8 +241,8 @@
 
             const reader = new FileReader();
 
-            reader.onload = function (e) {
-                    document.querySelector('#imagePreview').src = e.target.result;
+            reader.onload = function(e) {
+                document.querySelector('#imagePreview').src = e.target.result;
             };
 
             reader.readAsDataURL(document.querySelector('.navbanner-image-input').files[0]);

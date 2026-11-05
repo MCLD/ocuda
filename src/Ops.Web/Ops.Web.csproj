@@ -66,6 +66,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ocuda\ImageToolsNetVips\ImageToolsNetVips.csproj" />
     <ProjectReference Include="..\Ocuda\MaricopaCountyAssessorHelper\MaricopaCountyAssessorHelper.csproj" />
     <ProjectReference Include="..\Ops.Controllers\Ops.Controllers.csproj" />
     <ProjectReference Include="..\Ops.DataProvider.SqlServer.Ops\Ops.DataProvider.SqlServer.Ops.csproj" />

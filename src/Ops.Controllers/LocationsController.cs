@@ -1488,8 +1488,10 @@ namespace Ocuda.Ops.Controllers
 
             var viewModel = new UpdateMapImageViewModel
             {
+                Height = 250,
                 Location = await locationService.GetLocationByStubAsync(slug),
                 MapApiKey = configuration[Configuration.OcudaGoogleAPI],
+                Width = 500,
             };
             return View(viewModel);
         }
@@ -1517,18 +1519,21 @@ namespace Ocuda.Ops.Controllers
 
             try
             {
-                var (extension, imageBytes) = imageService.ConvertFromBase64(imageBase64);
+                var imageWithInfo = await imageService.ConvertFromBase64Async(imageBase64);
 
                 // TODO: fix this using slugify the way the other image processes work?
                 var fixedBase = location.Name
                     .ToLowerInvariant()
                     .Replace(" ", "-", StringComparison.InvariantCultureIgnoreCase)
                     .Replace(".", string.Empty, StringComparison.InvariantCultureIgnoreCase);
-                var filename = $"{fixedBase}-map{extension}";
+                var filename = $"{fixedBase}-map{imageWithInfo.ImageInformation.Extension}";
 
                 try
                 {
-                    await locationService.UpdateMapImageAsync(imageBytes, filename, slug);
+                    await locationService.UpdateMapImageAsync(
+                        imageWithInfo.ImageBytes,
+                        filename,
+                        slug);
                 }
                 catch (OcudaException oex)
                 {

@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ImageOptimApi;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
@@ -19,6 +18,7 @@ using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
@@ -29,6 +29,7 @@ namespace Ocuda.Ops.Service
         private readonly IGoogleClient _googleClient;
         private readonly IImageAltTextRepository _imageAltTextRepository;
         private readonly IImageService _imageService;
+        private readonly IImageTools _imageTools;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
         private readonly ILocationGroupRepository _locationGroupRepository;
         private readonly ILocationHoursOverrideRepository _locationHoursOverrideRepository;
@@ -42,14 +43,15 @@ namespace Ocuda.Ops.Service
         private readonly ISiteSettingService _siteSettingService;
 
         public LocationService(IGoogleClient googleClient,
-            IImageService imageService,
+            IHttpContextAccessor httpContextAccessor,
             IImageAltTextRepository imageAltTextRepository,
-            ILocationInteriorImageRepository locationInteriorImageRepository,
+            IImageService imageService,
+            IImageTools imageTools,
             ILocationFeatureRepository locationFeatureRepository,
             ILocationGroupRepository locationGroupRepository,
-            IHttpContextAccessor httpContextAccessor,
             ILocationHoursOverrideRepository locationHoursOverrideRepository,
             ILocationHoursRepository locationHoursRepository,
+            ILocationInteriorImageRepository locationInteriorImageRepository,
             ILocationProductMapRepository locationProductMapRepository,
             ILocationRepository locationRepository,
             ILogger<LocationService> logger,
@@ -60,13 +62,14 @@ namespace Ocuda.Ops.Service
             : base(logger, httpContextAccessor)
         {
             ArgumentNullException.ThrowIfNull(googleClient);
-            ArgumentNullException.ThrowIfNull(imageService);
             ArgumentNullException.ThrowIfNull(imageAltTextRepository);
-            ArgumentNullException.ThrowIfNull(locationInteriorImageRepository);
+            ArgumentNullException.ThrowIfNull(imageService);
+            ArgumentNullException.ThrowIfNull(imageTools);
             ArgumentNullException.ThrowIfNull(locationFeatureRepository);
             ArgumentNullException.ThrowIfNull(locationGroupRepository);
             ArgumentNullException.ThrowIfNull(locationHoursOverrideRepository);
             ArgumentNullException.ThrowIfNull(locationHoursRepository);
+            ArgumentNullException.ThrowIfNull(locationInteriorImageRepository);
             ArgumentNullException.ThrowIfNull(locationProductMapRepository);
             ArgumentNullException.ThrowIfNull(locationRepository);
             ArgumentNullException.ThrowIfNull(rosterDivisionRepository);
@@ -75,13 +78,14 @@ namespace Ocuda.Ops.Service
             ArgumentNullException.ThrowIfNull(siteSettingService);
 
             _googleClient = googleClient;
-            _imageService = imageService;
             _imageAltTextRepository = imageAltTextRepository;
-            _locationInteriorImageRepository = locationInteriorImageRepository;
+            _imageService = imageService;
+            _imageTools = imageTools;
             _locationFeatureRepository = locationFeatureRepository;
             _locationGroupRepository = locationGroupRepository;
             _locationHoursOverrideRepository = locationHoursOverrideRepository;
             _locationHoursRepository = locationHoursRepository;
+            _locationInteriorImageRepository = locationInteriorImageRepository;
             _locationProductMapRepository = locationProductMapRepository;
             _locationRepository = locationRepository;
             _rosterDivisionRepository = rosterDivisionRepository;
@@ -609,11 +613,11 @@ namespace Ocuda.Ops.Service
             await imageFile.CopyToAsync(memoryStream);
             var fileBytes = memoryStream.ToArray();
 
-            using var imagePeek = SixLabors.ImageSharp.Image.Load(fileBytes);
-            if (imagePeek.Width != ExteriorImageWidth
-                || imagePeek.Height != ExteriorImageHeight)
+            var imageInfo = await _imageTools.GetInformationAsync(fileBytes);
+            if (imageInfo.Width != ExteriorImageWidth || imageInfo.Height != ExteriorImageHeight)
             {
-                throw new OcudaException($"Please provide an image exactly {ExteriorImageWidth} pixels wide and {ExteriorImageHeight} pixels high.");
+                throw new OcudaException(
+                    $"Please provide an image exactly {ExteriorImageWidth} x {ExteriorImageHeight} pixels; the image you supplied is {imageInfo.Width} x {imageInfo.Height} pixels");
             }
 
             string oldImageName = location.ImagePath;
@@ -623,7 +627,11 @@ namespace Ocuda.Ops.Service
                     ? filename : filename + Path.GetExtension(imageFile.FileName)
                 : imageFile.FileName;
 
-            location.ImagePath = await SaveImageToServerAsync(fileBytes, assumedName, false);
+            location.ImagePath = await SaveImageToServerAsync(
+                fileBytes,
+                assumedName,
+                false,
+                string.Empty);
 
             string basePath = await _siteSettingService.GetSettingStringAsync(
                 Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
@@ -664,11 +672,11 @@ namespace Ocuda.Ops.Service
             await imageFile.CopyToAsync(memoryStream);
             var fileBytes = memoryStream.ToArray();
 
-            using var imagePeek = SixLabors.ImageSharp.Image.Load(fileBytes);
-            if (imagePeek.Width != InteriorImageWidth
-                || imagePeek.Height != InteriorImageHeight)
+            var imageInfo = await _imageTools.GetInformationAsync(fileBytes);
+            if (imageInfo.Width != InteriorImageWidth || imageInfo.Height != InteriorImageHeight)
             {
-                throw new OcudaException($"Please provide an image exactly {InteriorImageWidth} pixels wide and {InteriorImageHeight} pixels high.");
+                throw new OcudaException(
+                    $"Please provide an image exactly {InteriorImageWidth} x {InteriorImageHeight} pixels; the image you supplied is {imageInfo.Width} x {imageInfo.Height} pixels");
             }
 
             string oldImageName = interiorImage.ImagePath;
@@ -678,10 +686,11 @@ namespace Ocuda.Ops.Service
                     ? filename : filename + Path.GetExtension(imageFile.FileName)
                 : imageFile.FileName;
 
-            interiorImage.ImagePath = await SaveImageToServerAsync(fileBytes,
+            interiorImage.ImagePath = await SaveImageToServerAsync(
+                fileBytes,
                 assumedName,
                 false,
-                UriPaths.Images);
+                UriPaths.Interior);
 
             string basePath = await _siteSettingService.GetSettingStringAsync(
                 Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
@@ -764,7 +773,8 @@ namespace Ocuda.Ops.Service
 
             string assumedName = filename;
 
-            location.MapImagePath = await SaveImageToServerAsync(fileBytes,
+            location.MapImagePath = await SaveImageToServerAsync(
+                fileBytes,
                 assumedName,
                 true,
                 UriPaths.Maps);
@@ -795,21 +805,21 @@ namespace Ocuda.Ops.Service
             ArgumentNullException.ThrowIfNull(altTexts);
             ArgumentNullException.ThrowIfNull(imageFile);
 
-            var locationInteriorImage = new LocationInteriorImage
+            var interiorImage = new LocationInteriorImage
             {
                 LocationId = locationId,
-                SortOrder = await _locationInteriorImageRepository.GetNextSortOrderAsync(locationId)
+                SortOrder = await _locationInteriorImageRepository.GetNextSortOrderAsync(locationId),
             };
 
             await using var memoryStream = new MemoryStream();
             await imageFile.CopyToAsync(memoryStream);
             var fileBytes = memoryStream.ToArray();
 
-            using var imagePeek = SixLabors.ImageSharp.Image.Load(fileBytes);
-            if (imagePeek.Width != InteriorImageWidth
-                || imagePeek.Height != InteriorImageHeight)
+            var imageInfo = await _imageTools.GetInformationAsync(fileBytes);
+            if (imageInfo.Width != InteriorImageWidth || imageInfo.Height != InteriorImageHeight)
             {
-                throw new OcudaException($"Please provide an image exactly {InteriorImageWidth} pixels wide and {InteriorImageHeight} pixels high.");
+                throw new OcudaException(
+                    $"Please provide an image exactly {InteriorImageWidth} x {InteriorImageHeight} pixels; the image you supplied is {imageInfo.Width} x {imageInfo.Height} pixels");
             }
 
             string assumedName = !string.IsNullOrEmpty(filename)
@@ -817,7 +827,8 @@ namespace Ocuda.Ops.Service
                     ? filename : filename + Path.GetExtension(imageFile.FileName)
                 : imageFile.FileName;
 
-            locationInteriorImage.ImagePath = await SaveImageToServerAsync(fileBytes,
+            interiorImage.ImagePath = await SaveImageToServerAsync(
+                fileBytes,
                 assumedName,
                 false,
                 UriPaths.Interior);
@@ -825,7 +836,7 @@ namespace Ocuda.Ops.Service
             string basePath = await _siteSettingService.GetSettingStringAsync(
                 Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
 
-            await AddInteriorImageAsync(locationInteriorImage);
+            await AddInteriorImageAsync(interiorImage);
 
             var altTextToInsert = new List<LocationInteriorImageAltText>();
             foreach (var altText in altTexts)
@@ -834,7 +845,7 @@ namespace Ocuda.Ops.Service
                 {
                     AltText = altText.Value,
                     LanguageId = altText.Key,
-                    LocationInteriorImageId = locationInteriorImage.Id,
+                    LocationInteriorImageId = interiorImage.Id,
                 });
             }
 
@@ -937,14 +948,8 @@ namespace Ocuda.Ops.Service
             await _locationInteriorImageRepository.FixInteriorImageSortOrder(locationId);
         }
 
-        private async Task<string> SaveImageToServerAsync(byte[] imageBytes,
-            string requestedFilename,
-            bool overwrite)
-        {
-            return await SaveImageToServerAsync(imageBytes, requestedFilename, overwrite, string.Empty);
-        }
-
-        private async Task<string> SaveImageToServerAsync(byte[] imageBytes,
+        private async Task<string> SaveImageToServerAsync(
+            byte[] imageBytes,
             string requestedFilename,
             bool overwrite,
             string subDirectory)
@@ -952,25 +957,19 @@ namespace Ocuda.Ops.Service
             ArgumentNullException.ThrowIfNull(imageBytes);
             ArgumentNullException.ThrowIfNull(requestedFilename);
 
-            string tempFilePath = Path.Combine(Path.GetTempPath(),
-                Path.GetFileNameWithoutExtension(Path.GetTempFileName())
-                + Path.GetExtension(requestedFilename));
-
-            File.WriteAllBytes(tempFilePath, imageBytes);
-
             try
             {
-                try
+                if (_imageService.IsOptimizeConfigured())
                 {
-                    var optimized = await _imageService.OptimizeAsync(tempFilePath);
-                    imageBytes = optimized.File;
+                    var optimized = await _imageService.OptimizeAsync(
+                        imageBytes,
+                        requestedFilename);
+
+                    imageBytes = optimized.ImageBytes;
+                    requestedFilename = Path.ChangeExtension(
+                        requestedFilename,
+                        optimized.ImageInformation.Extension);
                 }
-                catch (ParameterException pex)
-                {
-                    throw new OcudaException($"Error optimizing file: {pex.Message}", pex);
-                }
-                catch (OcudaConfigurationException)
-                { }
 
                 string basePath = await _siteSettingService.GetSettingStringAsync(
                     Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
@@ -987,24 +986,13 @@ namespace Ocuda.Ops.Service
                     Directory.CreateDirectory(filePath);
                 }
 
-                var format = SixLabors.ImageSharp.Image.DetectFormat(imageBytes);
-
-                var filename = Path.GetFileNameWithoutExtension(requestedFilename)
-                    + "."
-                    + format.FileExtensions.First();
+                var filename = overwrite
+                    ? FileHelper.MakeValidFilename(requestedFilename)
+                    : FileHelper.GetUniqueFilename(
+                        filePath,
+                        FileHelper.MakeValidFilename(requestedFilename));
 
                 var fileWritePath = Path.Combine(filePath, filename);
-
-                int renameCounter = 1;
-                while (!overwrite && File.Exists(fileWritePath))
-                {
-                    filename = string.Format(CultureInfo.InvariantCulture,
-                        "{0}-{1}.{2}",
-                        Path.GetFileNameWithoutExtension(requestedFilename),
-                        renameCounter++,
-                        format.FileExtensions.First());
-                    fileWritePath = Path.Combine(filePath, filename);
-                }
 
                 await File.WriteAllBytesAsync(fileWritePath, imageBytes);
 
@@ -1026,6 +1014,7 @@ namespace Ocuda.Ops.Service
             {
                 throw new OcudaException($"Location Name '{location.Name}' already exists.");
             }
+
             if (await _locationRepository.IsDuplicateStubAsync(location))
             {
                 throw new OcudaException($"Location Stub '{location.Stub}' already exists.");

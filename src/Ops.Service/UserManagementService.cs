@@ -11,6 +11,7 @@ using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
+using Ocuda.Utility.Models;
 using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Service
@@ -265,12 +266,13 @@ namespace Ocuda.Ops.Service
         {
             ArgumentNullException.ThrowIfNull(user);
 
-            string extension;
-            byte[] profilePicture;
+            ImageWithInformation imageWithInformation;
 
             try
             {
-                (extension, profilePicture) = imageService.ConvertFromBase64(profilePictureBase64, true);
+                imageWithInformation = await imageService.ConvertFromBase64Async(
+                    profilePictureBase64,
+                    true);
             }
             catch (OcudaException oex)
             {
@@ -285,8 +287,9 @@ namespace Ocuda.Ops.Service
                 System.IO.Directory.CreateDirectory(checkPath);
             }
 
-            var filename = FileHelper.MakeValidFilename(
-                System.IO.Path.ChangeExtension(user.Username, extension));
+            var filename = FileHelper.MakeValidFilename(System.IO.Path.ChangeExtension(
+                user.Username,
+                imageWithInformation.ImageInformation.Extension));
 
             var fullPath = GetProfilePictureFilePath(filename);
 
@@ -298,7 +301,7 @@ namespace Ocuda.Ops.Service
                     user.Username);
             }
 
-            await System.IO.File.WriteAllBytesAsync(fullPath, profilePicture);
+            await System.IO.File.WriteAllBytesAsync(fullPath, imageWithInformation.ImageBytes);
 
             user.PictureFilename = filename;
             user.PictureUpdatedBy = GetCurrentUserId();

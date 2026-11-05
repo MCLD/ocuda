@@ -18,6 +18,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Decks
 
         [DisplayName("Image")]
         public IFormFile CardImage { get; set; }
+        public int CardImageWidth { get; set; }
 
         public int DeckId { get; set; }
         public string DeckName { get; set; }

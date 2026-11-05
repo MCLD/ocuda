@@ -368,6 +368,27 @@
         }
         @RenderBody()
     </div>
+
+    <div class="modal fade"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false"
+         id="uploadingAndOptimizingModal"
+         tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Uploading and optimizing...</h1>
+                </div>
+                <div class="modal-body">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="~/js/main.min.js" asp-append-version="true"></script>
     <script src="~/js/bootstrap.min.js" asp-append-version="true"></script>
     @if (Context.Items.ContainsKey(ItemKey.ExternalJS))
@@ -377,6 +398,9 @@
             <script src="@jsUrl" asp-append-version="true"></script>
         }
     }
+    <script>
+        const uploadingAndOptimizingModal = new bootstrap.Modal('#uploadingAndOptimizingModal', null);
+    </script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

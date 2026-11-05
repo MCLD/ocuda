@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,17 +10,21 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Helpers;
 
 namespace Ocuda.Ops.Service
 {
     public class DeckService : BaseService<DeckService>, IDeckService
     {
         private const string CardsFilePath = "cards";
+        private const int DefaultCardImageWidth = 666;
 
         private readonly ICardDetailRepository _cardDetailRepository;
         private readonly ICardRepository _cardRepository;
         private readonly IDeckRepository _deckRepository;
+        private readonly IImageTools _imageTools;
         private readonly ILanguageService _languageService;
         private readonly IPageItemRepository _pageItemRepository;
         private readonly ISiteSettingService _siteSettingService;
@@ -31,6 +34,7 @@ namespace Ocuda.Ops.Service
             IDeckRepository deckRepository,
             ICardDetailRepository cardDetailRepository,
             ICardRepository cardRepository,
+            IImageTools imageTools,
             ILanguageService languageService,
             IPageItemRepository pageItemRepository,
             ISiteSettingService siteSettingService) : base(logger, httpContextAccessor)
@@ -41,6 +45,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(cardDetailRepository));
             _cardRepository = cardRepository
                 ?? throw new ArgumentNullException(nameof(cardRepository));
+            _imageTools = imageTools
+                ?? throw new ArgumentNullException(nameof(imageTools));
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
             _pageItemRepository = pageItemRepository
@@ -237,6 +243,11 @@ namespace Ocuda.Ops.Service
             return await _cardDetailRepository.GetByDeckLanguageAsync(deckId, languageId);
         }
 
+        public int GetCardImageWidth()
+        {
+            return DefaultCardImageWidth;
+        }
+
         public async Task<int> GetDeckIdAsync(int cardId)
         {
             return await _cardRepository.GetDeckIdAsync(cardId);
@@ -266,21 +277,12 @@ namespace Ocuda.Ops.Service
             var cardPath = await GetFullImageDirectoryPath(_siteSettingService,
                 languageName,
                 CardsFilePath);
-            var fullFilePath = Path.Combine(cardPath, filename);
 
-            if (!overwriteIfExists)
-            {
-                int renameCounter = 1;
-                while (File.Exists(fullFilePath))
-                {
-                    fullFilePath = Path.Combine(cardPath, string.Format(
-                        CultureInfo.InvariantCulture,
-                        "{0}-{1}{2}",
-                        Path.GetFileNameWithoutExtension(filename),
-                        renameCounter++,
-                        Path.GetExtension(filename)));
-                }
-            }
+            var sanitizedFilename = overwriteIfExists
+                ? FileHelper.MakeValidFilename(filename)
+                : FileHelper.GetUniqueFilename(cardPath, FileHelper.MakeValidFilename(filename));
+
+            var fullFilePath = Path.Combine(cardPath, sanitizedFilename);
 
             if (File.Exists(fullFilePath))
             {
@@ -334,6 +336,17 @@ namespace Ocuda.Ops.Service
             }
 
             await _cardDetailRepository.SaveAsync();
+        }
+
+        public async Task<bool> VerifyCardSizeAsync(byte[] imageBytes)
+        {
+            if (imageBytes?.Length > 0)
+            {
+                var imageInfo = await _imageTools.GetInformationAsync(imageBytes);
+                return imageInfo.Width == GetCardImageWidth();
+            }
+
+            return false;
         }
 
         private async Task RemoveCardImageInternalAsync(int cardId, int? languageId)

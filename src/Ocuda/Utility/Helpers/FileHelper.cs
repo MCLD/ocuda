@@ -1,8 +1,5 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
 using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Utility.Helpers
@@ -11,54 +8,32 @@ namespace Ocuda.Utility.Helpers
     {
         public static string GetUniqueFilename(string path, string filename)
         {
+            string baseFilename = filename;
             int renameCounter = 1;
+
             while (File.Exists(Path.Combine(path, filename)))
             {
                 filename = string.Format(CultureInfo.InvariantCulture,
                     "{0}-{1}{2}",
-                    Path.GetFileNameWithoutExtension(filename),
+                    Path.GetFileNameWithoutExtension(baseFilename),
                     renameCounter++,
-                    Path.GetExtension(filename));
+                    Path.GetExtension(baseFilename));
 
-                if (renameCounter > 9999)
+                if (renameCounter > 999)
                 {
-                    throw new OcudaException($"Unable to create valid filename for {filename} in {path}");
+                    throw new OcudaException(
+                        $"Unable to find a valid filename for {filename} in {path} after {renameCounter} tries");
                 }
             }
+
             return filename;
         }
 
-        public static string MakeValidFilename(string text, char? replacement)
+        public static string MakeValidFilename(string text, char replacement)
         {
-            if (string.IsNullOrEmpty(text))
-            {
-                return null;
-            }
-
-            var sb = new StringBuilder(text.Length);
-            bool changed = false;
-            foreach (char c in text)
-            {
-                if (Path.GetInvalidFileNameChars().Contains(c))
-                {
-                    changed = true;
-                    if (replacement.HasValue)
-                    {
-                        sb.Append(replacement);
-                    }
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-            }
-
-            if (sb.Length == 0)
-            {
-                return "_";
-            }
-
-            return changed ? sb.ToString() : text;
+            return string.IsNullOrEmpty(text)
+                ? null
+                : string.Join(replacement, text.Split(Path.GetInvalidFileNameChars())).Trim();
         }
 
         public static string MakeValidFilename(string text)

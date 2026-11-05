@@ -130,7 +130,7 @@
         </div>
         <div class="card mb-2">
             <div class="card-header">Map</div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 <a asp-action="@nameof(LocationsController.MapImage)"
                    asp-route-slug="@Model.Location.Stub">
                     <img class="img-fluid"
@@ -229,7 +229,7 @@
                     {
                         <a asp-action="@nameof(LocationsController.InteriorImage)"
                            asp-route-id="@interiorImage.Id">
-                            <img class="img-thumbnail" style="max-width: 200px; max-height: 200px;"
+                            <img class="img-thumbnail mb-1" style="max-width: 200px; max-height: 200px;"
                                  src="@Url.Action(nameof(LocationsController.InteriorImage), new { id = interiorImage.Id })?@DetailsViewModel.Now">
                         </a>
                     }
