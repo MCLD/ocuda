@@ -32,7 +32,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private const string DetailModelStateKey = "ImageFeatures.Detail";
         private const string ItemErrorMessageKey = "ImageFeatures.ItemErrorMessage";
         private const int MaximumFileSizeBytes = 200 * 1024;
-        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png", ".svg" };
+        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png", ".svg", ".jpeg" };
 
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IImageFeatureService _imageFeatureService;

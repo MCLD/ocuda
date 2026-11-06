@@ -230,6 +230,8 @@
                 imgContainer.innerHTML = '';
                 imgContainer.appendChild(img);
 
+                showStatus('New map acquired, displayed below.');
+
                 document.querySelector('#save-image').disabled = false;
             } catch (e) {
                 imgContainer.innerHTML = '';

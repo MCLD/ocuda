@@ -28,7 +28,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class DecksController : BaseController<DecksController>
     {
         public static readonly int MaximumFileSizeBytes = 0; // disable this check
-        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png" };
+        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png", ".jpeg" };
 
         private readonly IDeckService _deckService;
         private readonly IImageService _imageService;
