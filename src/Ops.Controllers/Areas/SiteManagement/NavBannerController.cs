@@ -282,11 +282,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var optimizeResult = await OptimizeAndSaveImageFileAsync(viewModel.Image,
                     Path.Combine(navBannerImagePath, saveImageFilename));
 
-                if (!optimizeResult)
-                {
-                    AlertWarning = "Unable to optimize image, uploaded un-optimized";
-                }
-
                 if (navBannerImage != null)
                 {
                     navBannerImage.Filename = saveImageFilename;
