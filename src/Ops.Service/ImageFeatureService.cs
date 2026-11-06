@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,27 +10,32 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
     public class ImageFeatureService : BaseService<ImageFeatureService>, IImageFeatureService
     {
+
         private const string FeaturesFilePath = "features";
+        private const string ImageXMustBeYIsZ = "Image {0} must be {1} pixels, submitted image is {2} pixels";
         private readonly IImageFeatureItemRepository _imageFeatureItemRepository;
         private readonly IImageFeatureItemTextRepository _imageFeatureItemTextRepository;
         private readonly IImageFeatureRepository _imageFeatureRepository;
         private readonly IImageFeatureTemplateRepository _imageFeatureTemplateRepository;
+        private readonly IImageTools _imageTools;
         private readonly ILanguageService _languageService;
         private readonly ISiteSettingService _siteSettingService;
 
-        public ImageFeatureService(ILogger<ImageFeatureService> logger,
-            IHttpContextAccessor httpContextAccessor,
+        public ImageFeatureService(IHttpContextAccessor httpContextAccessor,
             IImageFeatureItemRepository imageFeatureItemRepository,
             IImageFeatureItemTextRepository imageFeatureItemTextRepository,
             IImageFeatureRepository imageFeatureRepository,
             IImageFeatureTemplateRepository imageFeatureTemplateRepository,
+            IImageTools imageTools,
             ILanguageService languageService,
+            ILogger<ImageFeatureService> logger,
             ISiteSettingService siteSettingService)
             : base(logger, httpContextAccessor)
         {
@@ -38,6 +43,7 @@ namespace Ocuda.Ops.Service
             _imageFeatureItemTextRepository = imageFeatureItemTextRepository;
             _imageFeatureRepository = imageFeatureRepository;
             _imageFeatureTemplateRepository = imageFeatureTemplateRepository;
+            _imageTools = imageTools;
             _languageService = languageService;
             _siteSettingService = siteSettingService;
         }
@@ -360,6 +366,38 @@ namespace Ocuda.Ops.Service
 
             _imageFeatureTemplateRepository.Update(currentTemplate);
             await _imageFeatureTemplateRepository.SaveAsync();
+        }
+
+        public async Task<IEnumerable<string>> ValidateImageAsync(
+            byte[] imageBytes,
+            ImageFeatureTemplate template)
+        {
+            var results = new List<string>();
+
+            if (imageBytes != null
+                && (template?.Height.HasValue == true || template?.Width.HasValue == true))
+            {
+                var imageInfo = await _imageTools.GetInformationAsync(imageBytes);
+                if (template.Height.HasValue && imageInfo.Height != template.Height)
+                {
+                    results.Add(string.Format(
+                        ImageXMustBeYIsZ,
+                        "height",
+                        template.Height,
+                        imageInfo.Height));
+                }
+
+                if (template.Width.HasValue && imageInfo.Width != template.Width)
+                {
+                    results.Add(string.Format(
+                        ImageXMustBeYIsZ,
+                        "width",
+                        template.Width,
+                        imageInfo.Width));
+                }
+            }
+
+            return results;
         }
 
         private async Task<IDictionary<string, string>> DeleteImage(ImageFeatureItemText itemTexts)

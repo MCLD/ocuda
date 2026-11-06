@@ -14,14 +14,34 @@
 </div>
 
 <div class="row">
-    <div class="col-sm-6">
-        <div class="alert alert-success d-none" id="status-message"></div>
-        <div class="alert alert-warning d-none" id="status-error"></div>
+    <div class="col-lg-6 offset-lg-3">
+        <div class="alert alert-success" id="status-message">
+            <p class="mb-0">
+                Note: if your API key is restricted by IP address and you are accessing via a split
+                tunnel VPN, your local IP address must be configured for the API key.
+            </p>
+            @if (!string.IsNullOrEmpty(Model.Location?.MapImagePath))
+            {
+                <p class="mb-0 mt-3">The initial image is the current map.</p>
+            }
+        </div>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-sm-6 offset-3">
+    <div class="col-lg-6 offset-lg-3 d-flex justify-content-center align-items-center border p-0 bg-light"
+         id="image-preview-container"
+         style="min-width: @(Model.Width)px; min-height: @(Model.Height)px;">
+        @if (!string.IsNullOrEmpty(Model.Location?.MapImagePath))
+        {
+            <img class="img-fluid"
+                 src="@Url.Action(nameof(LocationsController.MapImage), LocationsController.Name, new { slug = Model.Location.Stub })" />
+        }
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-6 offset-lg-3">
         <div class="row mb-3">
             <label class="col-sm-4" for="zoom-level">
                 Zoom Level
@@ -32,7 +52,13 @@
                 </span>
             </label>
             <div class="col-sm-8">
-                <input class="form-control" id="zoom-level" name="zoom-level" type="number" value="13" min="0" max="18" />
+                <input class="form-control"
+                       id="zoom-level"
+                       name="zoom-level"
+                       type="number"
+                       value="13"
+                       min="0"
+                       max="18" />
             </div>
         </div>
         <div class="row mb-3">
@@ -45,60 +71,63 @@
                 </span>
             </label>
             <div class="col-sm-8">
-                <input class="form-control" id="scale" name="scale" type="number" value="2" min="1" max="2" disabled="disabled" />
+                <input class="form-control"
+                       id="scale"
+                       name="scale"
+                       type="number"
+                       value="2"
+                       min="1"
+                       max="2"
+                       disabled="disabled" />
             </div>
         </div>
         <div class="row mb-3">
             <label class="col-sm-4" for="image-width">Image Width</label>
             <div class="col-sm-8">
-                <input class="form-control" id="image-width" name="image-width" type="number" step="10" value="500" disabled="disabled" />
+                <input class="form-control"
+                       id="image-width"
+                       name="image-width"
+                       type="number"
+                       step="10"
+                       value="@Model.Width"
+                       disabled="disabled" />
             </div>
         </div>
         <div class="row mb-3">
             <label class="col-sm-4" for="image-height">Image Height</label>
             <div class="col-sm-8">
-                <input class="form-control" id="image-height" name="image-height" type="number" step="10" value="250" disabled="disabled" />
+                <input class="form-control"
+                       id="image-height"
+                       name="image-height"
+                       type="number"
+                       step="10"
+                       value="@Model.Height"
+                       disabled="disabled" />
             </div>
         </div>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-sm-6 offset-3" id="image-preview-container"></div>
-</div>
-
-<div class="row">
-    <div class="col-sm-6 offset-3 d-flex justify-content-end">
-        <button class="btn btn-outline-primary me-2" id="preview-image">Preview</button>
-        <button class="btn btn-outline-success" id="save-image" disabled>Optimize and Save</button>
+    <div class="col-lg-6 offset-lg-3 d-flex justify-content-end">
+        <button button-spinner
+                class="btn btn-outline-primary me-2"
+                id="preview-image">
+            Preview
+        </button>
+        <button button-spinner
+                class="btn btn-outline-success"
+                id="save-image" disabled>
+            Optimize and Save
+        </button>
     </div>
 
-</div>
-
-<div class="modal fade"
-     data-bs-backdrop="static"
-     data-bs-keyboard="false"
-     id="uploadModal"
-     tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="uploadingModal">Uploading and optimizing...</h1>
-            </div>
-            <div class="modal-body">
-                <div class="progress">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated"
-                         style="width: 100%"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 @section Scripts
 {
     <script>
-        $(function () {
+        $(function() {
             $('[data-bs-toggle="tooltip"]').tooltip()
         });
 
@@ -109,8 +138,6 @@
                 showPreview();
             }
         })
-
-        const upModal = new bootstrap.Modal('#uploadModal', null);
 
         const locationAddress = "@Model.Location.Address";
         const apiKey = "@Model.MapApiKey";
@@ -123,6 +150,9 @@
         const scaleEl = document.querySelector('#scale');
         const widthEl = document.querySelector('#image-width');
         const heightEl = document.querySelector('#image-height');
+
+        const statusContainer = document.querySelector('#status-message');
+        const imgContainer = document.querySelector('#image-preview-container');
 
         let requestingPreview = false;
         let imageBase64;
@@ -143,23 +173,21 @@
 
         function showStatus(statusMessage) {
             if (statusMessage) {
-                showError();
-                document.querySelector('#status-message').innerText = statusMessage;
-                document.querySelector('#status-message').style.display = "block";
+                statusContainer.innerText = statusMessage;
+                statusContainer.classList.add("alert-success");
+                statusContainer.classList.remove("d-none", "alert-warning");
             } else {
-                document.querySelector('#status-message').innerText = "";
-                document.querySelector('#status-message').style.display = "none";
+                statusContainer.classList.add("d-none");
             }
         }
 
         function showError(errorMessage) {
             if (errorMessage) {
-                showStatus();
-                document.querySelector('#status-error').innerText = errorMessage;
-                document.querySelector('#status-error').style.display = "block";
+                statusContainer.innerText = errorMessage;
+                statusContainer.classList.add("alert-warning");
+                statusContainer.classList.remove("d-none", "alert-success");
             } else {
-                document.querySelector('#status-error').innerText = "";
-                document.querySelector('#status-error').style.display = "none";
+                statusContainer.classList.add("d-none");
             }
         }
 
@@ -167,7 +195,7 @@
             if (requestingPreview) return;
 
             showStatus("Fetching preview image...");
-            showError();
+            imgContainer.innerHTML = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
 
             if (!inputsComplete()) {
                 return alert("All input fields must be complete");
@@ -182,8 +210,7 @@
                 const mapImageResult = await fetch(`https://maps.googleapis.com/maps/api/staticmap?zoom=${zoomEl.value}&size=${widthEl.value}x${heightEl.value}&maptype=roadmap&markers=color:red|${locationAddress}&key=${apiKey}&style=feature:poi|visibility:off&scale=${scaleEl.value}`);
 
                 if (!mapImageResult.ok) {
-                    showError(`Error fetching map image: ${mapImageResult.status} ${await mapImageResult.text()}.`);
-                    return;
+                    throw new Error(`${mapImageResult.status}: ${await mapImageResult.text()}`);
                 }
 
                 const imageBlob = await mapImageResult.blob();
@@ -198,25 +225,28 @@
 
                 const img = document.createElement('img');
                 img.src = mapImageResult.url;
-                img.className = 'mb-3 img-fluid';
+                img.className = 'img-fluid';
 
-                const imageContainer = document.querySelector('#image-preview-container');
-                imageContainer.innerHTML = '';
-                imageContainer.appendChild(img);
+                imgContainer.innerHTML = '';
+                imgContainer.appendChild(img);
+
+                showStatus('New map acquired, displayed below.');
 
                 document.querySelector('#save-image').disabled = false;
             } catch (e) {
+                imgContainer.innerHTML = '';
                 console.error(e);
-                alert(e);
-                showStatus();
-                showError(`Error optimizing image: ${e.value}`);
+                showError(`Error optimizing image: ${e}`);
             } finally {
                 requestingPreview = false;
+                ResetSpinners();
             }
         }
 
         async function saveImage() {
-            upModal.show();
+            if(uploadingAndOptimizingModal) {
+                uploadingAndOptimizingModal.show();
+            }
             try {
                 const saveResponse = await fetch(savePath, {
                     headers: {
@@ -226,15 +256,14 @@
                     body: JSON.stringify(imageBase64)
                 });
 
-                const saveMessage = await saveResponse.json();
-
-                showStatus(saveMessage);
+                showStatus(await saveResponse.json());
             } catch (e) {
                 console.log(e);
                 showError(`Error optimizing image. ${e.value}`);
-                return;
+            } finally {
+                uploadingAndOptimizingModal.hide();
+                ResetSpinners();
             }
-            upModal.hide();
         }
     </script>
 }

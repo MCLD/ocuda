@@ -277,13 +277,14 @@
                                 }
                                 <form asp-controller="@ImageFeaturesController.Name"
                                       asp-action="@nameof(ImageFeaturesController.EditImageFeatureItemText)"
+                                      class="imageFeatureForm"
                                       enctype="multipart/form-data">
                                     <input id="featureItem@(item.Id)Feature"
                                            asp-for="ImageFeatureId"
                                            type="hidden" />
                                     <input id="featureItem@(item.Id)Id"
                                            asp-for="ImageFeatureItemText.ImageFeatureItemId"
-                                           value="@item.Id"f
+                                           value="@item.Id" f
                                            type="hidden" />
                                     <input id="featureItem@(item.Id)Language"
                                            asp-for="ImageFeatureItemText.LanguageId"
@@ -350,29 +351,38 @@
 </div>
 
 @section scripts {
-    <script>
-        @if (Model.FocusItemId.HasValue)
-        {
-            <text>
-                $(function () {
-                    var focusAccordion = $("#accordion@(Model.FocusItemId.Value)");
-                    if (focusAccordion.length > 0) {
-                        $("#accordion@(Model.FocusItemId.Value)")[0].scrollIntoView();
-                    }
-                });
-            </text>
-        }
-
-            $("#SelectLanguage").on("change", function () {
-                window.location.href = "@Url.Action(nameof(ImageFeaturesController.Detail), new { id = Model.ImageFeatureId})" + "?language=" + $(this).val();
+    @if (Model.FocusItemId.HasValue)
+    {
+        <script>
+            $(function() {
+                var focusAccordion = $("#accordion@(Model.FocusItemId.Value)");
+                if (focusAccordion.length > 0) {
+                    $("#accordion@(Model.FocusItemId.Value)")[0].scrollIntoView();
+                }
             });
+        </script>
+    }
 
-        $("#addItemForm").submit(function (e) {
+    <script>
+        document.querySelectorAll(".imageFeatureForm").forEach((element) => {
+            element.addEventListener("submit", (e) => {
+                const imageField = e.target.querySelector("#ItemImage");
+                if (imageField.value && uploadingAndOptimizingModal) {
+                    uploadingAndOptimizingModal.show();
+                }
+            })
+        })
+
+        $("#SelectLanguage").on("change", function() {
+            window.location.href = "@Url.Action(nameof(ImageFeaturesController.Detail), new { id = Model.ImageFeatureId })" + "?language=" + $(this).val();
+        });
+
+        $("#addItemForm").submit(function(e) {
             e.preventDefault();
             var form = $(this);
             $.post("@(Url.Action(nameof(ImageFeaturesController.AddImageFeatureItem), ImageFeaturesController.Name))",
                 form.serialize(),
-                function (response) {
+                function(response) {
                     if (response.success == true) {
                         location.href = response.url;
                     }
@@ -383,7 +393,7 @@
                 });
         });
 
-        $("#editItemModal").on("show.bs.modal", function (e) {
+        $("#editItemModal").on("show.bs.modal", function(e) {
             var button = $(e.relatedTarget);
 
             $("#editFeatureItem").val(button.data("id"));
@@ -394,12 +404,12 @@
             $("#editItemEndTime").val(button.data("endtime"));
         });
 
-        $("#editItemForm").submit(function (e) {
+        $("#editItemForm").submit(function(e) {
             e.preventDefault();
             var form = $(this);
             $.post("@(Url.Action(nameof(ImageFeaturesController.EditImageFeatureItem), ImageFeaturesController.Name))",
                 form.serialize(),
-                function (response) {
+                function(response) {
                     if (response.success == true) {
                         location.href = response.url;
                     }
@@ -410,7 +420,7 @@
                 });
         });
 
-        $("#deleteItemModal").on("show.bs.modal", function (e) {
+        $("#deleteItemModal").on("show.bs.modal", function(e) {
             var button = $(e.relatedTarget);
             var id = button.data("id");
             var name = button.data("name");
@@ -420,7 +430,7 @@
             modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
         });
 
-        $(".changeSort").on("click", function () {
+        $(".changeSort").on("click", function() {
             var button = $(this);
             var id = button.data("id");
             var increase = button.data("increase");
@@ -429,7 +439,7 @@
                 icon.removeClass("fa-arrow-up fa-arrow-down").addClass("fa-spinner fa-pulse");
                 $.post("@Url.Action(nameof(ImageFeaturesController.ChangeSort))",
                     { id, increase },
-                    function (response) {
+                    function(response) {
                         icon.removeClass("fa-spinner fa-pulse");
                         if (increase) {
                             icon.addClass("fa-arrow-down");

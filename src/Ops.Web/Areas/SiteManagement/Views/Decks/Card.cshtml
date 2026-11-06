@@ -62,7 +62,7 @@
                     <div class="row mb-2">
                         <div class="col-md-8 offset-md-2">
                             <div class="alert alert-info">
-                                Card images must be @DecksController.CardImageWidth pixels wide
+                                Card images must be @Model.CardImageWidth pixels wide
                                 @if (DecksController.MaximumFileSizeBytes > 0)
                                 {
                                     @:and smaller than @(DecksController.MaximumFileSizeBytes / 1024) KB
@@ -76,10 +76,11 @@
                             <div class="col-form-label text-md-end col-md-3">Current image</div>
                             <div class="col-md-9">
                                 <img style="max-width: 333px;"
-                                     src="@Url.Action(nameof(DecksController.Image), DecksController.Name, new {
-language = Model.SelectedLanguage.Name,
-filename = Model.CardDetail.Filename
-})" />
+                                     src="@Url.Action(nameof(DecksController.Image), DecksController.Name, new
+                                     {
+                                         language = Model.SelectedLanguage.Name,
+                                         filename = Model.CardDetail.Filename
+                                     })" />
                             </div>
                         </div>
                     }
@@ -94,7 +95,7 @@ filename = Model.CardDetail.Filename
                                 <input type="file"
                                        class="form-control"
                                        asp-for="CardImage"
-                                       accept=".jpg,.png" />
+                                       accept=".jpg,.jpeg,.png" />
                                 <!-- id = file_name -->
                             </div>
                         </div>
@@ -106,6 +107,17 @@ filename = Model.CardDetail.Filename
                         </label>
                         <div class="col-md-9">
                             <input asp-for="AltText" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row d-none mt-4" id="uploadingStatus">
+                        <div class="card border-primary border-5">
+                            <h1 class="card-title text-center fs-5 mt-2">Uploading and optimizing...</h1>
+                            <div class="card-body">
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                         style="width: 100%"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -250,7 +262,7 @@ filename = Model.CardDetail.Filename
     <script src="~/js/md.min.js" asp-append-version="true"></script>
 
     <script>
-        $(function () {
+        $(function() {
             let textEditor = new Markdown.Editor($("#CardDetail_Text"), {
                 allowUploads: false,
                 allowImages: false,
@@ -261,7 +273,7 @@ filename = Model.CardDetail.Filename
                 textEditor.run();
             }
         });
-        $(function () {
+        $(function() {
             let detailEditor = new Markdown.Editor($("#CardDetail_Footer"), {
                 allowUploads: false,
                 allowImages: false,
@@ -273,20 +285,20 @@ filename = Model.CardDetail.Filename
             }
         });
 
-        $("#CardDetail_Header").keydown(function (event) {
+        $("#CardDetail_Header").keydown(function(event) {
             $(".oc-save-warning").removeClass("d-none");
         });
-        $("#CardDetail_Text").keydown(function (event) {
+        $("#CardDetail_Text").keydown(function(event) {
             $(".oc-save-warning").removeClass("d-none");
         });
-        $("#CardDetail_Link").keydown(function (event) {
+        $("#CardDetail_Link").keydown(function(event) {
             $(".oc-save-warning").removeClass("d-none");
         });
-        $("#CardDetail_AltText").keydown(function (event) {
+        $("#CardDetail_AltText").keydown(function(event) {
             $(".oc-save-warning").removeClass("d-none");
         });
 
-        $('#deleteModal').on('show.bs.modal', function (event) {
+        $('#deleteModal').on('show.bs.modal', function(event) {
             if (@Model.IsOnlyCard.ToString().ToLowerInvariant() === true) {
                 $('#deleteModal').find('.modal-text')
                     .html('Are you sure you want to delete the last card in this deck (including any translations) as well as the deck itself?')
@@ -307,17 +319,17 @@ filename = Model.CardDetail.Filename
             }
         }
 
-        $('#addModal').on('hidden.bs.modal', function (e) {
+        $('#addModal').on('hidden.bs.modal', function(e) {
             $('#CardImage').val('');
             $('#addImageAlertRow').addClass('d-none');
             $('#AltText').val('');
         });
 
-        $('#CardImage').on('change', function (e) {
+        $('#CardImage').on('change', function(e) {
             $('#addImageFormButton').removeAttr("disabled");
         });
 
-        $('#addImageForm').submit(function (e) {
+        $('#addImageForm').submit(function(e) {
             e.preventDefault();
             let goodToGo = true;
 
@@ -331,6 +343,7 @@ filename = Model.CardDetail.Filename
                 notes.push("<li>You must supply alt text for the image.</li>")
             }
             if (goodToGo === true) {
+                $("#uploadingStatus").removeClass("d-none");
                 $.ajax({
                     url: '@(Url.Action(nameof(DecksController.AddUpdateImage), DecksController.Name))',
                     data: new FormData(e.target),
@@ -338,13 +351,15 @@ filename = Model.CardDetail.Filename
                     contentType: false,
                     processData: false,
                     type: 'POST'
-                }).done(function (response) {
+                }).done(function(response) {
                     if (response.success === true) {
                         location.href = response.url;
                     } else {
                         notes.push(response.message);
                         UpdateImageAddNotes(notes);
                     }
+                }).always(function() {
+                    $("#uploadingStatus").addClass("d-none");
                 });
             }
             UpdateImageAddNotes(notes);

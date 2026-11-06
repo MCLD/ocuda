@@ -1,41 +1,22 @@
-﻿using System;
 using System.Threading.Tasks;
-using ImageOptimApi;
-using Microsoft.AspNetCore.Http;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 {
     public interface IImageService
     {
-        public string BgColor { get; set; }
-        public bool Crop { get; set; }
-        public CropType CropType { get; set; }
-        public int? CropXFocalPoint { get; set; }
-        public int? CropYFocalPoint { get; set; }
-        public bool DisableWebCall { get; set; }
-        public bool Fit { get; set; }
-        public Format Format { get; set; }
-        public int? Height { get; set; }
-        public HighDpi HighDpi { get; set; }
-        public Quality Quality { get; set; }
-        public bool TrimBorder { get; set; }
-        public string Username { get; set; }
-        public int? Width { get; set; }
+        public string FormatMimeType { get; set; }
 
-        public (string extension, byte[] imageBytes) ConvertFromBase64(string imageBase64);
+        public Task<ImageWithInformation> ConvertFromBase64Async(string imageBase64);
 
-        public (string extension, byte[] imageBytes) ConvertFromBase64(string imageBase64, bool profileImage);
+        public Task<ImageWithInformation> ConvertFromBase64Async(string imageBase64, bool isSquare);
 
-        public string ConvertToBase64(byte[] imageBytes);
+        public Task<string> ConvertToBase64Async(byte[] imageBytes);
 
-        public string GetExtension(byte[] imageBytes);
+        public Task<ImageInformation> GetInformationAsync(byte[] imageBytes);
 
-        public string GetMimeType(byte[] imageBytes);
+        public bool IsOptimizeConfigured();
 
-        public Task<OptimizedImageResult> OptimizeAsync(Uri imageUri);
-
-        public Task<OptimizedImageResult> OptimizeAsync(string imagePath);
-
-        public Task<OptimizedImageResult> OptimizeAsync(IFormFile formFile);
+        public Task<ImageWithInformation> OptimizeAsync(byte[] imageBytes, string filename);
     }
 }

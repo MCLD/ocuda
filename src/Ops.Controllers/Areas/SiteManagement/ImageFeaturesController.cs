@@ -20,8 +20,8 @@ using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Filters;
+using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
-using SixLabors.ImageSharp;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
@@ -32,7 +32,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private const string DetailModelStateKey = "ImageFeatures.Detail";
         private const string ItemErrorMessageKey = "ImageFeatures.ItemErrorMessage";
         private const int MaximumFileSizeBytes = 200 * 1024;
-        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png", ".svg" };
+        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png", ".svg", ".jpeg" };
 
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IImageFeatureService _imageFeatureService;
@@ -40,24 +40,26 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ILanguageService _languageService;
         private readonly IPermissionGroupService _permissionGroupService;
 
-        public ImageFeaturesController(ServiceFacades.Controller<ImageFeaturesController> context,
+        public ImageFeaturesController(
+            ServiceFacades.Controller<ImageFeaturesController> context,
             IDateTimeProvider dateTimeProvider,
-            ILanguageService languageService,
             IImageFeatureService imageFeatureService,
             IImageService imageService,
+            ILanguageService languageService,
             IPermissionGroupService permissionGroupService)
             : base(context)
         {
-            _dateTimeProvider = dateTimeProvider
-                ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
-            _imageFeatureService = imageFeatureService
-                ?? throw new ArgumentNullException(nameof(imageFeatureService));
-            _imageService = imageService
-                ?? throw new ArgumentNullException(nameof(imageService));
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
+            ArgumentNullException.ThrowIfNull(dateTimeProvider);
+            ArgumentNullException.ThrowIfNull(imageFeatureService);
+            ArgumentNullException.ThrowIfNull(imageService);
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+
+            _dateTimeProvider = dateTimeProvider;
+            _imageFeatureService = imageFeatureService;
+            _imageService = imageService;
+            _languageService = languageService;
+            _permissionGroupService = permissionGroupService;
         }
 
         public static string Area
@@ -398,8 +400,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             byte[] imageBytes = null;
 
-            OptimizedImageResult optimized;
-
             if (model.ItemImage != null)
             {
                 var extension = Path.GetExtension(model.ItemImage.FileName);
@@ -410,26 +410,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
                 else
                 {
-                    try
-                    {
-                        optimized = await _imageService.OptimizeAsync(model.ItemImage);
-                        imageBytes = optimized.File;
-                    }
-                    catch (ParameterException pex)
-                    {
-                        TempData[ItemErrorMessageKey] = $"Error optimizing uploaded image: {pex.Message}";
-                        ModelState.AddModelError("ItemImage",
-                            $"Error optimizing uploaded image: {pex.Message}");
-                    }
-                    catch (OcudaConfigurationException)
-                    { }
-
-                    if (imageBytes == null)
-                    {
-                        await using var memoryStream = new MemoryStream();
-                        await model.ItemImage.CopyToAsync(memoryStream);
-                        imageBytes = memoryStream.ToArray();
-                    }
+                    await using var memoryStream = new MemoryStream();
+                    await model.ItemImage.CopyToAsync(memoryStream);
+                    imageBytes = memoryStream.ToArray();
 
                     var template = await _imageFeatureService
                         .GetTemplateForImageFeatureAsync(featureItem.ImageFeatureId);
@@ -438,21 +421,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                     if (imageBytes?.Length > maxFileSize)
                     {
-                        ModelState.AddModelError("ItemImage", $"Image must be smaller than {maxFileSize / 1024} KB");
+                        ModelState.AddModelError(
+                            nameof(model.ItemImage),
+                            $"Image must be smaller than {maxFileSize / 1024} KB");
                     }
-
-                    if (imageBytes != null && (template?.Height.HasValue == true || template?.Width.HasValue == true))
+                    else
                     {
-                        using var image = Image.Load(imageBytes);
-                        if (template.Height.HasValue && image.Height != template.Height)
+                        var notes = await _imageFeatureService.ValidateImageAsync(imageBytes, template);
+
+                        foreach (var note in notes)
                         {
-                            ModelState.AddModelError("ItemImage",
-                                $"Image height needs to be {template.Height}px");
-                        }
-                        if (template.Width.HasValue && image.Width != template.Width)
-                        {
-                            ModelState.AddModelError("ItemImage",
-                                $"Image width needs to be {template.Width}px");
+                            ModelState.AddModelError(nameof(model.ItemImage), note);
                         }
                     }
                 }
@@ -471,6 +450,29 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var language = await _languageService
                 .GetActiveByIdAsync(model.ImageFeatureItemText.LanguageId);
+
+            string filename = model.ItemImage?.FileName;
+
+            if (ModelState.IsValid)
+            {
+                if (model.ItemImage != null && _imageService.IsOptimizeConfigured())
+                {
+                    try
+                    {
+                        var optimized = await _imageService.OptimizeAsync(imageBytes, filename);
+                        imageBytes = optimized.ImageBytes;
+                        filename = Path.ChangeExtension(
+                            filename,
+                            optimized.ImageInformation.Extension);
+                    }
+                    catch (ParameterException pex)
+                    {
+                        TempData[ItemErrorMessageKey] = $"Error optimizing uploaded image: {pex.Message}";
+                        ModelState.AddModelError("ItemImage",
+                            $"Error optimizing uploaded image: {pex.Message}");
+                    }
+                }
+            }
 
             if (ModelState.IsValid)
             {
@@ -493,20 +495,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             model.ImageFeatureItemText.ImageFeatureItemId,
                             model.ImageFeatureItemText.LanguageId);
 
-                        var fullFilePath = Path.Combine(filePath, model.ItemImage.FileName);
+                        var sanitizedFilename = FileHelper.MakeValidFilename(filename);
 
-                        if (currentItem?.Filename != model.ItemImage.FileName)
+                        var fullFilePath = Path.Combine(filePath, sanitizedFilename);
+
+                        if (currentItem?.Filename != sanitizedFilename)
                         {
-                            int renameCounter = 1;
-                            while (System.IO.File.Exists(fullFilePath))
-                            {
-                                fullFilePath = Path.Combine(filePath, string.Format(
-                                    CultureInfo.InvariantCulture,
-                                    "{0}-{1}{2}",
-                                    Path.GetFileNameWithoutExtension(model.ItemImage.FileName),
-                                    renameCounter++,
-                                    Path.GetExtension(model.ItemImage.FileName)));
-                            }
+                            fullFilePath = Path.Combine(
+                                filePath,
+                                FileHelper.GetUniqueFilename(filePath, sanitizedFilename));
                         }
 
                         if (System.IO.File.Exists(fullFilePath))

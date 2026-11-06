@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -191,7 +192,6 @@ namespace Ocuda.Ops.Service
                 ?? throw new OcudaException($"Cannot find user ID {userId}");
 
             var fullPath = GetProfilePictureFilePath(user.PictureFilename);
-
             if (System.IO.File.Exists(fullPath))
             {
                 System.IO.File.Delete(fullPath);
@@ -266,11 +266,16 @@ namespace Ocuda.Ops.Service
             ArgumentNullException.ThrowIfNull(user);
 
             string extension;
-            byte[] profilePicture;
+            byte[] imageBytes;
 
             try
             {
-                (extension, profilePicture) = imageService.ConvertFromBase64(profilePictureBase64, true);
+                var imageWithInformation = await imageService.ConvertFromBase64Async(
+                    profilePictureBase64,
+                    true);
+
+                imageBytes = imageWithInformation.ImageBytes;
+                extension = imageWithInformation.ImageInformation.Extension;
             }
             catch (OcudaException oex)
             {
@@ -279,14 +284,22 @@ namespace Ocuda.Ops.Service
                 throw;
             }
 
-            var checkPath = GetProfilePictureFilePath(null);
-            if (!System.IO.Directory.Exists(checkPath))
+            if (imageService.IsOptimizeConfigured())
             {
-                System.IO.Directory.CreateDirectory(checkPath);
+                var optimized = await imageService.OptimizeAsync(imageBytes,
+                    Path.ChangeExtension(Path.GetTempFileName(), extension));
+                imageBytes = optimized.ImageBytes;
+                extension = optimized.ImageInformation.Extension;
+            }
+
+            var checkPath = GetProfilePictureFilePath(null);
+            if (!Directory.Exists(checkPath))
+            {
+                Directory.CreateDirectory(checkPath);
             }
 
             var filename = FileHelper.MakeValidFilename(
-                System.IO.Path.ChangeExtension(user.Username, extension));
+                Path.ChangeExtension(user.Username, extension));
 
             var fullPath = GetProfilePictureFilePath(filename);
 
@@ -298,7 +311,7 @@ namespace Ocuda.Ops.Service
                     user.Username);
             }
 
-            await System.IO.File.WriteAllBytesAsync(fullPath, profilePicture);
+            await System.IO.File.WriteAllBytesAsync(fullPath, imageBytes);
 
             user.PictureFilename = filename;
             user.PictureUpdatedBy = GetCurrentUserId();

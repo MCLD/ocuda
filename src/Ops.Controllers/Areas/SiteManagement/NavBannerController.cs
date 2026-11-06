@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ImageOptimApi;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -279,13 +278,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     uploadImageFilename,
                     uploadFilenameUseCount,
                     saveImageFilename);
+
                 var optimizeResult = await OptimizeAndSaveImageFileAsync(viewModel.Image,
                     Path.Combine(navBannerImagePath, saveImageFilename));
-
-                if (!optimizeResult)
-                {
-                    AlertWarning = "Unable to optimize image, uploaded un-optimized";
-                }
 
                 if (navBannerImage != null)
                 {
@@ -416,29 +411,44 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return permissionClaims.Any(_ => permissionGroupsStrings.Contains(_));
         }
 
+        /// <summary>
+        /// Optimize the image if image optimization is configured, write out the image in any
+        /// event.
+        /// </summary>
+        /// <param name="image">The <see cref="IFormFile"/> containing the image attachment.</param>
+        /// <param name="path">Path to the image file to output.</param>
+        /// <returns>True if the image was optimized, false if it was not. The image is written
+        /// in any event.</returns>
+        /// <exception cref="OcudaException">Throws if image cannot be processed or written.
+        /// </exception>
         private async Task<bool> OptimizeAndSaveImageFileAsync(IFormFile image, string path)
         {
             bool success = true;
-            byte[] imageBytes = null;
-            OptimizedImageResult optimized;
 
-            try
+            await using var memoryStream = new MemoryStream();
+            await image.CopyToAsync(memoryStream);
+            var imageBytes = memoryStream.ToArray();
+
+            if (_imageService.IsOptimizeConfigured())
             {
-                optimized = await _imageService.OptimizeAsync(image);
-                imageBytes = optimized.File;
+                try
+                {
+                    var optimized = await _imageService.OptimizeAsync(imageBytes, path);
+                    imageBytes = optimized.ImageBytes;
+                    path = Path.ChangeExtension(path, optimized.ImageInformation.Extension);
+                }
+                catch (OcudaException oex)
+                {
+                    _logger.LogError(
+                        "Optimizing image {Path} failed: {ErrorMessage}",
+                        path,
+                        oex.Message);
+                    success = false;
+                }
             }
-            catch (ParameterException)
+            else
             {
                 success = false;
-            }
-            catch (OcudaConfigurationException)
-            { }
-
-            if (imageBytes == null)
-            {
-                await using var memoryStream = new MemoryStream();
-                await image.CopyToAsync(memoryStream);
-                imageBytes = memoryStream.ToArray();
             }
 
             if (imageBytes == null)

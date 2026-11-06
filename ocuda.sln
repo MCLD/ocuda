@@ -101,6 +101,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ocuda", "Ocuda", "{DE93E337
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ocuda.Utility.Test", "test\Ocuda\Ocuda.Utility.Test\Ocuda.Utility.Test.csproj", "{14FED238-C488-4BE3-8927-E608F306F7C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageToolsNetVips", "src\Ocuda\ImageToolsNetVips\ImageToolsNetVips.csproj", "{3F21E93C-C963-427A-9E09-589A26AA006A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -203,6 +205,10 @@ Global
 		{14FED238-C488-4BE3-8927-E608F306F7C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14FED238-C488-4BE3-8927-E608F306F7C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14FED238-C488-4BE3-8927-E608F306F7C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F21E93C-C963-427A-9E09-589A26AA006A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F21E93C-C963-427A-9E09-589A26AA006A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F21E93C-C963-427A-9E09-589A26AA006A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F21E93C-C963-427A-9E09-589A26AA006A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -237,6 +243,7 @@ Global
 		{1E0D60D5-3313-4A71-AA0A-F860C0A9914B} = {3138C719-1208-42FE-8D35-B79DA1529219}
 		{DE93E337-44E9-4D40-BE31-99D5670B3ECC} = {EF2E402F-3D9C-4EAD-93A2-68D759A003A7}
 		{14FED238-C488-4BE3-8927-E608F306F7C5} = {DE93E337-44E9-4D40-BE31-99D5670B3ECC}
+		{3F21E93C-C963-427A-9E09-589A26AA006A} = {FC70E8FE-76E9-4D23-8D85-F219DD8BAC37}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E2592F73-781B-49DC-8020-540473F814F7}

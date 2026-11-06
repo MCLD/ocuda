@@ -38,8 +38,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<int?> GetPageLayoutIdAsync(int deckId);
 
-        Task<string> GetUploadImageFilePathAsync(string languageName,
-                            string filename,
+        Task<string> GetUploadImageFilePathAsync(
+            string languageName,
+            string filename,
             bool overwriteIfExists);
 
         Task RemoveCardImageAsync(int cardId);
@@ -47,5 +48,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task RemoveCardImageAsync(int cardId, int languageId);
 
         Task UpdateCardAsync(int cardId, int languageId, CardDetail cardDetail);
+
+        Task<bool> VerifyCardSizeAsync(byte[] imageBytes);
+
+        int GetCardImageWidth();
     }
 }

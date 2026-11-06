@@ -56,35 +56,14 @@
     </div>
 </form>
 
-<div class="modal fade"
-     data-bs-backdrop="static"
-     data-bs-keyboard="false"
-     id="uploadModal"
-     tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="uploadingModal">Uploading and optimizing...</h1>
-            </div>
-            <div class="modal-body">
-                <div class="progress">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated"
-                         style="width: 100%"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 @section scripts {
     <script>
         $(function () {
-            const upModal = new bootstrap.Modal('#uploadModal', null);
             $('#uploadForm').on('submit', function () {
                 $('button[type=\'submit\']').each(function () {
                     $(this).prop('disabled', true);
                 });
-                upModal.show()
+                uploadingAndOptimizingModal.show()
             });
             if (slugify) {
                 $('#Filename').val(slugify($('#LocationName').val().replace(".", "").toLowerCase()));

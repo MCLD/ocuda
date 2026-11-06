@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ImageOptimApi;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.StaticFiles;
@@ -28,9 +27,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class DecksController : BaseController<DecksController>
     {
-        public static readonly int CardImageWidth = 666;
         public static readonly int MaximumFileSizeBytes = 0; // disable this check
-        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png" };
+        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png", ".jpeg" };
 
         private readonly IDeckService _deckService;
         private readonly IImageService _imageService;
@@ -41,7 +39,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             IDeckService deckService,
             IImageService imageService,
             ILanguageService languageService,
-            IPermissionGroupService permissionGroupService) : base(context)
+            IPermissionGroupService permissionGroupService)
+            : base(context)
         {
             ArgumentNullException.ThrowIfNull(deckService);
             ArgumentNullException.ThrowIfNull(imageService);
@@ -74,10 +73,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             viewModel ??= new CardViewModel();
 
-            viewModel.SelectedLanguage = languages.Single(_ => _.IsDefault);
             viewModel.BackLink = Url.Action(nameof(Detail), new { deckId });
+            viewModel.CardImageWidth = _deckService.GetCardImageWidth();
             viewModel.DeckId = deckId;
             viewModel.DeckName = deck.Name;
+            viewModel.SelectedLanguage = languages.Single(_ => _.IsDefault);
             viewModel.LanguageDescription = viewModel.SelectedLanguage.Description;
             viewModel.LanguageId = viewModel.SelectedLanguage.Id;
 
@@ -123,63 +123,61 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
-                byte[] imageBytes = null;
-                OptimizedImageResult optimized;
+                await using var memoryStream = new MemoryStream();
+                await viewModel.CardImage.CopyToAsync(memoryStream);
+                var imageBytes = memoryStream.ToArray();
 
-                try
+                if (!await _deckService.VerifyCardSizeAsync(imageBytes))
                 {
-                    optimized = await _imageService.OptimizeAsync(viewModel.CardImage);
-                    imageBytes = optimized.File;
+                    var cardImageWidth = _deckService.GetCardImageWidth();
+                    issues.Add($"Card images must be {cardImageWidth} pixels wide.");
                 }
-                catch (ParameterException pex)
+                else
                 {
-                    issues.Add($"Error optimizing uploaded image: {pex.Message}");
-                }
-                catch (OcudaConfigurationException)
-                { }
+                    var language = await _languageService
+                        .GetActiveByIdAsync(viewModel.CardDetail.LanguageId);
+                    languageName = language.Name;
 
-                if (imageBytes == null)
-                {
-                    await using var memoryStream = new MemoryStream();
-                    await viewModel.CardImage.CopyToAsync(memoryStream);
-                    imageBytes = memoryStream.ToArray();
-                }
+                    var currentCard = await _deckService
+                        .GetCardDetailsAsync(viewModel.CardDetail.CardId,
+                            viewModel.CardDetail.LanguageId);
 
-                if (imageBytes != null)
-                {
-                    using var image = SixLabors.ImageSharp.Image.Load(imageBytes);
-                    if (image.Width != CardImageWidth)
+                    var currentFilename = Path.GetFileName(currentCard.Filename);
+
+                    // file is the same then replace the old one
+                    bool replaceImage = currentFilename?.Equals(viewModel.CardImage.FileName,
+                        StringComparison.OrdinalIgnoreCase) == true;
+
+                    // filename is different but there is an old image, delete it
+                    if (!replaceImage && !string.IsNullOrEmpty(currentFilename))
                     {
-                        issues.Add($"Card images must be {CardImageWidth} pixels wide.");
+                        await _deckService.RemoveCardImageAsync(currentCard.CardId,
+                            currentCard.LanguageId);
                     }
-                    else
+
+                    // get an approved filename with path
+                    var filename = await _deckService.GetUploadImageFilePathAsync(languageName,
+                        viewModel.CardImage.FileName,
+                        replaceImage);
+
+                    if (_imageService.IsOptimizeConfigured())
                     {
-                        var language = await _languageService
-                            .GetActiveByIdAsync(viewModel.CardDetail.LanguageId);
-                        languageName = language.Name;
-
-                        var currentCard = await _deckService
-                            .GetCardDetailsAsync(viewModel.CardDetail.CardId,
-                                viewModel.CardDetail.LanguageId);
-
-                        var currentFilename = Path.GetFileName(currentCard.Filename);
-
-                        // file is the same then replace the old one
-                        bool replaceImage = currentFilename?.Equals(viewModel.CardImage.FileName,
-                            StringComparison.OrdinalIgnoreCase) == true;
-
-                        // filename is different but there is an old image, delete it
-                        if (!replaceImage && !string.IsNullOrEmpty(currentFilename))
+                        try
                         {
-                            await _deckService.RemoveCardImageAsync(currentCard.CardId,
-                                currentCard.LanguageId);
+                            var optimized = await _imageService.OptimizeAsync(imageBytes, filename);
+                            imageBytes = optimized.ImageBytes;
+                            filename = Path.ChangeExtension(
+                                filename,
+                                optimized.ImageInformation.Extension);
                         }
+                        catch (OcudaException oex)
+                        {
+                            issues.Add($"Error optimizing uploaded image: {oex.Message}");
+                        }
+                    }
 
-                        // get an approved filename with path
-                        var filename = await _deckService.GetUploadImageFilePathAsync(languageName,
-                            viewModel.CardImage.FileName,
-                            replaceImage);
-
+                    if (issues.Count == 0)
+                    {
                         // copy file
                         await System.IO.File.WriteAllBytesAsync(filename, imageBytes);
 
@@ -479,6 +477,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 BackLink = Url.Action(nameof(Detail), new { deckId }),
                 CardDetail = card,
+                CardImageWidth = _deckService.GetCardImageWidth(),
                 DeckId = deckId,
                 IsOnlyCard = cardCount == 1,
                 IsUpdate = isUpdate,

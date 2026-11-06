@@ -1,10 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using ImageOptimApi;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ImageOptimizer;
@@ -12,6 +10,7 @@ using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
@@ -27,7 +26,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         public ImageOptimizerController(
             IImageService imageService,
             IPermissionGroupService permissionGroupService,
-            ServiceFacades.Controller<ImageOptimizerController> context) : base(context)
+            ServiceFacades.Controller<ImageOptimizerController> context)
+            : base(context)
         {
             ArgumentNullException.ThrowIfNull(imageService);
             ArgumentNullException.ThrowIfNull(permissionGroupService);
@@ -54,35 +54,36 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (viewModel == null || viewModel.FormFile == null)
             {
                 _logger.LogError("No uploaded image supplied.");
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "No uploaded image supplied.");
+                return StatusCode(StatusCodes.Status404NotFound, "No uploaded image supplied.");
             }
 
-            OptimizedImageResult optimized;
+            if (!_imageService.IsOptimizeConfigured())
+            {
+                _logger.LogError("Attempt to optimize image with optimization not configured.");
+                return StatusCode(StatusCodes.Status403Forbidden,
+                    "Image optimization not configured.");
+            }
 
             try
             {
-                _imageService.Format = viewModel.TargetFormat;
+                _imageService.FormatMimeType = viewModel.TargetFormat;
 
-                optimized = await _imageService.OptimizeAsync(viewModel.FormFile);
+                await using var memoryStream = new MemoryStream();
+                await viewModel.FormFile.CopyToAsync(memoryStream);
 
-                string newFilename = Path.GetFileNameWithoutExtension(viewModel.FormFile.FileName)
-                    + _imageService.GetExtension(optimized.File);
+                var optimized = await _imageService.OptimizeAsync(
+                    memoryStream.ToArray(),
+                    viewModel.FormFile.FileName);
 
-                var provider = new FileExtensionContentTypeProvider();
-                provider.TryGetContentType(newFilename, out var contentType);
-                return File(optimized.File,
-                    contentType ?? "application/octet-stream",
-                    newFilename);
+                var filename = FileHelper.MakeValidFilename(Path.ChangeExtension(
+                     viewModel.FormFile.FileName,
+                     optimized.ImageInformation.Extension));
+
+                return File(optimized.ImageBytes, optimized.ImageInformation.MimeType, filename);
             }
-            catch (ParameterException pex)
+            catch (OcudaException oex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                        pex.Message);
-            }
-            catch (OcudaConfigurationException)
-            {
-                return StatusCode(500);
+                return StatusCode(StatusCodes.Status500InternalServerError, oex.Message);
             }
         }
 
@@ -94,34 +95,31 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToUnauthorized();
             }
 
+            if (!_imageService.IsOptimizeConfigured())
+            {
+                _logger.LogError("Attempt to optimize image with optimization not configured.");
+                return StatusCode(StatusCodes.Status403Forbidden,
+                    "Image optimization not configured.");
+            }
+
             try
             {
-                var (extension, imageBytes) = _imageService.ConvertFromBase64(imageBase64);
+                var imageWithInfo = await _imageService.ConvertFromBase64Async(imageBase64);
 
-                string filePath = Path.Combine(Path.GetTempPath(),
-                Path.GetFileNameWithoutExtension(Path.GetTempFileName())
-                + extension);
+                string filename = Path.GetTempFileName() + imageWithInfo.ImageInformation.Extension;
 
-                System.IO.File.WriteAllBytes(filePath, imageBytes);
+                var optimized = await _imageService.OptimizeAsync(
+                    imageWithInfo.ImageBytes,
+                    filename);
 
-                OptimizedImageResult optimized = null;
-                try
-                {
-                    optimized = await _imageService.OptimizeAsync(filePath);
-                }
-                catch (OcudaConfigurationException)
-                {
-                    return StatusCode(500);
-                }
-
-                var optimizedBase64 = _imageService.ConvertToBase64(optimized.File);
-
-                return new JsonResult(optimizedBase64);
+                return File(
+                    optimized.ImageBytes,
+                    optimized.ImageInformation.MimeType,
+                    Path.ChangeExtension(filename, optimized.ImageInformation.Extension));
             }
-            catch (ParameterException pex)
+            catch (OcudaException oex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                        pex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, oex.Message);
             }
         }
 

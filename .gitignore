@@ -539,6 +539,10 @@ src/Promenade.Web/shared/*
 src/Ops.Web.WindowsAuth/Properties/PublishProfiles/
 
 # Site-specific files
+src/Ops.Web/wwwroot/*.ico
+src/Ops.Web/wwwroot/*.png
+src/Ops.Web/wwwroot/*.svg
+src/Ops.Web/wwwroot/*.webmanifest
 src/Promenade.Web/wwwroot/*.ico
 src/Promenade.Web/wwwroot/*.png
 src/Promenade.Web/wwwroot/*.svg

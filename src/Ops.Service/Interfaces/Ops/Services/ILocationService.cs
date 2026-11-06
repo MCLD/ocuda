@@ -104,7 +104,5 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
             string filename,
             IFormFile imageFile,
             IDictionary<int, string> altTexts);
-
-        Task UploadLocationMapAsync(byte[] imageBytes, string fileName);
     }
 }
